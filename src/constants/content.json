@@ -1,0 +1,800 @@
+{
+  "layout": {
+    "pages": ["Voorbereiding", "Nabewerking", "Tools"],
+
+    "login": {
+      "notLoggedInWarning": {
+        "title": "U bent niet ingelogd",
+        "body": "Log in met uw Lis-account om de functies van de applicatie te kunnen gebruiken.",
+        "cta": "Inloggen"
+      },
+
+      "noRoleWarning": {
+        "title": "Geen Toegang",
+        "body": "Neem contact op met de beheerder om toegang te krijgen.",
+        "cta": "Uitloggen"
+      },
+
+      "logOutModal": {
+        "title": "Weet je zeker dat je wilt uitloggen?",
+        "annuleren": "Annuleren",
+        "uitloggen": "Uitloggen"
+      }
+    },
+
+    "filterSection": {
+      "filterBtnTab": "Aandachtspunten filteren",
+      "resetBtnTab": "Herstel filter",
+      "filterText": "Filter",
+
+      "text": "Geef de criteria op die van toepassing zijn op het gewenste filter. Eventueel bestaand filter wordt overschreven.",
+
+      "naamAandachtspunt": "Naam aandachtspunt",
+      "regio": "Regio",
+      "activiteit": "Activiteit",
+      "organisatie": "Organisatie",
+      "periode": "Periode",
+      "herhalen": "Herhalen",
+      "geenHerhaling": "Geen herhaling",
+      "metHerhaling": "Met herhaling"
+    },
+
+    "tabHeaders": {
+      "addPoint": "Aandachtspunt toevoegen aan vluchtplan",
+      "enrichedAddPoint": "Aanmaken aandachtspunt",
+      "templateFlights": "Vluchten-template",
+      "flightPlan": "Vluchtplan aanmaken",
+      "viewPlan": "Vluchtplan informatie",
+      "prepareFlightPlan": "Vluchtplan voorbereiding afronden",
+      "removeFlightPlan": "Vluchtplan verwijderen",
+      "aandachtspuntenFilteren": "Aandachtspunten filteren",
+      "bevragen": "Gegevens van de kaartlagen bevragen",
+      "vluchtZoeken": "Vluchten zoeken",
+      "reuseFlightPlan": "Vluchtplan hergebruiken",
+      "waarnemings": "Waarnemingsrapport aanmaken",
+      "vluchtplanStatus": "Vluchtplan status aanpassen",
+      "verwijderen": "Aandachtspunten verwijderen",
+      "emailijst": "E-maillijst bijwerken"
+    },
+
+    "searchResult": {
+      "listPointFunctions": {
+        "addPoints": {
+          "title": "Aandachtspunten toevoegen",
+          "subtitle": "Aandachtspunten toevoegen aan vluchtplan"
+        },
+        "tableView": {
+          "title": "Tabelweergave",
+          "subtitle": "Toon resultaten in tabelweergave"
+        },
+        "zoomAll": {
+          "title": "Zoom naar alles",
+          "subtitle": "Zoom naar het gebied van alle resultaten"
+        },
+        "selectAll": {
+          "title": "Selecteer alle",
+          "subtitle": "Voeg alle items toe aan de sterselectie"
+        },
+        "bufferOptions": {
+          "title": "Toon buffer opties",
+          "subtitle": "Bevraag objecten dichtbij deze resulaten"
+        },
+        "exportCsv": {
+          "title": "Exporteer naar CSV",
+          "subtitle": "Exporteer resultaten naar CSV"
+        },
+        "exportXlsx": {
+          "title": "Exporteer naar XLSX",
+          "subtitle": "Exporteer resultaten naar XLSX"
+        },
+        "exportShp": {
+          "title": "Exporteer naar shapefile",
+          "subtitle": "Exporteer resultaten naar shapefile"
+        },
+        "openSaved": {
+          "title": "Open opgeslagen resultaten",
+          "subtitle": "Kies uit een lijst van opgeslagen resultaten om deze te bekijken"
+        },
+        "saveResults": {
+          "title": "Opslaan resultaten",
+          "subtitle": "Sla de resultatenlijst op voor toekomstig gebruik."
+        },
+        "combineResults": {
+          "title": "Combineer resultaten",
+          "subtitle": "Uitvoeren geavanceerde bewerkingen met meerdee resultaatlijsten."
+        },
+        "removeFromResults": {
+          "title": "Verwijder uit resultaten",
+          "subtitle": "Verwijder deze objectverzameling uit de huidige verzameling van resultaten"
+        }
+      },
+
+      "plansList": {
+        "expandedView": {
+          "title": "Toon uitgebreid overzicht",
+          "description": "Schakel naar het uitgebreide overzicht van objectdetails."
+        },
+        "zoomToObject": {
+          "title": "Zoom naar object",
+          "description": "Zoom naar het object."
+        },
+        "panToObject": {
+          "title": "Verschuif naar object",
+          "description": "Verschuif de kaart naar het object."
+        },
+        "removeFromResults": {
+          "title": "Verwijderen uit resultaten",
+          "description": "Verwijder dit object uit de huidige set van resultaten."
+        }
+      }
+    }
+  },
+
+  "common": {
+    "invoeren": "Invoeren",
+    "volgende": "Volgende",
+    "vorige": "Vorige",
+    "sluiten": "Sluiten",
+    "bevestigen": "Bevestigen",
+    "annuleren": "Annuleren",
+    "update": "Update",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "opslaan": "Opslaan",
+    "filteren": "Filteren",
+    "toevoegen": "Toevoegen",
+    "wijzigen": "Wijzigen",
+    "verwijderen": "Verwijderen",
+    "ok": "Ok",
+    "kaartfilter": "Kaartfilter",
+
+    "ja": "Ja",
+    "nee": "Nee",
+
+    "selecteerAlle": "Selecteer alle",
+    "selecteerGeen": "Selecteer geen",
+
+    "cancelModal": {
+      "title": "Cancel?",
+      "message": "Are you sure you want to cancel? All points you have added will be deleted."
+    },
+
+    "filterSection": {
+      "Alle": "Alle",
+      "periode": "Periode",
+      "Laatste4weken": "Laatste 4 weken",
+      "PeriodeVanTot": "Periode van-tot",
+      "Periodevan": "Periode van",
+      "Periodetot": "Periode tot",
+
+      "activiteit": "Activiteit"
+    }
+  },
+
+  "voorbereiding": {
+    "label": "Voorbereiding",
+    "tabs": {
+      "enrichedAddPoint": "Aandachtspunt aanmaken",
+      "templateFlights": "Vluchten-template",
+      "flightPlan": "Vluchtplan aanmaken",
+      "reuseFlightPlan": "Vluchtplan hergebruiken",
+      "prepareFlightPlan": "Vluchtplan voorbereiding afronden",
+      "addPoint": "Aandachtspunt toevoegen aan vluchtplan",
+      "removeFlightPlan": "Vluchtplan verwijderen",
+      "viewPlan": "Vluchtplan informatie"
+    },
+
+    "addPointsFromPlan": {
+      "cta": "Aandachtspunt Toevoegen uit vluchtplan/template",
+      "tabs": {
+        "flightplans": "Vluchtplannen",
+        "templates": "Templates"
+      },
+      "placeholders": {
+        "filterPlans": "Vluchtplannen filteren",
+        "filterPoints": "Aandachtspunten filteren"
+      }
+    },
+    "addPointToPlan": {
+      "cta": "Bestaand aandachtspunt toevoegen"
+    },
+    "step2": {
+      "actions": {
+        "createNewPoint": {
+          "label": "Nieuw aandachtspunt aanmaken",
+          "button": "Aanmaken"
+        },
+        "addFromPlan": {
+          "label": "Aandachtspunt toevoegen uit vluchtplan/template",
+          "button": "Toevoegen"
+        },
+        "addToPlan": {
+          "label": "Aandachtspunt aan vluchtplan toevoegen",
+          "button": "Toevoegen"
+        }
+      }
+    },
+    "selectedPoint": {
+      "deletePoint": {
+        "title": "Aandachtspunt verwijderen",
+        "confirm": "Weet u zeker dat u dit aandachtspunt wilt verwijderen?",
+        "delete": "Verwijderen",
+        "cancel": "Annuleren",
+        "loading": "Bezig met opslaan..."
+      }
+    },
+
+    "aandachtspuntAanmaken": {
+      "headerText": "Aanmaken aandachtspunt",
+      "step1": {
+        "text": "Klik in de kaart om de locatie van het aandachtspunt in te tekenen of kies voor de optie 'invoeren' om de coördinaten van het aandachtspunt op te geven.",
+        "warning": "Klik in de kaart om de locatie van het aandachtspunt in te tekenen",
+
+        "nearPointToast": "Punt ligt dicht bij een ander punt"
+      },
+      "step2": {
+        "vertrouwelijk": "Vertrouwelijk",
+        "herhalen": "Herhalen",
+        "omschrijving": "Omschrijving",
+        "activiteit": "Activiteit",
+        "selecteerActiviteit": "Selecteer een activiteit",
+        "organisatie": "Organisatie",
+        "selecteerOrganisatie": "Selecteer een organisatie",
+        "specifiekLettenOp": "Specifiek letten op"
+      },
+      "step3": {
+        "text": "Klik op 'update' om een voorbeeldpunt te tekenen op de kaart.",
+        "Coördinatensysteem": "Coördinatensysteem",
+        "coordinates": ["RD", "WGS84"],
+        "x": "X",
+        "y": "Y",
+        "long": "Longitude",
+        "lat": "Latitude",
+        "warning": "Punt ligt dicht bij een ander punt",
+        "omschrijvingWarning": "Omschrijving al in gebruik"
+      }
+    },
+
+    "vluchtenTemplate": {
+      "headerText": "Vluchten-template",
+
+      "step1": {
+        "text": "Vul de naam van het Vluchten-template in",
+        "placeholder": "Bijvoorbeeld: Template A"
+      },
+
+      "step2": {
+        "text": "(1) Selecteer de gewenste herhaalde aandachtspunten en klik op 'Opslaan'. Klik op het selectievakje om meerdere punten te selecteren."
+      },
+
+      "step3": {
+        "text": "(2) Selecteer de gewenste niet-herhaalde aandachtspunten en klik op 'Opslaan'. Klik op het selectievakje om meerdere punten te selecteren."
+      },
+
+      "common": {
+        "activiteit": "Activiteit",
+        "organisatie": "Organisatie",
+        "specifiekLettenOp": "Letten op",
+        "aanmaakdatum": "Aanmaakdatum",
+        "herhalen": "Herhalen"
+      }
+    },
+
+    "vluchtAanmaken": {
+      "headerText": "Vluchtplan Aanmaken",
+
+      "step1": {
+        "vluchtnummer": "Vluchtnummer",
+        "omschrijving": "Omschrijving",
+        "waarnemer": "Waarnemer",
+        "piloot": "Piloot",
+        "datum": "Inspectiedatum",
+        "geplandeVliegduur": "Geplande vliegduur",
+        "typeLuchtvaartuig": "Type luchtvaartuig",
+        "aantalPassagiers": "Aantal passagiers",
+        "doelEnHoofdthema": "Doel en hoofdthema",
+        "aanvullendeInfo": "Aanvullende info",
+        "selecteerPiloot": "Selecteer een piloot",
+        "selecteerWaarnemer": "Selecteer een waarnemer",
+
+        "vluchtWarning1": "Vluchtnummer moet bestaan uit letters en cijfers",
+        "vluchtWarning2": "Vluchtnummer al in gebruik",
+
+        "text1": "Gebruik een bestaand vluchten-template of koppel aandachtspunten aan het vluchtplan",
+        "vluchtenTemplate": "Vluchten-template",
+        "aandachtspunten": "Aandachtspunten",
+        "importLabel": "Punten importeren uit csv/excel",
+
+        "text2": "Geen vluchten-template gevonden. Maak eerst een nieuw vluchten-template aan.",
+
+        "toasts": {
+          "fileMissingData": "Bestand mist vereiste gegevens.",
+          "noValidRows": "Geen geldige rijen gevonden.",
+          "importCompleted": "Import voltooid. Nieuw: {created}, Bestaand: {existing}",
+          "importFailed": "Er is iets misgegaan bij importeren.",
+          "fetchError": "Fout bij importeren."
+        },
+
+        "puntentImport": "Punten importeren uit csv/excel"
+      },
+
+      "step2": {
+        "text": "(1) Selecteer de gewenste herhaalde aandachtspunten en klik op 'Opslaan'. Klik op het selectievakje om meerdere punten te selecteren."
+      },
+
+      "step3": {
+        "text": "(2) Selecteer de gewenste niet-herhaalde aandachtspunten en klik op 'Opslaan'. Klik op het selectievakje om meerdere punten te selecteren."
+      }
+    },
+
+    "vluchtplanHergebruiken": {
+      "headerText": "Vluchtplan hergebruiken",
+
+      "step1": {
+        "kopieerVluchtplan": "Kopieer vluchtplan",
+
+        "omschrijving": "Omschrijving",
+        "doelEnHoofdthema": "Doel en hoofdthema",
+        "aanvullendeInformatie": "Aanvullende informatie",
+        "inspecteerdatum": "Inspectiedatum"
+      },
+
+      "step2": {
+        "text1": "Voeg aandachtspunten toe aan vluchtplan. Gebruik de 'ctrl'-toets om een aandachtspunt te deselecteren.",
+        "text2": "Aandachtspunten uit gekopieerde vluchtplan:",
+
+        "text3": "Aandachtspunten die op 'herhalend' staan:"
+      }
+    },
+
+    "vluchtplanVoorbereiding": {
+      "headerText": "Vluchtplan voorbereiding afronden",
+
+      "text": "Selecteer de vlucht waarvan de voorbereiding afgerond moet worden. De voorbereide vlucht wordt vervolgens gesynchroniseerd naar de mobiele omgeving, zodat deze gedownload kan worden voor de vlucht.",
+
+      "vluchtnummer": "Vluchtnummer",
+      "selecteerEenVlucht": "Selecteer een vlucht",
+
+      "letOp": {
+        "title": "LET OP:",
+        "text": "Controleer of deze vlucht inderdaad gereed is voor je verder gaat. Na deze stap kan deze vlucht niet meer worden aangepast."
+      },
+
+      "noOptions": "Er is geen vluchtplan om te selecteren.",
+
+      "confirmModal": {
+        "title": "Vluchtplan voorbereiding afronden",
+        "messageP1": "Vlucht met nummer",
+        "messageP2": "test-layers wordt gemarkeerd als 'voorbereid'. Hierna kan de vlucht niet meer worden aangepast in de vlucht voorbereiding. Weet je het zeker?",
+        "ok": "OK",
+        "annuleren": "Annuleren",
+        "loadingMessage": "Vlucht ether wordt gemarkeerd als 'voorbereid' en beschikbaar gemaakt voor download"
+      }
+    },
+
+    "aandachtspuntToevoegenAan": {
+      "headerText": "Aandachtspunt toevoegen aan vluchtplan",
+
+      "step1": {
+        "header": "Geef vluchtnummer op.",
+        "vluchtnummer": "Vluchtnummer",
+        "selecteerEenVlucht": "Selecteer een vlucht",
+        "noOptions": "Er is geen vluchtplan om te selecteren."
+      }
+    },
+
+    "vluchtplanVerwijderen": {
+      "headerText": "Vluchtplan verwijderen",
+
+      "noPlans": "Er zijn geen vluchtplannen om te bekijken.",
+
+      "comfirmModal": {
+        "header": "Vluchtplan verwijderen",
+        "messageP1": "Vluchtplan",
+        "messageP2": "wordt verwijderd. Deze stap kan niet ongedaan gemaakt worden. Doorgaan?"
+      }
+    },
+
+    "vluchtplanInformatie": {
+      "headerText": "Vluchtplan informatie",
+
+      "step1": {
+        "header": "Geef vluchtnummer op.",
+
+        "alreadyInProgressToast": "Deze vlucht is al in uitvoering"
+      },
+
+      "step2": {
+        "andachtspunten": "Aandachtspunten",
+        "text": "Selecteer een aandachtspunt voor details en eventuele bewerkingen"
+      },
+
+      "editPointStep": {
+        "ontkoppelen": "Ontkoppelen"
+      },
+
+      "duplicateStep": {
+        "warning": "Vluchtnummer moet bestaan uit letters en cijfers",
+        "warning2": "Vluchtnummer al in gebruik"
+      },
+
+      "addPointStep": {
+        "step1": {
+          "text1": "Klik in de kaart om de locatie van het aandachtspunt in te tekenen of kies voor de optie 'invoeren' om de coördinaten van het aandachtspunt op te geven.",
+          "text2": "Klik in de kaart om de locatie van het aandachtspunt in te tekenen"
+        },
+
+        "step2": {
+          "text": "Klik op 'update' om een voorbeeldpunt te tekenen op de kaart.",
+          "Coördinatensysteem": "Coördinatensysteem",
+          "coordinates": ["RD", "WGS84"],
+          "x": "X",
+          "y": "Y",
+          "long": "Longitude",
+          "lat": "Latitude",
+          "warning": "Punt ligt dicht bij een ander punt",
+          "omschrijvingWarning": "Omschrijving al in gebruik"
+        }
+      }
+    }
+  },
+
+  "nabewerking": {
+    "label": "Nabewerking",
+    "tabs": {
+      "vluchtZoeken": "Vluchten Zoeken",
+      "waarnemings": "Waarnemingsrapport aanmaken",
+      "vluchtplanStatus": "Vluchtplan Status aanpassen"
+    },
+
+    "vluchtenZoeken": {
+      "headerText": "Vluchten Zoeken",
+
+      "step1": {
+        "text": "Selecteer een vlucht om te bekijken. Gebruik de 'Filter resultaten' balk om een vluchtplan te zoeken. Gebruik de 'Filteren' knop om te filteren op periode.",
+        "noPlans": "Er zijn geen vluchtplannen om te bekijken."
+      },
+
+      "step2": {
+        "loadingPath": "Vluchtplanpad wordt geladen...",
+
+        "hints": {
+          "hint1": "Klik op 'Waarnemingen' om de waarnemingen van deze vlucht te bekijken/bewerken.",
+          "hint2": "Deze vlucht heeft geen ad hoc aandachtpunten.",
+          "hint3": "Deze vlucht heeft geen tracks.",
+          "hint4": "Klik op 'Vlucht bewerken' om de vluchtgegevens aan te passen.",
+          "hint5": "Klik op 'Vliegroute exporteren' om de vliegroute als shapefile te exporteren."
+        },
+
+        "waarnemingenBtn": "Waarnemingen",
+        "vluchtBewerken": "Vlucht bewerken",
+        "vliegrouteExporteren": "Vliegroute exporteren",
+
+        "labels": {
+          "omschrijving": "Omschrijving",
+          "piloot": "Piloot",
+          "waarnemer": "Waarnemer",
+          "inspectiedatum": "Inspectiedatum",
+          "luchtvaartuig": "Luchtvaartuig",
+          "aantalPassagiers": "Aantal passagiers",
+          "doelEnHoofdthema": "Doel en hoofdthema",
+          "aanvullendeInfo": "Aanvullende info",
+          "geplandeVliegduur": "Geplande vliegduur",
+          "begintijdEnDatum": "Begintijd en datum",
+          "eindtijdEnDatum": "Eindtijd en datum",
+          "werkelijkeVliegduur": "Werkelijke vliegduur",
+          "status": "Status"
+        },
+
+        "exportFlightPath": {
+          "readyText": "Export van gevlogen track van vlucht {vluchtnummer} is klaar.",
+          "afterUploadInstruction": "Klik op onderstaande link om deze te downloaden.",
+          "downloadLinkText": "Klik hier om het ZIP-bestand te downloaden",
+          "buttons": {
+            "export": "Exporteer Vliegroute",
+            "copyLink": "Link kopiëren"
+          },
+          "toasts": {
+            "copySuccess": "Downloadlink is gekopieerd naar het klembord!",
+            "uploadFailed": "Het uploaden van het ZIP-bestand is mislukt."
+          },
+          "errors": {
+            "noPath": "Geen vliegroutegegevens beschikbaar."
+          }
+        },
+
+        "waarnemingen": {
+          "text": "Selecteer het aandachtspunt waarvan u de waarneming wilt wijzigen. Vertrouwelijke aandachtspunten gemaakt door een andere waarnemer kunnen niet worden bewerkt en worden om die reden ook niet weergegeven.",
+
+          "editPointDetails": {
+            "help": {
+              "photos": "Klik op 'Foto's' om de gekoppelde foto's te bekijken/bewerken.",
+              "changePoint": "Klik op 'Wijzig aandachtspunt' om de waarneming aan een ander aandachtspunt te koppelen.",
+              "deleteObservation": "Klik op 'Verwijderen' om de waarneming te verwijderen. Let op: deze wordt definitief verwijderd.",
+              "save": "Klik op 'Opslaan' om de wijzigingen in dit formulier op te slaan."
+            },
+
+            "labels": {
+              "aandachtspunt": "Aandachtspunt:",
+              "vluchtplan": "Vluchtplan:",
+              "datum": "Datum:",
+              "waarnemer": "Waarnemer:",
+              "emailadres": "E-mailadres:",
+              "aanvullendeInfo": "Aanvullende info:",
+              "status": "Status:",
+              "spoedrapport": "Spoedrapport:"
+            },
+
+            "fotoBtn": "Foto's",
+            "changePointBtn": "Wijzig aandachtspunt",
+            "editPointCoordinatesBtn": "Geometrie aanpassen",
+            "kaartfilter": "Kaartfilter",
+            "noImages": "No attachments available",
+
+            "deletePoint": {
+              "text": "Weet je zeker dat je dit aandachtspunt wilt verwijderen?"
+            },
+
+            "loading": "Bezig met opslaan...",
+            "addNewImage": "Foto toevoegen"
+          }
+        }
+      }
+    },
+
+    "changeFlightPlanStatus": {
+      "noPlans": "Er zijn geen vluchtplannen om te bekijken.",
+
+      "confirmStatusModal": {
+        "title": "Vluchtplanstatus aanpassen",
+        "body": {
+          "line1": "De status van vluchtplan '{plan}' wordt gewijzigd naar '{status}'.",
+          "line2": "Gebruik deze functionaliteit alleen als tijdens de synchronisatie vanaf de tablet de volgende foutmelding is verschenen: Het vluchtplan is geüpload maar nog niet opgeslagen als 'uitgevoerd'.",
+          "line3": "Deze actie kan niet ongedaan worden gemaakt en de vluchtduur wordt op deze manier niet opgeslagen."
+        },
+        "buttons": {
+          "confirm": "Wijzigen",
+          "cancel": "Annuleren"
+        }
+      }
+    },
+
+    "createReport": {
+      "noPlans": "Er zijn geen vluchtplannen om te bekijken.",
+
+      "step3": {
+        "uploadFailed": "Uploaden mislukt",
+        "copySuccess": "Download link is gekopieerd!",
+        "progress": {
+          "generic": "{status}",
+          "withBarsTrigger": "Waarnemingsrapport"
+        },
+        "done": {
+          "instruction": "Download de bestanden of kopieer de link hieronder.",
+          "downloadText": "Download",
+          "buttons": {
+            "copyLink": "Link kopiëren",
+            "close": "Sluiten",
+            "previous": "Vorige"
+          },
+          "passwordPrompt": "Voer een wachtwoord in voor deze downloadlink"
+        },
+
+        "progressHint": "Bezig met genereren en pakketten van de waarnemingsrapporten...",
+        "uploadingHint": "Bezig met uploaden van het rapport...",
+        "preparingLink": "Bezig met voorbereiden van de downloadlink...",
+        "downloading": "Bezig met downloaden van het rapport...",
+
+        "toasts": {
+          "error": "Uploaden mislukt",
+          "success": "Download link gekopieerd!",
+          "passwordRequired": "Wachtwoord is verplicht"
+        }
+      }
+    }
+  },
+
+  "tools": {
+    "label": "Tools",
+
+    "tabs": {
+      "emailijst": "E-maillijst bewerken",
+      "verwijderen": "Aandachtspunten verwijderen",
+      "startgebied": "Startgebied",
+      "exporteer": "Exporteer kaart"
+    },
+
+    "emailijst": {
+      "list": {
+        "text": "Selecteer de vlucht waarvan de voorbereiding afgerond moet worden. De voorbereide vlucht wordt vervolgens gesynchroniseerd naar de mobiele omgeving, zodat deze gedownload kan worden voor de vlucht."
+      },
+
+      "deleteModal": {
+        "text": "Are you sure you want to delete this email?"
+      },
+
+      "edit": {
+        "emailadres": "E-mailadres",
+
+        "failToast": "Ongeldig e-mailadres",
+        "successToast": "E-mail succesvol bijgewerkt"
+      }
+    },
+
+    "exporteer": {
+      "modal": {
+        "title": "Exporteer kaartbeeld",
+        "text": "Kies afbeeldingsformaat",
+        "inclusiefGeoreferentie": "Inclusief georeferentie",
+        "afbeeldingAanmaken": "Afbeelding aanmaken",
+        "loading": "Afbeelding aanmaken. Wachten ...",
+
+        "step3Text": "Klik op Toon afbeelding om de afbeelding van de kaart te downloaden en weer te geven.",
+        "step3Btn": "Toon afbeelding"
+      }
+    },
+
+    "aandachtspuntenVerwijderen": {
+      "pointsList": {
+        "header": "Er zijn {pointsLength} aandachtspunten geselecteerd. Gebruik desgewenst de functie ‘Aandachtspunten filteren’ om dit aantal te beperken. Met de knop ‘Kaartfilter’ kunnen aandachtspunten op de kaart worden gefilterd. Door het aanvinken van het selectievakje kunt u meerdere aandachtspunten in de lijst selecteren. Aandachtspunten met gekoppelde waarnemingen worden niet verwijderd maar op ‘inactief’ gezet.",
+        "selecteerAlle": "Selecteer alle",
+        "selecteerGeen": "Selecteer geen",
+        "noPoints": "Er zijn geen aandachtspunten om te bekijken.",
+
+        "btns": {
+          "aandachtspuntWijzigen": "Aandachtspunt wijzigen",
+          "aandachtspuntVerwijderen": "Aandachtspunt verwijderen",
+          "waarnemingenBekijken": "Waarnemingen bekijken",
+          "aandachtspuntToevoegenAanVluchtplan": "Aandachtspunt toevoegen aan vluchtplan"
+        }
+      },
+
+      "addToPlan": {
+        "title": "Wilt u meer dan één punt toevoegen aan een vluchtplan?",
+        "ja": "Ja",
+        "nee": "Nee",
+
+        "selecteerEenVluchtplan": "Selecteer een vluchtplan",
+
+        "step2Text": "Aandachtspunt(en) is/zijn toegevoegd aan vluchtplan"
+      },
+
+      "deletePoint": {
+        "title": "Weet u zeker dat u dit aandachtspunt wilt verwijderen?",
+        "loading": "Bezig met opslaan..."
+      },
+
+      "editPoint": {
+        "labels": {
+          "herhalen": "Herhalen",
+          "omschrijving": "Omschrijving",
+          "datum": "Datum",
+          "aanmaker": "Aanmaker",
+          "regio": "Regio",
+          "activiteit": "Activiteit",
+          "organisatie": "Organisatie",
+          "specifiekLettenOp": "Specifiek letten op",
+          "rd": "RD (X, Y)",
+          "wgs84": "WGS84 (Lat, Long)",
+          "vertrouwelijk": "Vertrouwelijk"
+        },
+
+        "geometrieAanpassen": "Geometrie aanpassen",
+
+        "step2": {
+          "text1": "Klik in de kaart om de locatie van het aandachtspunt in te tekenen of kies voor de optie 'invoeren' om de coördinaten van het aandachtspunt op te geven.",
+          "coördinatenInvoeren": "Coördinaten invoeren",
+          "loading": "Bezig met opslaan...",
+
+          "text2": "Klik op 'update' om een voorbeeldpunt te tekenen op de kaart."
+        }
+      }
+    }
+  },
+
+  "bottomSection": {
+    "pointsList": {
+      "listView": {
+        "title": "Lijstweergave",
+        "subtitle": "Toon resultaten in lijstweergave"
+      },
+      "zoomToAll": {
+        "title": "Zoom naar alles",
+        "subtitle": "Zoom naar het gebied van alle resultaten"
+      },
+      "exportCsv": {
+        "title": "Exporteer naar CSV",
+        "subtitle": "Exporteer resultaten naar CSV"
+      },
+      "exportXlsx": {
+        "title": "Exporteer naar XLSX",
+        "subtitle": "Exporteer resultaten naar XLSX"
+      },
+      "exportShp": {
+        "title": "Exporteer naar shapefile",
+        "subtitle": "Exporteer resultaten naar shapefile"
+      }
+    },
+
+    "plansList": {
+      "compactView": {
+        "title": "Toon compact overzicht",
+        "description": "Schakel naar het compacte overzicht van objectdetails."
+      },
+      "zoomToObject": {
+        "title": "Zoom naar object",
+        "description": "Zoom naar het object."
+      },
+      "panToObject": {
+        "title": "Verschuif naar object",
+        "description": "Verschuif de kaart naar het object."
+      },
+      "removeFromResults": {
+        "title": "Verwijderen uit resultaten",
+        "description": "Verwijder dit object uit de huidige set van resultaten."
+      }
+    },
+
+    "plansView": {
+      "details": {
+        "createdBy": "Aanmaken vliegplan",
+        "createdAt": "Aanmaakdatum",
+        "flightNumber": "Vluchtnummer",
+        "description": "Omschrijving",
+        "observer": "Waarnemer",
+        "pilot": "Piloot",
+        "inspectionDate": "Inspectiedatum",
+        "aircraft": "Luchtvaartuig",
+        "region": "Regio",
+        "passengers": "Aantal passagiers",
+        "goalTheme": "Doel en hoofdthema",
+        "additionalInfo": "Aanvullende informatie",
+        "plannedDuration": "Geplande vliegduur",
+        "beginTime": "Begintijd en datum",
+        "endTime": "Eindtijd en datum",
+        "actualDuration": "Werkelijke vliegduur",
+        "distance": "Gevlogen afstand",
+        "status": "Status"
+      }
+    },
+
+    "clickedPointFunctions": {
+      "menu": {
+        "zoomToObject": {
+          "title": "Zoom naar object",
+          "description": "Zoom naar het object"
+        },
+        "panToObject": {
+          "title": "Verschuif naar object",
+          "description": "Verschuif naar het object"
+        },
+        "removeFromResults": {
+          "title": "Verwijderen uit resultaten",
+          "description": "Verwijder dit object uit de huidige set van resultaten"
+        }
+      }
+    },
+
+    "editPointTabs": {
+      "viewDetails": "Toon objectdetails",
+      "editPoint": "Aandachtspunt wijzigen",
+      "deletePoint": "Aandachtspunt verwijderen",
+      "viewObservations": "Waarnemingen bekijken",
+      "addToPlan": "Aandachtspunt toevoegen aan vluchtplan",
+      "details": "Details"
+    },
+
+    "pagination": {
+      "showingResults": "Weergeven resultaat {start} - {end} (Totaal: {total})",
+      "pageInfo": "Pagina {current} van {totalPages}",
+      "previous": "Vorige",
+      "next": "Volgende",
+      "noResults": "Geen resultaten gevonden"
+    }
+  },
+
+  "pointPopUp": {
+    "notAllowed": "Dit punt ligt niet in jouw regio, dus je kunt het niet bewerken."
+  }
+}

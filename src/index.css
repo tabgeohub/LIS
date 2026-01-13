@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* URL property is a string */
+@import "https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css";
+
+/* URL property is the url() function */
+@import url("https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css");
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.inputClass {
+  @apply bg-white disabled:bg-gray-100 border border-gray-300 text-gray-500 text-sm rounded focus:border-gray-500 focus:shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] focus:outline-none block w-full p-1;
+}
+
+.labelClass {
+  @apply block text-sm font-medium text-gray-500;
+}
+
+.gray-button {
+  @apply bg-gray-100 border border-gray-200 disabled:bg-gray-100 disabled:border-gray-200 disabled:text-primary disabled:opacity-50 px-2 !py-0 h-[35px] text-[12px] rounded text-primary font-semibold hover:bg-primary hover:border-primary hover:text-white transition-all;
+}
+
+.react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+.datepicker-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.datepicker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: #f1f1f1;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.thin-scrollbar::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Firefox scrollbar styles */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.esri-search--multiple-sources.esri-search__container
+  .esri-search__sources-button.esri-widget--button {
+  display: none !important;
+}
+
+.esri-menu.esri-search__sources-menu {
+  display: none !important;
+}
+
+.esri-menu.esri-search__warning-menu {
+  display: none !important;
+}
+
+.esri-search__submit-button.esri-widget--button {
+  display: none !important;
+}
+
+/* .esri-menu.esri-search__suggestions-menu {
+  display: none !important;
+} */
+
+.esri-search__clear-button.esri-widget--button {
+  display: none !important;
+}
+
+.esri-input.esri-search__input {
+  height: 35px;
+  min-width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding-left: 6px;
+}
+
+/* Add scroll overflow to the suggestions menu */
+.esri-search__suggestions-menu {
+  max-height: 300px; /* Limit height to make scrolling necessary */
+  overflow-y: auto; /* Enable vertical scrolling */
+  background-color: #fff; /* Background for better visibility */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
+
+/* Style the suggestion list */
+.esri-menu__list {
+  list-style-type: none; /* Remove bullet points */
+  margin: 0;
+  padding: 0;
+}
+
+/* Style individual suggestion items */
+.esri-menu__list-item {
+  padding: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Add hover effect on suggestion items */
+.esri-menu__list-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Header styles for better separation */
+.esri-menu__header {
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
+}
+
+.bar {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.bar:nth-child(1) {
+  animation-delay: -0.4s;
+}
+.bar:nth-child(2) {
+  animation-delay: -0.2s;
+}
+.bar:nth-child(3) {
+  animation-delay: 0s;
+}

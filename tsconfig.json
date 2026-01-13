@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src", // This must be set if you're using "paths"
+    "paths": {
+      "@helpers/*": ["helpers/*"],
+      "@components/*": ["components/*"],
+      "@types/*": ["types/*"],
+      // Define other aliases as needed
+    },
+    // "strictNullChecks": false,
+    "noImplicitAny": false,
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+  ]
+}
