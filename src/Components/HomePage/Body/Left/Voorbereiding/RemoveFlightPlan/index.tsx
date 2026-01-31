@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Buttons from "./Buttons";
 import Loading from "./Loading";
 import ScrollButtonsLayout from "../../Common/ScrollButtonsLayout";
@@ -22,21 +22,15 @@ export default function RemoveFlightPlan() {
     openFilter,
   } = useDeleteFlightPlan();
 
+  const [showAllPlans, setShowAllPlans] = useState(false);
+
   const filterPlans = useFilterPlans();
 
   const { user } = useAuth();
-  
+
   const { data: plans, loading, refetch } = useReadData<FlightPlanType[]>(
     `/flightPlans?regio_id=${user.role}`
   );
-
-  // const {
-  //   data: plans,
-  //   loading,
-  //   refetch,
-  // } = useReadData<FlightPlanType[]>(
-  //   `/flightPlans/prepreparedFlightPlans?regio_id=${user.role}`
-  // );
 
   useEffect(() => {
     if (!plans) return;
@@ -60,18 +54,32 @@ export default function RemoveFlightPlan() {
 
   const content = useContent();
 
+  const allPlans = useMemo(() => {
+    if (showAllPlans) {
+      return plans;
+    } else {
+      return plans?.filter((plan: FlightPlanType) => plan.status !== "finished" && plan.status !== "in-progress");
+    }
+  }, [plans, showAllPlans]);
+
   return (
     <div className="h-full ">
       {!openFilter && (
         <ScrollButtonsLayout
           setFilterTerm={setFilterTerm}
-          className="h-full"
+          className="h-full "
           buttons={<Buttons />}
         >
-          <div className="divide-y-2">
+          <div className="divide-y-2 pt-6">
+            <div className="flex items-center gap-x-1 absolute top-20 left-0 z-10 px-1 py-1 bg-white border-b border-t border-gray-300 w-full">
+              <input type="checkbox" className="cursor-pointer" id="allPlans" checked={showAllPlans} onChange={() => setShowAllPlans(!showAllPlans)} />
+              <label htmlFor="allPlans" className="text-[12px] cursor-pointer text-primary font-semibold">Alle vluchtplannen</label>
+            </div>
+
+
             {loading && <Loading />}
 
-            {(!filteredPlans || filteredPlans.length === 0) && (
+            {(!allPlans || allPlans.length === 0) && (
               <div className="flex flex-col items-center justify-center">
                 <p className="text-center text-gray-400 text-[12px]">
                   {content.voorbereiding.vluchtplanVerwijderen.noPlans}{" "}
@@ -80,7 +88,7 @@ export default function RemoveFlightPlan() {
             )}
 
             {!loading &&
-              filteredPlans?.map((plan: FlightPlanType) => (
+              allPlans?.map((plan: FlightPlanType) => (
                 <SinglePlan key={plan.id} plan={plan} />
               ))}
           </div>
