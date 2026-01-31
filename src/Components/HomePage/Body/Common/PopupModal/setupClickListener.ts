@@ -7,7 +7,8 @@ export const setupClickListener = (
   setClickedPoint: (value: EnrichedPointType) => void,
   selectedPointGraphicsLayer: __esri.GraphicsLayer,
   createNewPoint: boolean,
-  pointsGraphicsLayer?: __esri.GraphicsLayer | null
+  pointsGraphicsLayer?: __esri.GraphicsLayer | null,
+  isTabBlocked?: () => boolean
 ) => {
   if (!mapView) {
     return;
@@ -18,6 +19,11 @@ export const setupClickListener = (
   const DEBOUNCE_MS = 150; // Debounce rapid clicks
 
   const clickHandler = mapView.on("click", async (event) => {
+    // Check if tab is blocked - return early if so
+    if (isTabBlocked && isTabBlocked()) {
+      return;
+    }
+
     // Debounce rapid clicks
     const now = Date.now();
     if (now - lastClickTime < DEBOUNCE_MS) {

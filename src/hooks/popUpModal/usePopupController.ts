@@ -8,7 +8,7 @@ import { createYellowCircle } from "Components/HomePage/Body/Common/PopupModal/c
 import { setupClickListener } from "Components/HomePage/Body/Common/PopupModal/setupClickListener";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/zustand/usePointsStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function usePopupController(
   setOpenModal: (open: boolean) => void
@@ -25,17 +25,34 @@ export default function usePopupController(
   const { selectedTab, setSelectedTab } = useTabState();
   const { points } = usePointsStore();
 
+  const blockedTabs = new Set([
+    "enrichedAddPoint",
+    "flightPlan",
+    "templateFlights",
+    "addPoint",
+    "verwijderen",
+  ]);
+
+  console.log(selectedTab)
+
+  // Use ref to store current selectedTab so the check function always has latest value
+  const selectedTabRef = useRef(selectedTab);
+  useEffect(() => {
+    selectedTabRef.current = selectedTab;
+  }, [selectedTab]);
+
   // 1) Attach/detach click listener based on tab, not on clickedPointId
   useEffect(() => {
     if (!mapView || !selectedPointGraphicsLayer) return;
 
-    const blockedTabs = new Set([
-      "enrichedAddPoint",
-      "flightPlan",
-      "templateFlights",
-      "addPoint",
-    ]);
-    if (blockedTabs.has(selectedTab)) return;
+    // If tab is blocked, ensure listener is removed and return early
+    if (blockedTabs.has(selectedTab)) {
+      // Clear any existing clicked point when entering blocked tab
+      setClickedPointId(0);
+      setClickedPoint(initialPointState as any);
+      selectedPointGraphicsLayer?.removeAll();
+      return;
+    }
 
     const cleanup = setupClickListener(
       mapView,
@@ -43,7 +60,8 @@ export default function usePopupController(
       setClickedPoint,
       selectedPointGraphicsLayer,
       createNewPoint,
-      pointsGraphicsLayer
+      pointsGraphicsLayer,
+      () => blockedTabs.has(selectedTabRef.current) // Pass function to check if tab is blocked
     );
 
     return () => {
@@ -56,6 +74,14 @@ export default function usePopupController(
   useEffect(() => {
     if (!mapView || !selectedPointGraphicsLayer) return;
     if (!clickedPointId) return;
+
+    // If we're in a blocked tab, clear the clickedPointId to prevent popup from opening later
+    if (blockedTabs.has(selectedTab)) {
+      setClickedPointId(0);
+      setClickedPoint(initialPointState as any);
+      selectedPointGraphicsLayer?.removeAll();
+      return;
+    }
 
     const foundPoint = points.find((point) => point.id === clickedPointId);
     if (!foundPoint) {
@@ -70,7 +96,9 @@ export default function usePopupController(
     setOpenModal(true);
     createYellowCircle(selectedPointGraphicsLayer, foundPoint);
 
-    if (selectedTab === "none") {
+    // Only change tab if we're not in a blocked tab (defensive check)
+    // Double-check that we're not in a blocked tab before changing tab
+    if (selectedTab === "none" && !blockedTabs.has(selectedTab)) {
       setSelectedBottomTab("viewSelectedPointDetails");
       setSelectedTab("none");
       setOpenSideBar(true);
@@ -81,25 +109,19 @@ export default function usePopupController(
       newData: { point: foundPoint },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clickedPointId, points]);
+  }, [clickedPointId, points, selectedTab]);
 
   // 2b) Close modal when selection is cleared (e.g., clicking empty map)
   useEffect(() => {
-    if (clickedPointId === 0) {
+    if (clickedPointId === 0 && selectedTab === "none") {
       setOpenModal(false);
       setSelectedBottomTab("Kaartlagenlijst");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clickedPointId]);
+  }, [clickedPointId, selectedTab]);
 
   // 3) Clear selected point when switching to blocked tabs
   useEffect(() => {
-    const blockedTabs = new Set([
-      "enrichedAddPoint",
-      "flightPlan",
-      "templateFlights",
-      "addPoint",
-    ]);
     if (!blockedTabs.has(selectedTab)) return;
 
     // Clear popup selection and graphics
