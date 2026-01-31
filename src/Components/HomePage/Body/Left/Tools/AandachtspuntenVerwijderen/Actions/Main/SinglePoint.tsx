@@ -13,12 +13,8 @@ export default function SinglePoint({ point }: { point: EnrichedPointType }) {
   const { selectedPoints, setSelectedPoints } = useDeletePointState();
 
   const handleSelectChange = () => {
-    const isSelected = selectedPoints.includes(point);
-    if (isSelected) {
-      setSelectedPoints(selectedPoints.filter((p) => p !== point));
-    } else {
-      setSelectedPoints([...selectedPoints, point]);
-    }
+    // Radio button: select only this point
+    setSelectedPoints([point]);
   };
 
   usePointClick(selectedPoints);
@@ -41,19 +37,19 @@ export default function SinglePoint({ point }: { point: EnrichedPointType }) {
       onClick={() => {
         setSelectedPoints([point]);
       }}
-      className={`p-2 transition-all shadow ${
-        selectedPoints.includes(point) ? "bg-gray-100" : "hover:bg-gray-50"
-      }`}
+      className={`p-2 transition-all shadow ${selectedPoints.includes(point) ? "bg-gray-100" : "hover:bg-gray-50"
+        }`}
     >
       <div className="flex items-center gap-x-1 cursor-pointer">
         <input
-          id={`checkbox-${point.id}`}
-          type="checkbox"
-          checked={selectedPoints.includes(point)}
+          id={`radio-${point.id}`}
+          type="radio"
+          name="selectedPoint"
+          checked={selectedPoints.length === 1 && selectedPoints[0]?.id === point.id}
           onChange={handleSelectChange}
           className="h-3 w-3 mt-0.5 cursor-pointer"
         />
-        <label className="text-gray-900 cursor-pointer text-[14px]">
+        <label htmlFor={`radio-${point.id}`} className="text-gray-900 cursor-pointer text-[14px]">
           {point.omschrijving}
         </label>
       </div>
