@@ -8,7 +8,7 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import { useEffect, useRef, useState } from "react";
 import usePathPointHandlerClick from "./usePathPointHandlerClick";
 
-export default function useDrawPath() {
+export default function useDrawPath(finishedPlanLoading: boolean = false) {
   const { selectedPlan } = useFinishedPlansState();
   const { mapView, redGraphicsLayer, pointsGraphicsLayer } = useMapViewState();
 
@@ -121,20 +121,6 @@ export default function useDrawPath() {
       }
     }
 
-    const startTime = Date.now();
-    const minLoadingTime = 500; // Increased from 100ms to 500ms to make it more visible
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, minLoadingTime - elapsed);
-
-        setTimeout(() => {
-          setLoadingPath(false);
-        }, remaining);
-      });
-    });
-
     return () => {
       if (pathLayer && mapView.map.layers.includes(pathLayer)) {
         mapView.map.remove(pathLayer);
@@ -143,6 +129,62 @@ export default function useDrawPath() {
       setLoadingPath(false);
     };
   }, [mapView, redGraphicsLayer, selectedPlan, pointsGraphicsLayer]);
+
+  // Check if all conditions are met to set loadingPath to false
+  useEffect(() => {
+    // Only check if loadingPath is currently true
+    if (!loadingPath) return;
+
+    // Condition 1: finishedPlan is completely fetched
+    if (finishedPlanLoading) return;
+
+    // Condition 2: Path is fetched from flight plan and added to map
+    if (!selectedPlan?.path || !Array.isArray(selectedPlan.path) || selectedPlan.path.length === 0) {
+      return;
+    }
+
+    if (!featureLayerRef.current || !mapView) {
+      return;
+    }
+
+    if (!mapView.map.layers.includes(featureLayerRef.current)) {
+      return;
+    }
+
+    // Condition 3: Points are completely added to the map
+    if (!selectedPlan.points_data || !Array.isArray(selectedPlan.points_data) || selectedPlan.points_data.length === 0) {
+      return;
+    }
+
+    if (!pointsGraphicsLayer) {
+      return;
+    }
+
+    // Verify points are actually on the map by checking graphics count
+    // Use a small delay to ensure graphics are fully added
+    const checkPoints = () => {
+      const graphicsCount = pointsGraphicsLayer.graphics.length;
+      const expectedPointsCount = selectedPlan.points_data.length;
+      
+      if (graphicsCount >= expectedPointsCount) {
+        setLoadingPath(false);
+      }
+    };
+
+    // Use requestAnimationFrame to ensure DOM/graphics are updated
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        checkPoints();
+      });
+    });
+  }, [
+    loadingPath,
+    finishedPlanLoading,
+    selectedPlan?.path,
+    selectedPlan?.points_data,
+    mapView,
+    pointsGraphicsLayer,
+  ]);
 
   return { loadingPath };
 }

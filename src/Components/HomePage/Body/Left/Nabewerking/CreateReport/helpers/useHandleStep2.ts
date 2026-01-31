@@ -306,7 +306,7 @@ export function useHandleStep2(
     });
 
     const [preloaded, logoDataUrl] = await Promise.all([
-      runWithConcurrency(preloadTasks, 2),
+      runWithConcurrency(preloadTasks, 5),
       preloadLogoDataUrl(),
     ]);
 
@@ -321,10 +321,18 @@ export function useHandleStep2(
       attachmentsByPoint.set(item.pointId, item.attachments);
     }
 
-    for (let i = 0; i < totalPoints; i++) {
-      const point = selectedPointsData[i];
+    // Process points in parallel batches for better performance
+    const processPoint = async (
+      point: typeof selectedPointsData[0],
+      index: number
+    ): Promise<{
+      filename: string;
+      pdfData: ArrayBuffer;
+      attachments: { name: string; blob: Blob }[];
+      pointName: string;
+    }> => {
       setZippingStatus(
-        `Rapport ${i + 1} van ${totalPoints} wordt gegenereerd: '${
+        `Rapport ${index + 1} van ${totalPoints} wordt gegenereerd: '${
           point.omschrijving
         }'`
       );
@@ -344,23 +352,25 @@ export function useHandleStep2(
       tempLayer.removeAll();
       tempLayer.add(graphic);
 
-      const overviewImage = await getStaticMapImage(
-        point.longitude,
-        point.latitude,
-        10,
-        1600,
-        900,
-        MAPSERVER_URL
-      );
-
-      const detailImage = await getStaticMapImage(
-        point.longitude,
-        point.latitude,
-        17,
-        1600,
-        900,
-        MAPSERVER_URL
-      );
+      // Parallelize map image fetching (Approach 1)
+      const [overviewImage, detailImage] = await Promise.all([
+        getStaticMapImage(
+          point.longitude,
+          point.latitude,
+          10,
+          1600,
+          900,
+          MAPSERVER_URL
+        ),
+        getStaticMapImage(
+          point.longitude,
+          point.latitude,
+          17,
+          1600,
+          900,
+          MAPSERVER_URL
+        ),
+      ]);
 
       const pointData: PDFPointDataType = {
         datum: selectedPlan.datum,
@@ -412,12 +422,30 @@ export function useHandleStep2(
         logoDataUrl || undefined
       );
       const arrayBuffer = await pdfData.arrayBuffer();
-      zip.file(`Waarnemingsrapport_Point_${safeName}.pdf`, arrayBuffer);
+
+      return {
+        filename: `Waarnemingsrapport_Point_${safeName}.pdf`,
+        pdfData: arrayBuffer,
+        attachments,
+        pointName: safeName,
+      };
+    };
+
+    // Process points in parallel (Approach 3: 4 concurrent points)
+    const pointTasks = selectedPointsData.map((point, index) => () =>
+      processPoint(point, index + 1)
+    );
+
+    const processedPoints = await runWithConcurrency(pointTasks, 4);
+
+    // Add all processed points to zip
+    for (const result of processedPoints) {
+      zip.file(result.filename, result.pdfData);
 
       // Create a folder for this point inside the attachments folder
-      if (attachments.length > 0) {
-        const pointFolder = attachmentsFolder?.folder(safeName);
-        attachments.forEach((attr, index) => {
+      if (result.attachments.length > 0) {
+        const pointFolder = attachmentsFolder?.folder(result.pointName);
+        result.attachments.forEach((attr, index) => {
           const extension =
             (attr.blob.type.split("/")[1] || "").split(";")[0] || "bin";
           const filename = `attachment_${index + 1}.${extension}`;

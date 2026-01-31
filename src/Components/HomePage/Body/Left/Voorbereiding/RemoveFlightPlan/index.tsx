@@ -25,14 +25,18 @@ export default function RemoveFlightPlan() {
   const filterPlans = useFilterPlans();
 
   const { user } = useAuth();
-
-  const {
-    data: plans,
-    loading,
-    refetch,
-  } = useReadData<FlightPlanType[]>(
-    `/flightPlans/prepreparedFlightPlans?regio_id=${user.role}`
+  
+  const { data: plans, loading, refetch } = useReadData<FlightPlanType[]>(
+    `/flightPlans?regio_id=${user.role}`
   );
+
+  // const {
+  //   data: plans,
+  //   loading,
+  //   refetch,
+  // } = useReadData<FlightPlanType[]>(
+  //   `/flightPlans/prepreparedFlightPlans?regio_id=${user.role}`
+  // );
 
   useEffect(() => {
     if (!plans) return;

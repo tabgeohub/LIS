@@ -35,11 +35,11 @@ export default function Step2() {
 
   const { mapView, pointsGraphicsLayer } = useMapViewState();
 
-  const { data: finishedPlan } = useReadData<FinishedFlightPlanType>(
+  const { data: finishedPlan, loading: finishedPlanLoading } = useReadData<FinishedFlightPlanType>(
     "/finished_plans/getSingleFinishedFlightPlan/" + selectedPlan?.id
   );
 
-  const { loadingPath } = useDrawPath();
+  const { loadingPath } = useDrawPath(finishedPlanLoading);
 
   useEffect(() => {
     const planPointsIds = selectedPlan?.points_data.flatMap(
