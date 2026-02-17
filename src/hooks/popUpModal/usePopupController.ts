@@ -33,8 +33,6 @@ export default function usePopupController(
     "verwijderen",
   ]);
 
-  console.log(selectedTab)
-
   // Use ref to store current selectedTab so the check function always has latest value
   const selectedTabRef = useRef(selectedTab);
   useEffect(() => {

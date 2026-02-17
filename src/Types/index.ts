@@ -117,7 +117,8 @@ export type VoorbereidingTabsType =
   | "viewPlan"
   | "prepareFlightPlan"
   | "removeFlightPlan"
-  | "reuseFlightPlan";
+  | "reuseFlightPlan"
+  | "tekengereedschap";
 
 export type ToolsTabsType =
   | "none"

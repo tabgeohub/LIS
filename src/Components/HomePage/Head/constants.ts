@@ -5,7 +5,7 @@ import {
   VoorbereidingTabsType,
 } from "Types";
 
-import { FaPlus } from "react-icons/fa6";
+import { FaDrawPolygon, FaPlus } from "react-icons/fa6";
 import { TbPointFilled } from "react-icons/tb";
 import { HiDocumentAdd, HiTemplate } from "react-icons/hi";
 import { IoDocumentsSharp } from "react-icons/io5";
@@ -48,12 +48,20 @@ export const voorbereidingTabs: {
   label: string;
   icon: IconType;
   disabled: boolean;
+  new?: boolean;
 }[] = [
   {
     id: "enrichedAddPoint",
     label: content.voorbereiding.tabs.enrichedAddPoint,
     icon: TbPointFilled,
     disabled: false,
+  },
+  {
+    id: "tekengereedschap",
+    label: "Tekengereedschap",
+    icon: FaDrawPolygon,
+    disabled: false,
+    new: true,
   },
   {
     id: "templateFlights",
@@ -104,6 +112,7 @@ export const toolsTabs: {
   label: string;
   icon: IconType;
   disabled: boolean;
+  new?: boolean;
 }[] = [
   {
     id: "emailijst",
@@ -123,7 +132,14 @@ export const toolsTabs: {
     icon: RiRestartFill,
     disabled: false,
   },
-  // {
+  {
+    id: "exporteer",
+    label: content.tools.tabs.exporteer,
+    icon: TiExport,
+    disabled: false,
+  },
+
+    // {
   //   id: "bevragen",
   //   label: content.tools.tabs.bevragen,
   //   icon: PiPlusDuotone,
@@ -141,12 +157,6 @@ export const toolsTabs: {
   //   icon: FaUpload,
   //   disabled: false,
   // },
-  {
-    id: "exporteer",
-    label: content.tools.tabs.exporteer,
-    icon: TiExport,
-    disabled: false,
-  },
 ];
 
 export const nabewerkingTabs: {
@@ -154,6 +164,7 @@ export const nabewerkingTabs: {
   label: string;
   icon: IconType;
   disabled: boolean;
+  new?: boolean;
 }[] = [
   {
     id: "vluchtZoeken",

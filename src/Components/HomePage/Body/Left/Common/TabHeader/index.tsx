@@ -73,6 +73,7 @@ export default function TabHeader() {
     vluchtplanStatus: content.layout.tabHeaders.vluchtplanStatus,
     verwijderen: content.layout.tabHeaders.verwijderen,
     emailijst: content.layout.tabHeaders.emailijst,
+    tekengereedschap: content.layout.tabHeaders.tekengereedschap,
   };
 
   // @ts-ignore

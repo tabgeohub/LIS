@@ -176,3 +176,12 @@ code {
 .bar:nth-child(3) {
   animation-delay: 0s;
 }
+
+/* Prevent scroll-into-view when ArcGIS elements receive focus during drawing */
+.esri-view,
+.esri-view-root,
+.esri-view-surface,
+.esri-view-surface * {
+  scroll-margin: 0;
+  scroll-padding: 0;
+}
