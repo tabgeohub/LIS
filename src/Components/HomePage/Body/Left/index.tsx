@@ -25,7 +25,7 @@ import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import ResultTab from "./Common/ResultTab";
 import SearchedResultsTab from "./Common/SearchedResultsTab";
 import TemplateFlight from "./Voorbereiding/TemplateFlight";
-import DrawingTool from "./Tools/DrawingTool";
+import DrawingTool from "./Voorbereiding/DrawingTool";
 
 export default function Left({
   vluchtnummer,
