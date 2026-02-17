@@ -1,7 +1,7 @@
 import { useReadData } from "utils/useReadData";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
-import { vluchtnummerRegex } from "constants/vluchtnummerRegex";
+import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useContent } from "hooks/useContent";
 
 export default function Vluchtnummer() {

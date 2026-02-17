@@ -1,9 +1,9 @@
 export function getBackEndUrl() {
-  if (process.env.NODE_ENV === "production") {
+  if (import.meta.env.PROD) {
     if (window.location.href.includes("intranet")) {
-      return `${process.env.REACT_APP_INTRANET_BACKEND_URL}`;
+      return `${import.meta.env.VITE_INTRANET_BACKEND_URL}`;
     } else {
-      return `${process.env.REACT_APP_EXTERNAL_BACKEND_URL}`;
+      return `${import.meta.env.VITE_EXTERNAL_BACKEND_URL}`;
     }
   } else {
     return "http://localhost:5000";

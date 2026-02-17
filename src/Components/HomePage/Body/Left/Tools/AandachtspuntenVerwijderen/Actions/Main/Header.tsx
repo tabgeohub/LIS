@@ -30,11 +30,11 @@ export default function Header({
         />
 
         <div className="text-[13px] flex text-blue-500 items-center gap-x-2 mt-1 font-medium">
-          <button onClick={() => setSelectedPoints(points)}>
+          {/* <button onClick={() => setSelectedPoints(points)}>
             {content.tools.aandachtspuntenVerwijderen.pointsList.selecteerAlle}
           </button>
 
-          <div className="h-[16px] w-[1px] bg-blue-300" />
+          <div className="h-[16px] w-[1px] bg-blue-300" /> */}
 
           <button onClick={() => setSelectedPoints([])}>
             {content.tools.aandachtspuntenVerwijderen.pointsList.selecteerGeen}

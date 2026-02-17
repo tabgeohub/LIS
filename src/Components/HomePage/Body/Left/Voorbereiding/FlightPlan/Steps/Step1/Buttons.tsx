@@ -1,7 +1,7 @@
 import useLogAction from "hooks/useLogAction";
 import { useFlightPlanState } from "../../helpers/flightPlanStates";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
-import { vluchtnummerRegex } from "constants/vluchtnummerRegex";
+import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useContent } from "hooks/useContent";
 
 export default function Buttons() {

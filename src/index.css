@@ -2,11 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* URL property is a string */
-@import "https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css";
-
-/* URL property is the url() function */
-@import url("https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css");
+/* Note: ArcGIS CSS is imported directly in App.tsx */
+/* @import "https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css"; */
+/* @import url("https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/<theme-name>/main.css"); */
 
 body {
   margin: 0;

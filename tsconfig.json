@@ -5,7 +5,11 @@
       "@helpers/*": ["helpers/*"],
       "@components/*": ["components/*"],
       "@types/*": ["types/*"],
-      // Define other aliases as needed
+      "@constants/*": ["constants/*"],
+      // Path aliases for baseUrl imports
+      "hooks/*": ["hooks/*"],
+      "Components/*": ["Components/*"],
+      "utils/*": ["utils/*"],
     },
     // "strictNullChecks": false,
     "noImplicitAny": false,
@@ -23,7 +27,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -31,5 +35,6 @@
   },
   "include": [
     "src"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

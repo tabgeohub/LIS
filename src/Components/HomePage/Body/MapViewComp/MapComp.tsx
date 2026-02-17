@@ -8,7 +8,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 import { useMapInitialization } from "hooks/useMapInitialization";
 import { useRenderPoints } from "hooks/useRenderPoints";
-import { regionsCoordinates } from "constants/regionCoordintaes";
+import { regionsCoordinates } from "@constants/regionCoordintaes";
 import BasemapWidget from "./BasemapWidget";
 
 export default function MapComp({
