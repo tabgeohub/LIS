@@ -13,7 +13,7 @@ export default function Body({
   const [vluchtnummer, setVluchtnummer] = useState("");
 
   return (
-    <div className="flex h-full relative">
+    <div className="flex h-full overflow-hidden relative">
       <Left
         vluchtnummer={vluchtnummer}
         setVluchtnummer={setVluchtnummer}

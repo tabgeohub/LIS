@@ -7,7 +7,7 @@ import PopupModal from "../Common/PopupModal";
 import FeatureLayerPopup from "../Common/FeatureLayerPopup";
 import Bottom from "../Bottom";
 import MapComp from "./MapComp";
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import Bevragen from "../Left/Tools/Bevragen";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { IoCloseOutline } from "react-icons/io5";
@@ -17,6 +17,7 @@ import {
   usePathPointState,
 } from "@helpers/ZustandStates/pathPointState";
 import useFeatureLayerLabels from "hooks/hover-click-handlers/useFeatureLayerLabels";
+import useMapSectionHeight from "./useMapSectionHeight";
 
 export default function MapViewComp({
   mapDiv,
@@ -47,6 +48,12 @@ export default function MapViewComp({
   useEffect(() => {
     setPanelVh(openAllTable ? 90 : 55);
   }, [openAllTable]);
+
+  // Calculate dynamic map section height
+  const { containerRef, mapSectionHeight } = useMapSectionHeight({
+    openTable,
+    panelVh,
+  });
 
   // Clamp helper
   const clamp = (v: number, min: number, max: number) =>
@@ -116,15 +123,9 @@ export default function MapViewComp({
     };
   }, [openTable, panelVh]);
 
-  // Map section height depends on whether the bottom panel is open
-  const mapSectionHeight = useMemo(() => {
-    if (!openTable) return "90vh"; // your original full map height
-    // When table is open, the map takes the remaining height
-    return `calc(100vh - ${panelVh}vh)`;
-  }, [openTable, panelVh]);
-
   return (
     <motion.div
+      ref={containerRef}
       variants={{
         visible: { width: "100vw", transition: { duration: 0.5 } },
         semiVisible: { width: "60vw", transition: { duration: 0.5 } },
@@ -132,7 +133,7 @@ export default function MapViewComp({
       initial="semiVisible"
       animate="visible"
       exit="semiVisible"
-      className="relative"
+      className="relative h-full"
     >
       {/* ---------------- TOP (Map) ---------------- */}
       <div
