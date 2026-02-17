@@ -4,34 +4,26 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { classNames } from "@helpers/classNames";
 
 interface ClearButtonProps {
-  graphicsLayer: GraphicsLayer | null;
+  onClear: () => void;
+  hasGraphics: boolean;
 }
 
-export default function ClearButton({ graphicsLayer }: ClearButtonProps) {
-  const handleClear = () => {
-    if (graphicsLayer) {
-      graphicsLayer.removeAll();
-    }
-  };
-
-  const hasGraphics = graphicsLayer && graphicsLayer.graphics.length > 0;
+export default function ClearButton({ onClear, hasGraphics }: ClearButtonProps) {
 
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      onClick={handleClear}
+      onClick={onClear}
       disabled={!hasGraphics}
       className={classNames(
         "flex items-center justify-center gap-1.5",
-        "px-3 py-1.5 rounded-lg",
+        "px-3 py-2 rounded",
         "text-xs font-semibold",
         "transition-all duration-200",
-        hasGraphics
-          ? "bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg cursor-pointer"
-          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+        "bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg cursor-pointer"
       )}
-      title={hasGraphics ? "Alle tekeningen wissen" : "Geen tekeningen om te wissen"}
+      title={"Alle tekeningen wissen"}
     >
       <TbTrash className="h-3.5 w-3.5" />
       <span>Alles wissen</span>

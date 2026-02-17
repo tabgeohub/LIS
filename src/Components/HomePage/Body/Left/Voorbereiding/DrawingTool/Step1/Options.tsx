@@ -17,6 +17,7 @@ interface OptionsProps {
   sketchViewModel: SketchViewModel | null;
   setSketchViewModel: (viewModel: SketchViewModel | null) => void;
   mapView: MapView | null;
+  handleClear: () => void;
 }
 
 export default function Options({
@@ -27,6 +28,7 @@ export default function Options({
   sketchViewModel,
   setSketchViewModel,
   mapView,
+  handleClear,
 }: OptionsProps) {
   // Cleanup function
   const cleanup = () => {
@@ -37,7 +39,6 @@ export default function Options({
     if (mapView?.container) {
       mapView.container.style.cursor = "";
     }
-    setSelectedTool(null);
   };
 
   // Cleanup on unmount
@@ -55,6 +56,7 @@ export default function Options({
     // If same tool clicked, cancel drawing
     if (selectedTool === tool) {
       cleanup();
+      setSelectedTool(null);
       return;
     }
 
