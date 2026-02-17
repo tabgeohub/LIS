@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { TbTrash } from "react-icons/tb";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { classNames } from "@helpers/classNames";
 
 interface ClearButtonProps {
@@ -21,7 +20,8 @@ export default function ClearButton({ onClear, hasGraphics }: ClearButtonProps) 
         "px-3 py-2 rounded",
         "text-xs font-semibold",
         "transition-all duration-200",
-        "bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg cursor-pointer"
+        "bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg cursor-pointer",
+        !hasGraphics && "opacity-50 cursor-not-allowed"
       )}
       title={"Alle tekeningen wissen"}
     >

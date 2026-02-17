@@ -38,7 +38,6 @@ export default function ConfirmButton({
             type: "lijn",
             points: points,
           });
-          console.log(`Lijn ${pathIndex + 1} punten:`, points);
         });
       } else if (geometry.type === "polygon") {
         const polygon = geometry as Polygon;
@@ -49,15 +48,10 @@ export default function ConfirmButton({
             type: "veelhoek",
             points: points,
           });
-          console.log(`Veelhoek ${ringIndex + 1} punten:`, points);
         });
       }
     });
 
-    // Log all points together
-    console.log("Alle getekende vormen:", allPoints);
-
-    // Save to store and move to next step
     setGraphicsDrawn(allPoints);
     setStep(2);
   };
