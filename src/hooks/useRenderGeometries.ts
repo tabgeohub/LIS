@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Graphic from "@arcgis/core/Graphic";
@@ -9,49 +7,20 @@ import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
-
-interface GeometryPoint {
-  id: number;
-  longitude: number;
-  latitude: number;
-  [key: string]: any;
-}
-
-interface Geometry {
-  id: number;
-  omschrijving: string;
-  type: "polygon" | "line";
-  points: GeometryPoint[];
-  [key: string]: any;
-}
+import { useGeometriesStore, Geometry } from "./zustand/useGeometriesStore";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, graphicsLayer } = useMapViewState();
-  const [geometries, setGeometries] = useState<Geometry[]>([]);
+  const { geometries, fetchGeometries } = useGeometriesStore();
 
   // Fetch geometries
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
 
-    const fetchGeometries = async () => {
-      try {
-        const url = `${getBackEndUrl()}/api/geometries`;
-        const params: Record<string, string> = {};
-
-        // Add regio filter if user is not admin
-        if (user.role && user.role !== "admin") {
-          params.regio = user.role;
-        }
-
-        const res = await axios.get<Geometry[]>(url, { params });
-        setGeometries(res.data);
-      } catch (error) {
-        console.error("Failed to fetch geometries:", error);
-      }
-    };
-
-    fetchGeometries();
+    fetchGeometries({
+      regio: user.role && user.role !== "admin" ? user.role : undefined,
+    });
   }, [user]);
 
   // Render geometries on the map
