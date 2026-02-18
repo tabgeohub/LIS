@@ -37,13 +37,7 @@ export default function HeadButtonsNabewerking() {
                   setSelectedTab(item.id);
                   setOpenSideBar(true);
                   resetFeatures();
-                  // Remove all graphics except geometries
-                  if (graphicsLayer) {
-                    const graphicsToRemove = graphicsLayer.graphics.filter(
-                      (g) => g.attributes?.type !== "geometry"
-                    );
-                    graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
-                  }
+                  graphicsLayer?.removeAll();
                   graphicsLayerHover?.removeAll();
                   redGraphicsLayer?.removeAll();
                 }

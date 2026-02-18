@@ -69,10 +69,14 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
   const yellowGraphicsLayer = new GraphicsLayer();
   const redGraphicsLayer = new GraphicsLayer();
   const selectedPointGraphicsLayer = new GraphicsLayer();
+  const geometriesGraphicsLayer = new GraphicsLayer({
+    title: "Geometries",
+  });
 
   mapView.map.add(pointsGraphicsLayer);
   mapView.map.add(yellowGraphicsLayer);
   mapView.map.add(graphicsLayer);
+  mapView.map.add(geometriesGraphicsLayer);
   mapView.map.add(graphicsLayerHover);
   mapView.map.add(redGraphicsLayer);
   mapView.map.add(selectedPointGraphicsLayer);
@@ -81,7 +85,8 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
   map.layers.reorder(yellowGraphicsLayer, map.layers.length - 2);
   map.layers.reorder(redGraphicsLayer, map.layers.length - 3);
   map.layers.reorder(graphicsLayer, map.layers.length - 4);
-  map.layers.reorder(selectedPointGraphicsLayer, map.layers.length - 5);
+  map.layers.reorder(geometriesGraphicsLayer, map.layers.length - 5);
+  map.layers.reorder(selectedPointGraphicsLayer, map.layers.length - 6);
 
   return {
     map,
@@ -92,5 +97,6 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
     yellowGraphicsLayer,
     redGraphicsLayer,
     selectedPointGraphicsLayer,
+    geometriesGraphicsLayer,
   };
 }

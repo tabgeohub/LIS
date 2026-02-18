@@ -17,6 +17,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
     setYellowGraphicsLayer,
     setRedGraphicsLayer,
     setSelectedPointGraphicsLayer,
+    setGeometriesGraphicsLayer,
   } = useMapViewState();
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
         yellowGraphicsLayer,
         redGraphicsLayer,
         selectedPointGraphicsLayer,
+        geometriesGraphicsLayer,
       } = createMapView(mapDiv);
 
       setMap(map);
@@ -40,6 +42,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
       setYellowGraphicsLayer(yellowGraphicsLayer);
       setRedGraphicsLayer(redGraphicsLayer);
       setSelectedPointGraphicsLayer(selectedPointGraphicsLayer);
+      setGeometriesGraphicsLayer(geometriesGraphicsLayer);
 
       initialized.current = true;
     }

@@ -11,7 +11,7 @@ import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
-  const { map, graphicsLayer } = useMapViewState();
+  const { map, geometriesGraphicsLayer } = useMapViewState();
   const { geometries, fetchGeometries, fetchDBGeometries } = useGeometriesStore();
 
   // Fetch geometries
@@ -29,12 +29,11 @@ export function useRenderGeometries() {
 
   // Render geometries on the map
   useEffect(() => {
-    if (!map || !graphicsLayer || !geometries || geometries.length === 0) return;
+    if (!map || !geometriesGraphicsLayer || !geometries || geometries.length === 0) return;
     if (user.user_id === undefined || user.user_id === 0) return;
 
-    // Clear existing geometry graphics (but keep other graphics)
-    // We'll need to track which graphics are geometries, or use a separate layer
-    // For now, let's create a dedicated approach
+    // Clear existing geometry graphics
+    geometriesGraphicsLayer.removeAll();
 
     const graphics: Graphic[] = [];
 
@@ -121,22 +120,15 @@ export function useRenderGeometries() {
 
     // Add all geometry graphics to the layer
     if (graphics.length > 0) {
-      graphicsLayer.addMany(graphics);
+      geometriesGraphicsLayer.addMany(graphics);
     }
 
     // Cleanup: remove geometry graphics when component unmounts or geometries change
     return () => {
-      if (graphicsLayer) {
-        // Remove only geometry graphics by checking attributes
-        const graphicsToRemove: Graphic[] = [];
-        graphicsLayer.graphics.forEach((g) => {
-          if (g.attributes?.type === "geometry") {
-            graphicsToRemove.push(g);
-          }
-        });
-        graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
+      if (geometriesGraphicsLayer) {
+        geometriesGraphicsLayer.removeAll();
       }
     };
-  }, [map, graphicsLayer, geometries, user]);
+  }, [map, geometriesGraphicsLayer, geometries, user]);
 }
 

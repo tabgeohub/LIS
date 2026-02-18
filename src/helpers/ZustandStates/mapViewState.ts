@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import Search from "@arcgis/core/widgets/Search";
-import Graphic from "@arcgis/core/Graphic";
 
 interface RegionData {
   [key: string]: {
@@ -50,6 +49,11 @@ export const useMapViewState = create<{
     selectedPointGraphicsLayer: __esri.GraphicsLayer | null
   ) => void;
 
+  geometriesGraphicsLayer: __esri.GraphicsLayer | null;
+  setGeometriesGraphicsLayer: (
+    geometriesGraphicsLayer: __esri.GraphicsLayer | null
+  ) => void;
+
   clearGraphics: () => void;
 }>((set, get) => ({
   mapView: null,
@@ -86,6 +90,11 @@ export const useMapViewState = create<{
     selectedPointGraphicsLayer: __esri.GraphicsLayer | null
   ) => set({ selectedPointGraphicsLayer }),
 
+  geometriesGraphicsLayer: null,
+  setGeometriesGraphicsLayer: (
+    geometriesGraphicsLayer: __esri.GraphicsLayer | null
+  ) => set({ geometriesGraphicsLayer }),
+
   topMessage: {
     message: "",
     show: false,
@@ -99,13 +108,8 @@ export const useMapViewState = create<{
   clearGraphics: () => {
     const { graphicsLayer, graphicsLayerHover, yellowGraphicsLayer } = get();
 
-    // Remove all graphics except geometries
-    if (graphicsLayer) {
-      const graphicsToRemove = graphicsLayer.graphics.filter(
-        (g: Graphic) => g.attributes?.type !== "geometry"
-      );
-      graphicsToRemove.forEach((g: Graphic) => graphicsLayer.remove(g));
-    }
+    // geometriesGraphicsLayer is not cleared - geometries persist
+    graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
     yellowGraphicsLayer?.removeAll();
   },
