@@ -7,6 +7,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
 import Point from "@arcgis/core/geometry/Point";
+import { useCreateData } from "utils/useCreateData";
 
 export default function Buttons() {
   const {
@@ -23,6 +24,7 @@ export default function Buttons() {
   const { mapView } = useMapViewState();
   const { user } = useAuth();
   const content = useContent();
+  const { create, loading } = useCreateData("/geometries");
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(
     null
   );
@@ -92,6 +94,7 @@ export default function Buttons() {
       vertrouwelijk: number;
       activiteit: string;
       specifiekLettenOp: string;
+      geometry_type: string;
     }> = [];
 
     let pointOrder = 1;
@@ -149,44 +152,84 @@ export default function Buttons() {
           vertrouwelijk: vertrouwelijk ? 1 : 0,
           activiteit: activiteit,
           specifiekLettenOp: specifiekLettenOp,
+          geometry_type: shape.type,
         });
 
         pointOrder++;
       });
     });
 
-    console.log("Form data:", {
-      ...pointsArray,
-      omschrijving,
-      organisatie,
-      vertrouwelijk,
-      herhalen,
-      activiteit,
-      specifiekLettenOp,
-    });
+    // Get unique geometry types (or use the first one if all are the same)
+    const geometryTypes = graphicsDrawn.map((shape) => shape.type);
+    const uniqueGeometryTypes = Array.from(new Set(geometryTypes));
+    // Use the first geometry type, or combine them if multiple
+    const geometryType = uniqueGeometryTypes.length === 1
+      ? uniqueGeometryTypes[0]
+      : uniqueGeometryTypes.join(", ");
 
-    // Clear graphics and reset
-    clearGraphics();
-    clear();
+    // Call API to create geometry and points
+    const result = await create(
+      {
+        omschrijving,
+        organisatie,
+        vertrouwelijk,
+        herhalen,
+        activiteit,
+        specifiekLettenOp,
+        geometry_type: geometryType,
+        regio_id: user?.role,
+        points: pointsArray,
+      },
+      () => {
+        // Success callback - clear graphics and reset after successful creation
+        clearGraphics();
+        clear();
+      }
+    );
+
+    // Only clear if creation was successful (result is not null)
+    if (result !== null) {
+      // Success toast is already shown by useCreateData hook
+      // Graphics cleared in success callback above
+    }
   }
 
   return (
-    <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-      <button onClick={handleBack} className="gray-button">
-        {content.common.vorige}
-      </button>
+    <div className="relative">
+      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
+        <button
+          onClick={handleBack}
+          disabled={loading}
+          className="gray-button"
+        >
+          {content.common.vorige}
+        </button>
 
-      <button
-        disabled={omschrijving === "" || organisatie === ""}
-        onClick={handleSubmit}
-        className="gray-button"
-      >
-        {content.common.opslaan}
-      </button>
+        <button
+          disabled={omschrijving === "" || organisatie === "" || loading}
+          onClick={handleSubmit}
+          className="gray-button"
+        >
+          {loading ? "Opslaan..." : content.common.opslaan}
+        </button>
 
-      <button onClick={handleCancel} className="gray-button">
-        {content.common.annuleren}
-      </button>
+        <button
+          onClick={handleCancel}
+          disabled={loading}
+          className="gray-button"
+        >
+          {content.common.annuleren}
+        </button>
+      </div>
+
+      {loading && (
+        <div className="absolute inset-0 bg-gray-100/50 backdrop-blur-sm z-10 flex justify-center items-center rounded">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-gray-600 text-sm">Bezig met opslaan...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

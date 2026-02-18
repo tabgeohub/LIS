@@ -12,11 +12,19 @@ export async function getPoints(req: Request, res: Response) {
       herhalen,
       regio,
       status,
+      hasGeometry
     } = req.query;
 
     let query = "SELECT * FROM lis.points";
     const params: any[] = [];
     const conditions: string[] = [];
+
+    // hasGeometry filter
+    if (hasGeometry === "true") {
+      conditions.push("geometry_id IS NOT NULL");
+    } else if (hasGeometry === "false") {
+      conditions.push("geometry_id IS NULL");
+    }
 
     // herhalen (numeric)
     if (herhalen !== undefined) {
@@ -87,6 +95,7 @@ export async function getPoints(req: Request, res: Response) {
     query += " ORDER BY id DESC";
 
     const result = await pool.query(query, params);
+
     res.json(result.rows);
   } catch (err) {
     console.error(err instanceof Error ? err.message : String(err));

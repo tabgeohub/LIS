@@ -10,6 +10,7 @@ import { useMapInitialization } from "hooks/useMapInitialization";
 import { useRenderPoints } from "hooks/useRenderPoints";
 import { regionsCoordinates } from "@constants/regionCoordintaes";
 import BasemapWidget from "./BasemapWidget";
+import { useRenderGeometries } from "hooks/useRenderGeometries";
 
 export default function MapComp({
   mapDiv,
@@ -28,6 +29,7 @@ export default function MapComp({
 
   useMapInitialization(mapDiv);
   useRenderPoints();
+  useRenderGeometries();
 
   useEffect(() => {
     if (user.user_id !== 0) return;

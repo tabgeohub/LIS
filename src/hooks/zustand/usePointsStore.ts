@@ -54,7 +54,7 @@ export const usePointsStore = create<PointsState>((set) => ({
 
   fetchPoints: async (filters = {}) => {
     try {
-      const url = `${getBackEndUrl()}/api/points`;
+      const url = `${getBackEndUrl()}/api/points?hasGeometry=false`;
 
       // Only send defined, non-empty values as query params
       const params: Record<string, string | number> = {};
@@ -80,9 +80,9 @@ export const usePointsStore = create<PointsState>((set) => ({
     }
   },
 
-  fetchDBPoints: async (filters = {}) => {
+  fetchDBPoints: async (filters = {}) => {  
     try {
-      const url = `${getBackEndUrl()}/api/points`;
+      const url = `${getBackEndUrl()}/api/points?hasGeometry=false`;
 
       // Only send defined, non-empty values as query params
       const params: Record<string, string | number> = {};

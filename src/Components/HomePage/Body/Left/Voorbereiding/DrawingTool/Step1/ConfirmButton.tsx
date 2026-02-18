@@ -35,7 +35,7 @@ export default function ConfirmButton({
         polyline.paths.forEach((path, pathIndex) => {
           const points = path.map((coord) => [coord[0], coord[1]]);
           allPoints.push({
-            type: "lijn",
+            type: "line",
             points: points,
           });
         });
@@ -45,7 +45,7 @@ export default function ConfirmButton({
         polygon.rings.forEach((ring, ringIndex) => {
           const points = ring.map((coord) => [coord[0], coord[1]]);
           allPoints.push({
-            type: "veelhoek",
+            type: "polygon",
             points: points,
           });
         });
