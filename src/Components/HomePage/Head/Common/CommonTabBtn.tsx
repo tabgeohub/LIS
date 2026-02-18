@@ -1,7 +1,7 @@
 import { classNames } from "@helpers/classNames";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function CommonTabBtn({
   item,
@@ -17,7 +17,7 @@ export default function CommonTabBtn({
   onClick: () => void;
 }) {
   const { selectedTab } = useTabState();
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const logAction = useLogAction();
 
@@ -27,7 +27,7 @@ export default function CommonTabBtn({
       onClick={() => {
         onClick();
 
-        setPoints(dbPoints);
+        resetFeatures();
 
         logAction({ message: `User clicked ${item.label} tab` });
       }}

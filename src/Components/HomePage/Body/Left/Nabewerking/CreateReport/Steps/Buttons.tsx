@@ -3,7 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleStep2 } from "../helpers/useHandleStep2";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
@@ -16,7 +16,7 @@ export default function Buttons() {
 
   const { graphicsLayerHover, graphicsLayer } = useMapViewState();
   const { setHoveredPoints } = useHoveredPlanState();
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
   const handleCancel = useHandleCancel();
 
   const {
@@ -68,7 +68,7 @@ export default function Buttons() {
           className="gray-button"
           onClick={() => {
             setStep(1);
-            setPoints(dbPoints);
+            resetFeatures();
 
             logAction({
               message: "User clicked 'Previous' button",
@@ -109,7 +109,7 @@ export default function Buttons() {
           <button
             className="gray-button"
             onClick={() => {
-              setPoints(dbPoints);
+              resetFeatures();
               clear();
 
               handleCancel();

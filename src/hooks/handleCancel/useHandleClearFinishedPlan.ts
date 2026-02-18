@@ -1,10 +1,10 @@
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export function useHandleClearFinishedPlan() {
   const { setOpenFilter, setSelectedPlan, setDateFrom, setDateTo, setPeriode } =
     useFinishedPlansState();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   return () => {
     setOpenFilter(false);
@@ -14,6 +14,6 @@ export function useHandleClearFinishedPlan() {
     setDateTo("");
     setPeriode("");
 
-    setPoints(dbPoints);
+    resetFeatures();
   };
 }

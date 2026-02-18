@@ -2,10 +2,10 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function Buttons() {
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
   const logAction = useLogAction();
 
   const { setOpenFilter, clear, setStep } = useAddPointStates();
@@ -62,7 +62,7 @@ export default function Buttons() {
 
       <button
         onClick={() => {
-          setPoints(dbPoints);
+          resetFeatures();
 
           handleCancel();
           clear();

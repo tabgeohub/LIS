@@ -8,6 +8,8 @@ import SelectFormik from "../../Common/SelectFormik";
 import { EnrichedPointType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
@@ -28,7 +30,9 @@ export default function Step1({
   const { clickedPoint } = usePopUpState();
 
   const { update, loading } = useUpdateData(`/points/${clickedPoint?.id}`);
-  const { setPoints, dbPoints, fetchDBPoints, fetchPoints } = usePointsStore();
+  const { fetchDBPoints, fetchPoints } = usePointsStore();
+  const { fetchGeometries } = useGeometriesStore();
+  const { resetFeatures } = useResetFeatures();
 
   function handleClose() {
     setSelectedBottomTab("Kaartlagenlijst");
@@ -73,7 +77,11 @@ export default function Step1({
         regio: user?.role,
       });
 
-      setPoints(dbPoints);
+      fetchGeometries({
+        regio: user?.role,
+      });
+
+      resetFeatures();
       setSelectedBottomTab("viewSelectedPointDetails");
     });
 

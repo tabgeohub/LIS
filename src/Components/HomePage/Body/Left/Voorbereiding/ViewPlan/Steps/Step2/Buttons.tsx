@@ -2,7 +2,7 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
 import { useViewPlanState } from "../../helpers/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 export default function Buttons({
@@ -38,7 +38,7 @@ export default function Buttons({
 
   const { setPointsTable, setOpenTable } = useOpenTable();
 
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const { yellowGraphicsLayer } = useMapViewState();
 
@@ -92,7 +92,7 @@ export default function Buttons({
     <>
       <button
         onClick={() => {
-          setPoints(dbPoints);
+          resetFeatures();
 
           yellowGraphicsLayer?.graphics.removeAll();
 
@@ -134,7 +134,7 @@ export default function Buttons({
 
       <button
         onClick={() => {
-          setPoints(dbPoints);
+          resetFeatures();
 
           handleCancel();
 

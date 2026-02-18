@@ -2,7 +2,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { ActionType } from ".";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFinishedPlan";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 
@@ -12,7 +12,7 @@ export default function Buttons({
   setAction: (value: ActionType) => void;
 }) {
   const { setStep } = useFinishedPlansState();
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const logAction = useLogAction();
 
@@ -107,7 +107,7 @@ export default function Buttons({
           graphicsLayerHover?.removeAll();
           redGraphicsLayer?.removeAll();
 
-          setPoints(dbPoints);
+          resetFeatures();
 
           handleClear();
         }}

@@ -4,10 +4,10 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function Buttons() {
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
   const logAction = useLogAction();
 
   const {
@@ -95,7 +95,7 @@ export default function Buttons() {
 
         <button
           onClick={() => {
-            setPoints(dbPoints);
+            resetFeatures();
 
             handleCancel();
             clear();

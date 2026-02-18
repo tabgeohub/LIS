@@ -4,7 +4,7 @@ import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { IoReloadCircle } from "react-icons/io5";
 import { TbFilterQuestion } from "react-icons/tb";
 
@@ -12,7 +12,7 @@ export default function FilterTabs() {
   const { selectedTab, setSelectedTab } = useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
   const { user } = useAuth();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const {
     setNaamAandachtspunt,
@@ -31,7 +31,7 @@ export default function FilterTabs() {
     setTot("");
     setHerhalen("");
 
-    setPoints(dbPoints);
+    resetFeatures();
 
     setSelectedTab("none");
   }

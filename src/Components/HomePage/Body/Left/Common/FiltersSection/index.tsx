@@ -12,12 +12,14 @@ import { useContent } from "hooks/useContent";
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function FiltersSection() {
   const { setSelectedTab } = useTabState();
   const activities = useGetActiviteiten();
   const organizations = useGetOrganisaties();
-  const { dbPoints, setPoints, fetchPoints } = usePointsStore();
+  const { fetchPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const {
     naamAandachtspunt,
@@ -56,7 +58,7 @@ export default function FiltersSection() {
     setTot("");
     setHerhalen("");
 
-    setPoints(dbPoints);
+    resetFeatures();
 
     setSelectedTab("none");
   }

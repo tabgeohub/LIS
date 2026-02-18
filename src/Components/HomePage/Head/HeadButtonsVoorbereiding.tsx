@@ -4,7 +4,7 @@ import { voorbereidingTabs } from "./constants";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import FilterTabs from "./Common/FilterTabs";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
@@ -14,7 +14,7 @@ export default function HeadButtonsVoorbereiding() {
   const { setSelectedTab } = useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
   const { user } = useAuth();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
   const { graphicsLayer, graphicsLayerHover, redGraphicsLayer } =
     useMapViewState();
   const handleClose = useHandleClosePopUp();
@@ -37,8 +37,14 @@ export default function HeadButtonsVoorbereiding() {
                   handleClose();
                   setSelectedTab(item.id);
                   setOpenSideBar(true);
-                  setPoints(dbPoints);
-                  graphicsLayer?.removeAll();
+                  resetFeatures();
+                  // Remove all graphics except geometries
+                  if (graphicsLayer) {
+                    const graphicsToRemove = graphicsLayer.graphics.filter(
+                      (g) => g.attributes?.type !== "geometry"
+                    );
+                    graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
+                  }
                   graphicsLayerHover?.removeAll();
                   redGraphicsLayer?.removeAll();
                 }

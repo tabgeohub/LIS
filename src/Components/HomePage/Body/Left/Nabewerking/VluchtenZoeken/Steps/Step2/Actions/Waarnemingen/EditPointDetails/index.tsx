@@ -4,7 +4,7 @@ import Form from "./Actions/Form";
 import Foto from "./Actions/Foto";
 import ChangePoint from "./Actions/ChangePoint";
 import EditPointCoordinates from "./Actions/EditPointCoordinates";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function EditPointDetails({
   setOpenEdit,
@@ -12,11 +12,11 @@ export default function EditPointDetails({
   setOpenEdit: (value: boolean) => void;
 }) {
   const [actions, setAction] = useState("form");
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   useEffect(() => {
     if (actions === "form") {
-      setPoints(dbPoints);
+      resetFeatures();
     }
   }, [actions]);
 

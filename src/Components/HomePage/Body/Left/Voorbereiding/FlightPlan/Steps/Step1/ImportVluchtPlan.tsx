@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import * as XLSX from "xlsx";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
@@ -40,7 +40,7 @@ export default function ImportVluchtPlan() {
 
   const { setSelectedPoints, setSelectedPoints2 } = useFlightPlanState();
 
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
   const { user } = useAuth();
   const logAction = useLogAction();
 
@@ -230,7 +230,7 @@ export default function ImportVluchtPlan() {
           true
         );
 
-        setPoints(dbPoints);
+        resetFeatures();
       } catch (e: any) {
         toast.error(
           e?.message ??

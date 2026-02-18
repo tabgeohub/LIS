@@ -8,7 +8,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useState } from "react";
 import Exporter from "../Body/Left/Tools/Exporter";
 import Uploaden from "../Body/Left/Tools/Uploaden";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
@@ -19,7 +19,7 @@ export default function HeadButtonsTools() {
   const { setOpenSideBar } = useOpeSideBarState();
   const { mapView, graphicsLayer, graphicsLayerHover, redGraphicsLayer } =
     useMapViewState();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const [openExporter, setOpenExporter] = useState(false);
   const [openUploader, setOpenUploader] = useState(false);
@@ -39,10 +39,16 @@ export default function HeadButtonsTools() {
           duration: 2000,
         };
 
-        graphicsLayer?.removeAll();
+        resetFeatures();
+        // Remove all graphics except geometries
+        if (graphicsLayer) {
+          const graphicsToRemove = graphicsLayer.graphics.filter(
+            (g) => g.attributes?.type !== "geometry"
+          );
+          graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
+        }
         graphicsLayerHover?.removeAll();
         redGraphicsLayer?.removeAll();
-        setPoints(dbPoints);
 
         mapView?.goTo(
           {
@@ -60,9 +66,15 @@ export default function HeadButtonsTools() {
       } else {
         setSelectedTab(item.id);
         setOpenSideBar(true);
+        resetFeatures();
+        // Remove all graphics except geometries
+        if (graphicsLayer) {
+          const graphicsToRemove = graphicsLayer.graphics.filter(
+            (g) => g.attributes?.type !== "geometry"
+          );
+          graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
+        }
         redGraphicsLayer?.removeAll();
-        setPoints(dbPoints);
-        graphicsLayer?.removeAll();
         graphicsLayerHover?.removeAll();
       }
 

@@ -12,13 +12,17 @@ import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, graphicsLayer } = useMapViewState();
-  const { geometries, fetchGeometries } = useGeometriesStore();
+  const { geometries, fetchGeometries, fetchDBGeometries } = useGeometriesStore();
 
   // Fetch geometries
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
 
     fetchGeometries({
+      regio: user.role && user.role !== "admin" ? user.role : undefined,
+    });
+
+    fetchDBGeometries({
       regio: user.role && user.role !== "admin" ? user.role : undefined,
     });
   }, [user]);

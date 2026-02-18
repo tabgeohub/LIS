@@ -3,7 +3,7 @@ import { useFlightPlanState } from "../../helpers/flightPlanStates";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function Buttons({
   setOpenFilter,
@@ -12,7 +12,7 @@ export default function Buttons({
 }) {
   const logAction = useLogAction();
 
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const {
     step,
@@ -54,7 +54,7 @@ export default function Buttons({
     resetFilters();
     setSelectedPoints([]);
 
-    setPoints(dbPoints);
+    resetFeatures();
 
     clearGraphics();
   };
@@ -75,7 +75,7 @@ export default function Buttons({
 
       <button
         onClick={() => {
-          setPoints(dbPoints);
+          resetFeatures();
 
           clear();
           handleCancel();

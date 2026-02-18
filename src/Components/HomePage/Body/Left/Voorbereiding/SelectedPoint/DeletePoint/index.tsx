@@ -4,6 +4,7 @@ import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottom
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { CgClose, CgSpinner } from "react-icons/cg";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";
@@ -20,6 +21,7 @@ export default function DeletePoint() {
 
   const { clickedPointId } = usePopUpState();
   const { points, fetchDBPoints, fetchPoints } = usePointsStore();
+  const { fetchGeometries } = useGeometriesStore();
 
   const { mapView } = useMapViewState();
 
@@ -36,6 +38,10 @@ export default function DeletePoint() {
       });
 
       fetchPoints({
+        regio: user?.role,
+      });
+
+      fetchGeometries({
         regio: user?.role,
       });
 

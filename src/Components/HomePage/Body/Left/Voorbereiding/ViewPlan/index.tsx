@@ -16,7 +16,7 @@ import { filterPlans } from "@helpers/filterPlans";
 import { FlightPlanType } from "Types";
 import { useViewPlanState } from "./helpers/useViewPlanState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";
 import AddPointToPlan from "./Steps/AddPointToPlan";
 
@@ -33,7 +33,7 @@ export default function ViewPlan({
   const { setOpenTable } = useOpenTable();
   const { setSelectedTab } = useTabState();
   const { user } = useAuth();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const {
     initialPlans,
@@ -86,7 +86,7 @@ export default function ViewPlan({
     graphicsLayerHover?.removeAll();
     yellowGraphicsLayer?.removeAll();
 
-    setPoints(dbPoints);
+    resetFeatures();
 
     setOpenTable(false);
     setVluchtnummer("");

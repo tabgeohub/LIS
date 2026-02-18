@@ -3,7 +3,7 @@ import { useViewPlanState } from "../../Voorbereiding/ViewPlan/helpers/useViewPl
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useFilterState } from "@helpers/ZustandStates/filterState";
 
 export default function TabHeader() {
@@ -12,7 +12,7 @@ export default function TabHeader() {
     useMapViewState();
   const { setSelectedIndex } = useViewPlanState();
 
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const {
     setNaamAandachtspunt,
@@ -33,7 +33,7 @@ export default function TabHeader() {
     setTot("");
     setHerhalen("");
 
-    setPoints(dbPoints);
+    resetFeatures();
 
     setSelectedTab("none");
   }
@@ -44,7 +44,7 @@ export default function TabHeader() {
     if (selectedTab === "viewPlan") {
       setSelectedIndex(0);
 
-      setPoints(dbPoints);
+      resetFeatures();
 
       graphicsLayer?.removeAll();
       graphicsLayerHover?.removeAll();

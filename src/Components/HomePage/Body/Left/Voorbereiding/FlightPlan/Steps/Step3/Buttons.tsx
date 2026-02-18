@@ -8,7 +8,7 @@ import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFli
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import toast from "react-hot-toast";
 
 export default function Buttons({
@@ -23,7 +23,7 @@ export default function Buttons({
   const handleCancel = useCancelCreateFlightPlan();
   const { yellowGraphicsLayer, clearGraphics } = useMapViewState();
 
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const { create, loading } = useCreateData("/flightPlans");
   const { selectedLayers } = kaartlagenState();
@@ -150,7 +150,7 @@ export default function Buttons({
 
       <button
         onClick={() => {
-          setPoints(dbPoints);
+          resetFeatures();
 
           handleCancel();
           resetFilters();

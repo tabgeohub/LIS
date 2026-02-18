@@ -3,7 +3,7 @@ import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/Te
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "./Buttons";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
@@ -22,7 +22,7 @@ export default function Form({
   const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
     useFinishedPlansState();
 
-  const { setPoints, dbPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
 
@@ -71,7 +71,7 @@ export default function Form({
 
       if (!selectedPlan) return;
 
-      setPoints(dbPoints);
+      resetFeatures();
       setAction("form");
 
       setSelectedPoint(updatedPoint);

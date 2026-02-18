@@ -3,7 +3,7 @@ import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { nabewerkingTabs } from "./constants";
 import FilterTabs from "./Common/FilterTabs";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
@@ -12,7 +12,7 @@ import { useContent } from "hooks/useContent";
 export default function HeadButtonsNabewerking() {
   const { setSelectedTab } = useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
-  const { dbPoints, setPoints } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   const { graphicsLayer, graphicsLayerHover, redGraphicsLayer } =
     useMapViewState();
@@ -36,10 +36,16 @@ export default function HeadButtonsNabewerking() {
                   reset();
                   setSelectedTab(item.id);
                   setOpenSideBar(true);
-                  graphicsLayer?.removeAll();
+                  resetFeatures();
+                  // Remove all graphics except geometries
+                  if (graphicsLayer) {
+                    const graphicsToRemove = graphicsLayer.graphics.filter(
+                      (g) => g.attributes?.type !== "geometry"
+                    );
+                    graphicsToRemove.forEach((g) => graphicsLayer.remove(g));
+                  }
                   graphicsLayerHover?.removeAll();
                   redGraphicsLayer?.removeAll();
-                  setPoints(dbPoints);
                 }
               }}
             />

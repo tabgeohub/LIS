@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Header from "./Header";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import SinglePoint from "./SinglePoints";
 import { EnrichedPointType } from "Types";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
@@ -26,10 +27,11 @@ export default function ChangePoint({
   const [newSelectedPoint, setNewSelectedPoint] =
     useState<EnrichedPointType | null>(null);
 
-  const { points, setPoints, dbPoints } = usePointsStore();
+  const { points } = usePointsStore();
+  const { resetFeatures } = useResetFeatures();
 
   useEffect(() => {
-    setPoints(dbPoints);
+    resetFeatures();
   }, []);
 
   const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
@@ -57,7 +59,7 @@ export default function ChangePoint({
     update(newUpdatedPoint, (responseData) => {
       if (!responseData.result) return;
 
-      setPoints(dbPoints);
+      resetFeatures();
       setAction("form");
     });
 

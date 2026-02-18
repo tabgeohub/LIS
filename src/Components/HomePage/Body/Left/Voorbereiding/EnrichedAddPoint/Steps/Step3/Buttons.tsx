@@ -3,6 +3,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useEnrichedPointState } from "../../../../../../../../hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 
@@ -14,6 +15,7 @@ export default function Buttons({
   const { redGraphicsLayer } = useMapViewState();
   const { user } = useAuth();
   const { fetchDBPoints, fetchPoints } = usePointsStore();
+  const { fetchGeometries } = useGeometriesStore();
 
   const { create } = useCreateData("/points");
 
@@ -57,6 +59,10 @@ export default function Buttons({
     });
 
     fetchPoints({
+      regio: user?.role,
+    });
+
+    fetchGeometries({
       regio: user?.role,
     });
 
