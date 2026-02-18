@@ -16,7 +16,7 @@ import { filterPlans } from "@helpers/filterPlans";
 import { FlightPlanType } from "Types";
 import { useViewPlanState } from "./helpers/useViewPlanState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";
 import AddPointToPlan from "./Steps/AddPointToPlan";
 

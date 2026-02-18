@@ -1,6 +1,6 @@
 import { useContent } from "hooks/useContent";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function Header({
   setFilterTerm,

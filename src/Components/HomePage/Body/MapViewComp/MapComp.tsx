@@ -7,10 +7,10 @@ import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 import { useMapInitialization } from "hooks/useMapInitialization";
-import { useRenderPoints } from "hooks/useRenderPoints";
+import { useRenderPoints } from "hooks/features/useRenderPoints";
 import { regionsCoordinates } from "@constants/regionCoordintaes";
 import BasemapWidget from "./BasemapWidget";
-import { useRenderGeometries } from "hooks/useRenderGeometries";
+import { useRenderGeometries } from "hooks/features/useRenderGeometries";
 
 export default function MapComp({
   mapDiv,

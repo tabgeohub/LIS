@@ -2,7 +2,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { ActionType } from ".";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFinishedPlan";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 

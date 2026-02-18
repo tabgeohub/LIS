@@ -4,7 +4,7 @@ import DeletePoint from "./Actions/DeletePoint";
 import ViewPlans from "./Actions/ViewPlans";
 import AddToPlan from "./Actions/AddToPlan";
 import Filter from "./Actions/Filter";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 
 export default function AandachtspuntenVerwijderen() {

@@ -1,6 +1,6 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import React from "react";
 import { getDistanceInMeters } from "../../helpers/getDistanceInMeters";
 import toast from "react-hot-toast";

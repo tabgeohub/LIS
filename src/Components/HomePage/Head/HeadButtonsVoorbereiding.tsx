@@ -4,7 +4,7 @@ import { voorbereidingTabs } from "./constants";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import FilterTabs from "./Common/FilterTabs";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";

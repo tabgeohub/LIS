@@ -10,7 +10,7 @@ import Buttons from "./Buttons";
 import Filter from "../../Common/Filter";
 import Header from "../../Common/Header";
 import PointsList from "../../Common/PointsList";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 dayjs.extend(isBetween);
 

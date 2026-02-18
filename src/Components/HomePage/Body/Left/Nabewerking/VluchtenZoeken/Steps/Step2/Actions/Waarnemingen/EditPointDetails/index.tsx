@@ -4,7 +4,7 @@ import Form from "./Actions/Form";
 import Foto from "./Actions/Foto";
 import ChangePoint from "./Actions/ChangePoint";
 import EditPointCoordinates from "./Actions/EditPointCoordinates";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function EditPointDetails({
   setOpenEdit,

@@ -8,7 +8,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useState } from "react";
 import Exporter from "../Body/Left/Tools/Exporter";
 import Uploaden from "../Body/Left/Tools/Uploaden";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";

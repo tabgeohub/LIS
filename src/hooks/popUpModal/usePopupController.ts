@@ -7,7 +7,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { createYellowCircle } from "Components/HomePage/Body/Common/PopupModal/createYellowCircle";
 import { setupClickListener } from "Components/HomePage/Body/Common/PopupModal/setupClickListener";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useEffect, useRef } from "react";
 
 export default function usePopupController(

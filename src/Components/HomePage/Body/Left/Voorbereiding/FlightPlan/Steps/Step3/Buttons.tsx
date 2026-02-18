@@ -8,7 +8,7 @@ import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFli
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import toast from "react-hot-toast";
 
 export default function Buttons({

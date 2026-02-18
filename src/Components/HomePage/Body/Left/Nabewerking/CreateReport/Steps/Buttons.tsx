@@ -3,7 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleStep2 } from "../helpers/useHandleStep2";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useLogAction from "hooks/useLogAction";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";

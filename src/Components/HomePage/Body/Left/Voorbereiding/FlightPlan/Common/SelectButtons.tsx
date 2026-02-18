@@ -1,6 +1,6 @@
 import { useContent } from "hooks/useContent";
 import { useFlightPlanState } from "../helpers/flightPlanStates";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
   const { setSelectedPoints, setSelectedPoints2 } = useFlightPlanState();

@@ -3,7 +3,7 @@ import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/Te
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "./Buttons";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";

@@ -7,7 +7,7 @@ import InputFormik from "../../Common/InputFormik";
 import SelectFormik from "../../Common/SelectFormik";
 import { EnrichedPointType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useLogAction from "hooks/useLogAction";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";

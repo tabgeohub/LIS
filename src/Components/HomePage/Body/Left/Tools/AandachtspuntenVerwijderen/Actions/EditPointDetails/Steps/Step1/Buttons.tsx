@@ -1,5 +1,5 @@
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
 import Loading from "./Loading";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";

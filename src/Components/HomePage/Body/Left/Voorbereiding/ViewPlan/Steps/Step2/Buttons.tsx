@@ -2,7 +2,7 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
 import { useViewPlanState } from "../../helpers/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 export default function Buttons({

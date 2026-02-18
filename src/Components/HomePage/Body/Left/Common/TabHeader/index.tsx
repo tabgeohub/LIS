@@ -3,7 +3,7 @@ import { useViewPlanState } from "../../Voorbereiding/ViewPlan/helpers/useViewPl
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useFilterState } from "@helpers/ZustandStates/filterState";
 
 export default function TabHeader() {

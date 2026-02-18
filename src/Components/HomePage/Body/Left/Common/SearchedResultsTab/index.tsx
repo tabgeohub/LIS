@@ -9,7 +9,7 @@ import PointsBuffer from "./Functions/PointsBuffer";
 import PointDetails from "./Points/PointDetails";
 import Points from "./Points";
 import AddPoint from "./Functions/AddPoint";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function SearchedResultsTab() {
   const [fase, setFase] = useState<string>("all");

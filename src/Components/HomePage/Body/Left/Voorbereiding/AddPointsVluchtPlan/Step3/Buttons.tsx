@@ -4,7 +4,7 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function Buttons() {
   const { setPoints, dbPoints } = usePointsStore();

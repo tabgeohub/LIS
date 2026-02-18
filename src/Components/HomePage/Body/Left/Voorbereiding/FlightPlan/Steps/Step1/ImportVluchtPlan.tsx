@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import * as XLSX from "xlsx";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";

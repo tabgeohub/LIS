@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import Header from "./Header";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import SinglePoint from "./SinglePoints";
 import { EnrichedPointType } from "Types";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";

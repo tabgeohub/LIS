@@ -7,7 +7,7 @@ import Buttons from "./Buttons";
 import Filter from "../../Common/Filter";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 import { useFlightPlanState } from "../../helpers/flightPlanStates";
 import Header from "../../Common/Header";

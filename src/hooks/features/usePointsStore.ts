@@ -110,3 +110,4 @@ export const usePointsStore = create<PointsState>((set) => ({
 
   clearPoints: () => set({ points: [] }),
 }));
+

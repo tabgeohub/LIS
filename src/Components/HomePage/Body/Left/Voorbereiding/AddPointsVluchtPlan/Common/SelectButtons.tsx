@@ -1,5 +1,5 @@
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
   const { points } = usePointsStore();

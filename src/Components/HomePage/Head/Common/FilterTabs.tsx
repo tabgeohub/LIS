@@ -4,7 +4,7 @@ import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { IoReloadCircle } from "react-icons/io5";
 import { TbFilterQuestion } from "react-icons/tb";
 

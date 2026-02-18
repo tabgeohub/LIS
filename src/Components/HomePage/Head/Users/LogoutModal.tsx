@@ -3,7 +3,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import Modal from "Components/HomePage/Body/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function LogoutModal({
   isOpen,

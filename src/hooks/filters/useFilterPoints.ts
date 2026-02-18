@@ -1,5 +1,5 @@
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { EnrichedPointType } from "Types";
 
 export function useFilterPoints() {

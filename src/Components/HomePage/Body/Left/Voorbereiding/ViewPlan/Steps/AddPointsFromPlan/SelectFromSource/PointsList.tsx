@@ -5,7 +5,7 @@ import { EnrichedPointType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 import usePointHover from "hooks/hover-click-handlers/usePointHover";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 type Point = { id: number; omschrijving: string };
 type ItemModel = { id: number; title: string; points: Point[] };

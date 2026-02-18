@@ -5,7 +5,7 @@ import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
 import { useUpdateData } from "utils/useUpdateData";
 import { EnrichedPointType } from "Types";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";

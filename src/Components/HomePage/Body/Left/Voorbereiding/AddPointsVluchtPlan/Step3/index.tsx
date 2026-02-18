@@ -8,7 +8,7 @@ import Filter from "../Common/Filter";
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 import Header from "../Common/Header";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";

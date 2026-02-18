@@ -1,7 +1,7 @@
 import { classNames } from "@helpers/classNames";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function CommonTabBtn({
   item,

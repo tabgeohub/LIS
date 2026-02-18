@@ -3,7 +3,7 @@ import Header from "./Header";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import SinglePoint from "./SinglePoint";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";

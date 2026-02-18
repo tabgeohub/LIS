@@ -3,7 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import Form from "./Form";
 import PointsList from "./PointsList";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useEffect } from "react";
 import Point from "@arcgis/core/geometry/Point";
 import { useViewPlanState } from "../../helpers/useViewPlanState";

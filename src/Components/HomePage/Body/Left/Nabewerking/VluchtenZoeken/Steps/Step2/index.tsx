@@ -6,7 +6,7 @@ import EditFlight from "./Actions/EditFlight";
 import VliegrouteExporteren from "./Actions/VliegrouteExporteren";
 import Waarnemingen from "./Actions/Waarnemingen";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useDrawPath from "hooks/hover-click-handlers/useDrawPath";
 import { useReadData } from "utils/useReadData";
 import { FinishedFlightPlanType } from "Types/finished_plans";

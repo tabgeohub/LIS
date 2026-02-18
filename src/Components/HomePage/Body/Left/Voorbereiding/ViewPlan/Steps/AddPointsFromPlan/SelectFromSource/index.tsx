@@ -17,7 +17,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import Point from "@arcgis/core/geometry/Point";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 

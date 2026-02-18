@@ -3,7 +3,7 @@ import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { CgClose, CgSpinner } from "react-icons/cg";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";

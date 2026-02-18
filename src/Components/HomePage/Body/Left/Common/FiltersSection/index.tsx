@@ -11,7 +11,7 @@ import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useContent } from "hooks/useContent";
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function FiltersSection() {
   const { setSelectedTab } = useTabState();

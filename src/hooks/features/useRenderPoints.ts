@@ -4,7 +4,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import { usePointsStore } from "./zustand/usePointsStore";
+import { usePointsStore } from "./usePointsStore";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 
@@ -111,3 +111,4 @@ export function useRenderPoints() {
     return () => handle.remove();
   }, [mapView, pointsGraphicsLayer]);
 }
+

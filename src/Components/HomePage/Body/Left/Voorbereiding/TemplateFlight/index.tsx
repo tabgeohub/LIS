@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useTemplateFlightState } from "./templateFlightStates";
 import Filter from "./Steps/Filter";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { EnrichedPointType } from "Types";
 import Step1 from "./Steps/Step1";
 import Step2 from "./Steps/Step2";

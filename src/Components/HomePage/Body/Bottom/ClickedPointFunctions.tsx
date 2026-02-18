@@ -3,7 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
 import { EnrichedPointType } from "Types";
 import { useDeleteData } from "utils/useDeleteData";

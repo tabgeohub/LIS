@@ -2,7 +2,7 @@ import createYellowBorder from "@helpers/ArcGISHelpers/createYellowBorder";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import usePointClick from "hooks/hover-click-handlers/usePointClick";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { useEffect } from "react";
 

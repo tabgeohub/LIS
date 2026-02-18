@@ -9,7 +9,7 @@ import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
 
 import { useEnrichedPointState } from "../../../../../../hooks/zustand/useEnrichedPointState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import toast from "react-hot-toast";
 import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
 import useLogAction from "hooks/useLogAction";

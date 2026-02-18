@@ -7,7 +7,7 @@ import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
-import { useGeometriesStore, Geometry } from "./zustand/useGeometriesStore";
+import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 
 export function useRenderGeometries() {
   const { user } = useAuth();

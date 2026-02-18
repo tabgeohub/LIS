@@ -1,5 +1,5 @@
 import { useFilterState } from "@helpers/ZustandStates/filterState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export function useHandleFilterTab() {
   const { fetchPoints } = usePointsStore();

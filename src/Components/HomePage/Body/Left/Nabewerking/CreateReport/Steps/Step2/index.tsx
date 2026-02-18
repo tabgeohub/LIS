@@ -4,7 +4,7 @@ import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import useLogAction from "hooks/useLogAction";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useEffect } from "react";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import {

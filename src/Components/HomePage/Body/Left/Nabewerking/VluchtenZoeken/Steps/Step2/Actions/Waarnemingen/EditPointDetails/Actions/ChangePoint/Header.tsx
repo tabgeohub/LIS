@@ -1,4 +1,4 @@
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function Header({
   setFilterTerm,

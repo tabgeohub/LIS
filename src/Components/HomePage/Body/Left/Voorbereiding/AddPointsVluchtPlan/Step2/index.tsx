@@ -8,7 +8,7 @@ import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPoin
 import Header from "../Common/Header";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";

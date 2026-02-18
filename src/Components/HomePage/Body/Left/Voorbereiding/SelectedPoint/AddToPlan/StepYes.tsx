@@ -4,7 +4,7 @@ import useLogAction from "hooks/useLogAction";
 import { useState } from "react";
 import { LuHexagon } from "react-icons/lu";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 export default function StepYes({
   setStep,
 }: {

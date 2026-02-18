@@ -1,7 +1,7 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { FlightPlanType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
 

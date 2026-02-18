@@ -3,7 +3,7 @@ import { useFlightPlanState } from "../../helpers/flightPlanStates";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function Buttons({
   setOpenFilter,

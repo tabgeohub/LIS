@@ -3,7 +3,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { useDeleteData } from "utils/useDeleteData";
 import { useState } from "react";
 import ConfirmationModal from "./ConfirmationModal";

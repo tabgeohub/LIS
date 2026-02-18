@@ -2,7 +2,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useEnrichedPointState } from "../../../../../../../../hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 

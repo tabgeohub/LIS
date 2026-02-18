@@ -2,7 +2,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 
 export default function Buttons() {
   const { setPoints, dbPoints } = usePointsStore();

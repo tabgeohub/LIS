@@ -13,7 +13,7 @@ import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePointsStore } from "hooks/zustand/usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
 
 import Step1 from "./Step1";
