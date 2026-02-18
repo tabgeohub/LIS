@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import Search from "@arcgis/core/widgets/Search";
+import Graphic from "@arcgis/core/Graphic";
 
 interface RegionData {
   [key: string]: {
@@ -98,7 +99,13 @@ export const useMapViewState = create<{
   clearGraphics: () => {
     const { graphicsLayer, graphicsLayerHover, yellowGraphicsLayer } = get();
 
-    graphicsLayer?.removeAll();
+    // Remove all graphics except geometries
+    if (graphicsLayer) {
+      const graphicsToRemove = graphicsLayer.graphics.filter(
+        (g: Graphic) => g.attributes?.type !== "geometry"
+      );
+      graphicsToRemove.forEach((g: Graphic) => graphicsLayer.remove(g));
+    }
     graphicsLayerHover?.removeAll();
     yellowGraphicsLayer?.removeAll();
   },
