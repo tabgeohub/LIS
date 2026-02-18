@@ -5,6 +5,8 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 
 import { useMapInitialization } from "hooks/useMapInitialization";
 import { useRenderPoints } from "hooks/features/useRenderPoints";
@@ -25,6 +27,7 @@ export default function MapComp({
     graphicsLayerHover,
     selectedPointGraphicsLayer,
     yellowGraphicsLayer,
+    geometriesGraphicsLayer,
   } = useMapViewState();
 
   useMapInitialization(mapDiv);
@@ -64,10 +67,11 @@ export default function MapComp({
       pointsGraphicsLayer,
       selectedPointGraphicsLayer,
       yellowGraphicsLayer,
+      geometriesGraphicsLayer,
     ].filter(Boolean) as (__esri.Layer | __esri.GraphicsLayer)[];
 
     const { setHovered } = useHoveredGraphicState.getState();
-    const hoverSymbol = new SimpleMarkerSymbol({
+    const pointHoverSymbol = new SimpleMarkerSymbol({
       style: "circle",
       color: [255, 213, 0, 0.9],
       size: 12,
@@ -75,6 +79,17 @@ export default function MapComp({
         color: [255, 255, 255, 1],
         width: 1.5,
       },
+    });
+    const polygonHoverSymbol = new SimpleFillSymbol({
+      color: [0, 0, 0, 0], // Transparent fill
+      outline: {
+        color: [255, 213, 0, 0.9], // Yellow outline
+        width: 3,
+      },
+    });
+    const lineHoverSymbol = new SimpleLineSymbol({
+      color: [255, 213, 0, 0.9], // Yellow
+      width: 4,
     });
 
     const clearHover = () => {
@@ -97,19 +112,36 @@ export default function MapComp({
         const match = response.results.find(
           (result): result is __esri.MapViewGraphicHit =>
             result.type === "graphic" &&
-            result.graphic?.geometry?.type === "point"
+            (result.graphic?.geometry?.type === "point" ||
+              result.graphic?.geometry?.type === "polygon" ||
+              result.graphic?.geometry?.type === "polyline")
         );
 
         if (match && match.graphic?.geometry) {
           const attrs = match.graphic.attributes || {};
-          const label =
-            attrs.omschrijving ||
-            attrs.name ||
-            attrs.label ||
-            attrs.title ||
-            "Onbekend punt";
+          const geometryType = match.graphic.geometry.type;
+          
+          // Determine label based on geometry type
+          let label: string;
+          if (geometryType === "polygon" || geometryType === "polyline") {
+            label =
+              attrs.omschrijving ||
+              attrs.name ||
+              attrs.label ||
+              attrs.title ||
+              (geometryType === "polygon" ? "Onbekend veelhoek" : "Onbekend lijn");
+          } else {
+            label =
+              attrs.omschrijving ||
+              attrs.name ||
+              attrs.label ||
+              attrs.title ||
+              "Onbekend punt";
+          }
+          
           const id =
             attrs.id ??
+            attrs.geometryId ??
             attrs.objectid ??
             attrs.objectId ??
             attrs.OBJECTID ??
@@ -117,6 +149,17 @@ export default function MapComp({
 
           setHovered({ id, label, point: attrs });
           graphicsLayerHover?.removeAll();
+          
+          // Choose appropriate hover symbol based on geometry type
+          let hoverSymbol: SimpleMarkerSymbol | SimpleFillSymbol | SimpleLineSymbol;
+          if (geometryType === "polygon") {
+            hoverSymbol = polygonHoverSymbol;
+          } else if (geometryType === "polyline") {
+            hoverSymbol = lineHoverSymbol;
+          } else {
+            hoverSymbol = pointHoverSymbol;
+          }
+          
           graphicsLayerHover?.add(
             new Graphic({
               geometry: match.graphic.geometry,
@@ -141,6 +184,7 @@ export default function MapComp({
     graphicsLayerHover,
     selectedPointGraphicsLayer,
     yellowGraphicsLayer,
+    geometriesGraphicsLayer,
   ]);
 
   return (

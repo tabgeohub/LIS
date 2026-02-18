@@ -14,7 +14,13 @@ export default function HoveredPointPopup() {
           transition={{ duration: 0.15 }}
           className="absolute top-3 right-3 z-[10001] bg-white/95 backdrop-blur rounded shadow px-3 py-2 border border-gray-200"
         >
-          <p className="text-xs text-gray-600">Aandachtspunt</p>
+          <p className="text-xs text-gray-600">
+            {hovered.point?.type === "geometry"
+              ? hovered.point?.geometryType === "polygon"
+                ? "Veelhoek"
+                : "Lijn"
+              : "Aandachtspunt"}
+          </p>
           <p className="text-sm font-semibold text-gray-800 max-w-[240px] truncate">
             {hovered.label}
           </p>
