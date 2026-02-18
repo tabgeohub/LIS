@@ -41,6 +41,12 @@ interface FlightPlanState {
   selectedPoints2: number[];
   setSelectedPoints2: (value: number[]) => void;
 
+  selectedGeometries: number[];
+  setSelectedGeometries: (value: number[]) => void;
+
+  selectedGeometries2: number[];
+  setSelectedGeometries2: (value: number[]) => void;
+
   hoveredGraphic: __esri.Graphic | null;
   setHoveredGraphic: (value: __esri.Graphic | null) => void;
 
@@ -93,6 +99,12 @@ export const useFlightPlanState = create<FlightPlanState>((set) => ({
   selectedPoints2: [],
   setSelectedPoints2: (value) => set({ selectedPoints2: value }),
 
+  selectedGeometries: [],
+  setSelectedGeometries: (value) => set({ selectedGeometries: value }),
+
+  selectedGeometries2: [],
+  setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
+
   hoveredGraphic: null,
   setHoveredGraphic: (value) => set({ hoveredGraphic: value }),
 
@@ -142,6 +154,12 @@ export const useFlightPlanState = create<FlightPlanState>((set) => ({
 
       selectedPoints2: [],
       setSelectedPoints2: (value) => set({ selectedPoints2: value }),
+
+      selectedGeometries: [],
+      setSelectedGeometries: (value) => set({ selectedGeometries: value }),
+
+      selectedGeometries2: [],
+      setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
 
       hoveredGraphic: null,
       setHoveredGraphic: (value) => set({ hoveredGraphic: value }),

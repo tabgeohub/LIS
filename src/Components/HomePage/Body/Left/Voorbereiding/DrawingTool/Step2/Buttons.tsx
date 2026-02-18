@@ -75,7 +75,6 @@ export default function Buttons() {
 
   async function handleSubmit() {
     if (!graphicsDrawn || graphicsDrawn.length === 0) {
-      console.log("No graphics drawn");
       return;
     }
 

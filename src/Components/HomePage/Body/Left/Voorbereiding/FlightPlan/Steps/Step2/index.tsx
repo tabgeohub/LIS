@@ -8,20 +8,25 @@ import Filter from "../../Common/Filter";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 
 import { useFlightPlanState } from "../../helpers/flightPlanStates";
 import Header from "../../Common/Header";
 import PointsList from "../../Common/PointsList";
+import GeometriesList from "../../Common/GeometriesList";
 import { EnrichedPointType } from "Types";
 
 dayjs.extend(isBetween);
 
 export default function Step2() {
   const { points, dbPoints, setPoints } = usePointsStore();
-  const { selectedPoints, setSelectedPoints } = useFlightPlanState();
+  const { geometries, dbGeometries, setGeometries } = useGeometriesStore();
+  const { selectedPoints, setSelectedPoints, selectedGeometries, setSelectedGeometries } = useFlightPlanState();
 
   const [filteredPoints, setFilteredPoints] =
     useState<EnrichedPointType[]>(points);
+  const [filteredGeometries, setFilteredGeometries] =
+    useState<Geometry[]>(geometries);
 
   const [openFilter, setOpenFilter] = useState(false);
 
@@ -29,8 +34,26 @@ export default function Step2() {
 
   useEffect(() => {
     setPoints(dbPoints.filter((point) => point.herhalen === 1));
-
     setFilteredPoints(dbPoints.filter((point) => point.herhalen === 1));
+
+    setGeometries(dbGeometries.filter((geometry) => {
+      const herhalenValue =
+        typeof geometry.herhalen === "number"
+          ? geometry.herhalen === 1
+          : typeof geometry.herhalen === "string"
+            ? geometry.herhalen === "1"
+            : geometry.herhalen === true;
+      return herhalenValue;
+    }));
+    setFilteredGeometries(dbGeometries.filter((geometry) => {
+      const herhalenValue =
+        typeof geometry.herhalen === "number"
+          ? geometry.herhalen === 1
+          : typeof geometry.herhalen === "string"
+            ? geometry.herhalen === "1"
+            : geometry.herhalen === true;
+      return herhalenValue;
+    }));
   }, []);
 
   return (
@@ -46,6 +69,15 @@ export default function Step2() {
           <ScrollButtonsLayout
             buttons={<Buttons setOpenFilter={setOpenFilter} />}
           >
+            <GeometriesList
+              selectedGeometries={selectedGeometries}
+              setSelectedGeometries={setSelectedGeometries}
+              geometries={filteredGeometries.filter((geometry) =>
+                geometry.omschrijving
+                  .toLowerCase()
+                  .includes(filterText.toLowerCase())
+              )}
+            />
             <PointsList
               selectedPoints={selectedPoints}
               setSelectedPoints={setSelectedPoints}

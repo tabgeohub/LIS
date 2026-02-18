@@ -9,6 +9,7 @@ import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import toast from "react-hot-toast";
 
 export default function Buttons({
@@ -33,6 +34,8 @@ export default function Buttons({
   const {
     selectedPoints2,
     selectedPoints,
+    selectedGeometries,
+    selectedGeometries2,
     setStep,
     vluchtnummer,
     omschrijving,
@@ -48,8 +51,28 @@ export default function Buttons({
   } = useFlightPlanState();
 
   const { map } = useMapViewState();
+  const { dbGeometries } = useGeometriesStore();
 
   const handleSubmit = () => {
+    // Get all selected geometries
+    const allSelectedGeometryIds = [...selectedGeometries, ...selectedGeometries2];
+
+    // Get the actual geometry objects
+    const selectedGeometryObjects = dbGeometries.filter((geometry) =>
+      allSelectedGeometryIds.includes(geometry.id)
+    );
+
+    // Extract all point IDs from selected geometries
+    const geometryPointIds = selectedGeometryObjects.flatMap((geometry) =>
+      geometry.points.map((point) => point.id)
+    );
+
+    // Combine all point IDs (selected points + points from selected geometries)
+    const allPointIds = [...selectedPoints, ...selectedPoints2, ...geometryPointIds];
+
+    // Remove duplicates
+    const uniquePointIds = Array.from(new Set(allPointIds));
+
     const attributes = {
       vluchtnummer,
       omschrijving,
@@ -61,7 +84,7 @@ export default function Buttons({
       passagiers: aantalPassagiers,
       hoofdthema: doelEnHoofdthema,
       aanvullende: aanvullendeInfo,
-      points: [...selectedPoints, ...selectedPoints2],
+      points: uniquePointIds,
       regio_id: user?.role,
       basemap: basemapString,
       layers: selectedLayers.join(","),

@@ -10,24 +10,47 @@ import Buttons from "./Buttons";
 import Filter from "../../Common/Filter";
 import Header from "../../Common/Header";
 import PointsList from "../../Common/PointsList";
+import GeometriesList from "../../Common/GeometriesList";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 
 dayjs.extend(isBetween);
 
 export default function Step3({ basemapString }: { basemapString: string }) {
   const { points, setPoints, dbPoints } = usePointsStore();
-  const { selectedPoints2, setSelectedPoints2 } = useFlightPlanState();
+  const { geometries, dbGeometries, setGeometries } = useGeometriesStore();
+  const { selectedPoints2, setSelectedPoints2, selectedGeometries2, setSelectedGeometries2 } = useFlightPlanState();
 
   const [openFilter, setOpenFilter] = useState(false);
   const [filteredPoints, setFilteredPoints] =
     useState<EnrichedPointType[]>(points);
+  const [filteredGeometries, setFilteredGeometries] =
+    useState<Geometry[]>(geometries);
 
   const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
     setPoints(dbPoints.filter((point) => point.herhalen === 0));
-
     setFilteredPoints(dbPoints.filter((point) => point.herhalen === 0));
+
+    setGeometries(dbGeometries.filter((geometry) => {
+      const herhalenValue =
+        typeof geometry.herhalen === "number"
+          ? geometry.herhalen === 0
+          : typeof geometry.herhalen === "string"
+            ? geometry.herhalen === "0"
+            : geometry.herhalen === false;
+      return herhalenValue;
+    }));
+    setFilteredGeometries(dbGeometries.filter((geometry) => {
+      const herhalenValue =
+        typeof geometry.herhalen === "number"
+          ? geometry.herhalen === 0
+          : typeof geometry.herhalen === "string"
+            ? geometry.herhalen === "0"
+            : geometry.herhalen === false;
+      return herhalenValue;
+    }));
   }, []);
 
   return (
@@ -49,6 +72,16 @@ export default function Step3({ basemapString }: { basemapString: string }) {
               />
             }
           >
+            <GeometriesList
+              selectedGeometries={selectedGeometries2}
+              setSelectedGeometries={setSelectedGeometries2}
+              geometries={filteredGeometries.filter((geometry) =>
+                geometry.omschrijving
+                  .toLowerCase()
+                  .includes(filterText.toLowerCase())
+              )}
+            />
+
             <PointsList
               selectedPoints={selectedPoints2}
               setSelectedPoints={setSelectedPoints2}
