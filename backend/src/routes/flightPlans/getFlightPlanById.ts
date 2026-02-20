@@ -39,12 +39,16 @@ export async function getFlightPlanById(
               'vertrouwelijk', pt.vertrouwelijk,
               'activiteit_id', pt.activiteit_id,
               'organisatie_id', pt.organisatie_id,
-              'specifiek_letten_op', pt.specifiek_letten_op
+              'specifiek_letten_op', pt.specifiek_letten_op,
+              'geometry_id', pt.geometry_id,
+              'geometry_type', g.type,
+              'geometry_omschrijving', g.omschrijving
             )
           ) AS points
         FROM lis.flightPlans fp
         JOIN LATERAL UNNEST(fp.points) AS point_id ON TRUE
         JOIN lis.points pt ON pt.id = point_id
+        LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
         WHERE fp.id = $1
         GROUP BY fp.id
         ORDER BY fp.id;

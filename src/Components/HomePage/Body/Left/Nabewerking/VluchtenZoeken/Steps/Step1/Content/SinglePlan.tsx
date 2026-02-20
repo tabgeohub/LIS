@@ -117,9 +117,8 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
       onClick={handleClick}
       onMouseEnter={handleHover}
       onMouseLeave={handleMouseLeave}
-      className={`p-2 hover:bg-gray-100 ${
-        selectedPlan?.id === plan.id && "bg-gray-200"
-      } transition-all cursor-pointer relative`}
+      className={`p-2 hover:bg-gray-100 ${selectedPlan?.id === plan.id && "bg-gray-200"
+        } transition-all cursor-pointer relative`}
     >
       <div className="flex items-center gap-x-2">
         <FaMapMarkedAlt className="size-6 text-blue-500" />
@@ -136,7 +135,7 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
       <div className="absolute mt-4 bottom-0 right-4">
         <LuWaypoints className="size-4 text-gray-500" />
         <div className="absolute bottom-2 -right-3 bg-[#3B82F6] rounded-full px-1 text-white text-[10px]">
-          {plan.points_data.length}
+          {plan.points_data.length + plan.geometries.length}
         </div>
       </div>
     </div>

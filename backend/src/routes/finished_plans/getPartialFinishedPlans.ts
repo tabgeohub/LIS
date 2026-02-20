@@ -34,7 +34,10 @@ export async function getPartialFinishedFlightPlans(
               'herhalen',         pt.herhalen,
               'user_id',          pt.user_id,
               'datum',            pt.created_at,
-              'organisatie_id',   pt.organisatie_id
+              'organisatie_id',   pt.organisatie_id,
+              'geometry_id',      pt.geometry_id,
+              'geometry_type',     g.type,
+              'geometry_omschrijving', g.omschrijving
             )
           )
           ORDER BY pt.created_at, pt.id
@@ -44,6 +47,8 @@ export async function getPartialFinishedFlightPlans(
         ON ppp.plan_id = fp.id
       JOIN lis.points pt
         ON pt.id = ppp.point_id
+      LEFT JOIN lis.geometries g
+        ON g.id = pt.geometry_id
       WHERE fp.status = 'finished'
       ${shouldFilter ? `AND fp.regio_id = $1` : ``}
       GROUP BY fp.id;
@@ -53,7 +58,44 @@ export async function getPartialFinishedFlightPlans(
 
     const result = await pool.query(sql, params);
 
-    res.status(200).json(result.rows);
+    // Format plans: group points with geometry_id into geometries array
+    const formattedPlans = result.rows.map((plan: any) => {
+      const points = plan.points_data || [];
+      const pointsWithoutGeometry: any[] = [];
+      const geometriesMap = new Map<number, any>();
+
+      // Separate points with and without geometry_id
+      points.forEach((point: any) => {
+        if (point.geometry_id) {
+          const geometryId = point.geometry_id;
+          
+          if (!geometriesMap.has(geometryId)) {
+            geometriesMap.set(geometryId, {
+              id: geometryId,
+              geometry_type: point.geometry_type || null,
+              geometry_omschrijving: point.geometry_omschrijving || null,
+              points: [],
+            });
+          }
+          
+          // Remove geometry fields from point before adding to geometry
+          const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
+          geometriesMap.get(geometryId)!.points.push(pointWithoutGeometry);
+        } else {
+          // Remove geometry fields from point (they'll be null/undefined anyway)
+          const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
+          pointsWithoutGeometry.push(pointWithoutGeometry);
+        }
+      });
+
+      return {
+        ...plan,
+        points_data: pointsWithoutGeometry,
+        geometries: Array.from(geometriesMap.values()),
+      };
+    });
+
+    res.status(200).json(formattedPlans);
   } catch (error: any) {
     console.error("❌ Error fetching finished flightplans:", error);
     res.status(500).json({

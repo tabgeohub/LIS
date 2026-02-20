@@ -21,6 +21,7 @@ export interface EnrichedPointType {
   region: string;
   copiedFrom?: number;
   geometry_id?: number;
+  geometry_omschrijving?: string;
 }
 
 export interface FlightPlanType {

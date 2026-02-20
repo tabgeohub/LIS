@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from "react";
 import SinglePoint from "./SinglePoint";
+import SingleGeometry from "./SingleGeometry";
 import { ActionType } from "../..";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { useTabState } from "@helpers/ZustandStates/tabState";
@@ -8,6 +9,7 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import EditPointDetails from "./EditPointDetails";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { FinishedGeometryType } from "Types/finished_plans";
 
 export default function Waarnemingen({
   setAction,
@@ -25,13 +27,23 @@ export default function Waarnemingen({
 
   const [openEdit, setOpenEdit] = useState(false);
 
+  const [selectedGeometry, setSelectedGeometry] = useState<FinishedGeometryType | null>(null);
+
   const content = useContent();
 
   const filteredPoints = useMemo(() => {
     return selectedPlan?.points_data.filter((point) =>
       point.omschrijving.toLowerCase().includes(value.toLowerCase())
     );
-  }, [value, openEdit]);
+  }, [value, openEdit, selectedPlan?.points_data]);
+
+  const filteredGeometries = useMemo(() => {
+    return selectedPlan?.geometries.filter((geometry) => {
+      const searchTerm = value.toLowerCase();
+      const omschrijving = geometry.geometry_omschrijving?.toLowerCase() || "";
+      return omschrijving.includes(searchTerm);
+    });
+  }, [value, openEdit, selectedPlan?.geometries]);
 
   useEffect(() => {
     setValue("");
@@ -97,12 +109,20 @@ export default function Waarnemingen({
             }
           >
             <div className="divide-y-2 pb-10">
+              {filteredGeometries?.map((geometry) => (
+                <SingleGeometry
+                  geometry={geometry}
+                  selectedGeometry={selectedGeometry}
+                  setSelectedGeometry={setSelectedGeometry}
+                  key={`geometry-${geometry.id}`}
+                />
+              ))}
               {filteredPoints?.map((point) => (
                 <SinglePoint
                   selectedPoint={selectedPoint!}
                   setSelectedPoint={setSelectedPoint}
                   point={point}
-                  key={point.id}
+                  key={`point-${point.id}`}
                 />
               ))}
             </div>

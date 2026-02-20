@@ -18,6 +18,7 @@ export interface FinishedFlightPlanType {
   passagiers: number;
   piloot: string;
   points_data: FinishedPointType[];
+  geometries: FinishedGeometryType[];
   user_id: number;
   vliegduur: string;
   vluchtnummer: string;
@@ -45,6 +46,13 @@ export interface FinishedPointType {
   attachments: AttachmentType[];
   spoed?: boolean;
   spoedemail?: string;
+}
+
+export interface FinishedGeometryType {
+  id: number;
+  geometry_type: string | null;
+  geometry_omschrijving: string | null;
+  points: FinishedPointType[];
 }
 
 export interface AttachmentType {
