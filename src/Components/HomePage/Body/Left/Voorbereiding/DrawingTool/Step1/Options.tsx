@@ -104,13 +104,13 @@ export default function Options({
           });
         } else if (tool === "line") {
           symbol = new SimpleLineSymbol({
-            color: [226, 119, 40],
+            color: [0, 0, 255, 1], // Blue
             width: 3,
           });
         } else if (tool === "polygon") {
           symbol = new SimpleFillSymbol({
-            color: [226, 119, 40, 0.3],
-            outline: { color: [226, 119, 40], width: 2 },
+            color: [0, 0, 0, 0], // Empty inside (fully transparent)
+            outline: { color: [0, 0, 255, 1], width: 2 }, // Blue outline
           });
         }
 

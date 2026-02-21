@@ -64,8 +64,11 @@ export default function Step2() {
   }, [finishedPlan]);
 
   // Render points directly from points_data to ensure "Ad hoc" points are included
+  // Only render plan points when action is not "none" (i.e., when in a specific action view)
   useEffect(() => {
     if (!mapView || !pointsGraphicsLayer || !selectedPlan?.points_data) return;
+    // When action is "none", let useRenderPoints handle rendering all points
+    if (action === "none") return;
 
     pointsGraphicsLayer.removeAll();
 
@@ -125,11 +128,14 @@ export default function Step2() {
     if (graphics.length > 0) {
       pointsGraphicsLayer.addMany(graphics);
     }
-  }, [selectedPlan?.points_data, mapView, pointsGraphicsLayer]);
+  }, [selectedPlan?.points_data, mapView, pointsGraphicsLayer, action]);
 
   // Render geometries directly from selectedPlan.geometries to ensure only plan geometries are shown
+  // Only render plan geometries when action is not "none" (i.e., when in a specific action view)
   useEffect(() => {
     if (!mapView || !geometriesGraphicsLayer || !selectedPlan?.geometries) return;
+    // When action is "none", let useRenderGeometries handle rendering all geometries
+    if (action === "none") return;
 
     geometriesGraphicsLayer.removeAll();
 
@@ -185,7 +191,7 @@ export default function Step2() {
         const fillSymbol = new SimpleFillSymbol({
           color: [0, 0, 0, 0], // Empty inside (fully transparent)
           outline: {
-            color: [255, 0, 0, 1], // Red outline
+            color: [0, 0, 255, 1], // Blue outline
             width: 2,
           },
         });
@@ -209,7 +215,7 @@ export default function Step2() {
         });
 
         const lineSymbol = new SimpleLineSymbol({
-          color: [0, 255, 0, 1], // Green
+          color: [0, 0, 255, 1], // Blue
           width: 3,
         });
 
@@ -231,7 +237,7 @@ export default function Step2() {
     if (graphics.length > 0) {
       geometriesGraphicsLayer.addMany(graphics);
     }
-  }, [selectedPlan?.geometries, mapView, geometriesGraphicsLayer]);
+  }, [selectedPlan?.geometries, mapView, geometriesGraphicsLayer, action]);
 
   return (
     <div className="p-1.5 h-full">

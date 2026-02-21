@@ -10,6 +10,8 @@ import EditPointDetails from "./EditPointDetails";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import { FinishedGeometryType } from "Types/finished_plans";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 export default function Waarnemingen({
   setAction,
@@ -22,6 +24,8 @@ export default function Waarnemingen({
     useFinishedPlansState();
 
   const { setSelectedTab } = useTabState();
+  const { resetFeatures } = useResetFeatures();
+  const { pointsGraphicsLayer, geometriesGraphicsLayer } = useMapViewState();
 
   const [value, setValue] = useState("");
 

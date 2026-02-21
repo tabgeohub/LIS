@@ -63,7 +63,7 @@ export function useRenderGeometries() {
         const fillSymbol = new SimpleFillSymbol({
           color: [0, 0, 0, 0], // Empty inside (fully transparent)
           outline: {
-            color: [255, 0, 0, 1], // Red outline
+            color: [0, 0, 255, 1], // Blue outline
             width: 2,
           },
         });
@@ -93,7 +93,7 @@ export function useRenderGeometries() {
         });
 
         const lineSymbol = new SimpleLineSymbol({
-          color: [0, 255, 0, 1], // Green
+          color: [0, 0, 255, 1], // Blue
           width: 3,
         });
 
