@@ -1,6 +1,7 @@
 import {
   FinishedFlightPlanType,
   FinishedPointType,
+  FinishedGeometryType,
 } from "Types/finished_plans";
 import { create } from "zustand";
 
@@ -31,6 +32,9 @@ interface FinishedPlansState {
 
   selectedPoint: FinishedPointType | null;
   setSelectedPoint: (value: FinishedPointType | null) => void;
+
+  selectedGeometry: FinishedGeometryType | null;
+  setSelectedGeometry: (value: FinishedGeometryType | null) => void;
 
   omschrijving: string;
   setOmschrijving: (value: string) => void;
@@ -92,6 +96,9 @@ export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
 
   selectedPoint: null,
   setSelectedPoint: (value) => set({ selectedPoint: value }),
+
+  selectedGeometry: null,
+  setSelectedGeometry: (value) => set({ selectedGeometry: value }),
 
   omschrijving: "",
   setOmschrijving: (value) => set({ omschrijving: value }),

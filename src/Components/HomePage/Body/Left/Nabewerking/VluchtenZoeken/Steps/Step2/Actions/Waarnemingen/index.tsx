@@ -7,11 +7,9 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import EditPointDetails from "./EditPointDetails";
+import EditGeometryDetails from "./EditGeometryDetails";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { FinishedGeometryType } from "Types/finished_plans";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 export default function Waarnemingen({
   setAction,
@@ -20,18 +18,14 @@ export default function Waarnemingen({
 }) {
   const logAction = useLogAction();
 
-  const { selectedPlan, selectedPoint, setSelectedPoint } =
+  const { selectedPlan, selectedPoint, setSelectedPoint, selectedGeometry, setSelectedGeometry } =
     useFinishedPlansState();
 
   const { setSelectedTab } = useTabState();
-  const { resetFeatures } = useResetFeatures();
-  const { pointsGraphicsLayer, geometriesGraphicsLayer } = useMapViewState();
 
   const [value, setValue] = useState("");
 
   const [openEdit, setOpenEdit] = useState(false);
-
-  const [selectedGeometry, setSelectedGeometry] = useState<FinishedGeometryType | null>(null);
 
   const content = useContent();
 
@@ -94,7 +88,7 @@ export default function Waarnemingen({
                       step: "Second step - Edit point",
                     });
                   }}
-                  disabled={!selectedPoint}
+                  disabled={!selectedPoint && !selectedGeometry}
                   className="gray-button"
                 >
                   {content.common.volgende}
@@ -121,14 +115,20 @@ export default function Waarnemingen({
                 <SingleGeometry
                   geometry={geometry}
                   selectedGeometry={selectedGeometry}
-                  setSelectedGeometry={setSelectedGeometry}
+                  setSelectedGeometry={(geometry) => {
+                    setSelectedGeometry(geometry);
+                    setSelectedPoint(null);
+                  }}
                   key={`geometry-${geometry.id}`}
                 />
               ))}
               {filteredPoints?.map((point) => (
                 <SinglePoint
                   selectedPoint={selectedPoint!}
-                  setSelectedPoint={setSelectedPoint}
+                  setSelectedPoint={(point) => {
+                    setSelectedPoint(point);
+                    setSelectedGeometry(null);
+                  }}
                   point={point}
                   key={`point-${point.id}`}
                 />
@@ -138,7 +138,10 @@ export default function Waarnemingen({
         </>
       )}
 
-      {openEdit && <EditPointDetails setOpenEdit={setOpenEdit} />}
+      {openEdit && selectedPoint && <EditPointDetails setOpenEdit={setOpenEdit} />}
+      {openEdit && selectedGeometry && !selectedPoint && (
+        <EditGeometryDetails setOpenEdit={setOpenEdit} />
+      )}
     </div>
   );
 }
