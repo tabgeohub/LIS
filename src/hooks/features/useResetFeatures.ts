@@ -7,10 +7,8 @@ export function useResetFeatures() {
 
   const resetFeatures = () => {
     setPoints(dbPoints);
-    // Only reset geometries if dbGeometries has data, otherwise preserve current state
-    if (dbGeometries && dbGeometries.length > 0) {
-      setGeometries(dbGeometries);
-    }
+    // Always reset geometries to dbGeometries (even if empty, to clear filtered state)
+    setGeometries(dbGeometries || []);
   };
 
   return { resetFeatures };

@@ -8,11 +8,13 @@ import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { useGeometriesStore, Geometry } from "./useGeometriesStore";
+import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, geometriesGraphicsLayer } = useMapViewState();
   const { geometries, fetchGeometries, fetchDBGeometries } = useGeometriesStore();
+  const { step } = useFinishedPlansState();
 
   // Fetch geometries
   useEffect(() => {
@@ -31,6 +33,8 @@ export function useRenderGeometries() {
   useEffect(() => {
     if (!map || !geometriesGraphicsLayer || !geometries || geometries.length === 0) return;
     if (user.user_id === undefined || user.user_id === 0) return;
+    // Skip rendering when in Step2 - useRenderPlanGeometries handles rendering plan geometries
+    if (step === 2) return;
 
     // Clear existing geometry graphics
     geometriesGraphicsLayer.removeAll();
@@ -129,6 +133,6 @@ export function useRenderGeometries() {
         geometriesGraphicsLayer.removeAll();
       }
     };
-  }, [map, geometriesGraphicsLayer, geometries, user]);
+  }, [map, geometriesGraphicsLayer, geometries, user, step]);
 }
 
