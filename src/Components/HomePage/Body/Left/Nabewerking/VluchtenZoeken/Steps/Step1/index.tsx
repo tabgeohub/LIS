@@ -8,12 +8,11 @@ import { useReadData } from "utils/useReadData";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import PeriodFilter from "Components/HomePage/Body/Left/Common/PeriodFilter";
-import { useFilterPlans } from "../../hooks/useFilterPlans";
+import { useFilterAndSortPlans } from "../../hooks/useFilterAndSortPlans";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 
 export default function Step1() {
   const [filterTerm, setFilterTerm] = useState("");
-  const filterPlans = useFilterPlans();
 
   const { user } = useAuth();
 
@@ -21,31 +20,10 @@ export default function Step1() {
     `/finished_plans/getPartialFinishedFlightPlans?regio_id=${user.role}`
   );
 
-  const {
-    periode,
-    dateFrom,
-    dateTo,
-    openFilter,
-    filteredPlans,
-    setFilteredPlans,
-  } = useFinishedPlansState();
+  const { openFilter, filteredPlans } = useFinishedPlansState();
 
-  useEffect(() => {
-    if (!plans) return;
-
-    const sortedPlansByCreatedAt = plans.sort((a, b) =>
-      a.datum > b.datum ? -1 : 1
-    );
-
-    filterPlans(
-      setFilteredPlans,
-      sortedPlansByCreatedAt,
-      filterTerm,
-      dateFrom,
-      dateTo,
-      periode
-    );
-  }, [plans, filterTerm]);
+  // Filter and sort plans
+  useFilterAndSortPlans(plans, filterTerm);
 
   return (
     <div className="h-full">

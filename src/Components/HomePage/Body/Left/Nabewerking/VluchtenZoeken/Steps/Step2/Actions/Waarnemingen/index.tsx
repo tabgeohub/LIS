@@ -41,9 +41,13 @@ export default function Waarnemingen({
     );
   }, [value, openEdit, selectedPlan?.points_data]);
 
+  // Filter geometries from selectedPlan (already filtered to plan geometries in Step2)
+  // Only apply search term filtering here
   const filteredGeometries = useMemo(() => {
-    return selectedPlan?.geometries.filter((geometry) => {
-      const searchTerm = value.toLowerCase();
+    if (!selectedPlan?.geometries) return [];
+
+    const searchTerm = value.toLowerCase();
+    return selectedPlan.geometries.filter((geometry) => {
       const omschrijving = geometry.geometry_omschrijving?.toLowerCase() || "";
       return omschrijving.includes(searchTerm);
     });
