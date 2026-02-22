@@ -103,6 +103,7 @@ export default function ImageGallery({
   activeIndex,
   setActiveIndex,
   onDelete,
+  onShowLocation,
 }: {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -110,6 +111,7 @@ export default function ImageGallery({
   activeIndex: number;
   setActiveIndex: (value: number | ((prev: number) => number)) => void;
   onDelete?: (attachmentId: number) => void;
+  onShowLocation?: (location: string) => void;
 }) {
   const token = localStorage.getItem("credential_token");
 
@@ -202,11 +204,41 @@ export default function ImageGallery({
               <CloseIcon />
             </button>
 
+            {/* Show location button - only show if onShowLocation is provided and current image has location */}
+            {onShowLocation &&
+              attachments[activeIndex]?.location && (
+                <button
+                  onClick={() => {
+                    const location = attachments[activeIndex]?.location;
+                    if (location) onShowLocation(location);
+                  }}
+                  className="absolute top-4 right-20 z-50 bg-blue-500 hover:bg-blue-600 border-2 border-white text-white p-2 rounded-full transition-all"
+                  title="Show location on map"
+                  aria-label="Show location on map"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              )}
+
             {/* Delete button - only show if onDelete is provided */}
             {onDelete && (
               <button
                 onClick={handleDelete}
-                className="absolute top-4 right-20 z-50 bg-red-500 hover:bg-red-600 border-2 border-white text-white p-2 rounded-full transition-all"
+                className={`absolute top-4 z-50 bg-red-500 hover:bg-red-600 border-2 border-white text-white p-2 rounded-full transition-all ${
+                  onShowLocation && attachments[activeIndex]?.location
+                    ? "right-32"
+                    : "right-20"
+                }`}
                 title="Delete image"
                 aria-label="Delete image"
               >

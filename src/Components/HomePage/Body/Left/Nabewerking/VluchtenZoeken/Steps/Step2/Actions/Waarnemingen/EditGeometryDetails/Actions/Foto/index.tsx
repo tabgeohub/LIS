@@ -16,9 +16,14 @@ export default function Foto({
 }: {
   setAction: (value: string) => void;
 }) {
-  const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
+  const { selectedGeometry, selectedPlan, setSelectedPlan, setSelectedGeometry } =
     useFinishedPlansState();
+
+  // Get first point from geometry
+  const firstPoint = selectedGeometry?.points?.[0];
+
   const { mapView, redGraphicsLayer } = useMapViewState();
+
   const token = localStorage.getItem("credential_token");
 
   const [isOpen, setIsOpen] = useState(false);
@@ -90,9 +95,9 @@ export default function Foto({
   };
 
   if (
-    !selectedPoint ||
-    !selectedPoint.attachments ||
-    selectedPoint.attachments.length === 0
+    !firstPoint ||
+    !firstPoint.attachments ||
+    firstPoint.attachments.length === 0
   ) {
     return (
       <div className="p-4">
@@ -113,8 +118,10 @@ export default function Foto({
   }
 
   function deleteImage(attachmentId: number) {
+    if (!firstPoint || !selectedGeometry || !selectedPlan) return;
+
     const currentIndex = activeIndex;
-    const newAttachments = selectedPoint?.attachments.filter(
+    const newAttachments = firstPoint.attachments.filter(
       (attachment) => attachment.id !== attachmentId
     );
 
@@ -122,46 +129,52 @@ export default function Foto({
     let newIndex = 0;
     if (newAttachments && newAttachments.length > 0) {
       if (currentIndex >= newAttachments.length) {
-        // If we deleted the last item, show the new last item
         newIndex = newAttachments.length - 1;
       } else {
-        // Otherwise, keep the same index (next image moves up)
         newIndex = currentIndex;
       }
     } else {
-      // No attachments left - close gallery
       setIsOpen(false);
     }
 
     const body = {
-      point_id: selectedPoint?.id,
-      plan_id: selectedPlan?.id,
-      attachments_id: newAttachments?.flatMap((attachment) => attachment.id),
+      point_id: firstPoint.id,
+      plan_id: selectedPlan.id,
+      attachments_id: newAttachments.flatMap((attachment) => attachment.id),
     };
 
     update(body, (responseData) => {
       setActiveIndex(newIndex);
 
+      // Update the first point's attachments
+      const updatedFirstPoint: typeof firstPoint = {
+        ...firstPoint,
+        attachments: newAttachments,
+      };
+
+      // Update all points in geometry with the same attachments (if they share the same point)
+      const updatedPoints = selectedGeometry.points.map((point) =>
+        point.id === firstPoint.id ? updatedFirstPoint : point
+      );
+
+      const updatedGeometry: typeof selectedGeometry = {
+        ...selectedGeometry,
+        points: updatedPoints,
+      };
+
+      setSelectedGeometry(updatedGeometry);
+
       setSelectedPlan({
         ...selectedPlan,
-        // @ts-ignore
-        points_data: selectedPlan?.points_data.map((point) => {
-          if (point.id === selectedPoint?.id) {
-            return {
-              ...point,
-              attachments: newAttachments,
-            };
+        geometries: selectedPlan.geometries.map((geom) =>
+          geom.id === selectedGeometry.id ? updatedGeometry : geom
+        ),
+        points_data: selectedPlan.points_data.map((point) => {
+          if (point.id === firstPoint.id) {
+            return updatedFirstPoint;
           }
           return point;
         }),
-      });
-
-      setSelectedPoint({
-        ...selectedPoint,
-        // @ts-ignore
-        attachments: selectedPoint?.attachments.filter(
-          (attachment) => attachment.id !== attachmentId
-        ),
       });
     });
   }
@@ -170,7 +183,7 @@ export default function Foto({
     <div className="h-full">
       <div className="overflow-y-scroll pb-20 thin-scrollbar flex-grow">
         <div className="grid grid-cols-2 gap-2 p-2">
-          {selectedPoint.attachments
+          {firstPoint.attachments
             .sort((attachment) => attachment.taken_at)
             .map(
               (attachment, index) =>
@@ -203,12 +216,12 @@ export default function Foto({
                 )
             )}
 
-          {selectedPoint.attachments &&
-            selectedPoint.attachments.length > 0 && (
+          {firstPoint.attachments &&
+            firstPoint.attachments.length > 0 && (
               <ImageGallery
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                attachments={selectedPoint.attachments}
+                attachments={firstPoint.attachments}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
                 onDelete={deleteImage}
@@ -234,3 +247,4 @@ export default function Foto({
     </div>
   );
 }
+

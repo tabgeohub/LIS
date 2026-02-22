@@ -33,7 +33,7 @@ export default function Waarnemingen({
     return selectedPlan?.points_data.filter((point) =>
       point.omschrijving.toLowerCase().includes(value.toLowerCase())
     );
-  }, [value, openEdit, selectedPlan?.points_data]);
+  }, [value, selectedPlan?.points_data]);
 
   // Filter geometries from selectedPlan (already filtered to plan geometries in Step2)
   // Only apply search term filtering here
@@ -45,7 +45,7 @@ export default function Waarnemingen({
       const omschrijving = geometry.geometry_omschrijving?.toLowerCase() || "";
       return omschrijving.includes(searchTerm);
     });
-  }, [value, openEdit, selectedPlan?.geometries]);
+  }, [value, selectedPlan?.geometries]);
 
   useEffect(() => {
     setValue("");

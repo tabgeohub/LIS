@@ -5,7 +5,7 @@ export async function createAttachment(
   req: Request,
   res: Response
 ): Promise<void> {
-  const { url, pointId, attachmentId, taken_at } = req.body;
+  const { url, pointId, attachmentId, taken_at, long, lat } = req.body;
 
   if (!pointId || !attachmentId || !taken_at || !url) {
     res.status(400).json({
@@ -15,10 +15,16 @@ export async function createAttachment(
     return;
   }
 
+  // Format location as "lat,long" if both are provided
+  let location: string | null = null;
+  if (lat !== undefined && lat !== null && long !== undefined && long !== null) {
+    location = `${lat},${long}`;
+  }
+
   try {
     const result = await pool.query(
-      `INSERT INTO lis.attachments (url, point_id, attachmentid, taken_at) VALUES ($1, $2, $3, $4) RETURNING *;`,
-      [url, pointId, attachmentId, taken_at]
+      `INSERT INTO lis.attachments (url, point_id, attachmentid, taken_at, location) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
+      [url, pointId, attachmentId, taken_at, location]
     );
 
     res.status(201).json({

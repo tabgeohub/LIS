@@ -38,7 +38,16 @@ export async function getFinishedFlightPlans(
       JOIN lis.finished_plans ffp ON ffp.plan_id = fp.id
       JOIN lis.points pt ON pt.id = ffp.point_id
       LEFT JOIN LATERAL (
-        SELECT jsonb_agg(a.*) AS attachments
+        SELECT jsonb_agg(
+          jsonb_build_object(
+            'id', a.id,
+            'url', a.url,
+            'point_id', a.point_id,
+            'attachmentid', a.attachmentid,
+            'taken_at', a.taken_at,
+            'location', a.location
+          )
+        ) AS attachments
         FROM lis.attachments a
         WHERE a.id = ANY(ffp.attachments_id)
       ) AS att_list ON true

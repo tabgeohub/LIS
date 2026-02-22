@@ -30,7 +30,16 @@ export async function getSingleFinishedFlightPlan(
       attachments_per_point AS (
         SELECT
           f.point_id,
-          jsonb_agg(DISTINCT a.*) AS attachments
+          jsonb_agg(DISTINCT 
+            jsonb_build_object(
+              'id', a.id,
+              'url', a.url,
+              'point_id', a.point_id,
+              'attachmentid', a.attachmentid,
+              'taken_at', a.taken_at,
+              'location', a.location
+            )
+          ) AS attachments
         FROM ffp_rows f
         LEFT JOIN lis.attachments a
           ON a.id = ANY(f.attachments_id)

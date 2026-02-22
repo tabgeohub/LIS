@@ -61,4 +61,5 @@ export interface AttachmentType {
   point_id?: number;
   attachmentid?: number;
   taken_at: number;
+  location?: string | null;
 }

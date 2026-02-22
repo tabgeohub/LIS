@@ -20,6 +20,8 @@ type Attachment = {
   url: string;
   objectId?: number | string | null;
   taken_at?: string | Date | null;
+  long?: number | null;
+  lat?: number | null;
 };
 
 type IncomingPoint = EnrichedPointType & {
@@ -215,15 +217,24 @@ export async function createFinishedPlan(
 
       if (Array.isArray(point.attachments) && point.attachments.length > 0) {
         for (const attachment of point.attachments) {
+          // Format location as "lat,long" if available from attachment, otherwise use point's location
+          let location: string | null = null;
+          if (attachment.lat !== undefined && attachment.lat !== null && attachment.long !== undefined && attachment.long !== null) {
+            location = `${attachment.lat},${attachment.long}`;
+          } else if (point.latitude !== undefined && point.latitude !== null && point.longitude !== undefined && point.longitude !== null) {
+            location = `${point.latitude},${point.longitude}`;
+          }
+
           const ins = await client.query(
-            `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at)
-             VALUES ($1, $2, $3, $4)
+            `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
+             VALUES ($1, $2, $3, $4, $5)
              RETURNING id`,
             [
               attachment.url,
               realPointId,
               attachment.objectId ?? null,
               attachment.taken_at ?? null,
+              location,
             ]
           );
           const attId = ins.rows?.[0]?.id;

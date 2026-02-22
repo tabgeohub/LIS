@@ -17,8 +17,12 @@ export default function CreateImageBtn({
     timestamp: number;
   } | null>(null);
 
-  const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
+  const { selectedGeometry, selectedPlan, setSelectedPlan, setSelectedGeometry } =
     useFinishedPlansState();
+
+  // Get first point from geometry
+  const firstPoint = selectedGeometry?.points?.[0];
+
   const uploadAttachmentForPoint = useUploadAttachmentForPoint();
 
   const content = useContent();
@@ -31,7 +35,7 @@ export default function CreateImageBtn({
   const handleFileInput = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (!selectedPoint) return;
+    if (!firstPoint) return;
 
     setLoading(true);
 
@@ -54,31 +58,31 @@ export default function CreateImageBtn({
   };
 
   useEffect(() => {
-    if (!selectedPoint || !newImage || !selectedPlan) return;
+    if (!firstPoint || !newImage || !selectedPlan) return;
 
     const uploadAttachment = async () => {
       const attachments = await uploadAttachmentForPoint(
-        selectedPoint.id,
+        firstPoint.id,
         newImage
       );
 
       create(
         {
           url: attachments[0].url,
-          pointId: selectedPoint.id,
+          pointId: firstPoint.id,
           attachmentId: attachments[0].objectId,
           taken_at: attachments[0].taken_at,
-          long: selectedPoint.longitude,
-          lat: selectedPoint.latitude,
+          long: firstPoint.longitude,
+          lat: firstPoint.latitude,
         },
         (responseData) => {
-          if (selectedPoint.attachments.at(0) === null) {
+          if (firstPoint.attachments?.at(0) === null || !firstPoint.attachments) {
             const newAttachment = [
               {
                 attachmentid: Number(attachments[0].objectId),
                 // @ts-ignore
                 id: Number(responseData.result.id),
-                point_id: Number(selectedPoint.id),
+                point_id: Number(firstPoint.id),
                 taken_at: Number(attachments[0].taken_at),
                 // @ts-ignore
                 url: responseData.result.url,
@@ -86,25 +90,36 @@ export default function CreateImageBtn({
             ];
 
             update({
-              point_id: selectedPoint.id,
+              point_id: firstPoint.id,
               plan_id: selectedPlan.id,
               // @ts-ignore
               attachments_id: [responseData.result.id],
             });
 
-            setSelectedPoint({
-              ...selectedPoint,
+            const updatedFirstPoint = {
+              ...firstPoint,
               attachments: newAttachment,
-            });
+            };
+
+            const updatedPoints = selectedGeometry?.points.map((point) =>
+              point.id === firstPoint.id ? updatedFirstPoint : point
+            );
+
+            const updatedGeometry = {
+              ...selectedGeometry,
+              points: updatedPoints,
+            };
+
+            setSelectedGeometry(updatedGeometry);
 
             setSelectedPlan({
               ...selectedPlan,
+              geometries: selectedPlan?.geometries.map((geom) =>
+                geom.id === selectedGeometry?.id ? updatedGeometry : geom
+              ),
               points_data: selectedPlan?.points_data.map((point) => {
-                if (point.id === selectedPoint?.id) {
-                  return {
-                    ...point,
-                    attachments: newAttachment,
-                  };
+                if (point.id === firstPoint.id) {
+                  return updatedFirstPoint;
                 }
                 return point;
               }),
@@ -113,7 +128,7 @@ export default function CreateImageBtn({
             setLoading(false);
           } else {
             const newAttachmentsIds = [
-              ...selectedPoint.attachments.flatMap(
+              ...firstPoint.attachments.flatMap(
                 (attachment) => attachment.id
               ),
               //   @ts-ignore
@@ -121,12 +136,12 @@ export default function CreateImageBtn({
             ];
 
             const newAttachments = [
-              ...selectedPoint.attachments,
+              ...firstPoint.attachments,
               {
                 attachmentid: Number(attachments[0].objectId),
                 // @ts-ignore
                 id: Number(responseData.result.id),
-                point_id: Number(selectedPoint.id),
+                point_id: Number(firstPoint.id),
                 taken_at: Number(attachments[0].taken_at),
                 // @ts-ignore
                 url: responseData.result.url,
@@ -134,24 +149,35 @@ export default function CreateImageBtn({
             ];
 
             update({
-              point_id: selectedPoint.id,
+              point_id: firstPoint.id,
               plan_id: selectedPlan.id,
               attachments_id: newAttachmentsIds,
             });
 
-            setSelectedPoint({
-              ...selectedPoint,
+            const updatedFirstPoint = {
+              ...firstPoint,
               attachments: newAttachments,
-            });
+            };
+
+            const updatedPoints = selectedGeometry?.points.map((point) =>
+              point.id === firstPoint.id ? updatedFirstPoint : point
+            );
+
+            const updatedGeometry = {
+              ...selectedGeometry,
+              points: updatedPoints,
+            };
+
+            setSelectedGeometry(updatedGeometry);
 
             setSelectedPlan({
               ...selectedPlan,
+              geometries: selectedPlan?.geometries.map((geom) =>
+                geom.id === selectedGeometry?.id ? updatedGeometry : geom
+              ),
               points_data: selectedPlan?.points_data.map((point) => {
-                if (point.id === selectedPoint?.id) {
-                  return {
-                    ...point,
-                    attachments: newAttachments,
-                  };
+                if (point.id === firstPoint.id) {
+                  return updatedFirstPoint;
                 }
                 return point;
               }),
@@ -187,3 +213,4 @@ export default function CreateImageBtn({
     </>
   );
 }
+

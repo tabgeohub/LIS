@@ -1,29 +1,30 @@
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useContent } from "hooks/useContent";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import Buttons from "./Actions/Buttons";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
+import Form from "./Actions/Form";
+import Foto from "./Actions/Foto";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function EditGeometryDetails({
   setOpenEdit,
 }: {
   setOpenEdit: (value: boolean) => void;
 }) {
-  const { selectedGeometry } = useFinishedPlansState();
-  const content = useContent();
+  const [actions, setAction] = useState("form");
+  const { resetFeatures } = useResetFeatures();
 
-  if (!selectedGeometry) return <div></div>;
+  useEffect(() => {
+    if (actions === "form") {
+      resetFeatures();
+    }
+  }, [actions]);
 
   return (
     <div className="h-[70vh] overflow-auto thin-scrollbar">
-      <ScrollButtonsLayout
-        buttons={<Buttons setOpenEdit={setOpenEdit} />}
-      >
-        <div className="text-[12px] px-2 text-gray-700 mt-2 space-y-2">
-          <p className="text-lg font-semibold">
-            {selectedGeometry.geometry_omschrijving || `Geometrie ${selectedGeometry.id}`}
-          </p>
-        </div>
-      </ScrollButtonsLayout>
+      {actions === "form" && (
+        <Form setOpenEdit={setOpenEdit} setAction={setAction} />
+      )}
+
+      {actions === "foto" && <Foto setAction={setAction} />}
     </div>
   );
 }

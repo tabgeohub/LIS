@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { TbLine, TbPolygon } from "react-icons/tb";
+import { IoMdImage } from "react-icons/io";
 import { FinishedGeometryType } from "Types/finished_plans";
 import useLogAction from "hooks/useLogAction";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
@@ -206,6 +207,14 @@ export default function SingleGeometry({
   const geometryTypeLabel =
     geometry.geometry_type === "polygon" ? "Veelhoek" : "Lijn";
 
+  // Get attachments from first point (geometries use first point's attachments)
+  const firstPoint = geometry.points?.[0];
+  const hasAttachments =
+    firstPoint?.attachments &&
+    firstPoint.attachments[0] !== null &&
+    firstPoint.attachments.length > 0;
+  const attachmentCount = firstPoint?.attachments?.length || 0;
+
   return (
     <div
       onMouseEnter={() => {
@@ -243,6 +252,15 @@ export default function SingleGeometry({
         <p>Specifiek letten op: {geometry.points.at(0)?.specifiek_letten_op}</p>
         <p>Activiteit: {geometry.points.at(0)?.activiteit_id}</p>
       </div>
+
+      {hasAttachments && (
+        <div className="absolute mt-4 bottom-0 right-4">
+          <IoMdImage className="size-4 text-gray-500" />
+          <div className="absolute bottom-2 -right-3 bg-[#3B82F6] rounded-full px-1 text-white text-[10px]">
+            {attachmentCount}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
