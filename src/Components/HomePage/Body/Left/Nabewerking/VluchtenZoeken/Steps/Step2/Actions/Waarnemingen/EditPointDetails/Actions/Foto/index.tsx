@@ -1,5 +1,5 @@
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";
@@ -9,6 +9,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { MdLocationOn } from "react-icons/md";
 
 export default function Foto({
@@ -31,6 +32,174 @@ export default function Foto({
   );
 
   const content = useContent();
+
+  // Store references to image markers for cleanup
+  const imageMarkersRef = useRef<Graphic[]>([]);
+
+  // Handle map clicks on image markers
+  useEffect(() => {
+    if (!mapView || !selectedPoint?.attachments || !redGraphicsLayer) return;
+
+    const handleMapClick = async (event: __esri.ViewClickEvent) => {
+      try {
+        // Query graphics at the click location, only check redGraphicsLayer
+        const hitTestResult = await mapView.hitTest(event, {
+          include: [redGraphicsLayer],
+        });
+
+        const clickedGraphic = hitTestResult.results
+          .filter((result): result is __esri.GraphicHit => 
+            result.type === "graphic" && (result as __esri.GraphicHit).graphic !== undefined
+          )
+          .map((result) => (result as __esri.GraphicHit).graphic)
+          .find((graphic) => 
+            graphic?.attributes?.type === "image-numbered-marker" || 
+            graphic?.attributes?.type === "image-numbered-marker-label"
+          );
+
+        if (clickedGraphic) {
+          const attachmentId = clickedGraphic.attributes?.attachmentId;
+
+          if (attachmentId !== undefined) {
+            // Find the index in the sorted array
+            const sortedIndex = selectedPoint.attachments
+              .sort((a, b) => a.taken_at - b.taken_at)
+              .findIndex((att) => att.id === attachmentId);
+            
+            if (sortedIndex !== -1) {
+              setActiveIndex(sortedIndex);
+              setIsOpen(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error handling marker click:", error);
+      }
+    };
+
+    const handle = mapView.on("click", handleMapClick);
+
+    return () => {
+      handle.remove();
+    };
+  }, [mapView, selectedPoint?.attachments, redGraphicsLayer, setIsOpen, setActiveIndex]);
+
+  // Create numbered markers on the map for images with locations
+  useEffect(() => {
+    if (!selectedPoint || !selectedPoint.attachments || !mapView || !redGraphicsLayer) {
+      return;
+    }
+
+    // Clear previous image markers
+    imageMarkersRef.current.forEach((marker) => {
+      redGraphicsLayer.remove(marker);
+    });
+    imageMarkersRef.current = [];
+
+    // Get sorted attachments with their indices
+    const sortedAttachments = [...selectedPoint.attachments]
+      .sort((a, b) => a.taken_at - b.taken_at)
+      .map((attachment, originalIndex) => ({
+        attachment,
+        displayNumber: originalIndex + 1, // 1-based numbering
+        originalIndex,
+      }))
+      .filter((item) => item.attachment.location); // Only include attachments with locations
+
+    if (sortedAttachments.length === 0) return;
+
+    // Track locations to handle duplicates (offset them slightly)
+    const locationMap = new Map<string, number>();
+
+    sortedAttachments.forEach(({ attachment, displayNumber, originalIndex }) => {
+      if (!attachment.location) return;
+
+      try {
+        const [lat, long] = attachment.location.split(",").map(Number);
+        if (isNaN(lat) || isNaN(long)) return;
+
+        // Handle duplicate locations by offsetting
+        const locationKey = `${lat.toFixed(6)},${long.toFixed(6)}`;
+        const offsetCount = locationMap.get(locationKey) || 0;
+        locationMap.set(locationKey, offsetCount + 1);
+
+        // Small offset for duplicates (about 10 meters)
+        const offsetDistance = 0.0001; // ~11 meters
+        const angle = (offsetCount * 60) * (Math.PI / 180); // 60 degrees between duplicates
+        const offsetLat = lat + offsetDistance * Math.cos(angle) * offsetCount;
+        const offsetLong = long + offsetDistance * Math.sin(angle) * offsetCount;
+
+        const point = new Point({
+          longitude: offsetLong,
+          latitude: offsetLat,
+          spatialReference: { wkid: 4326 },
+        });
+
+        // Create circle marker (smaller)
+        const circleSymbol = new SimpleMarkerSymbol({
+          color: [59, 130, 246, 0.9], // Blue color
+          size: 18, // Smaller size
+          style: "circle",
+          outline: {
+            color: [255, 255, 255, 1],
+            width: 1.5,
+          },
+        });
+
+        const circleGraphic = new Graphic({
+          geometry: point,
+          symbol: circleSymbol,
+          attributes: {
+            type: "image-numbered-marker",
+            imageIndex: originalIndex,
+            displayNumber,
+            attachmentId: attachment.id,
+          },
+        });
+
+        // Create text label (centered)
+        const textSymbol = new TextSymbol({
+          text: String(displayNumber),
+          color: [255, 255, 255, 1],
+          font: {
+            size: 10,
+            family: "Arial",
+            weight: "bold",
+          },
+          haloColor: [59, 130, 246, 0.8],
+          haloSize: 1,
+          xoffset: 0, // Center horizontally
+          yoffset: 0, // Center vertically
+        });
+
+        const textGraphic = new Graphic({
+          geometry: point,
+          symbol: textSymbol,
+          attributes: {
+            type: "image-numbered-marker-label",
+            imageIndex: originalIndex,
+            displayNumber,
+            attachmentId: attachment.id,
+          },
+        });
+
+        redGraphicsLayer.add(circleGraphic);
+        redGraphicsLayer.add(textGraphic);
+
+        imageMarkersRef.current.push(circleGraphic, textGraphic);
+      } catch (error) {
+        console.error("Error creating marker for image:", error);
+      }
+    });
+
+    // Cleanup function
+    return () => {
+      imageMarkersRef.current.forEach((marker) => {
+        redGraphicsLayer.remove(marker);
+      });
+      imageMarkersRef.current = [];
+    };
+  }, [selectedPoint?.attachments, mapView, redGraphicsLayer]);
 
   // Parse location string (format: "lat,long") and navigate to it
   const navigateToLocation = (location: string | null | undefined) => {
@@ -176,6 +345,10 @@ export default function Foto({
               (attachment, index) =>
                 attachment !== null && (
                   <div key={attachment.id} className="relative group">
+                    {/* Number badge in top-left */}
+                    <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-20 shadow-lg">
+                      {index + 1}
+                    </div>
                     <img
                       src={`${attachment.url
                         .split("token=")
