@@ -23,6 +23,7 @@ export default function Buttons() {
     step,
     selectedPlan,
     selectedPoints,
+    selectedGeometries,
     setZipFile,
     setZippingStatus,
     setStep,
@@ -33,6 +34,7 @@ export default function Buttons() {
   const handleStep2 = useHandleStep2(
     selectedPlan!,
     selectedPoints!,
+    selectedGeometries!,
     setZipFile,
     setZippingStatus,
     activities,

@@ -348,8 +348,6 @@ export default function Foto({
     });
   }
 
-  console.log(firstPoint.attachments)
-
   return (
     <div className="h-full">
       <div className="overflow-y-scroll pb-20 thin-scrollbar flex-grow">

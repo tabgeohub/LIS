@@ -12,6 +12,9 @@ interface CreateReportState {
   selectedPoints: number[];
   setSelectedPoints: (value: number[]) => void;
 
+  selectedGeometries: number[];
+  setSelectedGeometries: (value: number[]) => void;
+
   filteredPlans: FinishedFlightPlanType[];
   setFilteredPlans: (value: FinishedFlightPlanType[]) => void;
 
@@ -49,6 +52,9 @@ export const useCreateReportState = create<CreateReportState>((set) => ({
   selectedPoints: [],
   setSelectedPoints: (value) => set({ selectedPoints: value }),
 
+  selectedGeometries: [],
+  setSelectedGeometries: (value) => set({ selectedGeometries: value }),
+
   filteredPlans: [],
   setFilteredPlans: (value) => set({ filteredPlans: value }),
 
@@ -83,6 +89,9 @@ export const useCreateReportState = create<CreateReportState>((set) => ({
 
       selectedPoints: [],
       setSelectedPoints: (value) => set({ selectedPoints: value }),
+
+      selectedGeometries: [],
+      setSelectedGeometries: (value) => set({ selectedGeometries: value }),
 
       openFilter: false,
       setOpenFilter: (value) => set({ openFilter: value }),
