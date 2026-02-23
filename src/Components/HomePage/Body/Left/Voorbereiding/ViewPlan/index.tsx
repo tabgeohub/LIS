@@ -10,7 +10,6 @@ import EditPoint from "./Steps/EditPoint";
 import Loading from "./Common/Loading";
 import AddPointStep from "./Steps/AddPointStep";
 import DuplicateFlightPlan from "./Steps/DuplicateFlightPlan";
-import { useReadData } from "utils/useReadData";
 import { useRenderVluchtplans } from "hooks/useRenderVluchtPlans";
 import { filterPlans } from "@helpers/filterPlans";
 import { FlightPlanType } from "Types";
@@ -19,6 +18,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";
 import AddPointToPlan from "./Steps/AddPointToPlan";
+import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
 
 export default function ViewPlan({
   vluchtnummer,
@@ -56,13 +56,30 @@ export default function ViewPlan({
     setDoelEnHoofdthema,
     setAanvullendeInfo,
     setSelectedPlan,
+    setInitialPlans,
   } = useViewPlanState();
 
-  const { data, loading, refetch } = useReadData<FlightPlanType[]>(
-    `/flightPlans?regio_id=${user.role}`
-  );
+  const { flightPlans, fetchFlightPlans, refetchFlightPlans } = useFlightPlansStore();
 
-  useRenderVluchtplans(data!);
+  // Fetch flight plans when component mounts or user changes
+  useEffect(() => {
+    if (user.user_id === undefined || user.user_id === 0) return;
+    fetchFlightPlans(user.role);
+  }, [user.user_id, user.role]);
+
+  // Update initialPlans when flightPlans are fetched
+  useEffect(() => {
+    if (flightPlans.length > 0) {
+      setInitialPlans(flightPlans);
+    }
+  }, [flightPlans, setInitialPlans]);
+
+  const refetch = () => {
+    if (user.user_id === undefined || user.user_id === 0) return;
+    refetchFlightPlans(user.role);
+  };
+
+  useRenderVluchtplans(flightPlans);
 
   useEffect(() => {
     if (!initialPlans) return;
@@ -106,6 +123,8 @@ export default function ViewPlan({
     setSelectedPlan(null);
     setStep(1);
   }
+
+  const loading = flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0;
 
   return (
     <>

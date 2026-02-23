@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useReadData } from "utils/useReadData";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
+import { useReadData } from "utils/useReadData";
 import { useContent } from "hooks/useContent";
 import { useViewPlanState } from "../../../helpers/useViewPlanState";
 import PlansList from "./PlansList";
@@ -41,13 +42,24 @@ export default function SelectFromSource({ source }: { source: Source }) {
 
   const { selectedPlan } = useViewPlanState();
   const { dbPoints } = usePointsStore();
+  const { flightPlans, fetchFlightPlans } = useFlightPlansStore();
 
-  const fetchUrl =
-    source === "flightPlans"
-      ? `/flightPlans?regio_id=${user.role}`
-      : `/templateFlight?regio_id=${user.role}`;
+  // Fetch flight plans when component mounts or user changes (only for flightPlans source)
+  useEffect(() => {
+    if (source === "flightPlans" && user.user_id !== undefined && user.user_id !== 0) {
+      fetchFlightPlans(user.role);
+    }
+  }, [source, user.user_id, user.role, fetchFlightPlans]);
 
-  const { data } = useReadData<FlightPlanType[] | Template[]>(fetchUrl);
+  // Use shared store for flightPlans, useReadData for templates
+  const { data: templateData, loading: templateLoading } = useReadData<Template[]>(
+    source === "templates" ? `/templateFlight?regio_id=${user.role}` : ""
+  );
+
+  const data = source === "flightPlans" ? (flightPlans as FlightPlanType[] | Template[]) : templateData;
+  const dataLoading = source === "flightPlans" 
+    ? (flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0)
+    : templateLoading;
 
   const items: ItemModel[] = useMemo(() => {
     if (!data) return [];
@@ -331,9 +343,9 @@ export default function SelectFromSource({ source }: { source: Source }) {
         />
       }
     >
-      <Loading loading={loading} />
+      <Loading loading={dataLoading || loading} />
 
-      {!loading && !selectedItem && (
+      {!dataLoading && !loading && !selectedItem && (
         <PlansList
           items={items}
           onSelect={(id) => {
@@ -354,7 +366,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
         />
       )}
 
-      {!loading && selectedItem && (
+      {!dataLoading && !loading && selectedItem && (
         <PointsList
           selectedItem={selectedItem}
           selectedPointIds={selectedPointIds}

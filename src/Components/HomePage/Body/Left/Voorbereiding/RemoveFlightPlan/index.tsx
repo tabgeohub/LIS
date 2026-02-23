@@ -4,7 +4,6 @@ import Buttons from "./Buttons";
 import Loading from "./Loading";
 import ScrollButtonsLayout from "../../Common/ScrollButtonsLayout";
 import { FlightPlanType } from "Types";
-import { useReadData } from "utils/useReadData";
 import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
 import SinglePlan from "./SinglePlan";
 import Filter from "./Filter";
@@ -12,6 +11,7 @@ import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import CongfirmationModal from "./CongfirmationModal";
 import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
 
 export default function RemoveFlightPlan() {
   const {
@@ -27,10 +27,20 @@ export default function RemoveFlightPlan() {
   const filterPlans = useFilterPlans();
 
   const { user } = useAuth();
+  const { flightPlans, fetchFlightPlans, refetchFlightPlans } = useFlightPlansStore();
 
-  const { data: plans, loading, refetch } = useReadData<FlightPlanType[]>(
-    `/flightPlans?regio_id=${user.role}`
-  );
+  // Fetch flight plans when component mounts or user changes
+  useEffect(() => {
+    if (user.user_id === undefined || user.user_id === 0) return;
+    fetchFlightPlans(user.role);
+  }, [user.user_id, user.role, fetchFlightPlans]);
+
+  const plans = flightPlans;
+  const loading = flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0;
+  const refetch = () => {
+    if (user.user_id === undefined || user.user_id === 0) return;
+    refetchFlightPlans(user.role);
+  };
 
   useEffect(() => {
     if (!plans) return;
