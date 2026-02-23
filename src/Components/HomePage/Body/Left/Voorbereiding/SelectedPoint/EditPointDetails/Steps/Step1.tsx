@@ -7,8 +7,7 @@ import InputFormik from "../../Common/InputFormik";
 import SelectFormik from "../../Common/SelectFormik";
 import { EnrichedPointType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
-import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
@@ -30,8 +29,7 @@ export default function Step1({
   const { clickedPoint } = usePopUpState();
 
   const { update, loading } = useUpdateData(`/points/${clickedPoint?.id}`);
-  const { fetchDBPoints, fetchPoints } = usePointsStore();
-  const { fetchGeometries } = useGeometriesStore();
+  const { fetchInitialFeatures } = useFetchInitialFeatures();
   const { resetFeatures } = useResetFeatures();
 
   function handleClose() {
@@ -69,17 +67,7 @@ export default function Step1({
     update(attributes, (responseData) => {
       if (!responseData.result) return;
 
-      fetchDBPoints({
-        regio: user?.role,
-      });
-
-      fetchPoints({
-        regio: user?.role,
-      });
-
-      fetchGeometries({
-        regio: user?.role,
-      });
+      fetchInitialFeatures(user?.role);
 
       resetFeatures();
       setSelectedBottomTab("viewSelectedPointDetails");

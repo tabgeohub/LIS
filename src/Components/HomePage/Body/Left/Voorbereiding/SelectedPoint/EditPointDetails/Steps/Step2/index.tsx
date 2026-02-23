@@ -5,8 +5,7 @@ import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
 import { useUpdateData } from "utils/useUpdateData";
 import { EnrichedPointType } from "Types";
-import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
@@ -26,8 +25,7 @@ export default function Step2({
   });
 
   const { update, loading } = useUpdateData(`/points/${clickedPoint?.id}`);
-  const { fetchDBPoints, fetchPoints } = usePointsStore();
-  const { fetchGeometries } = useGeometriesStore();
+  const { fetchInitialFeatures } = useFetchInitialFeatures();
 
   const { values } = useFormikContext<EnrichedPointType>();
   const { redGraphicsLayer, mapView } = useMapViewState();
@@ -61,17 +59,7 @@ export default function Step2({
 
       mapView?.graphics.removeAll();
 
-      await fetchDBPoints({
-        regio: user?.role,
-      });
-
-      await fetchPoints({
-        regio: user?.role,
-      });
-
-      await fetchGeometries({
-        regio: user?.role,
-      });
+      await fetchInitialFeatures(user?.role);
 
       // Exit geometry-edit mode and go back to details
       setCreateNewPoint(false);

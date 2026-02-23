@@ -2,8 +2,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useEnrichedPointState } from "../../../../../../../../hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
-import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 
@@ -14,8 +13,7 @@ export default function Buttons({
 }) {
   const { redGraphicsLayer } = useMapViewState();
   const { user } = useAuth();
-  const { fetchDBPoints, fetchPoints } = usePointsStore();
-  const { fetchGeometries } = useGeometriesStore();
+  const { fetchInitialFeatures } = useFetchInitialFeatures();
 
   const { create } = useCreateData("/points");
 
@@ -54,17 +52,7 @@ export default function Buttons({
       specifiek_letten_op: specifiekLettenOp,
     });
 
-    fetchDBPoints({
-      regio: user?.role,
-    });
-
-    fetchPoints({
-      regio: user?.role,
-    });
-
-    fetchGeometries({
-      regio: user?.role,
-    });
+    fetchInitialFeatures(user?.role);
 
     logAction({
       message: "User clicked 'Save' button to save point data",

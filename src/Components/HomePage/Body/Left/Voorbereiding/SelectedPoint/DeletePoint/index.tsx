@@ -4,7 +4,7 @@ import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottom
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { CgClose, CgSpinner } from "react-icons/cg";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";
@@ -20,8 +20,8 @@ export default function DeletePoint() {
   const { user } = useAuth();
 
   const { clickedPointId } = usePopUpState();
-  const { points, fetchDBPoints, fetchPoints } = usePointsStore();
-  const { fetchGeometries } = useGeometriesStore();
+  const { points } = usePointsStore();
+  const { fetchInitialFeatures } = useFetchInitialFeatures();
 
   const { mapView } = useMapViewState();
 
@@ -33,17 +33,7 @@ export default function DeletePoint() {
     if (!mapView) return;
 
     update({ id: clickedPointId, status: "inactief" }, () => {
-      fetchDBPoints({
-        regio: user?.role,
-      });
-
-      fetchPoints({
-        regio: user?.role,
-      });
-
-      fetchGeometries({
-        regio: user?.role,
-      });
+      fetchInitialFeatures(user?.role);
 
       setSelectedBottomTab("viewSelectedPointDetails");
     });
