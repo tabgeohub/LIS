@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { base64ToBlob } from "@helpers/base64ToBlob";
 import { useContent } from "hooks/useContent";
 import { useUploadAttachmentForPoint } from "./useUploadAttachmentForPoint";
