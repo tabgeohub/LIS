@@ -14,7 +14,7 @@ export default function Buttons() {
   const activities = useGetActiviteiten();
   const organizations = useGetOrganisaties();
 
-  const { graphicsLayerHover, graphicsLayer } = useMapViewState();
+  const { graphicsLayerHover, graphicsLayer, geometriesGraphicsLayer } = useMapViewState();
   const { setHoveredPoints } = useHoveredPlanState();
   const { resetFeatures } = useResetFeatures();
   const handleCancel = useHandleCancel();
@@ -24,6 +24,7 @@ export default function Buttons() {
     selectedPlan,
     selectedPoints,
     selectedGeometries,
+    setSelectedGeometries,
     setZipFile,
     setZippingStatus,
     setStep,
@@ -69,7 +70,10 @@ export default function Buttons() {
         <button
           className="gray-button"
           onClick={() => {
+            setSelectedGeometries([]);
             setStep(1);
+            // Clear layer and reset features - global hook will re-render all geometries
+            geometriesGraphicsLayer?.removeAll();
             resetFeatures();
 
             logAction({
@@ -111,6 +115,9 @@ export default function Buttons() {
           <button
             className="gray-button"
             onClick={() => {
+              setSelectedGeometries([]);
+              // Clear layer and reset features - global hook will re-render all geometries
+              geometriesGraphicsLayer?.removeAll();
               resetFeatures();
               clear();
 
