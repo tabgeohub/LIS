@@ -59,7 +59,7 @@ export default function MapComp({
         }
       }, 1000);
     }
-  }, [user]);
+  }, [user.user_id, user.role, mapView]);
 
   useEffect(() => {
     if (!mapView) return;
@@ -120,7 +120,7 @@ export default function MapComp({
         if (match && match.graphic?.geometry) {
           const attrs = match.graphic.attributes || {};
           const geometryType = match.graphic.geometry.type;
-          
+
           // Determine label based on geometry type
           let label: string;
           if (geometryType === "polygon" || geometryType === "polyline") {
@@ -138,7 +138,7 @@ export default function MapComp({
               attrs.title ||
               "Onbekend punt";
           }
-          
+
           const id =
             attrs.id ??
             attrs.geometryId ??
@@ -149,7 +149,7 @@ export default function MapComp({
 
           setHovered({ id, label, point: attrs });
           graphicsLayerHover?.removeAll();
-          
+
           // Choose appropriate hover symbol based on geometry type
           let hoverSymbol: SimpleMarkerSymbol | SimpleFillSymbol | SimpleLineSymbol;
           if (geometryType === "polygon") {
@@ -159,7 +159,7 @@ export default function MapComp({
           } else {
             hoverSymbol = pointHoverSymbol;
           }
-          
+
           graphicsLayerHover?.add(
             new Graphic({
               geometry: match.graphic.geometry,

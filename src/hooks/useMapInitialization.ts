@@ -46,5 +46,5 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
 
       initialized.current = true;
     }
-  }, [mapDiv, user]);
+  }, [mapDiv, user.user_id]);
 }

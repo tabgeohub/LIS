@@ -54,7 +54,7 @@ export function useRenderPoints() {
     });
 
     pointsGraphicsLayer.addMany(graphics);
-  }, [map, points, user]);
+  }, [map, points, user.user_id]);
 
   useEffect(() => {
     if (!mapView || !pointsGraphicsLayer) return;

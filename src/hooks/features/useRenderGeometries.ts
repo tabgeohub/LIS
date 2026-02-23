@@ -130,6 +130,6 @@ export function useRenderGeometries() {
         geometriesGraphicsLayer.removeAll();
       }
     };
-  }, [map, geometriesGraphicsLayer, geometries, user, step]);
+  }, [map, geometriesGraphicsLayer, geometries, user.user_id, step]);
 }
 
