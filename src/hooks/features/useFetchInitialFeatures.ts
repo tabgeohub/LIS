@@ -6,14 +6,16 @@ export function useFetchInitialFeatures() {
   const { fetchGeometries } = useGeometriesStore();
 
   const fetchInitialFeatures = async (regio?: string | number) => {
-    // Only fetch once per resource type - each function now populates both stores
-    await fetchPoints({
-      regio: regio,
-    });
-
-    await fetchGeometries({
-      regio: regio,
-    });
+    // Execute both fetches in parallel for better performance
+    // This is typically called after mutations, so we want fresh data
+    await Promise.all([
+      fetchPoints({
+        regio: regio,
+      }),
+      fetchGeometries({
+        regio: regio,
+      }),
+    ]);
   };
 
   return { fetchInitialFeatures };
