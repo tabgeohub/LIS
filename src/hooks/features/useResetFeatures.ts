@@ -6,9 +6,11 @@ export function useResetFeatures() {
   const { dbGeometries, setGeometries } = useGeometriesStore();
 
   const resetFeatures = () => {
-    setPoints(dbPoints);
+    // Create new array references to ensure Zustand detects the change
+    setPoints(dbPoints ? [...dbPoints] : []);
     // Always reset geometries to dbGeometries (even if empty, to clear filtered state)
-    setGeometries(dbGeometries || []);
+    // Create new array reference to ensure Zustand detects the change
+    setGeometries(dbGeometries ? [...dbGeometries] : []);
   };
 
   return { resetFeatures };
