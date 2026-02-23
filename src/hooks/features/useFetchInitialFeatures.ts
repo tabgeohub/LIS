@@ -2,19 +2,12 @@ import { usePointsStore } from "./usePointsStore";
 import { useGeometriesStore } from "./useGeometriesStore";
 
 export function useFetchInitialFeatures() {
-  const { fetchDBPoints, fetchPoints } = usePointsStore();
-  const { fetchDBGeometries, fetchGeometries } = useGeometriesStore();
+  const { fetchPoints } = usePointsStore();
+  const { fetchGeometries } = useGeometriesStore();
 
   const fetchInitialFeatures = async (regio?: string | number) => {
-    await fetchDBPoints({
-      regio: regio,
-    });
-
+    // Only fetch once per resource type - each function now populates both stores
     await fetchPoints({
-      regio: regio,
-    });
-
-    await fetchDBGeometries({
       regio: regio,
     });
 

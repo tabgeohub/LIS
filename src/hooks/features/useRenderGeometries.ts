@@ -13,21 +13,18 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, geometriesGraphicsLayer } = useMapViewState();
-  const { geometries, fetchGeometries, fetchDBGeometries } = useGeometriesStore();
+  const { geometries, fetchGeometries } = useGeometriesStore();
   const { step } = useFinishedPlansState();
 
   // Fetch geometries
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
 
+    // Only fetch once - fetchGeometries now populates both geometries and dbGeometries
     fetchGeometries({
       regio: user.role && user.role !== "admin" ? user.role : undefined,
     });
-
-    fetchDBGeometries({
-      regio: user.role && user.role !== "admin" ? user.role : undefined,
-    });
-  }, [user]);
+  }, [user.user_id, user.role]);
 
   // Render geometries on the map
   useEffect(() => {

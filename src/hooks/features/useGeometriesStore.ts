@@ -62,7 +62,8 @@ export const useGeometriesStore = create<GeometriesState>((set) => ({
 
       const res = await axios.get<Geometry[]>(url, { params });
 
-      set({ geometries: res.data });
+      // Populate both geometries and dbGeometries with the same data to avoid duplicate API calls
+      set({ geometries: res.data, dbGeometries: res.data });
     } catch (error) {
       console.error("Failed to fetch geometries:", error);
     }
@@ -82,7 +83,8 @@ export const useGeometriesStore = create<GeometriesState>((set) => ({
 
       const res = await axios.get<Geometry[]>(url, { params });
 
-      set({ dbGeometries: res.data });
+      // Populate both geometries and dbGeometries with the same data to avoid duplicate API calls
+      set({ geometries: res.data, dbGeometries: res.data });
     } catch (error) {
       console.error("Failed to fetch geometries:", error);
     }

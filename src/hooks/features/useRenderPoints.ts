@@ -10,21 +10,18 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 
 export function useRenderPoints() {
   const { map, mapView, pointsGraphicsLayer } = useMapViewState();
-  const { points, fetchPoints, fetchDBPoints } = usePointsStore();
+  const { points, fetchPoints } = usePointsStore();
   const { setClickedPointId, setClickedPoint } = usePopUpState();
   const { user } = useAuth();
 
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
 
+    // Only fetch once - fetchPoints now populates both points and dbPoints
     fetchPoints({
       regio: user.role,
     });
-
-    fetchDBPoints({
-      regio: user.role,
-    });
-  }, [user]);
+  }, [user.user_id, user.role]);
 
   useEffect(() => {
     if (!map || !pointsGraphicsLayer || !points) return;

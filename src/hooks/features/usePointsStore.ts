@@ -74,7 +74,8 @@ export const usePointsStore = create<PointsState>((set) => ({
 
       const res = await axios.get<EnrichedPointType[]>(url, { params });
 
-      set({ points: res.data });
+      // Populate both points and dbPoints with the same data to avoid duplicate API calls
+      set({ points: res.data, dbPoints: res.data });
     } catch (error) {
       console.error("Failed to fetch points:", error);
     }
@@ -102,7 +103,8 @@ export const usePointsStore = create<PointsState>((set) => ({
 
       const res = await axios.get<EnrichedPointType[]>(url, { params });
 
-      set({ dbPoints: res.data });
+      // Populate both points and dbPoints with the same data to avoid duplicate API calls
+      set({ points: res.data, dbPoints: res.data });
     } catch (error) {
       console.error("Failed to fetch points:", error);
     }
