@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { useEffect, useMemo } from "react";
 import useLogAction from "hooks/useLogAction";

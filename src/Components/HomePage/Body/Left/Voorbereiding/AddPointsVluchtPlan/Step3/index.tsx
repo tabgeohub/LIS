@@ -221,6 +221,9 @@ export default function Step3() {
             herhalen={false}
             filterTerm={filterTerm}
             setFilterTerm={setFilterTerm}
+            selectedGeometries={selectedGeometries}
+            setSelectedGeometries={setSelectedGeometries}
+            filteredGeometries={filteredGeometries}
           />
 
           <ScrollButtonsLayout buttons={<Buttons />}>

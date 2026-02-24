@@ -1,3 +1,5 @@
+import { Geometry } from "hooks/features/useGeometriesStore";
+
 export interface EnrichedPointType {
   id: number;
   omschrijving: string;
@@ -36,6 +38,7 @@ export interface FlightPlanType {
   hoofdthema: string;
   aanvullende: string;
   points: EnrichedPointType[];
+  geometries?: Geometry[]; // Optional geometries array
   id: number;
   basemap: string;
   layers: string;

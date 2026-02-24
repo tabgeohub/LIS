@@ -2,7 +2,17 @@ import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPoin
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 
-export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
+export default function SelectButtons({
+  herhalen,
+  selectedGeometries,
+  setSelectedGeometries,
+  filteredGeometries,
+}: {
+  herhalen: boolean;
+  selectedGeometries?: number[];
+  setSelectedGeometries?: (value: number[]) => void;
+  filteredGeometries?: any[];
+}) {
   const { points } = usePointsStore();
   const { geometries } = useGeometriesStore();
 
@@ -10,8 +20,9 @@ export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
 
   function handleSelectAll() {
     if (herhalen === false) {
-      const herhalenPoints = points.filter((point) => point.herhalen === 0);
-      const herhalenGeometries = geometries.filter((geometry) => {
+      const notHerhalenPoints = points.filter((point) => point.herhalen === 0);
+      // filteredGeometries is already filtered by herhalen in Step3, so use it directly
+      const geometriesToSelect = filteredGeometries || geometries.filter((geometry) => {
         const herhalenValue =
           typeof geometry.herhalen === "number"
             ? geometry.herhalen === 0
@@ -21,12 +32,14 @@ export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
         return herhalenValue;
       });
 
-      setSelectedPoints2(herhalenPoints.flatMap((point) => point.id));
-      // Note: Geometry selection will be added when geometries are integrated into AddPointsVluchtPlan
-      // For now, geometries are filtered but not selected since useAddPointStates doesn't have geometry state yet
+      setSelectedPoints2(notHerhalenPoints.flatMap((point) => point.id));
+      if (setSelectedGeometries) {
+        setSelectedGeometries(geometriesToSelect.flatMap((geometry) => geometry.id));
+      }
     } else {
       const herhalenPoints = points.filter((point) => point.herhalen === 1);
-      const herhalenGeometries = geometries.filter((geometry) => {
+      // filteredGeometries is already filtered by herhalen in Step2, so use it directly
+      const geometriesToSelect = filteredGeometries || geometries.filter((geometry) => {
         const herhalenValue =
           typeof geometry.herhalen === "number"
             ? geometry.herhalen === 1
@@ -37,15 +50,18 @@ export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
       });
 
       setSelectedPoints(herhalenPoints.flatMap((point) => point.id));
-      // Note: Geometry selection will be added when geometries are integrated into AddPointsVluchtPlan
-      // For now, geometries are filtered but not selected since useAddPointStates doesn't have geometry state yet
+      if (setSelectedGeometries) {
+        setSelectedGeometries(geometriesToSelect.flatMap((geometry) => geometry.id));
+      }
     }
   }
 
   function handleSelectNone() {
     setSelectedPoints([]);
     setSelectedPoints2([]);
-    // Note: Geometry deselection will be added when geometries are integrated into AddPointsVluchtPlan
+    if (setSelectedGeometries) {
+      setSelectedGeometries([]);
+    }
   }
 
   return (

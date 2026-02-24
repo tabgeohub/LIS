@@ -4,10 +4,16 @@ export default function Header({
   herhalen,
   filterTerm,
   setFilterTerm,
+  selectedGeometries,
+  setSelectedGeometries,
+  filteredGeometries,
 }: {
   herhalen: boolean;
   filterTerm: string;
   setFilterTerm: (value: string) => void;
+  selectedGeometries?: number[];
+  setSelectedGeometries?: (value: number[]) => void;
+  filteredGeometries?: any[];
 }) {
   return (
     <>
@@ -16,7 +22,7 @@ export default function Header({
           "(1) Selecteer de gewenste herhalende aandachtspunten en klik op 'Volgende'. Selecteer meerdere aandachtspunten door de Ctrl toets ingedrukt te houden."}
 
         {herhalen === false &&
-          "(2) Selecteer de gewenste overige aandachtspunten en klik op ‘Toevoegen’. Selecteer meerdere aandachtspunten door de Ctrl toets ingedrukt te houden."}
+          "(2) Selecteer de gewenste overige aandachtspunten en klik op 'Toevoegen'. Selecteer meerdere aandachtspunten door de Ctrl toets ingedrukt te houden."}
       </p>
 
       <input
@@ -27,7 +33,12 @@ export default function Header({
         onChange={(e) => setFilterTerm(e.target.value)}
       />
 
-      <SelectButtons herhalen={herhalen} />
+      <SelectButtons 
+        herhalen={herhalen}
+        selectedGeometries={selectedGeometries}
+        setSelectedGeometries={setSelectedGeometries}
+        filteredGeometries={filteredGeometries}
+      />
     </>
   );
 }
