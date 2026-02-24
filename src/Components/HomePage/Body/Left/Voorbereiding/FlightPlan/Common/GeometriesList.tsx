@@ -1,4 +1,4 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { Geometry, useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { useEffect, useMemo } from "react";
 import useLogAction from "hooks/useLogAction";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
@@ -120,9 +120,13 @@ function useGeometryHover() {
 function useDrawYellowGeometries({
     selectedGeometryIds,
     geometries,
+    allGeometries,
+    herhalenFilter,
 }: {
     selectedGeometryIds: number[];
     geometries: Geometry[];
+    allGeometries: Geometry[];
+    herhalenFilter?: boolean | null;
 }) {
     const { mapView, yellowGraphicsLayer } = useMapViewState();
 
@@ -136,8 +140,24 @@ function useDrawYellowGeometries({
         }
 
         selectedGeometryIds.forEach((geometryId) => {
-            const geometry = geometries.find((g) => g.id === geometryId);
+            // Use allGeometries for lookup to ensure selected geometries are found even if filtered out
+            const geometry = allGeometries.find((g) => g.id === geometryId);
             if (!geometry || !geometry.points || geometry.points.length === 0) return;
+
+            // Filter by herhalen if herhalenFilter is provided
+            if (herhalenFilter !== null && herhalenFilter !== undefined) {
+                const geometryHerhalen =
+                    typeof geometry.herhalen === "number"
+                        ? geometry.herhalen === 1
+                        : typeof geometry.herhalen === "string"
+                            ? geometry.herhalen === "1"
+                            : geometry.herhalen === true;
+                
+                // Only draw geometries that match the herhalen filter
+                if (geometryHerhalen !== herhalenFilter) {
+                    return;
+                }
+            }
 
             const coordinates = geometry.points.map((point) => [
                 point.longitude,
@@ -194,16 +214,20 @@ function useDrawYellowGeometries({
                 yellowGraphicsLayer.add(graphic);
             }
         });
-    }, [selectedGeometryIds, geometries, mapView, yellowGraphicsLayer]);
+    }, [selectedGeometryIds, geometries, allGeometries, herhalenFilter, mapView, yellowGraphicsLayer]);
 }
 
 // Hook for geometry click (similar to usePointClick)
-function useGeometryClick(selectedGeometries: Geometry[]) {
+function useGeometryClick(selectedGeometries: Geometry[], allGeometries: Geometry[], herhalenFilter?: boolean | null) {
     const validGeometries = selectedGeometries?.filter((g) => g != null) || [];
 
+    // Use allGeometries to find selected geometries, not just the filtered list
+    // This ensures selected geometries are found even if they're not in the current filter
     useDrawYellowGeometries({
         selectedGeometryIds: validGeometries.map((g) => g.id),
-        geometries: validGeometries,
+        geometries: validGeometries, // Pass selected geometries for reference
+        allGeometries: allGeometries, // Use all geometries for lookup
+        herhalenFilter: herhalenFilter, // Filter by herhalen to only show geometries matching current step
     });
 }
 
@@ -316,8 +340,28 @@ export default function GeometriesList({
 }) {
     const logAction = useLogAction();
     const { mapView, redGraphicsLayer } = useMapViewState();
+    const { dbGeometries } = useGeometriesStore();
 
-    useGeometryClick(geometries.filter((geometry) => selectedGeometries.includes(geometry.id)));
+    // Ensure selectedGeometries is always an array
+    const safeSelectedGeometries = Array.isArray(selectedGeometries) ? selectedGeometries : [];
+
+    // Determine herhalen filter from the first geometry (if available)
+    const firstGeometry = geometries.at(0);
+    const herhalenFilter =
+        firstGeometry !== undefined
+            ? typeof firstGeometry.herhalen === "number"
+                ? firstGeometry.herhalen === 1
+                : typeof firstGeometry.herhalen === "string"
+                    ? firstGeometry.herhalen === "1"
+                    : firstGeometry.herhalen === true
+            : null;
+
+    // Pass all dbGeometries for lookup, but filtered geometries for the selected list
+    useGeometryClick(
+        geometries.filter((geometry) => safeSelectedGeometries.includes(geometry.id)),
+        dbGeometries, // Use all geometries for lookup
+        herhalenFilter // Pass herhalen filter to only draw matching geometries
+    );
     const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryHover();
 
     useEffect(() => {
@@ -334,16 +378,16 @@ export default function GeometriesList({
             message: `User is selecting geometries`,
             step: `Step ${step}`,
             newData: {
-                selectedGeometries: selectedGeometries,
+                selectedGeometries: safeSelectedGeometries,
             },
         });
-    }, [selectedGeometries]);
+    }, [safeSelectedGeometries]);
 
     function handleGeometryClick(geometry: Geometry) {
-        if (selectedGeometries?.includes(geometry.id)) {
-            setSelectedGeometries(selectedGeometries.filter((g) => g !== geometry.id));
+        if (safeSelectedGeometries.includes(geometry.id)) {
+            setSelectedGeometries(safeSelectedGeometries.filter((g) => g !== geometry.id));
         } else {
-            setSelectedGeometries([...selectedGeometries, geometry.id]);
+            setSelectedGeometries([...safeSelectedGeometries, geometry.id]);
         }
     }
 
@@ -369,7 +413,7 @@ export default function GeometriesList({
                 }
             });
         }
-    }, [selectedGeometries, geometries]);
+    }, [safeSelectedGeometries, geometries]);
 
     const sortedGeometries = useMemo(() => {
         const indexMap = new Map<number, number>();
@@ -377,17 +421,17 @@ export default function GeometriesList({
 
         // Create reverse index map for selected geometries (last clicked = 0, first clicked = highest)
         const selectedReverseIndexMap = new Map<number, number>();
-        selectedGeometries.forEach((id, i) => {
-            selectedReverseIndexMap.set(id, selectedGeometries.length - 1 - i);
+        safeSelectedGeometries.forEach((id, i) => {
+            selectedReverseIndexMap.set(id, safeSelectedGeometries.length - 1 - i);
         });
 
-        const isSelected = (id: number) => (selectedGeometries.includes(id) ? 0 : 1);
+        const isSelected = (id: number) => (safeSelectedGeometries.includes(id) ? 0 : 1);
         return [...geometries].sort((a, b) => {
             const selOrder = isSelected(a.id) - isSelected(b.id);
             if (selOrder !== 0) return selOrder;
 
             // For selected geometries, sort by reverse index (last clicked first)
-            if (selectedGeometries.includes(a.id) && selectedGeometries.includes(b.id)) {
+            if (safeSelectedGeometries.includes(a.id) && safeSelectedGeometries.includes(b.id)) {
                 const aReverseIndex = selectedReverseIndexMap.get(a.id) ?? 0;
                 const bReverseIndex = selectedReverseIndexMap.get(b.id) ?? 0;
                 return aReverseIndex - bReverseIndex;
@@ -396,7 +440,7 @@ export default function GeometriesList({
             // For non-selected geometries, maintain original order
             return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
         });
-    }, [geometries, selectedGeometries]);
+    }, [geometries, safeSelectedGeometries]);
 
     return (
         <>
@@ -404,7 +448,7 @@ export default function GeometriesList({
                 <GeometryItemCheckBox
                     key={geometry.id}
                     geometry={geometry}
-                    isSelected={selectedGeometries.includes(geometry.id)}
+                    isSelected={safeSelectedGeometries.includes(geometry.id)}
                     onMouseEnter={() => handleHoveredGeometry(geometry)}
                     onMouseLeave={handleRemoveHoveredGeometry}
                     onCheckboxClick={(e) => {

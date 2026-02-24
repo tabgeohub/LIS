@@ -4,6 +4,8 @@ import {
 } from "hooks/filters/usePointsFilterStore";
 import { EnrichedPointType } from "Types";
 import { useFilterPoints } from "hooks/filters/useFilterPoints";
+import { useFilterGeometries } from "hooks/filters/useFilterGeometries";
+import { Geometry } from "hooks/features/useGeometriesStore";
 import SelectComp from "../../../Common/FormComponents/SelectComp";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import { useContent } from "hooks/useContent";
@@ -12,10 +14,12 @@ export default function Filter({
   setOpenFilter,
   herhalen,
   setFilteredPoints,
+  setFilteredGeometries,
 }: {
   setOpenFilter: (value: boolean) => void;
   herhalen: boolean;
   setFilteredPoints: (value: EnrichedPointType[]) => void;
+  setFilteredGeometries?: (value: Geometry[]) => void;
 }) {
   const activities = useGetActiviteiten();
 
@@ -33,6 +37,7 @@ export default function Filter({
   } = usePointsFilterStore();
 
   const filterPoints = useFilterPoints();
+  const filterGeometries = useFilterGeometries();
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -94,6 +99,9 @@ export default function Filter({
             setOpenFilter(false);
 
             filterPoints(herhalen, setFilteredPoints);
+            if (setFilteredGeometries) {
+              filterGeometries(herhalen, setFilteredGeometries);
+            }
           }}
           className="gray-button"
         >

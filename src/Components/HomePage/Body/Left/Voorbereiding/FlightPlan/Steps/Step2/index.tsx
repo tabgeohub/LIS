@@ -36,7 +36,7 @@ export default function Step2() {
     setPoints(dbPoints.filter((point) => point.herhalen === 1));
     setFilteredPoints(dbPoints.filter((point) => point.herhalen === 1));
 
-    setGeometries(dbGeometries.filter((geometry) => {
+    const herhalenGeometries = dbGeometries.filter((geometry) => {
       const herhalenValue =
         typeof geometry.herhalen === "number"
           ? geometry.herhalen === 1
@@ -44,16 +44,14 @@ export default function Step2() {
             ? geometry.herhalen === "1"
             : geometry.herhalen === true;
       return herhalenValue;
-    }));
-    setFilteredGeometries(dbGeometries.filter((geometry) => {
-      const herhalenValue =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === 1
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === "1"
-            : geometry.herhalen === true;
-      return herhalenValue;
-    }));
+    });
+    
+    setGeometries(herhalenGeometries);
+    setFilteredGeometries(herhalenGeometries);
+
+    // Clear selected geometries that don't match the herhalen filter
+    const validGeometryIds = herhalenGeometries.map((g) => g.id);
+    setSelectedGeometries((prev) => prev.filter((id) => validGeometryIds.includes(id)));
   }, []);
 
   return (
@@ -92,6 +90,10 @@ export default function Step2() {
       ) : (
         <Filter
           setFilteredPoints={setFilteredPoints}
+          setFilteredGeometries={(geometries) => {
+            setFilteredGeometries(geometries);
+            setGeometries(geometries);
+          }}
           herhalen={true}
           setOpenFilter={setOpenFilter}
         />
