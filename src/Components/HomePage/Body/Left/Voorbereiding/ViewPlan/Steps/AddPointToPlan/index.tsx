@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
@@ -15,13 +16,16 @@ import { useViewPlanState } from "../../helpers/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import PointsList from "./PointsList";
+import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
 
 export default function AddPointToPlan() {
   const { dbPoints } = usePointsStore();
+  const { dbGeometries } = useGeometriesStore();
   const { mapView, pointsGraphicsLayer } = useMapViewState();
 
   const [filter, setFilter] = useState("");
   const [selectedPointIds, setSelectedPointIds] = useState<number[]>([]);
+  const [selectedGeometryIds, setSelectedGeometryIds] = useState<number[]>([]);
   const { selectedPlan } = useViewPlanState();
 
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans/points`);
@@ -32,6 +36,15 @@ export default function AddPointToPlan() {
         (dbPoint) => !selectedPlan?.points.some((p) => p.id === dbPoint.id)
       ),
     [dbPoints, filter]
+  );
+
+  const filteredGeometries = useMemo(
+    () =>
+      dbGeometries.filter(
+        (geometry) =>
+          !selectedPlan?.geometries?.some((g) => g.id === geometry.id)
+      ),
+    [dbGeometries, selectedPlan]
   );
 
   // Manage created pins for cleanup and toggle
@@ -183,6 +196,12 @@ export default function AddPointToPlan() {
         filteredPoints={filteredPoints}
         filter={filter}
         setFilter={setFilter}
+      />
+
+      <GeometriesList
+        selectedGeometries={selectedGeometryIds}
+        setSelectedGeometries={setSelectedGeometryIds}
+        geometries={filteredGeometries}
       />
 
       <PointsList

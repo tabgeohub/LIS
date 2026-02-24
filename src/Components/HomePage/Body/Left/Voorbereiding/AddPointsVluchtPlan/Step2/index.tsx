@@ -3,12 +3,14 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import Buttons from "./Buttons";
 import PointsList from "../Common/PointsList";
+import GeometriesList from "../../FlightPlan/Common/GeometriesList";
 import Filter from "../Common/Filter";
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 import Header from "../Common/Header";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
@@ -20,9 +22,12 @@ dayjs.extend(isBetween);
 
 export default function Step2() {
   const { setPoints, dbPoints } = usePointsStore();
+  const { dbGeometries, setGeometries } = useGeometriesStore();
   const { mapView, pointsGraphicsLayer } = useMapViewState();
 
   const [filterTerm, setFilterTerm] = useState("");
+  const [selectedGeometries, setSelectedGeometries] = useState<number[]>([]);
+  const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
 
   const {
     selectedPoints,
@@ -49,6 +54,15 @@ export default function Step2() {
     [filteredPoints, filterTerm, selectedPlan]
   );
 
+  const displayedGeometries = useMemo(
+    () =>
+      filteredGeometries
+        .filter((geometry) =>
+          geometry.omschrijving.toLowerCase().includes(filterTerm.toLowerCase())
+        ),
+    [filteredGeometries, filterTerm]
+  );
+
   useEffect(() => {
     setPoints(
       dbPoints
@@ -67,6 +81,19 @@ export default function Step2() {
             !selectedPlan?.points.flatMap((p) => p.id).includes(point.id)
         )
     );
+
+    const herhalenGeometries = dbGeometries.filter((geometry) => {
+      const herhalenValue =
+        typeof geometry.herhalen === "number"
+          ? geometry.herhalen === 1
+          : typeof geometry.herhalen === "string"
+            ? geometry.herhalen === "1"
+            : geometry.herhalen === true;
+      return herhalenValue;
+    });
+
+    setGeometries(herhalenGeometries);
+    setFilteredGeometries(herhalenGeometries);
   }, []);
 
   // Draw blue points for filtered list
@@ -196,6 +223,11 @@ export default function Step2() {
           />
 
           <ScrollButtonsLayout buttons={<Buttons />}>
+            <GeometriesList
+              selectedGeometries={selectedGeometries}
+              setSelectedGeometries={setSelectedGeometries}
+              geometries={displayedGeometries}
+            />
             <PointsList
               selectedPoints={selectedPoints}
               setSelectedPoints={setSelectedPoints}

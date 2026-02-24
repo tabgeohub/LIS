@@ -8,8 +8,14 @@ interface ReUseFlightPlanState {
   currentPoints: number[];
   setCurrentPoints: (value: number[]) => void;
 
+  currentGeometries: number[];
+  setCurrentGeometries: (value: number[]) => void;
+
   newPoints: number[];
   setNewPoints: (value: number[]) => void;
+
+  newGeometries: number[];
+  setNewGeometries: (value: number[]) => void;
 
   selectedPlan: FlightPlanType | null;
   setSelectedPlan: (value: FlightPlanType | null) => void;
@@ -66,8 +72,14 @@ export const useReuseFlightPlan = create<ReUseFlightPlanState>((set) => ({
   currentPoints: [],
   setCurrentPoints: (value) => set({ currentPoints: value }),
 
+  currentGeometries: [],
+  setCurrentGeometries: (value) => set({ currentGeometries: value }),
+
   newPoints: [],
   setNewPoints: (value) => set({ newPoints: value }),
+
+  newGeometries: [],
+  setNewGeometries: (value) => set({ newGeometries: value }),
 
   selectedPlan: null,
   setSelectedPlan: (value) => set({ selectedPlan: value }),
@@ -122,8 +134,14 @@ export const useReuseFlightPlan = create<ReUseFlightPlanState>((set) => ({
       currentPoints: [],
       setCurrentPoints: (value) => set({ currentPoints: value }),
 
+      currentGeometries: [],
+      setCurrentGeometries: (value) => set({ currentGeometries: value }),
+
       newPoints: [],
       setNewPoints: (value) => set({ newPoints: value }),
+
+      newGeometries: [],
+      setNewGeometries: (value) => set({ newGeometries: value }),
 
       selectedPlan: null,
       setSelectedPlan: (value) => set({ selectedPlan: value }),
