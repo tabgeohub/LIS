@@ -4,11 +4,12 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import Graphic from "@arcgis/core/Graphic";
 import EsriPoint from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
+import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
 import Header from "./Header";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
@@ -59,7 +60,7 @@ export default function AddPointToPlan() {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch {}
+      } catch { }
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -116,6 +117,9 @@ export default function AddPointToPlan() {
     }
   }, [filteredPoints, mapView, pointsGraphicsLayer]);
 
+  // Render geometries on the map
+  useRenderLocalGeometries(filteredGeometries);
+
   // Sync pins with selection
   useEffect(() => {
     if (!mapView) return;
@@ -138,40 +142,8 @@ export default function AddPointToPlan() {
     });
   }, [selectedPointIds, mapView, dbPoints]);
 
-  // Hover handler (pins and blue points)
-  useEffect(() => {
-    if (!mapView) return;
-    const { setHovered } = useHoveredGraphicState.getState();
-
-    const handle = mapView.on("pointer-move", async (event) => {
-      const hit: any = await mapView.hitTest(event);
-      const res: any[] = hit?.results || [];
-      const g: any = res.find((r: any) => {
-        const gr = r?.graphic;
-        if (!gr?.attributes) return false;
-        const id = gr.attributes.id;
-        const isPin = typeof id === "number" && pinRefs.current.has(id);
-        const isBluePoint =
-          !!pointsGraphicsLayer && gr.layer === pointsGraphicsLayer;
-        return isPin || isBluePoint;
-      })?.graphic;
-
-      if (g) {
-        setHovered({
-          id: g.attributes.id,
-          label: g.attributes.omschrijving || "",
-        });
-      } else {
-        setHovered(null);
-      }
-    });
-
-    return () => {
-      handle.remove();
-      const { setHovered } = useHoveredGraphicState.getState();
-      setHovered(null);
-    };
-  }, [mapView, pointsGraphicsLayer]);
+  // Hover handler (pins, blue points, and geometries)
+  useHoverPointsAndGeometries({ pinRefs });
 
   // Cleanup all pins on unmount
   useEffect(() => {

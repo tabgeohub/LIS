@@ -17,6 +17,8 @@ import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformed
 import Graphic from "@arcgis/core/Graphic";
 import EsriPoint from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
+import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
 
 dayjs.extend(isBetween);
 
@@ -101,7 +103,7 @@ export default function Step2() {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch {}
+      } catch { }
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -158,44 +160,11 @@ export default function Step2() {
     }
   }, [displayedPoints, mapView, pointsGraphicsLayer]);
 
-  // Hover handler for blue points on map only
-  useEffect(() => {
-    if (!mapView) return;
-    const { setHovered } = useHoveredGraphicState.getState();
+  // Render geometries on the map
+  useRenderLocalGeometries(displayedGeometries);
 
-    const handle = mapView.on("pointer-move", async (event) => {
-      // Check if the event target is within the map view container
-      const target = event.native.target as HTMLElement;
-      const mapContainer = mapView.container;
-      if (!mapContainer || !mapContainer.contains(target)) {
-        return; // Mouse is not over the map, don't interfere with list hover
-      }
-
-      const hit: any = await mapView.hitTest(event);
-      const res: any[] = hit?.results || [];
-      const g: any = res.find((r: any) => {
-        const gr = r?.graphic;
-        if (!gr?.attributes) return false;
-        const isBluePoint =
-          !!pointsGraphicsLayer && gr.layer === pointsGraphicsLayer;
-        return isBluePoint;
-      })?.graphic;
-
-      if (g) {
-        setHovered({
-          id: g.attributes.id,
-          label: g.attributes.omschrijving || "",
-        });
-      } else {
-        // Only clear if mouse is actually over map and not over a graphic
-        setHovered(null);
-      }
-    });
-
-    return () => {
-      handle.remove();
-    };
-  }, [mapView, pointsGraphicsLayer]);
+  // Hover handler for blue points and geometries on map only
+  useHoverPointsAndGeometries({ checkMapContainer: true });
 
   // Cleanup on unmount
   useEffect(() => {
@@ -204,7 +173,7 @@ export default function Step2() {
       if (mapView && blueGraphicsRef.current.length) {
         try {
           mapView.graphics.removeMany(blueGraphicsRef.current);
-        } catch {}
+        } catch { }
         blueGraphicsRef.current = [];
       }
       const { setHovered } = useHoveredGraphicState.getState();
