@@ -20,8 +20,6 @@ export default function ConfirmButton({
   const handleConfirm = () => {
     if (!graphicsLayer) return;
 
-    setStep(2)
-
     const graphics = graphicsLayer.graphics;
     const allPoints: Array<{ type: string; points: number[][] }> = [];
 

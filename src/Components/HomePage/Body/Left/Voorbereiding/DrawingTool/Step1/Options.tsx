@@ -47,7 +47,7 @@ export default function Options({
       cleanup();
       // Note: Don't remove graphics layer on unmount, let it persist
     };
-  }, []);
+  }, [sketchViewModel, mapView]);
 
   // Enables drawing on the map according to the tool selected
   function handleDrawingTool(tool: string) {
@@ -93,6 +93,12 @@ export default function Options({
     newSketchViewModel.on("create", (event) => {
       if (event.state === "complete") {
         const geometry = event.graphic.geometry;
+
+        // Mark this graphic as "currently-drawing" so we can easily find and delete it later
+        event.graphic.attributes = {
+          ...event.graphic.attributes,
+          "currently-drawing": true,
+        };
 
         // Apply appropriate symbol based on geometry type
         let symbol;

@@ -2,14 +2,12 @@ import { useDrawingStore } from "hooks/zustand/useDrawingStore";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useEffect, useState } from "react";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
 import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import ConfirmationModal from "./ConfirmationModal";
 
 export default function Buttons() {
   const {
@@ -28,60 +26,53 @@ export default function Buttons() {
   const content = useContent();
   const { create, loading } = useCreateData("/geometries");
   const { fetchGeometries } = useGeometriesStore();
-  const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(
-    null
-  );
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // Find the graphics layer used for drawing
-  useEffect(() => {
+  const clearCurrentlyDrawingGraphics = () => {
     if (!mapView) return;
 
-    const findGraphicsLayer = () => {
-      const layers = mapView.map.layers;
-      for (let i = 0; i < layers.length; i++) {
-        const layer = layers.getItemAt(i);
-
-
-        if (layer instanceof GraphicsLayer && layer.title === "Tekeninglaag") {
-          setGraphicsLayer(layer);
-          return;
-        }
-      }
-    };
-
-    findGraphicsLayer();
-  }, [mapView]);
-
-  const clearGraphics = () => {
-    if (!mapView) return;
-
-    // Find the graphics layer directly
+    // Search all graphics layers for graphics with "currently-drawing" attribute
     const layers = mapView.map.layers;
     for (let i = 0; i < layers.length; i++) {
       const layer = layers.getItemAt(i);
-      if (layer instanceof GraphicsLayer && layer.title === "Tekeninglaag") {
-        layer.removeAll();
-        return;
+      if (layer instanceof GraphicsLayer) {
+        const graphics = layer.graphics.toArray();
+        graphics.forEach((graphic) => {
+          if (graphic.attributes && graphic.attributes["currently-drawing"] === true) {
+            try {
+              layer.remove(graphic);
+            } catch (err) {
+              // Ignore removal errors
+            }
+          }
+        });
       }
     }
   };
 
   function handleBack() {
-    // Show confirmation modal instead of directly going back
-    setShowConfirmModal(true);
+    // Delete all graphics with "currently-drawing" attribute
+    clearCurrentlyDrawingGraphics();
+
+    // Reset cursor
+    if (mapView?.container) {
+      mapView.container.style.cursor = "";
+    }
+
+    // Clear store state (this will also set step to 1)
+    clear();
   }
 
   function handleCancel() {
-    // Show confirmation modal instead of directly clearing
-    setShowConfirmModal(true);
-  }
+    // Delete all graphics with "currently-drawing" attribute
+    clearCurrentlyDrawingGraphics();
 
-  function handleConfirmCancel() {
-    // Clear graphics and state, then close modal
-    clearGraphics();
+    // Reset cursor
+    if (mapView?.container) {
+      mapView.container.style.cursor = "";
+    }
+
+    // Clear store state (this will also set step to 1)
     clear();
-    setShowConfirmModal(false);
   }
 
   async function handleSubmit() {
@@ -192,7 +183,7 @@ export default function Buttons() {
       },
       async () => {
         // Success callback - clear graphics and reset after successful creation
-        clearGraphics();
+        clearCurrentlyDrawingGraphics();
         clear();
 
         // Refetch geometries to update the map immediately
@@ -246,12 +237,6 @@ export default function Buttons() {
           </div>
         </div>
       )}
-
-      <ConfirmationModal
-        isOpen={showConfirmModal}
-        setIsOpen={setShowConfirmModal}
-        handleConfirm={handleConfirmCancel}
-      />
     </div>
   );
 }
