@@ -7,12 +7,14 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { usePointsStore } from "./usePointsStore";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useTabState } from "@helpers/ZustandStates/tabState";
 
 export function useRenderPoints() {
   const { map, mapView, pointsGraphicsLayer } = useMapViewState();
   const { points, fetchPoints } = usePointsStore();
   const { setClickedPointId, setClickedPoint } = usePopUpState();
   const { user } = useAuth();
+  const { selectedTab } = useTabState();
 
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
@@ -27,6 +29,12 @@ export function useRenderPoints() {
     if (!map || !pointsGraphicsLayer || !points) return;
 
     if (user.user_id === undefined || user.user_id === 0) return;
+
+    // Hide points when in editGeometry tab
+    if (selectedTab === "editGeometry") {
+      pointsGraphicsLayer.removeAll();
+      return;
+    }
 
     pointsGraphicsLayer.removeAll();
 
@@ -54,7 +62,7 @@ export function useRenderPoints() {
     });
 
     pointsGraphicsLayer.addMany(graphics);
-  }, [map, points, user.user_id]);
+  }, [map, points, user.user_id, selectedTab]);
 
   useEffect(() => {
     if (!mapView || !pointsGraphicsLayer) return;

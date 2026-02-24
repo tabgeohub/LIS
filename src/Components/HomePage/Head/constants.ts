@@ -20,6 +20,7 @@ import { IoNewspaperOutline } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { RiRestartFill } from "react-icons/ri";
 import { TiExport } from "react-icons/ti";
+import { MdEdit } from "react-icons/md";
 
 import content from "../../../constants/content.json";
 
@@ -137,6 +138,13 @@ export const toolsTabs: {
     label: content.tools.tabs.exporteer,
     icon: TiExport,
     disabled: false,
+  },
+  {
+    id: "editGeometry",
+    label: content.tools.tabs.editGeometry,
+    icon: MdEdit,
+    disabled: false,
+    new: true,
   },
 
     // {

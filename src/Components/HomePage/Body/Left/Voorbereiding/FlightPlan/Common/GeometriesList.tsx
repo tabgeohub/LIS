@@ -214,18 +214,16 @@ function useDrawYellowGeometries({
                 yellowGraphicsLayer.add(graphic);
             }
         });
-    }, [selectedGeometryIds, geometries, allGeometries, herhalenFilter, mapView, yellowGraphicsLayer]);
+    }, [selectedGeometryIds, allGeometries, herhalenFilter, mapView, yellowGraphicsLayer]);
 }
 
 // Hook for geometry click (similar to usePointClick)
-function useGeometryClick(selectedGeometries: Geometry[], allGeometries: Geometry[], herhalenFilter?: boolean | null) {
-    const validGeometries = selectedGeometries?.filter((g) => g != null) || [];
-
+function useGeometryClick(selectedGeometryIds: number[], allGeometries: Geometry[], herhalenFilter?: boolean | null) {
     // Use allGeometries to find selected geometries, not just the filtered list
     // This ensures selected geometries are found even if they're not in the current filter
     useDrawYellowGeometries({
-        selectedGeometryIds: validGeometries.map((g) => g.id),
-        geometries: validGeometries, // Pass selected geometries for reference
+        selectedGeometryIds: selectedGeometryIds, // Pass IDs directly - the effect will handle re-rendering when they change
+        geometries: [], // Not used in the effect, but kept for API compatibility
         allGeometries: allGeometries, // Use all geometries for lookup
         herhalenFilter: herhalenFilter, // Filter by herhalen to only show geometries matching current step
     });
@@ -356,9 +354,10 @@ export default function GeometriesList({
                     : firstGeometry.herhalen === true
             : null;
 
-    // Pass all dbGeometries for lookup, but filtered geometries for the selected list
+    // Pass selected geometry IDs directly to avoid unnecessary object conversions
+    // This ensures the effect only runs when the selection actually changes
     useGeometryClick(
-        geometries.filter((geometry) => safeSelectedGeometries.includes(geometry.id)),
+        safeSelectedGeometries, // Pass IDs directly
         dbGeometries, // Use all geometries for lookup
         herhalenFilter // Pass herhalen filter to only draw matching geometries
     );

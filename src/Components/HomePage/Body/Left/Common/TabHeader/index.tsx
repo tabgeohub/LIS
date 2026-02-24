@@ -74,6 +74,7 @@ export default function TabHeader() {
     verwijderen: content.layout.tabHeaders.verwijderen,
     emailijst: content.layout.tabHeaders.emailijst,
     tekengereedschap: content.layout.tabHeaders.tekengereedschap,
+    editGeometry: content.layout.tabHeaders.editGeometry,
   };
 
   // @ts-ignore

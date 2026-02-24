@@ -52,7 +52,8 @@
       "vluchtplanStatus": "Vluchtplan status aanpassen",
       "verwijderen": "Aandachtspunten verwijderen",
       "emailijst": "E-maillijst bijwerken",
-      "tekengereedschap": "Tekengereedschap"
+      "tekengereedschap": "Tekengereedschap",
+      "editGeometry": "Geometrie bewerken"
     },
     "searchResult": {
       "listPointFunctions": {
@@ -534,7 +535,8 @@
       "emailijst": "E-maillijst bewerken",
       "verwijderen": "Aandachtspunten verwijderen",
       "startgebied": "Startgebied",
-      "exporteer": "Exporteer kaart"
+      "exporteer": "Exporteer kaart",
+      "editGeometry": "Geometrie bewerken"
     },
     "emailijst": {
       "list": {

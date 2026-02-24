@@ -133,7 +133,8 @@ export type ToolsTabsType =
   | "bevragen"
   | "kaartlagen"
   | "uploaden"
-  | "exporteer";
+  | "exporteer"
+  | "editGeometry";
 
 export type NabewerkingTabsType =
   | "none"

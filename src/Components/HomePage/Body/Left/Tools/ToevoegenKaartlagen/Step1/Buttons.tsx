@@ -1,7 +1,7 @@
 import { useTabState } from "@helpers/ZustandStates/tabState";
 
 export default function Buttons() {
-  const submitStep1 = () => {};
+  const submitStep1 = () => { };
   const { setSelectedTab } = useTabState();
 
   return (

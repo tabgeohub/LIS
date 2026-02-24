@@ -21,6 +21,7 @@ import AandachtspuntenVerwijderen from "./Tools/AandachtspuntenVerwijderen";
 import Emailijst from "./Tools/Emailijst";
 import ToevoegenKaartlagen from "./Tools/ToevoegenKaartlagen";
 import Uploaden from "./Tools/Uploaden";
+import EditGeometry from "./Tools/EditGeometry";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import ResultTab from "./Common/ResultTab";
 import SearchedResultsTab from "./Common/SearchedResultsTab";
@@ -63,6 +64,7 @@ export default function Left({
     kaartlagen: ToevoegenKaartlagen,
     uploaden: Uploaden,
     tekengereedschap: DrawingTool,
+    editGeometry: EditGeometry,
   };
 
   // @ts-ignore
