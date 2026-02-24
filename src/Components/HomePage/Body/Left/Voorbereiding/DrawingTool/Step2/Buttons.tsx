@@ -8,6 +8,7 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useMemo } from "react";
 
 export default function Buttons() {
   const {
@@ -25,7 +26,17 @@ export default function Buttons() {
   const { user } = useAuth();
   const content = useContent();
   const { create, loading } = useCreateData("/geometries");
-  const { fetchGeometries } = useGeometriesStore();
+  const { fetchGeometries, dbGeometries } = useGeometriesStore();
+
+  // Check if omschrijving already exists (case-insensitive)
+  const omschrijvingExists = useMemo(() => {
+    if (!omschrijving || omschrijving.trim() === "") return false;
+    return dbGeometries.some(
+      (geometry) =>
+        geometry.omschrijving?.toLowerCase().trim() ===
+        omschrijving.toLowerCase().trim()
+    );
+  }, [omschrijving, dbGeometries]);
 
   const clearCurrentlyDrawingGraphics = () => {
     if (!mapView) return;
@@ -213,7 +224,12 @@ export default function Buttons() {
         </button>
 
         <button
-          disabled={omschrijving === "" || organisatie === "" || loading}
+          disabled={
+            omschrijving === "" ||
+            organisatie === "" ||
+            loading ||
+            omschrijvingExists
+          }
           onClick={handleSubmit}
           className="gray-button"
         >
