@@ -8,9 +8,12 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { createQuadrantGraphic } from "../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
 import Polygon from "@arcgis/core/geometry/Polygon";
+import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import PointsTable from "./PointsTable";
 import FlightPlansTable from "./FlightPlansTable";
+import GeometriesTable from "./GeometriesTable";
 import ClickedPointFunctions from "../ClickedPointFunctions";
 
 interface PointsViewProps {
@@ -23,12 +26,18 @@ export default function PointsView({
   containerWidth,
 }: PointsViewProps) {
   const [clickedPoint, setClickedPoint] = useState<EnrichedPointType>();
+  const [clickedGeometry, setClickedGeometry] = useState<any>();
+  const [clickedGeometryPosition, setClickedGeometryPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [draggingCol, setDraggingCol] = useState<string | null>(null);
   const [starredPoints, setStarredPoints] = useState<EnrichedPointType[]>([]);
   const [starredPlans, setStarredPlans] = useState<FlightPlanType[]>([]);
+  const [starredGeometries, setStarredGeometries] = useState<any[]>([]);
   const [tab, setTab] = useState<string>("points");
 
-  const { pointsTable, flightPlans } = useOpenTable();
+  const { pointsTable, flightPlans, geometriesTable } = useOpenTable();
   const { graphicsLayerHover, graphicsLayer, mapView, yellowGraphicsLayer } =
     useMapViewState();
 
@@ -138,6 +147,80 @@ export default function PointsView({
             attributes: { id: point.id },
           });
           graphicsLayer?.graphics.add(g);
+        }
+      });
+    }
+
+    if (tab === "geometries") {
+      if (!mapView || !yellowGraphicsLayer || !geometriesTable) return;
+
+      geometriesTable.forEach((geometry) => {
+        if (!geometry.points || geometry.points.length === 0) return;
+
+        const coordinates = geometry.points.map((point) => [
+          point.longitude,
+          point.latitude,
+        ]);
+
+        if (geometry.type === "polygon") {
+          const ring = [...coordinates];
+          const first = ring[0];
+          const last = ring[ring.length - 1];
+          if (first[0] !== last[0] || first[1] !== last[1]) {
+            ring.push([first[0], first[1]]);
+          }
+
+          const polygon = new Polygon({
+            rings: [ring],
+            spatialReference: { wkid: 4326 },
+          });
+
+          const fillSymbol = new SimpleFillSymbol({
+            color: [255, 255, 0, 0.3],
+            outline: {
+              color: [255, 255, 0, 1],
+              width: 2,
+            },
+          });
+
+          yellowGraphicsLayer.add(
+            new Graphic({
+              geometry: polygon,
+              symbol: fillSymbol,
+              attributes: {
+                geometryId: geometry.id,
+                type: "geometry",
+              },
+            })
+          );
+        } else if (geometry.type === "line") {
+          const polyline = new Polyline({
+            paths: [coordinates],
+            spatialReference: { wkid: 4326 },
+          });
+
+          const lineSymbol = new SimpleLineSymbol({
+            color: [255, 255, 0, 1],
+            width: 3,
+          });
+
+          yellowGraphicsLayer.add(
+            new Graphic({
+              geometry: polyline,
+              symbol: lineSymbol,
+              attributes: {
+                geometryId: geometry.id,
+                type: "geometry",
+              },
+            })
+          );
+        }
+
+        const alreadyStarred = starredGeometries.find(
+          (g) => g.id === geometry.id
+        );
+        if (alreadyStarred) {
+          // Starred geometries are already handled in GeometriesTable
         }
       });
     }
@@ -275,9 +358,11 @@ export default function PointsView({
     tab,
     pointsTable.length,
     flightPlans.length,
+    geometriesTable.length,
     containerWidth,
     starredPoints.length,
     starredPlans.length,
+    starredGeometries.length,
   ]);
 
   return (
@@ -285,24 +370,34 @@ export default function PointsView({
       <div ref={headerRef} className="flex gap-2 px-2 pt-2 shrink-0">
         {pointsTable.length > 0 && (
           <button
-            className={`px-2 py-1 text-sm border rounded-t-lg ${
-              tab === "points"
-                ? "bg-white"
-                : "bg-gray-200 shadow-[rgba(0,_0,_0,_0.24)_0px_1px_8px]"
-            }`}
+            className={`px-2 py-1 text-sm border rounded-t-lg ${tab === "points"
+              ? "bg-white"
+              : "bg-gray-200 shadow-[rgba(0,_0,_0,_0.24)_0px_1px_8px]"
+              }`}
             onClick={() => setTab("points")}
           >
             Aandachtspunten
           </button>
         )}
 
+        {geometriesTable && geometriesTable.length > 0 && (
+          <button
+            className={`px-2 py-1 text-sm border rounded-t-lg ${tab === "geometries"
+              ? "bg-white"
+              : "bg-gray-200 shadow-[rgba(0,_0,_0,_0.24)_0px_1px_8px]"
+              }`}
+            onClick={() => setTab("geometries")}
+          >
+            Geometrieën
+          </button>
+        )}
+
         {flightPlans.length > 0 && (
           <button
-            className={`px-2 py-1 text-sm border rounded-t-lg ${
-              tab === "flightPlans"
-                ? "bg-white"
-                : "bg-gray-200 shadow-[rgba(0,_0,_0,_0.24)_0px_1px_8px]"
-            }`}
+            className={`px-2 py-1 text-sm border rounded-t-lg ${tab === "flightPlans"
+              ? "bg-white"
+              : "bg-gray-200 shadow-[rgba(0,_0,_0,_0.24)_0px_1px_8px]"
+              }`}
             onClick={() => setTab("flightPlans")}
           >
             Vluchtplan
@@ -373,6 +468,19 @@ export default function PointsView({
               removeColumn={removeColumn}
               setClickedPoint={setClickedPoint}
               setClickedPointPosition={setClickedPointPosition}
+            />
+          ) : tab === "geometries" ? (
+            <GeometriesTable
+              containerHeight={availableHeight}
+              containerWidth={containerWidth}
+              starredGeometries={starredGeometries}
+              setStarredGeometries={setStarredGeometries}
+              handleDragStart={handleDragStart}
+              handleDragOver={handleDragOver}
+              handleDrop={handleDrop}
+              removeColumn={removeColumn}
+              setClickedGeometry={setClickedGeometry}
+              setClickedGeometryPosition={setClickedGeometryPosition}
             />
           ) : (
             <FlightPlansTable
