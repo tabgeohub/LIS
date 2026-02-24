@@ -9,6 +9,7 @@ import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtil
 import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function Buttons() {
   const {
@@ -30,6 +31,7 @@ export default function Buttons() {
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(
     null
   );
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Find the graphics layer used for drawing
   useEffect(() => {
@@ -66,13 +68,20 @@ export default function Buttons() {
   };
 
   function handleBack() {
-    clearGraphics();
-    setStep(1);
+    // Show confirmation modal instead of directly going back
+    setShowConfirmModal(true);
   }
 
   function handleCancel() {
+    // Show confirmation modal instead of directly clearing
+    setShowConfirmModal(true);
+  }
+
+  function handleConfirmCancel() {
+    // Clear graphics and state, then close modal
     clearGraphics();
     clear();
+    setShowConfirmModal(false);
   }
 
   async function handleSubmit() {
@@ -185,7 +194,7 @@ export default function Buttons() {
         // Success callback - clear graphics and reset after successful creation
         clearGraphics();
         clear();
-        
+
         // Refetch geometries to update the map immediately
         await fetchGeometries({
           regio: user?.role && user.role !== "admin" ? user.role : undefined,
@@ -237,6 +246,12 @@ export default function Buttons() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        setIsOpen={setShowConfirmModal}
+        handleConfirm={handleConfirmCancel}
+      />
     </div>
   );
 }
