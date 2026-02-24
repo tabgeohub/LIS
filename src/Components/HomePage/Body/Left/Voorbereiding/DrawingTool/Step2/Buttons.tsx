@@ -8,6 +8,7 @@ import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformed
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
 import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 
 export default function Buttons() {
   const {
@@ -25,6 +26,7 @@ export default function Buttons() {
   const { user } = useAuth();
   const content = useContent();
   const { create, loading } = useCreateData("/geometries");
+  const { fetchGeometries } = useGeometriesStore();
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(
     null
   );
@@ -179,10 +181,15 @@ export default function Buttons() {
         regio_id: user?.role,
         points: pointsArray,
       },
-      () => {
+      async () => {
         // Success callback - clear graphics and reset after successful creation
         clearGraphics();
         clear();
+        
+        // Refetch geometries to update the map immediately
+        await fetchGeometries({
+          regio: user?.role && user.role !== "admin" ? user.role : undefined,
+        });
       }
     );
 
@@ -190,6 +197,7 @@ export default function Buttons() {
     if (result !== null) {
       // Success toast is already shown by useCreateData hook
       // Graphics cleared in success callback above
+      // Geometries refetched in success callback above
     }
   }
 
