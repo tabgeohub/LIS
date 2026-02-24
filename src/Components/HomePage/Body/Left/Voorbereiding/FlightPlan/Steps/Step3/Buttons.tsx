@@ -54,8 +54,10 @@ export default function Buttons({
   const { dbGeometries } = useGeometriesStore();
 
   const handleSubmit = () => {
-    // Get all selected geometries
-    const allSelectedGeometryIds = [...selectedGeometries, ...selectedGeometries2];
+    // Get all selected geometries (ensure they are arrays)
+    const safeSelectedGeometries = Array.isArray(selectedGeometries) ? selectedGeometries : [];
+    const safeSelectedGeometries2 = Array.isArray(selectedGeometries2) ? selectedGeometries2 : [];
+    const allSelectedGeometryIds = [...safeSelectedGeometries, ...safeSelectedGeometries2];
 
     // Get the actual geometry objects
     const selectedGeometryObjects = dbGeometries.filter((geometry) =>
@@ -68,7 +70,9 @@ export default function Buttons({
     );
 
     // Combine all point IDs (selected points + points from selected geometries)
-    const allPointIds = [...selectedPoints, ...selectedPoints2, ...geometryPointIds];
+    const safeSelectedPoints = Array.isArray(selectedPoints) ? selectedPoints : [];
+    const safeSelectedPoints2 = Array.isArray(selectedPoints2) ? selectedPoints2 : [];
+    const allPointIds = [...safeSelectedPoints, ...safeSelectedPoints2, ...geometryPointIds];
 
     // Remove duplicates
     const uniquePointIds = Array.from(new Set(allPointIds));
