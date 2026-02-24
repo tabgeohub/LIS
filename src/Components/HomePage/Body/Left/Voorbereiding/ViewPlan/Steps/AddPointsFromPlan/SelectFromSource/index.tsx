@@ -57,7 +57,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
   );
 
   const data = source === "flightPlans" ? (flightPlans as FlightPlanType[] | Template[]) : templateData;
-  const dataLoading = source === "flightPlans" 
+  const dataLoading = source === "flightPlans"
     ? (flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0)
     : templateLoading;
 
@@ -130,12 +130,12 @@ export default function SelectFromSource({ source }: { source: Source }) {
     return () => {
       try {
         pointsGraphicsLayer?.removeAll();
-      } catch {}
+      } catch { }
       const blueToRemove = [...blueGraphicsRef.current];
       if (mapView && blueToRemove.length) {
         try {
           mapView.graphics.removeMany(blueToRemove);
-        } catch {}
+        } catch { }
         blueGraphicsRef.current = [];
       }
       const pinSnapshot = new Map(pinRefs.current);
@@ -144,7 +144,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
           pinSnapshot.forEach(({ outerGraphic, pinGraphic }) => {
             mapView.graphics.removeMany([outerGraphic, pinGraphic]);
           });
-        } catch {}
+        } catch { }
         pinRefs.current.clear();
       }
       const { setHovered } = useHoveredGraphicState.getState();
@@ -158,7 +158,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch {}
+      } catch { }
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -176,7 +176,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch {}
+      } catch { }
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -418,7 +418,7 @@ function Buttons({
   } = useViewPlanState();
   const { dbPoints } = usePointsStore();
   const { yellowGraphicsLayer } = useMapViewState();
-  const { setPointsTable } = useOpenTable();
+  const { setPointsTable, setGeometriesTable } = useOpenTable();
 
   function handleSubmit() {
     if (!selectedPlan) return;
@@ -448,6 +448,7 @@ function Buttons({
         });
 
         setPointsTable(updatedPoints);
+        setGeometriesTable(selectedPlan.geometries || []);
 
         // Add yellow points to the map from checkedPoints array
         checkedPoints?.forEach((selectedPoint) => {

@@ -43,7 +43,7 @@ export default function Buttons({
 
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
-  const { pointsTable, setPointsTable } = useOpenTable();
+  const { pointsTable, setPointsTable, geometriesTable, setGeometriesTable } = useOpenTable();
 
   async function handleSubmit() {
     await create(
@@ -84,6 +84,8 @@ export default function Buttons({
           });
 
           setPointsTable([...pointsTable, newPoint]);
+          // Preserve geometries when adding a point
+          setGeometriesTable(geometriesTable);
 
           setStep(2);
           resetFormAndState();

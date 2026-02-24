@@ -31,7 +31,7 @@ export default function Buttons({
 
   const { setDuplicatedFlightPlan } = usePlanDuplicateState();
 
-  const { setPointsTable, setView } = useOpenTable();
+  const { setPointsTable, setGeometriesTable, setView } = useOpenTable();
 
   const content = useContent();
 
@@ -60,6 +60,7 @@ export default function Buttons({
         setDoelEnHoofdthema(selectedPlan.hoofdthema);
         setAanvullendeInfo(selectedPlan.aanvullende);
         setPointsTable(selectedPlan.points);
+        setGeometriesTable(selectedPlan.geometries || []);
         setView("points");
       }
 

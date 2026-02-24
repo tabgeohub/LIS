@@ -12,7 +12,7 @@ export default function RemovePoint() {
   const { clickedPoint, setStep, selectedPlan, setSelectedPlan } =
     useViewPlanState();
 
-  const { pointsTable, setPointsTable } = useOpenTable();
+  const { pointsTable, setPointsTable, geometriesTable, setGeometriesTable } = useOpenTable();
   const { setPoints } = usePointsStore();
   const { pointsGraphicsLayer, yellowGraphicsLayer } = useMapViewState();
 
@@ -75,6 +75,8 @@ export default function RemovePoint() {
             return point.id !== parseFloat(idToRemove);
           })
         );
+        // Preserve geometries when removing a point
+        setGeometriesTable(geometriesTable);
 
         setPoints(
           selectedPlan.points.filter((point) => point.id !== pointToUpdate.id)

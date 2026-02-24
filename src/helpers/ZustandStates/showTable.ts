@@ -1,5 +1,6 @@
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { create } from "zustand";
+import { Geometry } from "hooks/features/useGeometriesStore";
 
 export const useOpenTable = create<{
   openTable: boolean;
@@ -7,6 +8,9 @@ export const useOpenTable = create<{
 
   pointsTable: EnrichedPointType[];
   setPointsTable: (pointsTable: EnrichedPointType[]) => void;
+
+  geometriesTable: Geometry[];
+  setGeometriesTable: (geometriesTable: Geometry[]) => void;
 
   flightPlans: FlightPlanType[];
   setFlightPlans: (flightPlans: FlightPlanType[]) => void;
@@ -22,6 +26,9 @@ export const useOpenTable = create<{
 
   pointsTable: [],
   setPointsTable: (pointsTable: EnrichedPointType[]) => set({ pointsTable }),
+
+  geometriesTable: [],
+  setGeometriesTable: (geometriesTable: Geometry[]) => set({ geometriesTable }),
 
   flightPlans: [],
   setFlightPlans: (flightPlans: FlightPlanType[]) => set({ flightPlans }),

@@ -41,12 +41,16 @@ export async function getAllFlightPlans(
             'organisatie_id', pt.organisatie_id,
             'specifiek_letten_op', pt.specifiek_letten_op,
             'activiteit_id', pt.activiteit_id,
-            'created_at', pt.created_at
+            'created_at', pt.created_at,
+            'geometry_id', pt.geometry_id,
+            'geometry_type', g.type,
+            'geometry_omschrijving', g.omschrijving
           )
         ) AS points
       FROM lis.flightPlans fp
       JOIN LATERAL UNNEST(fp.points) AS point_id ON TRUE
       JOIN lis.points pt ON pt.id = point_id
+      LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
       WHERE fp.status <> 'inactief'
     `;
 
@@ -61,7 +65,44 @@ export async function getAllFlightPlans(
 
     const result = await pool.query(query, params);
 
-    res.status(200).json(result.rows);
+    // Format plans: group points with geometry_id into geometries array
+    const formattedPlans = result.rows.map((plan: any) => {
+      const points = plan.points || [];
+      const pointsWithoutGeometry: any[] = [];
+      const geometriesMap = new Map<number, any>();
+
+      // Separate points with and without geometry_id
+      points.forEach((point: any) => {
+        if (point.geometry_id) {
+          const geometryId = point.geometry_id;
+          
+          if (!geometriesMap.has(geometryId)) {
+            geometriesMap.set(geometryId, {
+              id: geometryId,
+              type: point.geometry_type || null,
+              omschrijving: point.geometry_omschrijving || null,
+              points: [],
+            });
+          }
+          
+          // Remove geometry fields from point before adding to geometry
+          const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
+          geometriesMap.get(geometryId)!.points.push(pointWithoutGeometry);
+        } else {
+          // Remove geometry fields from point (they'll be null/undefined anyway)
+          const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
+          pointsWithoutGeometry.push(pointWithoutGeometry);
+        }
+      });
+
+      return {
+        ...plan,
+        points: pointsWithoutGeometry,
+        geometries: Array.from(geometriesMap.values()),
+      };
+    });
+
+    res.status(200).json(formattedPlans);
   } catch (err) {
     console.error(
       "❌ Error fetching flight plans:",

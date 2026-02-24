@@ -28,7 +28,7 @@ export default function Buttons({
 
   const { dbPoints } = usePointsStore();
   const { yellowGraphicsLayer } = useMapViewState();
-  const { setPointsTable } = useOpenTable();
+  const { setPointsTable, setGeometriesTable } = useOpenTable();
 
   const logAction = useLogAction();
 
@@ -61,6 +61,7 @@ export default function Buttons({
         });
 
         setPointsTable(updatedPoints);
+        setGeometriesTable(selectedPlan.geometries || []);
 
         // Add yellow points to the map from checkedPoints array
         checkedPoints?.forEach((selectedPoint) => {

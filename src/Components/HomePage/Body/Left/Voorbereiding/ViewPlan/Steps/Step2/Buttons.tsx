@@ -36,7 +36,7 @@ export default function Buttons({
 
   const { update } = useUpdateData(`/flightPlans/vluchtplans`);
 
-  const { setPointsTable, setOpenTable } = useOpenTable();
+  const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
 
   const { resetFeatures } = useResetFeatures();
 
@@ -102,6 +102,7 @@ export default function Buttons({
           setStep(1);
           setSelectedIndex(0);
           setPointsTable([]);
+          setGeometriesTable([]);
           setOpenTable(false);
 
           logAction({

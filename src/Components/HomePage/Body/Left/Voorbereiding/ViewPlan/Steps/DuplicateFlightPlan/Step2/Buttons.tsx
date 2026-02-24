@@ -31,7 +31,7 @@ export default function Buttons({
     aanvullendeInfo,
   } = usePlanDuplicateState();
 
-  const { setPointsTable, setOpenTable } = useOpenTable();
+  const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
   const { create } = useCreateData("/flightPlans");
 
   const { user } = useAuth();
@@ -74,6 +74,7 @@ export default function Buttons({
           setStep(1);
           setSelectedIndex(0);
           setPointsTable([]);
+          setGeometriesTable([]);
           setOpenTable(false);
         }}
         className="gray-button"

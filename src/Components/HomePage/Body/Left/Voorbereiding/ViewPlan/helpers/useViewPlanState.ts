@@ -58,6 +58,9 @@ interface ViewPlanState {
 
   clickedPoint: number;
   setClickedPoint: (clickedPoint: number) => void;
+
+  clickedGeometry: number | null;
+  setClickedGeometry: (clickedGeometry: number | null) => void;
 }
 
 export const useViewPlanState = create<ViewPlanState>((set) => ({
@@ -121,6 +124,9 @@ export const useViewPlanState = create<ViewPlanState>((set) => ({
 
   clickedPoint: 0,
   setClickedPoint: (clickedPoint: number) => set(() => ({ clickedPoint })),
+
+  clickedGeometry: null,
+  setClickedGeometry: (clickedGeometry: number | null) => set(() => ({ clickedGeometry })),
 
   selectedPlan: null,
   setSelectedPlan: (selectedPlan: FlightPlanType) =>
