@@ -4,11 +4,14 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function Buttons({
   setOpenFilter,
+  setSelectedGeometries,
 }: {
   setOpenFilter: (value: boolean) => void;
+  setSelectedGeometries: (value: number[]) => void;
 }) {
   const {
     step,
@@ -18,13 +21,15 @@ export default function Buttons({
     hoveredGraphic,
     setHoveredGraphic,
     clear,
+    setSelectedPoints,
   } = useTemplateFlightState();
 
   const logAction = useLogAction();
 
-  const { mapView, yellowGraphicsLayer } = useMapViewState();
+  const { mapView, yellowGraphicsLayer, geometriesGraphicsLayer, clearGraphics } = useMapViewState();
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
+  const { resetFeatures } = useResetFeatures();
 
   const content = useContent();
 
@@ -48,9 +53,48 @@ export default function Buttons({
     yellowGraphicsLayer?.graphics.removeAll();
   };
 
+  const handlePrevious = () => {
+    setStep(1);
+    resetFilters();
+    setSelectedPoints([]);
+    setSelectedGeometries([]);
+
+    // Reset features back to initial DB state
+    resetFeatures();
+
+    clearGraphics();
+
+    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
+    setSelectedGraphics([]);
+
+    if (hoveredGraphic) {
+      mapView?.graphics.remove(hoveredGraphic);
+      setHoveredGraphic(null);
+    }
+  };
+
+  const handleCancelClick = () => {
+    // Reset features back to initial DB state
+    resetFeatures();
+
+    clear();
+    setSelectedGeometries([]);
+    handleCancel();
+    resetFilters();
+    clearGraphics();
+
+    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
+    setSelectedGraphics([]);
+
+    if (hoveredGraphic) {
+      mapView?.graphics.remove(hoveredGraphic);
+      setHoveredGraphic(null);
+    }
+  };
+
   return (
     <>
-      <button onClick={() => setStep(1)} className="gray-button">
+      <button onClick={handlePrevious} className="gray-button">
         {content.common.vorige}
       </button>
 
@@ -63,11 +107,7 @@ export default function Buttons({
       </button>
 
       <button
-        onClick={() => {
-          clear();
-          handleCancel();
-          resetFilters();
-        }}
+        onClick={handleCancelClick}
         className="gray-button"
       >
         {content.common.annuleren}
