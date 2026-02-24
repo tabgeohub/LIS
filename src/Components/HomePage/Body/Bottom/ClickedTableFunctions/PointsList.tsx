@@ -1,6 +1,7 @@
+import { useCallback } from "react";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { MdOutlineZoomOutMap, MdTableChart } from "react-icons/md";
-
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
@@ -16,11 +17,13 @@ import shpwrite from "@mapbox/shp-write";
 import { FeatureCollection, Point as pt } from "geojson";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import Polygon from "@arcgis/core/geometry/Polygon";
 
 export default function PointsList() {
   const logAction = useLogAction();
 
   const { pointsTable, setOpenTable, flightPlans } = useOpenTable();
+  const { mapView } = useMapViewState();
 
   const { setOpenResultTab } = useOpenResultTab();
   const { setOpenSearchedTab } = useOpenSearchedTab();
@@ -31,9 +34,39 @@ export default function PointsList() {
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const { selectedTab } = useTabState();
 
-  const zoomToPoints = () => {};
+  const zoomToPoints = useCallback(() => {
+    if (!mapView || !pointsTable || pointsTable.length === 0) return;
 
-  const listView = () => {
+    const lats = pointsTable.map((p) => p.latitude);
+    const lons = pointsTable.map((p) => p.longitude);
+
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLon = Math.min(...lons);
+    const maxLon = Math.max(...lons);
+
+    const polygon = new Polygon({
+      rings: [
+        [
+          [minLon, maxLat],
+          [maxLon, maxLat],
+          [maxLon, minLat],
+          [minLon, minLat],
+          [minLon, maxLat],
+        ],
+      ],
+      spatialReference: { wkid: 4326 },
+    });
+
+    mapView.goTo(polygon);
+
+    logAction({
+      message: "User clicked 'Zoom to all points' button",
+      step: "Clicked table functions",
+    });
+  }, [mapView, pointsTable, logAction]);
+
+  const listView = useCallback(() => {
     if (selectedTab === "none") {
       setSelectedBottomTab("searched");
       setOpenSearchedTab(true);
@@ -49,9 +82,18 @@ export default function PointsList() {
       message: "User clicked 'List view' button",
       step: "Clicked table functions",
     });
-  };
+  }, [
+    selectedTab,
+    setSelectedBottomTab,
+    setOpenSearchedTab,
+    setOpenResultTab,
+    setOpenSideBar,
+    setOpenAllTable,
+    setOpenTable,
+    logAction,
+  ]);
 
-  const exportCsv = async () => {
+  const exportCsv = useCallback(async () => {
     if (pointsTable.length > 0 && flightPlans.length > 0) {
       const zip = new JSZip();
 
@@ -117,9 +159,9 @@ export default function PointsList() {
       const blob = new Blob([csvPlans], { type: "text/csv;charset=utf-8;" });
       saveAs(blob, "plans_export.csv");
     }
-  };
+  }, [pointsTable, flightPlans]);
 
-  const exportXlsx = async () => {
+  const exportXlsx = useCallback(async () => {
     if (pointsTable.length > 0 && flightPlans.length > 0) {
       const zip = new JSZip();
 
@@ -181,9 +223,9 @@ export default function PointsList() {
       });
       saveAs(blob, "plans_export.xlsx");
     }
-  };
+  }, [pointsTable, flightPlans]);
 
-  const exportShp = async () => {
+  const exportShp = useCallback(async () => {
     const zip = new JSZip();
 
     // ===== 1. Points (as Shapefile) =====
@@ -223,7 +265,7 @@ export default function PointsList() {
     // ===== 3. Final Combined ZIP =====
     const finalZipBlob = await zip.generateAsync({ type: "blob" });
     saveAs(finalZipBlob, "exports_shapefiles.zip");
-  };
+  }, [pointsTable]);
 
   const content = useContent();
 

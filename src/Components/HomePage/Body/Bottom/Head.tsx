@@ -27,7 +27,7 @@ export default function Head({
         <div className="flex gap-x-2">
           <button
             onClick={() => {
-              setShowTableDiv(showTableDiv ? false : true);
+              setShowTableDiv(!showTableDiv);
             }}
             className="bg-transparent text-gray-500 text-lg font-bold absolute right-16 top-[50%] translate-y-[-50%]"
           >
@@ -35,7 +35,7 @@ export default function Head({
           </button>
           <button
             onClick={() => {
-              setOpenAllTable(openAllTable ? false : true);
+              setOpenAllTable(!openAllTable);
             }}
             className="bg-transparent text-gray-500 text-lg font-bold absolute right-8 top-[50%] translate-y-[-50%]"
           >

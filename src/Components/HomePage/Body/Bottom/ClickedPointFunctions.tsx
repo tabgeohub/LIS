@@ -1,3 +1,4 @@
+import React, { useCallback } from "react";
 import Point from "@arcgis/core/geometry/Point";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
@@ -7,8 +8,9 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
 import { EnrichedPointType } from "Types";
 import { useDeleteData } from "utils/useDeleteData";
+import MenuItem from "./common/MenuItem";
 
-export default function ClickedPointFunctions({
+function ClickedPointFunctions({
   clickedPoint,
 }: {
   clickedPoint: EnrichedPointType | undefined;
@@ -22,8 +24,9 @@ export default function ClickedPointFunctions({
   const { deleteData } = useDeleteData(`/points`);
 
   const logAction = useLogAction();
+  const content = useContent();
 
-  const zoomToPoint = () => {
+  const zoomToPoint = useCallback(() => {
     if (mapView && clickedPoint) {
       mapView.zoom = 15;
       const pt = new Point({
@@ -37,9 +40,9 @@ export default function ClickedPointFunctions({
         step: "BottomTabs - ClickedPointFunctions",
       });
     }
-  };
+  }, [mapView, clickedPoint, logAction]);
 
-  const goToPoint = () => {
+  const goToPoint = useCallback(() => {
     if (mapView && clickedPoint) {
       const pt = new Point({
         longitude: clickedPoint.longitude,
@@ -52,23 +55,22 @@ export default function ClickedPointFunctions({
         step: "BottomTabs - ClickedPointFunctions",
       });
     }
-  };
+  }, [mapView, clickedPoint, logAction]);
 
-  const removePoint = () => {
+  const removePoint = useCallback(() => {
     if (!clickedPoint) return;
 
     deleteData(clickedPoint.id, undefined, () => {
-      setPointsTable(pointsTable?.filter((p) => p.id !== clickedPoint?.id));
-      setPoints(pointsTable?.filter((p) => p.id !== clickedPoint?.id));
+      const filteredPoints = pointsTable?.filter((p) => p.id !== clickedPoint?.id);
+      setPointsTable(filteredPoints);
+      setPoints(filteredPoints);
 
       logAction({
         message: `User clicked on 'Verwijderen uit resultaten'`,
         step: "BottomTabs - ClickedPointFunctions",
       });
     });
-  };
-
-  const content = useContent();
+  }, [clickedPoint, pointsTable, deleteData, setPointsTable, setPoints, logAction]);
 
   return (
     <div>
@@ -112,25 +114,4 @@ export default function ClickedPointFunctions({
   );
 }
 
-interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  onClick: () => void;
-}
-
-function MenuItem({ icon, title, description, onClick }: MenuItemProps) {
-  return (
-    <div
-      className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-      onClick={onClick}
-    >
-      <div>{icon}</div>
-
-      <div>
-        <p className="text-[14px] font-semibold text-gray-800">{title}</p>
-        <p className="text-[12px] text-gray-500">{description}</p>
-      </div>
-    </div>
-  );
-}
+export default React.memo(ClickedPointFunctions);

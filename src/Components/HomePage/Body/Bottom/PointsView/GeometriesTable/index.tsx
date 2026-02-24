@@ -36,8 +36,6 @@ export default function GeometriesTable({
   handleDragOver,
   handleDrop,
   removeColumn,
-  setClickedGeometry,
-  setClickedGeometryPosition,
   containerHeight,
   containerWidth,
 }: any) {
@@ -299,21 +297,12 @@ export default function GeometriesTable({
                       />
                     </button>
 
+                    {/* Geometry popup functionality not yet implemented */}
                     <button
                       type="button"
-                      onClick={(e) => {
-                        const rect = (
-                          e.currentTarget as HTMLButtonElement
-                        ).getBoundingClientRect();
-
-                        setClickedGeometry(geometry);
-
-                        setClickedGeometryPosition({
-                          top: rect.bottom,
-                          left: rect.left,
-                        });
-                      }}
-                      className="p-0.5"
+                      className="p-0.5 opacity-50 cursor-not-allowed"
+                      disabled
+                      title="Geometry actions coming soon"
                     >
                       <TfiMoreAlt className="block h-4 w-4 shrink-0" />
                     </button>

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import Graphic from "@arcgis/core/Graphic";
@@ -33,11 +33,6 @@ export default function PointsView({
   containerWidth,
 }: PointsViewProps) {
   const [clickedPoint, setClickedPoint] = useState<EnrichedPointType>();
-  const [clickedGeometry, setClickedGeometry] = useState<any>();
-  const [clickedGeometryPosition, setClickedGeometryPosition] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
   const [clickedPointPosition, setClickedPointPosition] = useState<{
     top: number;
     left: number;
@@ -63,9 +58,7 @@ export default function PointsView({
   useClickOutside(
     popupRef,
     setClickedPoint,
-    setClickedPointPosition,
-    setClickedGeometry,
-    setClickedGeometryPosition
+    setClickedPointPosition
   );
   useScrollOrResize(setClickedPointPosition);
   const headerHeight = useHeaderHeight(headerRef);
@@ -103,18 +96,27 @@ export default function PointsView({
     originalGraphicsMap,
   });
 
-  // Column drag handlers
-  const handleDragStartWrapper = (col: string) =>
-    handleDragStart(col, setDraggingCol);
-  const handleDropWrapper = (
-    targetCol: string,
-    columns: string[],
-    setFunction: (value: string[] | ((prev: string[]) => string[])) => void
-  ) => handleDrop(targetCol, draggingCol, columns, setFunction, setDraggingCol);
+  // Column drag handlers - memoized to prevent unnecessary re-renders
+  const handleDragStartWrapper = useCallback(
+    (col: string) => handleDragStart(col, setDraggingCol),
+    [setDraggingCol]
+  );
 
-  // Scroll sync handler
-  const handleScrollSync = (source: "top" | "table") =>
-    syncScrollPositions(source, topScrollRef, tableScrollRef, syncingRef);
+  const handleDropWrapper = useCallback(
+    (
+      targetCol: string,
+      columns: string[],
+      setFunction: (value: string[] | ((prev: string[]) => string[])) => void
+    ) => handleDrop(targetCol, draggingCol, columns, setFunction, setDraggingCol),
+    [draggingCol, setDraggingCol]
+  );
+
+  // Scroll sync handler - memoized to prevent unnecessary re-renders
+  const handleScrollSync = useCallback(
+    (source: "top" | "table") =>
+      syncScrollPositions(source, topScrollRef, tableScrollRef, syncingRef),
+    [topScrollRef, tableScrollRef, syncingRef]
+  );
 
   return (
     <div className="h-full w-full flex flex-col min-w-0 min-h-0">
@@ -179,8 +181,6 @@ export default function PointsView({
               handleDragOver={handleDragOver}
               handleDrop={handleDropWrapper}
               removeColumn={removeColumn}
-              setClickedGeometry={setClickedGeometry}
-              setClickedGeometryPosition={setClickedGeometryPosition}
             />
           ) : (
             <FlightPlansTable
