@@ -13,11 +13,13 @@ export default function PointsList({
   setSelectedPoints,
   points,
   step,
+  hideHeader,
 }: {
   selectedPoints: number[];
   setSelectedPoints: (value: number[]) => void;
   points: EnrichedPointType[];
   step: number;
+  hideHeader?: boolean;
 }) {
   const [searchedPoints, setSearchedPoints] =
     useState<EnrichedPointType[]>(points);
@@ -95,14 +97,14 @@ export default function PointsList({
     return [...searchedPoints].sort((a, b) => {
       const selOrder = isSelected(a.id) - isSelected(b.id);
       if (selOrder !== 0) return selOrder;
-      
+
       // For selected points, sort by reverse index (last clicked first)
       if (selectedPoints.includes(a.id) && selectedPoints.includes(b.id)) {
         const aReverseIndex = selectedReverseIndexMap.get(a.id) ?? 0;
         const bReverseIndex = selectedReverseIndexMap.get(b.id) ?? 0;
         return aReverseIndex - bReverseIndex;
       }
-      
+
       // For non-selected points, maintain original order
       return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
     });
@@ -131,19 +133,23 @@ export default function PointsList({
 
   return (
     <>
-      <p className="text-gray-800 leading-3 text-[10px] p-3">
-        {step === 2
-          ? content.voorbereiding.vluchtenTemplate.step2.text
-          : content.voorbereiding.vluchtenTemplate.step3.text}
-      </p>
+      {!hideHeader && (
+        <>
+          <p className="text-gray-800 leading-3 text-[10px] p-3">
+            {step === 2
+              ? content.voorbereiding.vluchtenTemplate.step2.text
+              : content.voorbereiding.vluchtenTemplate.step3.text}
+          </p>
 
-      <input
-        type="text"
-        placeholder="Filter resultaten"
-        className="inputClass !rounded-lg !px-2 !py-0 !pb-0.5 placeholder:text-[10px]"
-        value={filterText}
-        onChange={(e) => setFilterText(e.target.value)}
-      />
+          <input
+            type="text"
+            placeholder="Filter resultaten"
+            className="inputClass !rounded-lg !px-2 !py-0 !pb-0.5 placeholder:text-[10px]"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+        </>
+      )}
 
       {sortedPoints.map((point) => (
         <PointItemCheckBox

@@ -6,6 +6,7 @@ import Buttons from "./Buttons";
 import { EnrichedPointType } from "Types";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useState, useEffect, useMemo } from "react";
+import { useContent } from "hooks/useContent";
 
 export default function Step2({
   setOpenFilter,
@@ -34,26 +35,58 @@ export default function Step2({
     setFilteredGeometries(herhalenGeometries);
   }, [dbGeometries, setGeometries]);
 
+  const [filterText, setFilterText] = useState("");
+
   const displayedGeometries = useMemo(
-    () => filteredGeometries,
-    [filteredGeometries]
+    () => filteredGeometries.filter((geometry) =>
+      geometry.omschrijving
+        .toLowerCase()
+        .includes(filterText.toLowerCase())
+    ),
+    [filteredGeometries, filterText]
   );
+
+  const filteredPointsList = useMemo(
+    () => filteredPoints.filter((point) =>
+      point.herhalen === 1 &&
+      point.omschrijving
+        .toLowerCase()
+        .includes(filterText.toLowerCase())
+    ),
+    [filteredPoints, filterText]
+  );
+
+  const content = useContent();
 
   return (
     <ScrollButtonsLayout
       className="h-[100%]"
       buttons={<Buttons setOpenFilter={setOpenFilter} />}
     >
+      <p className="text-gray-800 leading-3 text-[10px] p-3">
+        {content.voorbereiding.vluchtenTemplate.step2.text}
+      </p>
+
+      <input
+        type="text"
+        placeholder="Filter resultaten"
+        className="inputClass !rounded-lg !px-2 !py-0 !pb-0.5 placeholder:text-[10px]"
+        value={filterText}
+        onChange={(e) => setFilterText(e.target.value)}
+      />
+
       <GeometriesList
         selectedGeometries={selectedGeometries}
         setSelectedGeometries={setSelectedGeometries}
         geometries={displayedGeometries}
       />
+
       <PointsList
         selectedPoints={selectedPoints}
         setSelectedPoints={setSelectedPoints}
-        points={filteredPoints.filter((point) => point.herhalen === 1)}
+        points={filteredPointsList}
         step={2}
+        hideHeader={true}
       />
     </ScrollButtonsLayout>
   );

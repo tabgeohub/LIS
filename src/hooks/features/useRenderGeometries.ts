@@ -9,12 +9,14 @@ import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, geometriesGraphicsLayer } = useMapViewState();
   const { geometries, fetchGeometries } = useGeometriesStore();
   const { step } = useFinishedPlansState();
+  const { step: flightPlanStep } = useFlightPlanState();
 
   // Fetch geometries
   useEffect(() => {
@@ -32,6 +34,8 @@ export function useRenderGeometries() {
     if (user.user_id === undefined || user.user_id === 0) return;
     // Skip rendering when in Step2 - useRenderPlanGeometries handles rendering plan geometries
     if (step === 2) return;
+    // Skip rendering when in FlightPlan Step2 or Step3 - GeometriesList handles rendering
+    if (flightPlanStep === 3 || flightPlanStep === 4) return;
 
     // Clear existing geometry graphics
     geometriesGraphicsLayer.removeAll();
@@ -130,6 +134,6 @@ export function useRenderGeometries() {
         geometriesGraphicsLayer.removeAll();
       }
     };
-  }, [map, geometriesGraphicsLayer, geometries, user.user_id, step]);
+  }, [map, geometriesGraphicsLayer, geometries, user.user_id, step, flightPlanStep]);
 }
 
