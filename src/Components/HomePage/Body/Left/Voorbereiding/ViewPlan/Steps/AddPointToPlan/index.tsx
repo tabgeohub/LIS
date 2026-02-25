@@ -4,12 +4,9 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
-import Graphic from "@arcgis/core/Graphic";
-import EsriPoint from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
 import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
+import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import Header from "./Header";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
@@ -67,44 +64,15 @@ export default function AddPointToPlan() {
 
     if (!filteredPoints.length) return;
 
-    const blueSymbol = new SimpleMarkerSymbol({
-      color: "blue",
-      size: 10,
-      style: "circle",
-      outline: { color: "white", width: 1 },
-    });
-
-    const graphics: __esri.Graphic[] = [];
-    filteredPoints.forEach((pt) => {
-      let lon: number | undefined = (pt as any).longitude;
-      let lat: number | undefined = (pt as any).latitude;
-      if (
-        (typeof lon !== "number" || typeof lat !== "number") &&
-        typeof (pt as any).xcoordinaat_rd === "number" &&
-        typeof (pt as any).ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          (pt as any).xcoordinaat_rd,
-          (pt as any).ycoordinaat_rd
-        );
-        lon = wgs.x;
-        lat = wgs.y;
-      }
-      if (typeof lon !== "number" || typeof lat !== "number") return;
-
-      graphics.push(
-        new Graphic({
-          geometry: new EsriPoint({
-            longitude: lon,
-            latitude: lat,
-            spatialReference: { wkid: 4326 },
-          }),
-          symbol: blueSymbol,
-          attributes: { id: pt.id, omschrijving: pt.omschrijving },
-        })
-      );
+    const graphics = createPointGraphics(filteredPoints, {
+      symbolOptions: {
+        color: "blue",
+        size: 10,
+        style: "circle",
+        outlineColor: "white",
+        outlineWidth: 1,
+      },
+      transformCoordinates: true,
     });
 
     if (graphics.length) {

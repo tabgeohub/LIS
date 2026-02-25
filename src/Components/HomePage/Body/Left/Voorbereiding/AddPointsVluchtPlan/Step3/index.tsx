@@ -14,12 +14,9 @@ import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore"
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
-import Graphic from "@arcgis/core/Graphic";
-import EsriPoint from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
 import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
+import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 
 dayjs.extend(isBetween);
 
@@ -111,44 +108,15 @@ export default function Step3() {
 
     if (!displayedPoints.length) return;
 
-    const blueSymbol = new SimpleMarkerSymbol({
-      color: "blue",
-      size: 10,
-      style: "circle",
-      outline: { color: "white", width: 1 },
-    });
-
-    const graphics: __esri.Graphic[] = [];
-    displayedPoints.forEach((pt) => {
-      let lon: number | undefined = (pt as any).longitude;
-      let lat: number | undefined = (pt as any).latitude;
-      if (
-        (typeof lon !== "number" || typeof lat !== "number") &&
-        typeof (pt as any).xcoordinaat_rd === "number" &&
-        typeof (pt as any).ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          (pt as any).xcoordinaat_rd,
-          (pt as any).ycoordinaat_rd
-        );
-        lon = wgs.x;
-        lat = wgs.y;
-      }
-      if (typeof lon !== "number" || typeof lat !== "number") return;
-
-      graphics.push(
-        new Graphic({
-          geometry: new EsriPoint({
-            longitude: lon,
-            latitude: lat,
-            spatialReference: { wkid: 4326 },
-          }),
-          symbol: blueSymbol,
-          attributes: { id: pt.id, omschrijving: pt.omschrijving },
-        })
-      );
+    const graphics = createPointGraphics(displayedPoints, {
+      symbolOptions: {
+        color: "blue",
+        size: 10,
+        style: "circle",
+        outlineColor: "white",
+        outlineWidth: 1,
+      },
+      transformCoordinates: true,
     });
 
     if (graphics.length) {

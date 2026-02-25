@@ -2,10 +2,7 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import Graphic from "@arcgis/core/Graphic";
-import Point from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 
 /**
  * Hook to render plan points on the map
@@ -20,57 +17,15 @@ export function useRenderPlanPoints() {
 
     pointsGraphicsLayer.removeAll();
 
-    const blueSymbol = new SimpleMarkerSymbol({
-      color: "blue",
-      size: 12,
-      style: "circle",
-      outline: {
-        color: "white",
-        width: 1,
+    const graphics = createPointGraphics(selectedPlan.points_data.filter((p) => p !== null), {
+      symbolOptions: {
+        color: "blue",
+        size: 12,
+        style: "circle",
+        outlineColor: "white",
+        outlineWidth: 1,
       },
-    });
-
-    const graphics: __esri.Graphic[] = [];
-
-    selectedPlan.points_data.forEach((point) => {
-      if (!point) return;
-
-      // Get coordinates - prefer WGS84, fallback to RD transformation
-      let longitude: number | undefined = point.longitude;
-      let latitude: number | undefined = point.latitude;
-
-      if (
-        (typeof longitude !== "number" || typeof latitude !== "number") &&
-        typeof point.xcoordinaat_rd === "number" &&
-        typeof point.ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          point.xcoordinaat_rd,
-          point.ycoordinaat_rd
-        );
-        longitude = wgs.x;
-        latitude = wgs.y;
-      }
-
-      if (typeof longitude !== "number" || typeof latitude !== "number") {
-        return;
-      }
-
-      const geometry = new Point({
-        longitude,
-        latitude,
-        spatialReference: { wkid: 4326 },
-      });
-
-      const graphic = new Graphic({
-        geometry,
-        symbol: blueSymbol,
-        attributes: point,
-      });
-
-      graphics.push(graphic);
+      transformCoordinates: true,
     });
 
     if (graphics.length > 0) {

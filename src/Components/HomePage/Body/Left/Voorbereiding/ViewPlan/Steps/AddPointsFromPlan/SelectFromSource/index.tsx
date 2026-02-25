@@ -10,17 +10,17 @@ import PlansList from "./PlansList";
 import PointsList from "./PointsList";
 import { FlightPlanType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
-import Graphic from "@arcgis/core/Graphic";
-import EsriPoint from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import Point from "@arcgis/core/geometry/Point";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import Graphic from "@arcgis/core/Graphic";
 
 type Source = "flightPlans" | "templates";
 
@@ -183,50 +183,19 @@ export default function SelectFromSource({ source }: { source: Source }) {
 
     if (!selectedItem) return;
 
-    const blueSymbol = new SimpleMarkerSymbol({
-      color: "blue",
-      size: 10,
-      style: "circle",
-      outline: { color: "white", width: 1 },
-    });
-
     const uncommonPoints = selectedItem.points.filter(
       (pt) => !selectedPlan?.points.some((p) => p.id === pt.id)
     );
 
-    const graphics: __esri.Graphic[] = [];
-    uncommonPoints.forEach((pt) => {
-      let lon: number | undefined = pt.longitude;
-      let lat: number | undefined = pt.latitude;
-
-      if (
-        (typeof lon !== "number" || typeof lat !== "number") &&
-        typeof pt.xcoordinaat_rd === "number" &&
-        typeof pt.ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          pt.xcoordinaat_rd,
-          pt.ycoordinaat_rd
-        );
-        lon = wgs.x;
-        lat = wgs.y;
-      }
-
-      if (typeof lon === "number" && typeof lat === "number") {
-        graphics.push(
-          new Graphic({
-            geometry: new EsriPoint({
-              longitude: lon,
-              latitude: lat,
-              spatialReference: { wkid: 4326 },
-            }),
-            symbol: blueSymbol,
-            attributes: { id: pt.id, omschrijving: pt.omschrijving },
-          })
-        );
-      }
+    const graphics = createPointGraphics(uncommonPoints, {
+      symbolOptions: {
+        color: "blue",
+        size: 10,
+        style: "circle",
+        outlineColor: "white",
+        outlineWidth: 1,
+      },
+      transformCoordinates: true,
     });
 
     if (graphics.length) {
