@@ -12,10 +12,7 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import Buttons from "./Buttons";
 import PointsAdding from "./PointsAdding";
 import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 
 export default function Step2({
   vluchtnummer,
@@ -68,69 +65,24 @@ export default function Step2({
     geometriesTable.forEach((geometry) => {
       if (!geometry.points || geometry.points.length === 0) return;
 
-      // Convert points to coordinate arrays
-      const coordinates = geometry.points.map((point) => [
-        point.longitude,
-        point.latitude,
-      ]);
+      const graphic = createGeometryGraphic(geometry, {
+        symbolOptions: {
+          fillColor: [255, 255, 0, 0.3], // Yellow fill with transparency
+          outlineColor: [255, 255, 0, 1], // Yellow outline
+          lineColor: [255, 255, 0, 1], // Yellow line
+          outlineWidth: 2,
+          lineWidth: 3,
+        },
+        attributes: {
+          geometryId: geometry.id,
+          geometryType: geometry.type,
+          omschrijving: geometry.omschrijving,
+          type: "geometry",
+        },
+      });
 
-      if (geometry.type === "polygon") {
-        // For polygons, ensure the ring is closed (first point = last point)
-        const ring = [...coordinates];
-        const first = ring[0];
-        const last = ring[ring.length - 1];
-        if (first[0] !== last[0] || first[1] !== last[1]) {
-          ring.push([first[0], first[1]]);
-        }
-
-        const polygon = new Polygon({
-          rings: [ring],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const fillSymbol = new SimpleFillSymbol({
-          color: [255, 255, 0, 0.3], // Yellow fill with transparency
-          outline: {
-            color: [255, 255, 0, 1], // Yellow outline
-            width: 2,
-          },
-        });
-
-        graphics.push(
-          new Graphic({
-            geometry: polygon,
-            symbol: fillSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "polygon",
-              omschrijving: geometry.omschrijving,
-              type: "geometry",
-            },
-          })
-        );
-      } else if (geometry.type === "line") {
-        const polyline = new Polyline({
-          paths: [coordinates],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const lineSymbol = new SimpleLineSymbol({
-          color: [255, 255, 0, 1], // Yellow
-          width: 3,
-        });
-
-        graphics.push(
-          new Graphic({
-            geometry: polyline,
-            symbol: lineSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "line",
-              omschrijving: geometry.omschrijving,
-              type: "geometry",
-            },
-          })
-        );
+      if (graphic) {
+        graphics.push(graphic);
       }
     });
 

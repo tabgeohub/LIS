@@ -2,14 +2,10 @@
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
+import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
@@ -40,88 +36,22 @@ export function useRenderGeometries() {
     // Clear existing geometry graphics
     geometriesGraphicsLayer.removeAll();
 
-    const graphics: Graphic[] = [];
-
-    geometries.forEach((geometry) => {
-      if (!geometry.points || geometry.points.length === 0) return;
-
-      // Convert points to coordinate arrays
-      const coordinates = geometry.points.map((point) => [
-        point.longitude,
-        point.latitude,
-      ]);
-
-      if (geometry.type === "polygon") {
-        // For polygons, ensure the ring is closed (first point = last point)
-        const ring = [...coordinates];
-        const first = ring[0];
-        const last = ring[ring.length - 1];
-        if (first[0] !== last[0] || first[1] !== last[1]) {
-          ring.push([first[0], first[1]]);
-        }
-
-        const polygon = new Polygon({
-          rings: [ring],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const fillSymbol = new SimpleFillSymbol({
-          color: [0, 0, 0, 0], // Empty inside (fully transparent)
-          outline: {
-            color: [0, 0, 255, 1], // Blue outline
-            width: 2,
+    // Create graphics with additional attributes
+    const graphics = geometries
+      .map((geometry) => {
+        return createGeometryGraphic(geometry, {
+          attributes: {
+            // Include all geometry properties as attributes
+            organisatie: geometry.organisatie,
+            vertrouwelijk: geometry.vertrouwelijk,
+            herhalen: geometry.herhalen,
+            activiteit: geometry.activiteit,
+            specifiek_letten_op: geometry.specifiek_letten_op,
+            regio_id: geometry.regio_id,
           },
         });
-
-        graphics.push(
-          new Graphic({
-            geometry: polygon,
-            symbol: fillSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "polygon",
-              omschrijving: geometry.omschrijving,
-              type: "geometry",
-              organisatie: geometry.organisatie,
-              vertrouwelijk: geometry.vertrouwelijk,
-              herhalen: geometry.herhalen,
-              activiteit: geometry.activiteit,
-              specifiek_letten_op: geometry.specifiek_letten_op,
-              regio_id: geometry.regio_id,
-            },
-          })
-        );
-      } else if (geometry.type === "line") {
-        const polyline = new Polyline({
-          paths: [coordinates],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const lineSymbol = new SimpleLineSymbol({
-          color: [0, 0, 255, 1], // Blue
-          width: 3,
-        });
-
-        graphics.push(
-          new Graphic({
-            geometry: polyline,
-            symbol: lineSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "line",
-              omschrijving: geometry.omschrijving,
-              type: "geometry",
-              organisatie: geometry.organisatie,
-              vertrouwelijk: geometry.vertrouwelijk,
-              herhalen: geometry.herhalen,
-              activiteit: geometry.activiteit,
-              specifiek_letten_op: geometry.specifiek_letten_op,
-              regio_id: geometry.regio_id,
-            },
-          })
-        );
-      }
-    });
+      })
+      .filter((graphic): graphic is NonNullable<typeof graphic> => graphic !== null);
 
     // Add all geometry graphics to the layer
     if (graphics.length > 0) {

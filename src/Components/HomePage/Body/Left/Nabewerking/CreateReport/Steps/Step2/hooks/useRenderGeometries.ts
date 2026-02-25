@@ -2,11 +2,8 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import useLogAction from "hooks/useLogAction";
+import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 
 export function useRenderGeometries(
   selectedPlan: FinishedFlightPlanType | null,
@@ -26,69 +23,25 @@ export function useRenderGeometries(
     selectedPlan.geometries?.forEach((geometry) => {
       if (!geometry.points || geometry.points.length === 0) return;
 
-      const coordinates = geometry.points.map((point) => [
-        point.longitude,
-        point.latitude,
-      ]);
-
-      if (geometry.geometry_type === "polygon") {
-        const ring = [...coordinates];
-        const first = ring[0];
-        const last = ring[ring.length - 1];
-        if (first[0] !== last[0] || first[1] !== last[1]) {
-          ring.push([first[0], first[1]]);
-        }
-
-        const polygon = new Polygon({
-          rings: [ring],
-          spatialReference: { wkid: 4326 },
-        });
-
-        // Blue symbol for all geometries
-        const blueSymbol = new SimpleFillSymbol({
-          color: [0, 0, 0, 0], // Transparent fill
-          outline: {
-            color: [0, 0, 255, 1], // Blue outline
-            width: 2,
+      const graphic = createGeometryGraphic(
+        {
+          id: geometry.id,
+          geometry_type: (geometry.geometry_type as "polygon" | "line") || undefined,
+          geometry_omschrijving: geometry.geometry_omschrijving || undefined,
+          points: geometry.points,
+        },
+        {
+          attributes: {
+            geometryId: geometry.id,
+            geometryType: geometry.geometry_type,
+            omschrijving: geometry.geometry_omschrijving,
+            type: "geometry",
           },
-        });
+        }
+      );
 
-        graphics.push(
-          new Graphic({
-            geometry: polygon,
-            symbol: blueSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "polygon",
-              omschrijving: geometry.geometry_omschrijving,
-              type: "geometry",
-            },
-          })
-        );
-      } else if (geometry.geometry_type === "line") {
-        const polyline = new Polyline({
-          paths: [coordinates],
-          spatialReference: { wkid: 4326 },
-        });
-
-        // Blue symbol for all geometries
-        const blueSymbol = new SimpleLineSymbol({
-          color: [0, 0, 255, 1], // Blue
-          width: 3,
-        });
-
-        graphics.push(
-          new Graphic({
-            geometry: polyline,
-            symbol: blueSymbol,
-            attributes: {
-              geometryId: geometry.id,
-              geometryType: "line",
-              omschrijving: geometry.geometry_omschrijving,
-              type: "geometry",
-            },
-          })
-        );
+      if (graphic) {
+        graphics.push(graphic);
       }
     });
 
@@ -99,63 +52,30 @@ export function useRenderGeometries(
         .forEach((geometry) => {
           if (!geometry.points || geometry.points.length === 0) return;
 
-          const coordinates = geometry.points.map((point) => [
-            point.longitude,
-            point.latitude,
-          ]);
-
-          if (geometry.geometry_type === "polygon") {
-            const ring = [...coordinates];
-            const first = ring[0];
-            const last = ring[ring.length - 1];
-            if (first[0] !== last[0] || first[1] !== last[1]) {
-              ring.push([first[0], first[1]]);
-            }
-
-            const polygon = new Polygon({
-              rings: [ring],
-              spatialReference: { wkid: 4326 },
-            });
-
-            const yellowSymbol = new SimpleFillSymbol({
-              color: [0, 0, 0, 0],
-              outline: {
-                color: [255, 255, 0, 1],
-                width: 3,
+          const graphic = createGeometryGraphic(
+            {
+              id: geometry.id,
+              geometry_type: (geometry.geometry_type as "polygon" | "line") || undefined,
+              geometry_omschrijving: geometry.geometry_omschrijving || undefined,
+              points: geometry.points,
+            },
+            {
+              symbolOptions: {
+                fillColor: [0, 0, 0, 0], // Transparent fill
+                outlineColor: [255, 255, 0, 1], // Yellow outline
+                lineColor: [255, 255, 0, 1], // Yellow line
+                outlineWidth: 3,
+                lineWidth: 4,
               },
-            });
+              attributes: {
+                ...geometry,
+                isSelected: true,
+              },
+            }
+          );
 
-            graphics.push(
-              new Graphic({
-                geometry: polygon,
-                symbol: yellowSymbol,
-                attributes: {
-                  ...geometry,
-                  isSelected: true,
-                },
-              })
-            );
-          } else if (geometry.geometry_type === "line") {
-            const polyline = new Polyline({
-              paths: [coordinates],
-              spatialReference: { wkid: 4326 },
-            });
-
-            const yellowSymbol = new SimpleLineSymbol({
-              color: [255, 255, 0, 1],
-              width: 4,
-            });
-
-            graphics.push(
-              new Graphic({
-                geometry: polyline,
-                symbol: yellowSymbol,
-                attributes: {
-                  ...geometry,
-                  isSelected: true,
-                },
-              })
-            );
+          if (graphic) {
+            graphics.push(graphic);
           }
         });
     }
