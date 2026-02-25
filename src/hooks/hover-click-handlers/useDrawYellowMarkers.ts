@@ -5,7 +5,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEffect } from "react";
 import { EnrichedPointType } from "Types";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { FinishedPointType } from "Types/finished_plans";
 
 type PointType = EnrichedPointType | FinishedPointType;
@@ -37,27 +37,8 @@ export default function useDrawYellowMarkers({
       const point = points.find((p) => p.id === pointId);
       if (!point) return;
 
-      let longitude: number | undefined = point.longitude;
-      let latitude: number | undefined = point.latitude;
-
-      if (
-        (typeof longitude !== "number" || typeof latitude !== "number") &&
-        typeof point.xcoordinaat_rd === "number" &&
-        typeof point.ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          point.xcoordinaat_rd,
-          point.ycoordinaat_rd
-        );
-        longitude = wgs.x;
-        latitude = wgs.y;
-      }
-
-      if (typeof longitude !== "number" || typeof latitude !== "number") {
-        return;
-      }
+      const coords = getPointCoordinates(point);
+      if (!coords) return;
 
       const yellow = new SimpleMarkerSymbol({
         color: "yellow",
@@ -70,8 +51,8 @@ export default function useDrawYellowMarkers({
       });
 
       const geometry = new Point({
-        longitude,
-        latitude,
+        longitude: coords.longitude,
+        latitude: coords.latitude,
         spatialReference: { wkid: 4326 },
       });
 

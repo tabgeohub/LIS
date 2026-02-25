@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import Graphic from "@arcgis/core/Graphic";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { createGeometryGraphic, GeometryPoint } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 
 /**
@@ -26,30 +26,9 @@ export function useRenderPlanGeometries() {
 
       // Transform coordinates function for RD to WGS84 conversion
       const transformCoordinates = (point: GeometryPoint): [number, number] | null => {
-        // Get coordinates - prefer WGS84, fallback to RD transformation
-        let longitude: number | undefined = point.longitude;
-        let latitude: number | undefined = point.latitude;
-
-        if (
-          (typeof longitude !== "number" || typeof latitude !== "number") &&
-          typeof point.xcoordinaat_rd === "number" &&
-          typeof point.ycoordinaat_rd === "number"
-        ) {
-          const wgs = getTransformedCoordinates(
-            "RD",
-            "WGS84",
-            point.xcoordinaat_rd,
-            point.ycoordinaat_rd
-          );
-          longitude = wgs.x;
-          latitude = wgs.y;
-        }
-
-        if (typeof longitude !== "number" || typeof latitude !== "number") {
-          return null;
-        }
-
-        return [longitude, latitude];
+        const coords = getPointCoordinates(point);
+        if (!coords) return null;
+        return [coords.longitude, coords.latitude];
       };
 
       const graphic = createGeometryGraphic(

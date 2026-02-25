@@ -18,7 +18,7 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import Point from "@arcgis/core/geometry/Point";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Graphic from "@arcgis/core/Graphic";
 
@@ -229,29 +229,12 @@ export default function SelectFromSource({ source }: { source: Source }) {
       const fullPoint = dbPoints.find((dbPt) => dbPt.id === pt.id);
       if (!fullPoint) return;
 
-      let lon: number | undefined = fullPoint.longitude;
-      let lat: number | undefined = fullPoint.latitude;
-
-      if (
-        (typeof lon !== "number" || typeof lat !== "number") &&
-        typeof fullPoint.xcoordinaat_rd === "number" &&
-        typeof fullPoint.ycoordinaat_rd === "number"
-      ) {
-        const wgs = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          fullPoint.xcoordinaat_rd,
-          fullPoint.ycoordinaat_rd
-        );
-        lon = wgs.x;
-        lat = wgs.y;
-      }
-
-      if (typeof lon === "number" && typeof lat === "number") {
+      const coords = getPointCoordinates(fullPoint);
+      if (coords) {
         const fakePoint: any = {
           id: fullPoint.id,
-          longitude: lon,
-          latitude: lat,
+          longitude: coords.longitude,
+          latitude: coords.latitude,
         };
         const res = createPin(fakePoint, mapView, fullPoint.omschrijving);
         pinRefs.current.set(fullPoint.id, res);
@@ -432,28 +415,12 @@ function Buttons({
           });
 
           // Prefer WGS84 if available; otherwise convert RD -> WGS84
-          let lon: number | undefined = (selectedPoint as any).longitude;
-          let lat: number | undefined = (selectedPoint as any).latitude;
-          if (
-            (typeof lon !== "number" || typeof lat !== "number") &&
-            typeof (selectedPoint as any).xcoordinaat_rd === "number" &&
-            typeof (selectedPoint as any).ycoordinaat_rd === "number"
-          ) {
-            const wgs = getTransformedCoordinates(
-              "RD",
-              "WGS84",
-              (selectedPoint as any).xcoordinaat_rd,
-              (selectedPoint as any).ycoordinaat_rd
-            );
-            lon = wgs.x;
-            lat = wgs.y;
-          }
-
-          if (typeof lon !== "number" || typeof lat !== "number") return;
+          const coords = getPointCoordinates(selectedPoint as any);
+          if (!coords) return;
 
           const geometry = new Point({
-            longitude: lon,
-            latitude: lat,
+            longitude: coords.longitude,
+            latitude: coords.latitude,
             spatialReference: { wkid: 4326 },
           });
 

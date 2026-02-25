@@ -53,7 +53,7 @@ const DEFAULT_SYMBOL_OPTIONS: Required<PointSymbolOptions> = {
  * @param transformCoordinates - Whether to transform coordinates if needed
  * @returns Object with longitude and latitude, or null if invalid
  */
-function getPointCoordinates(
+export function getPointCoordinates(
   point: PointData,
   transformCoordinates: boolean = true
 ): { longitude: number; latitude: number } | null {

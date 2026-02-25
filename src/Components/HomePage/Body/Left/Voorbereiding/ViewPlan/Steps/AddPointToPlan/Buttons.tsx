@@ -5,7 +5,7 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 
@@ -76,28 +76,12 @@ export default function Buttons({
           });
 
           // Prefer WGS84 if available; otherwise convert RD -> WGS84
-          let lon: number | undefined = (selectedPoint as any).longitude;
-          let lat: number | undefined = (selectedPoint as any).latitude;
-          if (
-            (typeof lon !== "number" || typeof lat !== "number") &&
-            typeof (selectedPoint as any).xcoordinaat_rd === "number" &&
-            typeof (selectedPoint as any).ycoordinaat_rd === "number"
-          ) {
-            const wgs = getTransformedCoordinates(
-              "RD",
-              "WGS84",
-              (selectedPoint as any).xcoordinaat_rd,
-              (selectedPoint as any).ycoordinaat_rd
-            );
-            lon = wgs.x;
-            lat = wgs.y;
-          }
-
-          if (typeof lon !== "number" || typeof lat !== "number") return;
+          const coords = getPointCoordinates(selectedPoint as any);
+          if (!coords) return;
 
           const geometry = new Point({
-            longitude: lon,
-            latitude: lat,
+            longitude: coords.longitude,
+            latitude: coords.latitude,
             spatialReference: { wkid: 4326 },
           });
 
