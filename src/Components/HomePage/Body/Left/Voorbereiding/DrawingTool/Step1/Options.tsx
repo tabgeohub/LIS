@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import MapView from "@arcgis/core/views/MapView";
 import { classNames } from "@helpers/classNames";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 interface OptionsProps {
   selectedTool: "line" | "polygon" | null;
@@ -51,7 +52,7 @@ export default function Options({
 
   // Enables drawing on the map according to the tool selected
   function handleDrawingTool(tool: string) {
-    if (!mapView) return;
+    if (!validateMapView(mapView) || !mapView) return;
 
     // If same tool clicked, cancel drawing
     if (selectedTool === tool) {

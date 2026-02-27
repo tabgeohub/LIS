@@ -10,6 +10,7 @@ import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 // Hook for geometry hover (similar to usePointHover)
 function useGeometryHover() {
@@ -17,7 +18,7 @@ function useGeometryHover() {
   const setHovered = useHoveredGraphicState.getState().setHovered;
 
   function handleHoveredGeometry(geometry: FinishedGeometryType | null | undefined) {
-    if (!mapView || !geometry) return;
+    if (!validateMapView(mapView) || !geometry) return;
 
     const graphicsArray = mapView.graphics.toArray();
 

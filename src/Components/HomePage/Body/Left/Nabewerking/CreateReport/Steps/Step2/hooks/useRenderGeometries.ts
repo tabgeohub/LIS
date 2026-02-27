@@ -4,6 +4,8 @@ import { FinishedFlightPlanType } from "Types/finished_plans";
 import Graphic from "@arcgis/core/Graphic";
 import useLogAction from "hooks/useLogAction";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 export function useRenderGeometries(
   selectedPlan: FinishedFlightPlanType | null,
@@ -13,9 +15,7 @@ export function useRenderGeometries(
   const logAction = useLogAction();
 
   useEffect(() => {
-    if (!mapView || !selectedPlan || !geometriesGraphicsLayer) return;
-
-    geometriesGraphicsLayer.removeAll();
+    if (!validateMapView(mapView, geometriesGraphicsLayer) || !selectedPlan) return;
 
     const graphics: Graphic[] = [];
 
@@ -80,9 +80,7 @@ export function useRenderGeometries(
         });
     }
 
-    if (graphics.length > 0) {
-      geometriesGraphicsLayer.addMany(graphics);
-    }
+    replaceGraphics(geometriesGraphicsLayer, graphics);
 
     logAction({
       message: "User selected geometries",

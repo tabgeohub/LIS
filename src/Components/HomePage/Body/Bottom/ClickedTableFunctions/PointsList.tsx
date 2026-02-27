@@ -18,6 +18,7 @@ import { FeatureCollection, Point as pt } from "geojson";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import Polygon from "@arcgis/core/geometry/Polygon";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 export default function PointsList() {
   const logAction = useLogAction();
@@ -35,7 +36,7 @@ export default function PointsList() {
   const { selectedTab } = useTabState();
 
   const zoomToPoints = useCallback(() => {
-    if (!mapView || !pointsTable || pointsTable.length === 0) return;
+    if (!validateMapView(mapView) || !pointsTable || pointsTable.length === 0) return;
 
     const lats = pointsTable.map((p) => p.latitude);
     const lons = pointsTable.map((p) => p.longitude);

@@ -15,6 +15,7 @@ import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import PointsList from "./PointsList";
 import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 export default function AddPointToPlan() {
   const { dbPoints } = usePointsStore();
@@ -90,7 +91,7 @@ export default function AddPointToPlan() {
 
   // Sync pins with selection
   useEffect(() => {
-    if (!mapView) return;
+    if (!validateMapView(mapView)) return;
 
     const currentIds = new Set(selectedPointIds);
 

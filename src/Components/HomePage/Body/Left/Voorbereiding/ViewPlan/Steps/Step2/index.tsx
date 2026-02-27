@@ -13,6 +13,7 @@ import Buttons from "./Buttons";
 import PointsAdding from "./PointsAdding";
 import Graphic from "@arcgis/core/Graphic";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 export default function Step2({
   vluchtnummer,
@@ -34,8 +35,7 @@ export default function Step2({
   const { setGeometries } = useGeometriesStore();
 
   useEffect(() => {
-    if (!mapView) return;
-    if (!selectedPlan) return;
+    if (!validateMapView(mapView) || !selectedPlan) return;
 
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
@@ -51,7 +51,8 @@ export default function Step2({
 
   // Render geometries from geometriesTable as yellow on the map
   useEffect(() => {
-    if (!mapView || !yellowGraphicsLayer || !geometriesTable || geometriesTable.length === 0) return;
+    if (!validateMapView(mapView, yellowGraphicsLayer) || !geometriesTable || geometriesTable.length === 0) return;
+    if (!yellowGraphicsLayer) return; // Type guard
 
     // Clear existing yellow geometry graphics (but keep point graphics)
     const existingGraphics = yellowGraphicsLayer.graphics.toArray();
@@ -95,7 +96,7 @@ export default function Step2({
   const selectTargetPoint = (index: number) => {
     setClickedPoint(index);
 
-    if (mapView) {
+    if (validateMapView(mapView) && mapView) {
       mapView.zoom = 15;
 
       const pt = new Point({
@@ -110,7 +111,7 @@ export default function Step2({
   const selectTargetGeometry = (geometryId: number) => {
     setClickedGeometry(geometryId);
 
-    if (!mapView || !geometriesTable) return;
+    if (!validateMapView(mapView) || !geometriesTable || !mapView) return;
 
     const geometry = geometriesTable.find((g) => g.id === geometryId);
     if (!geometry || !geometry.points || geometry.points.length === 0) return;

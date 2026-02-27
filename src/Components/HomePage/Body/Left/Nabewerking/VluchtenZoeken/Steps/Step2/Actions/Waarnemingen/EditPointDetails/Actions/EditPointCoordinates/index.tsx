@@ -13,6 +13,7 @@ import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 export default function EditPointCoordinates({
   setAction,
@@ -53,8 +54,7 @@ export default function EditPointCoordinates({
 
     // Show current point on map with red marker
     if (
-      mapView &&
-      redGraphicsLayer &&
+      validateMapView(mapView, redGraphicsLayer) &&
       selectedPoint.longitude &&
       selectedPoint.latitude
     ) {

@@ -7,6 +7,8 @@ import Graphic from "@arcgis/core/Graphic";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import useDrawYellowGeometries from "hooks/hover-click-handlers/useDrawYellowGeometries";
 import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 
 
@@ -159,12 +161,12 @@ export default function GeometriesList({
     // Render blue geometries for non-selected ones
     // This effect runs after the global renderer to ensure our filtered rendering takes precedence
     useEffect(() => {
-        if (!mapView || !geometriesGraphicsLayer) return;
+        if (!validateMapView(mapView, geometriesGraphicsLayer)) return;
 
-        // Clear the layer to remove any geometries from global renderer
-        geometriesGraphicsLayer.removeAll();
-
-        if (!geometries.length) return;
+        if (!geometries.length) {
+            geometriesGraphicsLayer.removeAll();
+            return;
+        }
 
         const graphics: Graphic[] = [];
 
@@ -178,9 +180,7 @@ export default function GeometriesList({
             }
         });
 
-        if (graphics.length > 0) {
-            geometriesGraphicsLayer.addMany(graphics);
-        }
+        replaceGraphics(geometriesGraphicsLayer, graphics);
     }, [geometries, safeSelectedGeometries, mapView, geometriesGraphicsLayer]);
 
     useEffect(() => {

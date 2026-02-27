@@ -1,6 +1,7 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { createGeometryGraphic, BaseGeometryData } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 /**
  * Base geometry interface for hover functionality
@@ -29,7 +30,7 @@ export default function useGeometryHover() {
   const setHovered = useHoveredGraphicState.getState().setHovered;
 
   function handleHoveredGeometry(geometry: HoverableGeometry | null | undefined) {
-    if (!mapView || !geometry) return;
+    if (!validateMapView(mapView) || !geometry) return;
 
     const graphicsArray = mapView.graphics.toArray();
 
@@ -79,7 +80,7 @@ export default function useGeometryHover() {
   }
 
   function handleRemoveHoveredGeometry() {
-    if (!mapView) return;
+    if (!validateMapView(mapView)) return;
 
     const graphicsArray = mapView.graphics.toArray();
 

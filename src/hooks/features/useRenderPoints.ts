@@ -34,7 +34,7 @@ export function useRenderPoints() {
 
     // Hide points when in editGeometry tab
     if (selectedTab === "editGeometry") {
-      pointsGraphicsLayer.removeAll();
+      pointsGraphicsLayer?.removeAll();
       return;
     }
 
@@ -87,11 +87,11 @@ export function useRenderPoints() {
 
       try {
         // Optimize hitTest to only check pointsGraphicsLayer
-        const response = await mapView.hitTest(event, {
-          include: [pointsGraphicsLayer],
+        const response = await mapView?.hitTest(event, {
+          include: [pointsGraphicsLayer as any as __esri.Layer ],
         });
 
-        const clicked = response.results.find(
+        const clicked = response?.results.find(
           // @ts-ignore
           (r) => r.graphic?.layer === pointsGraphicsLayer
         );
@@ -112,8 +112,8 @@ export function useRenderPoints() {
       }
     };
 
-    const handle = mapView.on("click", handleClick);
-    return () => handle.remove();
+    const handle = mapView?.on("click", handleClick);
+    return () => handle?.remove();
   }, [mapView, pointsGraphicsLayer]);
 }
 

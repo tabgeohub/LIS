@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 interface UseHoverPointsAndGeometriesOptions {
   /**
@@ -22,7 +23,7 @@ export function useHoverPointsAndGeometries(options: UseHoverPointsAndGeometries
   const { pinRefs, checkMapContainer = false } = options;
 
   useEffect(() => {
-    if (!mapView) return;
+    if (!validateMapView(mapView)) return;
     const { setHovered } = useHoveredGraphicState.getState();
 
     const handle = mapView.on("pointer-move", async (event) => {
