@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 /**
  * Hook to render plan points on the map
@@ -13,9 +15,7 @@ export function useRenderPlanPoints() {
   const { mapView, pointsGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !pointsGraphicsLayer || !selectedPlan?.points_data) return;
-
-    pointsGraphicsLayer.removeAll();
+    if (!validateMapView(mapView, pointsGraphicsLayer) || !selectedPlan?.points_data) return;
 
     const graphics = createPointGraphics(selectedPlan.points_data.filter((p) => p !== null), {
       symbolOptions: {
@@ -28,9 +28,7 @@ export function useRenderPlanPoints() {
       transformCoordinates: true,
     });
 
-    if (graphics.length > 0) {
-      pointsGraphicsLayer.addMany(graphics);
-    }
+    replaceGraphics(pointsGraphicsLayer, graphics);
   }, [selectedPlan?.points_data, mapView, pointsGraphicsLayer]);
 }
 

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 interface UseDrawYellowGeometriesOptions {
   selectedGeometryIds: number[];
@@ -24,7 +25,7 @@ export default function useDrawYellowGeometries({
   const { mapView, yellowGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !yellowGraphicsLayer) return;
+    if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
     yellowGraphicsLayer.graphics.removeAll();
 

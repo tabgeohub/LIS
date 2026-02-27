@@ -6,6 +6,8 @@ import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 export function useRenderGeometries() {
   const { user } = useAuth();
@@ -26,15 +28,12 @@ export function useRenderGeometries() {
 
   // Render geometries on the map
   useEffect(() => {
-    if (!map || !geometriesGraphicsLayer || !geometries || geometries.length === 0) return;
+    if (!validateMapView(map, geometriesGraphicsLayer) || !geometries || geometries.length === 0) return;
     if (user.user_id === undefined || user.user_id === 0) return;
     // Skip rendering when in Step2 - useRenderPlanGeometries handles rendering plan geometries
     if (step === 2) return;
     // Skip rendering when in FlightPlan Step2 or Step3 - GeometriesList handles rendering
     if (flightPlanStep === 3 || flightPlanStep === 4) return;
-
-    // Clear existing geometry graphics
-    geometriesGraphicsLayer.removeAll();
 
     // Create graphics with additional attributes
     const graphics = geometries
@@ -53,10 +52,7 @@ export function useRenderGeometries() {
       })
       .filter((graphic): graphic is NonNullable<typeof graphic> => graphic !== null);
 
-    // Add all geometry graphics to the layer
-    if (graphics.length > 0) {
-      geometriesGraphicsLayer.addMany(graphics);
-    }
+    replaceGraphics(geometriesGraphicsLayer, graphics);
 
     // Cleanup: remove geometry graphics when component unmounts or geometries change
     return () => {

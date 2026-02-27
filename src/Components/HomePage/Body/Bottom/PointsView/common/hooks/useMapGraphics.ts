@@ -5,10 +5,11 @@ import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
+import { YELLOW_MARKER_SYMBOL, STARRED_POINT_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 interface UseMapGraphicsParams {
   tab: string;
@@ -44,17 +45,10 @@ export const useMapGraphics = ({
     yellowGraphicsLayer?.graphics.removeAll();
 
     if (tab === "points") {
-      if (!mapView || !yellowGraphicsLayer) return;
+      if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
       pointsTable.forEach((point) => {
         if (!point) return;
-
-        const yellow = new SimpleMarkerSymbol({
-          color: "yellow",
-          size: 12,
-          style: "circle",
-          outline: { color: "white", width: 1 },
-        });
 
         const geometry = new Point({
           longitude: point.longitude,
@@ -64,7 +58,7 @@ export const useMapGraphics = ({
 
         const graphic = new Graphic({
           geometry,
-          symbol: yellow,
+          symbol: YELLOW_MARKER_SYMBOL,
           attributes: point,
         });
         yellowGraphicsLayer.add(graphic);
@@ -76,12 +70,7 @@ export const useMapGraphics = ({
               longitude: point.longitude,
               latitude: point.latitude,
             }),
-            symbol: new SimpleMarkerSymbol({
-              style: "circle",
-              size: 14,
-              color: [255, 255, 255, 0],
-              outline: { color: [0, 0, 255, 1], width: 2 },
-            }),
+            symbol: STARRED_POINT_SYMBOL,
             attributes: { id: point.id },
           });
           graphicsLayer?.graphics.add(g);

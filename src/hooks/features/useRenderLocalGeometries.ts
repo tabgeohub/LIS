@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { Geometry } from "./useGeometriesStore";
 import { createGeometryGraphics } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 /**
  * Hook to render geometries locally on the map (for component-specific rendering)
@@ -12,11 +14,12 @@ export function useRenderLocalGeometries(geometries: Geometry[]) {
   const { mapView, geometriesGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !geometriesGraphicsLayer) return;
+    if (!validateMapView(mapView, geometriesGraphicsLayer)) return;
 
-    geometriesGraphicsLayer.removeAll();
-
-    if (!geometries.length) return;
+    if (!geometries.length) {
+      geometriesGraphicsLayer.removeAll();
+      return;
+    }
 
     const graphics = createGeometryGraphics(geometries, {
       attributes: {
@@ -24,9 +27,7 @@ export function useRenderLocalGeometries(geometries: Geometry[]) {
       },
     });
 
-    if (graphics.length > 0) {
-      geometriesGraphicsLayer.addMany(graphics);
-    }
+    replaceGraphics(geometriesGraphicsLayer, graphics);
 
     // Cleanup on unmount
     return () => {

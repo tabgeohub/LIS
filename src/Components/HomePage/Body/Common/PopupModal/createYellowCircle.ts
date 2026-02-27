@@ -1,7 +1,7 @@
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { EnrichedPointType } from "Types";
+import { YELLOW_MARKER_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
 
 export function createYellowCircle(
   selectedPointGraphicsLayer: __esri.GraphicsLayer,
@@ -10,16 +10,6 @@ export function createYellowCircle(
   const longitude = foundFeature.longitude;
   const latitude = foundFeature.latitude;
 
-  const yellow = new SimpleMarkerSymbol({
-    color: "yellow",
-    size: 12,
-    style: "circle",
-    outline: {
-      color: "white",
-      width: 1,
-    },
-  });
-
   const geometry = new Point({
     longitude: longitude,
     latitude: latitude,
@@ -27,7 +17,7 @@ export function createYellowCircle(
 
   const graphic = new Graphic({
     geometry,
-    symbol: yellow,
+    symbol: YELLOW_MARKER_SYMBOL,
   });
 
   selectedPointGraphicsLayer.add(graphic);

@@ -5,6 +5,8 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import Graphic from "@arcgis/core/Graphic";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { createGeometryGraphic, GeometryPoint } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 /**
  * Hook to render plan geometries on the map
@@ -15,9 +17,7 @@ export function useRenderPlanGeometries() {
   const { mapView, geometriesGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !geometriesGraphicsLayer || !selectedPlan?.geometries) return;
-
-    geometriesGraphicsLayer.removeAll();
+    if (!validateMapView(mapView, geometriesGraphicsLayer) || !selectedPlan?.geometries) return;
 
     const graphics: __esri.Graphic[] = [];
 
@@ -54,9 +54,7 @@ export function useRenderPlanGeometries() {
       }
     });
 
-    if (graphics.length > 0) {
-      geometriesGraphicsLayer.addMany(graphics);
-    }
+    replaceGraphics(geometriesGraphicsLayer, graphics);
   }, [selectedPlan?.geometries, mapView, geometriesGraphicsLayer]);
 }
 

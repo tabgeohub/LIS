@@ -2,7 +2,8 @@
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { YELLOW_MARKER_SYMBOL, STARRED_POINT_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
@@ -183,20 +184,10 @@ export default function Points({
   useEffect(() => {
     graphicsLayer?.removeAll();
     yellowGraphicsLayer?.graphics.removeAll();
-    if (!mapView || !yellowGraphicsLayer) return;
+    if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
     pointsData.forEach((point) => {
       if (!point) return;
-
-      const yellow = new SimpleMarkerSymbol({
-        color: "yellow",
-        size: 12,
-        style: "circle",
-        outline: {
-          color: "white",
-          width: 1,
-        },
-      });
 
       const geometry = new Point({
         longitude: point.longitude,
@@ -206,7 +197,7 @@ export default function Points({
 
       const graphic = new Graphic({
         geometry,
-        symbol: yellow,
+        symbol: YELLOW_MARKER_SYMBOL,
         attributes: point,
       });
 
@@ -220,15 +211,7 @@ export default function Points({
             longitude: point.longitude,
             latitude: point.latitude,
           }),
-          symbol: new SimpleMarkerSymbol({
-            style: "circle",
-            size: 14,
-            color: [255, 255, 255, 0],
-            outline: {
-              color: [0, 0, 255, 1],
-              width: 2,
-            },
-          }),
+          symbol: STARRED_POINT_SYMBOL,
           attributes: { id: point.id },
         });
 

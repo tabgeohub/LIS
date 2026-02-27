@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEffect } from "react";
 import { EnrichedPointType } from "Types";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { FinishedPointType } from "Types/finished_plans";
+import { YELLOW_MARKER_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 type PointType = EnrichedPointType | FinishedPointType;
 
@@ -24,7 +25,7 @@ export default function useDrawYellowMarkers({
   const { mapView, yellowGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !yellowGraphicsLayer) return;
+    if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
     yellowGraphicsLayer.graphics.removeAll();
 
@@ -40,16 +41,6 @@ export default function useDrawYellowMarkers({
       const coords = getPointCoordinates(point);
       if (!coords) return;
 
-      const yellow = new SimpleMarkerSymbol({
-        color: "yellow",
-        size: 12,
-        style: "circle",
-        outline: {
-          color: "white",
-          width: 1,
-        },
-      });
-
       const geometry = new Point({
         longitude: coords.longitude,
         latitude: coords.latitude,
@@ -58,7 +49,7 @@ export default function useDrawYellowMarkers({
 
       const graphic = new Graphic({
         geometry,
-        symbol: yellow,
+        symbol: YELLOW_MARKER_SYMBOL,
         attributes: point,
       });
 

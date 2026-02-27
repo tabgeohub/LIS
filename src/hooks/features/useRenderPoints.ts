@@ -8,6 +8,8 @@ import { usePointsStore } from "./usePointsStore";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 export function useRenderPoints() {
   const { map, mapView, pointsGraphicsLayer } = useMapViewState();
@@ -26,7 +28,7 @@ export function useRenderPoints() {
   }, [user.user_id, user.role]);
 
   useEffect(() => {
-    if (!map || !pointsGraphicsLayer || !points) return;
+    if (!validateMapView(map, pointsGraphicsLayer) || !points) return;
 
     if (user.user_id === undefined || user.user_id === 0) return;
 
@@ -35,8 +37,6 @@ export function useRenderPoints() {
       pointsGraphicsLayer.removeAll();
       return;
     }
-
-    pointsGraphicsLayer.removeAll();
 
     const blueSymbol = new SimpleMarkerSymbol({
       color: "blue",
@@ -61,11 +61,11 @@ export function useRenderPoints() {
       });
     });
 
-    pointsGraphicsLayer.addMany(graphics);
+    replaceGraphics(pointsGraphicsLayer, graphics);
   }, [map, points, user.user_id, selectedTab]);
 
   useEffect(() => {
-    if (!mapView || !pointsGraphicsLayer) return;
+    if (!validateMapView(mapView, pointsGraphicsLayer)) return;
 
     let isProcessing = false;
     let lastClickTime = 0;
