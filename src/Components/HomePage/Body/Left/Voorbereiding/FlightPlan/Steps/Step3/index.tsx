@@ -48,7 +48,7 @@ export default function Step3({ basemapString }: { basemapString: string }) {
 
     // Clear selected geometries that don't match the herhalen filter
     const validGeometryIds = notHerhalenGeometries.map((g) => g.id);
-    setSelectedGeometries2((prev) => prev.filter((id) => validGeometryIds.includes(id)));
+    setSelectedGeometries2(selectedGeometries2.filter((id) => validGeometryIds.includes(id)));
   }, []);
 
   return (

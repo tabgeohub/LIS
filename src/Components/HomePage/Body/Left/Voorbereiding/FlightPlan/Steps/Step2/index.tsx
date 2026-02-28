@@ -45,13 +45,13 @@ export default function Step2() {
             : geometry.herhalen === true;
       return herhalenValue;
     });
-    
+
     setGeometries(herhalenGeometries);
     setFilteredGeometries(herhalenGeometries);
 
     // Clear selected geometries that don't match the herhalen filter
     const validGeometryIds = herhalenGeometries.map((g) => g.id);
-    setSelectedGeometries((prev) => prev.filter((id) => validGeometryIds.includes(id)));
+    setSelectedGeometries(selectedGeometries.filter((id) => validGeometryIds.includes(id)));
   }, []);
 
   return (
