@@ -63,7 +63,7 @@ export default function Step3({
   return (
     <ScrollButtonsLayout
       className="h-[100%]"
-      buttons={<Buttons setOpenFilter={setOpenFilter} name={name} setSelectedGeometries={setSelectedGeometries} />}
+      buttons={<Buttons setOpenFilter={setOpenFilter} name={name} selectedGeometries={selectedGeometries} setSelectedGeometries={setSelectedGeometries} />}
     >
       <p className="text-gray-800 leading-3 text-[10px] p-3">
         {content.voorbereiding.vluchtenTemplate.step3.text}

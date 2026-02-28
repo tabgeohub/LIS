@@ -2,6 +2,7 @@ import { useContent } from "hooks/useContent";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { LuWaypoints } from "react-icons/lu";
+import { TbPolygon, TbLine } from "react-icons/tb";
 import { FlightPlanTemplate } from ".";
 import { useMemo, useState } from "react";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
@@ -30,6 +31,9 @@ export default function Fase2({
       plan.name.toLowerCase().includes(filterTerm.toLowerCase())
     );
   }, [flightTemplate, filterTerm]);
+
+
+  console.log({ filteredTemplates })
 
   return (
     <ScrollButtonsLayout
@@ -72,12 +76,28 @@ export default function Fase2({
                 <FaMapMarkedAlt className="mt-[2px] text-lg text-blue-400" />
                 <div>
                   <p className="text-gray-800 pl-2 mb-2">{plan.name}</p>
-                  <div className="flex items-center gap-x-1 text-gray-600">
-                    <span>
-                      {plan.points.length}{" "}
-                      {plan.points.length === 1 ? "Punt" : "Punten"}
-                    </span>
-                    <LuWaypoints className="text-base text-gray-500" />
+                  <div className="flex items-center gap-x-3 text-gray-600">
+                    <div className="flex items-center gap-x-1">
+                      <span>
+                        {plan.points.length}{" "}
+                        {plan.points.length === 1 ? "Punt" : "Punten"}
+                      </span>
+                      <LuWaypoints className="text-base text-gray-500" />
+                    </div>
+                    {plan.geometries && plan.geometries.length > 0 && (
+                      <div className="flex items-center gap-x-1">
+                        <span>
+                          {plan.geometries.length}{" "}
+                          {plan.geometries.length === 1 ? "Geometrie" : "Geometrieën"}
+                        </span>
+                        {plan.geometries.some((g) => g.type === "polygon") && (
+                          <TbPolygon className="text-base text-yellow-500" />
+                        )}
+                        {plan.geometries.some((g) => g.type === "line") && (
+                          <TbLine className="text-base text-green-500" />
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

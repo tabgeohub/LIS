@@ -7,14 +7,17 @@ import { useTemplateFlightState } from "../../templateFlightStates";
 import useLogAction from "hooks/useLogAction";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 
 export default function Buttons({
   setOpenFilter,
   name,
+  selectedGeometries,
   setSelectedGeometries,
 }: {
   setOpenFilter: (value: boolean) => void;
   name: string;
+  selectedGeometries: number[];
   setSelectedGeometries: (value: number[]) => void;
 }) {
   const { resetFilters } = usePointsFilterStore();
@@ -39,9 +42,32 @@ export default function Buttons({
     setHoveredGraphic,
   } = useTemplateFlightState();
 
+  const { dbGeometries } = useGeometriesStore();
+
   const handleSubmit = () => {
+    // Get all selected geometries
+    const safeSelectedGeometries = Array.isArray(selectedGeometries) ? selectedGeometries : [];
+
+    // Get the actual geometry objects
+    const selectedGeometryObjects = dbGeometries.filter((geometry) =>
+      safeSelectedGeometries.includes(geometry.id)
+    );
+
+    // Extract all point IDs from selected geometries
+    const geometryPointIds = selectedGeometryObjects.flatMap((geometry) =>
+      geometry.points.map((point) => point.id)
+    );
+
+    // Combine all point IDs (selected points + points from selected geometries)
+    const safeSelectedPoints = Array.isArray(selectedPoints) ? selectedPoints : [];
+    const safeSelectedPoints2 = Array.isArray(selectedPoints2) ? selectedPoints2 : [];
+    const allPointIds = [...safeSelectedPoints, ...safeSelectedPoints2, ...geometryPointIds];
+
+    // Remove duplicates
+    const uniquePointIds = Array.from(new Set(allPointIds));
+
     const attributes = {
-      points: [...selectedPoints, ...selectedPoints2],
+      points: uniquePointIds,
       name,
       regio_id: user.role,
     };
@@ -51,9 +77,11 @@ export default function Buttons({
       step: "Third step",
       newData: {
         name: name,
-        points: [...selectedPoints, ...selectedPoints2],
+        points: uniquePointIds,
+        geometries: safeSelectedGeometries,
       },
     });
+
 
     create(attributes, () => {
       clear();
@@ -66,12 +94,12 @@ export default function Buttons({
     resetFilters();
     setSelectedPoints2([]);
     setSelectedGeometries([]);
-    
+
     // Reset features back to initial DB state
     resetFeatures();
-    
+
     clearGraphics();
-    
+
     selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
     setSelectedGraphics([]);
 
@@ -84,13 +112,13 @@ export default function Buttons({
   const handleCancelClick = () => {
     // Reset features back to initial DB state
     resetFeatures();
-    
+
     setSelectedGeometries([]);
     handleCancel();
     resetFilters();
     clear();
     clearGraphics();
-    
+
     selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
     setSelectedGraphics([]);
 

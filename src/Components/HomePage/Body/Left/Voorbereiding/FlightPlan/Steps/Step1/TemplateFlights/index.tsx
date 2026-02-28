@@ -10,6 +10,7 @@ import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";
 import Fase3 from "./Fase3";
 import toast from "react-hot-toast";
+import { Geometry } from "hooks/features/useGeometriesStore";
 
 export interface FlightPlanTemplate {
   id: number;
@@ -22,6 +23,7 @@ export interface FlightPlanTemplate {
     latitude: number;
     longitude: number;
   }[];
+  geometries: Geometry[];
 }
 
 export default function TemplateFlight({
@@ -61,7 +63,30 @@ export default function TemplateFlight({
     clear,
   } = useFlightPlanState();
 
-  const handleSubmit = (points) => {
+  const handleSubmit = (points: number[], geometries?: number[]) => {
+    // Extract point IDs from selected geometries
+    const geometryPointIds: number[] = [];
+    if (geometries && geometries.length > 0 && selectedTemplate?.geometries) {
+      const selectedGeometryObjects = selectedTemplate.geometries.filter((g: Geometry) =>
+        geometries.includes(g.id)
+      );
+      selectedGeometryObjects.forEach((geometry: Geometry) => {
+        if (geometry.points && Array.isArray(geometry.points)) {
+          geometry.points.forEach((point) => {
+            if (point.id) {
+              geometryPointIds.push(point.id);
+            }
+          });
+        }
+      });
+    }
+
+    // Combine all point IDs (regular points + points from geometries)
+    const allPointIds = [...points, ...geometryPointIds];
+
+    // Remove duplicates
+    const uniquePointIds = Array.from(new Set(allPointIds));
+
     const attributes = {
       vluchtnummer,
       omschrijving,
@@ -73,7 +98,7 @@ export default function TemplateFlight({
       passagiers: aantalPassagiers,
       hoofdthema: doelEnHoofdthema,
       aanvullende: aanvullendeInfo,
-      points: points,
+      points: uniquePointIds,
       basemap: basemapString,
       layers: selectedLayers.join(","),
       user_id: user?.user_id,
