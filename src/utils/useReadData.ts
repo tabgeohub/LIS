@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 
@@ -23,14 +23,89 @@ interface InFlightRequest<T> {
 
 const cache = new Map<string, CacheEntry<any>>();
 const inFlightRequests = new Map<string, InFlightRequest<any>>();
+// Track active refetch functions for each path to enable automatic refetch on cache invalidation
+const activeRefetchCallbacks = new Map<string, Set<() => void>>();
 
 // Cache duration: 5 minutes
 const CACHE_DURATION = 5 * 60 * 1000;
+
+/**
+ * Invalidate cache entries that match the given pattern
+ * @param pattern - String pattern to match against cache keys (supports partial matching)
+ * @param exactMatch - If true, only invalidate exact matches. If false, invalidate all keys containing the pattern
+ */
+export function invalidateCache(pattern: string, exactMatch = false): void {
+  const keysToInvalidate: string[] = [];
+  
+  if (exactMatch) {
+    keysToInvalidate.push(pattern);
+  } else {
+    // Find all cache entries that contain the pattern
+    cache.forEach((_, key) => {
+      if (key.includes(pattern)) {
+        keysToInvalidate.push(key);
+      }
+    });
+  }
+  
+  // Invalidate cache and trigger refetch for active hooks
+  keysToInvalidate.forEach((key) => {
+    cache.delete(key);
+    inFlightRequests.delete(key);
+    
+    // Trigger refetch for all active hooks using this path
+    const callbacks = activeRefetchCallbacks.get(key);
+    if (callbacks) {
+      callbacks.forEach((refetch) => {
+        try {
+          refetch();
+        } catch (err) {
+          // Ignore errors from refetch callbacks (component might be unmounted)
+          console.warn("Error during cache invalidation refetch:", err);
+        }
+      });
+    }
+    
+    // Also trigger refetch for hooks with paths that contain the invalidated key
+    activeRefetchCallbacks.forEach((callbacks, activeKey) => {
+      if (activeKey.includes(pattern) && activeKey !== key) {
+        callbacks.forEach((refetch) => {
+          try {
+            refetch();
+          } catch (err) {
+            console.warn("Error during cache invalidation refetch:", err);
+          }
+        });
+      }
+    });
+  });
+}
+
+/**
+ * Clear all cache entries
+ */
+export function clearAllCache(): void {
+  cache.clear();
+  inFlightRequests.clear();
+  // Trigger refetch for all active hooks
+  activeRefetchCallbacks.forEach((callbacks) => {
+    callbacks.forEach((refetch) => {
+      try {
+        refetch();
+      } catch (err) {
+        console.warn("Error during cache clear refetch:", err);
+      }
+    });
+  });
+}
 
 export function useReadData<T>(path: string): UseReadDataResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Use ref to store the latest fetchData function to avoid stale closures
+  const fetchDataRef = useRef<(bypassCache?: boolean) => Promise<void>>();
 
   const fetchData = async (bypassCache = false) => {
     if (!path || path === "") {
@@ -110,12 +185,50 @@ export function useReadData<T>(path: string): UseReadDataResult<T> {
       setLoading(false);
     }
   };
+  
+  // Store the latest fetchData in ref
+  fetchDataRef.current = fetchData;
 
   useEffect(() => {
     fetchData(false);
   }, [path]);
 
-  const refetch = () => fetchData(true);
+  // Memoize refetch to prevent infinite loops
+  const refetch = useCallback(() => {
+    if (fetchDataRef.current) {
+      fetchDataRef.current(true);
+    }
+  }, []);
+
+  // Register refetch callback for automatic cache invalidation
+  useEffect(() => {
+    if (!path || path === "") return;
+    
+    const cacheKey = path;
+    if (!activeRefetchCallbacks.has(cacheKey)) {
+      activeRefetchCallbacks.set(cacheKey, new Set());
+    }
+    
+    // Create a stable refetch wrapper that always calls the latest fetchData
+    const refetchWrapper = () => {
+      if (fetchDataRef.current) {
+        fetchDataRef.current(true);
+      }
+    };
+    
+    activeRefetchCallbacks.get(cacheKey)!.add(refetchWrapper);
+    
+    // Cleanup: remove refetch callback when component unmounts or path changes
+    return () => {
+      const callbacks = activeRefetchCallbacks.get(cacheKey);
+      if (callbacks) {
+        callbacks.delete(refetchWrapper);
+        if (callbacks.size === 0) {
+          activeRefetchCallbacks.delete(cacheKey);
+        }
+      }
+    };
+  }, [path]);
 
   return { data, loading, error, refetch };
 }
