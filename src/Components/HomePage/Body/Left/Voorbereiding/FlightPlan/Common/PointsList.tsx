@@ -5,6 +5,7 @@ import usePointClick from "hooks/hover-click-handlers/usePointClick";
 import { useEffect, useMemo } from "react";
 import useLogAction from "hooks/useLogAction";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { getDistanceMeters } from "@helpers/getDistanceMeters";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 
 export default function PointsList({
@@ -21,6 +22,7 @@ export default function PointsList({
 
   usePointClick(points.filter((point) => selectedPoints.includes(point.id)));
   const { handleHoveredPoint, handleRemoveHoverePoint } = usePointHover();
+
 
   useEffect(() => {
     const step = points.at(0)?.herhalen === 1 ? 2 : 3;
@@ -42,26 +44,56 @@ export default function PointsList({
     }
   }
 
+  // Register map click handler - always finds nearest point to click location
   useEffect(() => {
     if (mapView && redGraphicsLayer) {
-      mapView.on("click", async (event) => {
+      const clickHandler = mapView.on("click", async (event) => {
         event.stopPropagation();
 
-        const hitTestResults = await mapView.hitTest(event);
+        const { mapPoint } = event;
+        if (!mapPoint) return;
 
-        const existingFeature = hitTestResults.results.find(
-          (result) => (result as __esri.GraphicHit).graphic
-        );
+        const clickedLat = Number(mapPoint.latitude);
+        const clickedLon = Number(mapPoint.longitude);
 
-        // @ts-ignore
-        const point = existingFeature?.graphic.attributes;
+        // Find the nearest point to the clicked location
+        // Use a reasonable maximum distance to avoid selecting points that are too far away
+        const MAX_DISTANCE_M = 5000; // 500 meters maximum
+        let nearestPoint: EnrichedPointType | null = null;
+        let minDistance = Infinity;
 
-        if (point) {
-          handlePointClick(point);
+        // Check all points and find the nearest one
+        for (const point of points) {
+          if (!point.latitude || !point.longitude) continue;
+
+          const distance = getDistanceMeters(
+            point.latitude,
+            point.longitude,
+            clickedLat,
+            clickedLon
+          );
+
+          // Always track the nearest point, but only select if within reasonable distance
+          if (distance < minDistance) {
+            minDistance = distance;
+            if (distance <= MAX_DISTANCE_M) {
+              nearestPoint = point;
+            }
+          }
+        }
+
+        // Select the nearest point if found within reasonable distance
+        if (nearestPoint) {
+          handlePointClick(nearestPoint);
         }
       });
+
+      // Cleanup to prevent memory leaks
+      return () => {
+        clickHandler.remove();
+      };
     }
-  }, [selectedPoints]);
+  }, [selectedPoints, mapView, redGraphicsLayer, points]);
 
   const sortedPoints = useMemo(() => {
     const indexMap = new Map<number, number>();
@@ -77,14 +109,14 @@ export default function PointsList({
     return [...points].sort((a, b) => {
       const selOrder = isSelected(a.id) - isSelected(b.id);
       if (selOrder !== 0) return selOrder;
-      
+
       // For selected points, sort by reverse index (last clicked first)
       if (selectedPoints.includes(a.id) && selectedPoints.includes(b.id)) {
         const aReverseIndex = selectedReverseIndexMap.get(a.id) ?? 0;
         const bReverseIndex = selectedReverseIndexMap.get(b.id) ?? 0;
         return aReverseIndex - bReverseIndex;
       }
-      
+
       // For non-selected points, maintain original order
       return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
     });
