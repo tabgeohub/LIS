@@ -2,10 +2,9 @@
 import { EnrichedPointType } from "Types";
 import usePointHover from "hooks/hover-click-handlers/usePointHover";
 import usePointClick from "hooks/hover-click-handlers/usePointClick";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import useLogAction from "hooks/useLogAction";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { getDistanceMeters } from "@helpers/getDistanceMeters";
+import useNearestPointClick from "hooks/hover-click-handlers/useNearestPointClick";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 
 export default function PointsList({
@@ -18,11 +17,9 @@ export default function PointsList({
   points: EnrichedPointType[];
 }) {
   const logAction = useLogAction();
-  const { mapView, redGraphicsLayer } = useMapViewState();
 
   usePointClick(points.filter((point) => selectedPoints.includes(point.id)));
   const { handleHoveredPoint, handleRemoveHoverePoint } = usePointHover();
-
 
   useEffect(() => {
     const step = points.at(0)?.herhalen === 1 ? 2 : 3;
@@ -36,64 +33,21 @@ export default function PointsList({
     });
   }, [selectedPoints]);
 
-  function handlePointClick(point: EnrichedPointType) {
+  const handlePointClick = useCallback((point: EnrichedPointType) => {
     if (selectedPoints?.includes(point.id)) {
       setSelectedPoints(selectedPoints.filter((p) => p !== point.id));
     } else {
       setSelectedPoints([...selectedPoints, point.id]);
     }
-  }
+  }, [selectedPoints, setSelectedPoints]);
 
-  // Register map click handler - always finds nearest point to click location
-  useEffect(() => {
-    if (mapView && redGraphicsLayer) {
-      const clickHandler = mapView.on("click", async (event) => {
-        event.stopPropagation();
-
-        const { mapPoint } = event;
-        if (!mapPoint) return;
-
-        const clickedLat = Number(mapPoint.latitude);
-        const clickedLon = Number(mapPoint.longitude);
-
-        // Find the nearest point to the clicked location
-        // Use a reasonable maximum distance to avoid selecting points that are too far away
-        const MAX_DISTANCE_M = 5000; // 500 meters maximum
-        let nearestPoint: EnrichedPointType | null = null;
-        let minDistance = Infinity;
-
-        // Check all points and find the nearest one
-        for (const point of points) {
-          if (!point.latitude || !point.longitude) continue;
-
-          const distance = getDistanceMeters(
-            point.latitude,
-            point.longitude,
-            clickedLat,
-            clickedLon
-          );
-
-          // Always track the nearest point, but only select if within reasonable distance
-          if (distance < minDistance) {
-            minDistance = distance;
-            if (distance <= MAX_DISTANCE_M) {
-              nearestPoint = point;
-            }
-          }
-        }
-
-        // Select the nearest point if found within reasonable distance
-        if (nearestPoint) {
-          handlePointClick(nearestPoint);
-        }
-      });
-
-      // Cleanup to prevent memory leaks
-      return () => {
-        clickHandler.remove();
-      };
-    }
-  }, [selectedPoints, mapView, redGraphicsLayer, points]);
+  // Use the reusable hook for nearest point click functionality
+  useNearestPointClick({
+    points,
+    onPointClick: handlePointClick,
+    maxDistanceMeters: 5000,
+    enabled: true,
+  });
 
   const sortedPoints = useMemo(() => {
     const indexMap = new Map<number, number>();

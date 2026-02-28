@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { EnrichedPointType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import useLogAction from "hooks/useLogAction";
 import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
+import useNearestPointClick from "hooks/hover-click-handlers/useNearestPointClick";
 import { useContent } from "hooks/useContent";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 
@@ -75,13 +76,21 @@ export default function PointsList({
     }
   }, [filterText, points]);
 
-  function handlePointClick(point: EnrichedPointType) {
+  const handlePointClick = useCallback((point: EnrichedPointType) => {
     if (selectedPoints?.includes(point.id)) {
       setSelectedPoints(selectedPoints.filter((p) => p !== point.id));
     } else {
       setSelectedPoints([...selectedPoints, point.id]);
     }
-  }
+  }, [selectedPoints, setSelectedPoints]);
+
+  // Use the reusable hook for nearest point click functionality
+  useNearestPointClick({
+    points,
+    onPointClick: handlePointClick,
+    maxDistanceMeters: 5000,
+    enabled: true,
+  });
 
   const sortedPoints = useMemo(() => {
     const indexMap = new Map<number, number>();
@@ -109,27 +118,6 @@ export default function PointsList({
       return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
     });
   }, [searchedPoints, selectedPoints]);
-
-  useEffect(() => {
-    if (mapView && redGraphicsLayer) {
-      mapView.on("click", async (event) => {
-        event.stopPropagation();
-
-        const hitTestResults = await mapView.hitTest(event);
-
-        const existingFeature = hitTestResults.results.find(
-          (result) => (result as __esri.GraphicHit).graphic
-        );
-
-        // @ts-ignore
-        const point = existingFeature?.graphic.attributes;
-
-        if (point) {
-          handlePointClick(point);
-        }
-      });
-    }
-  }, [selectedPoints]);
 
   return (
     <>
