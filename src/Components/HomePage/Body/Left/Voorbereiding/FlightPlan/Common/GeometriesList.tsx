@@ -164,7 +164,7 @@ export default function GeometriesList({
         if (!validateMapView(mapView, geometriesGraphicsLayer)) return;
 
         if (!geometries.length) {
-            geometriesGraphicsLayer.removeAll();
+            geometriesGraphicsLayer?.removeAll();
             return;
         }
 
@@ -180,7 +180,7 @@ export default function GeometriesList({
             }
         });
 
-        replaceGraphics(geometriesGraphicsLayer, graphics);
+        replaceGraphics(geometriesGraphicsLayer!, graphics);
     }, [geometries, safeSelectedGeometries, mapView, geometriesGraphicsLayer]);
 
     useEffect(() => {

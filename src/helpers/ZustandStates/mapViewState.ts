@@ -29,6 +29,9 @@ export const useMapViewState = create<{
   yellowGraphicsLayer: __esri.GraphicsLayer | null;
   setYellowGraphicsLayer: (yellowGraphicsLayer: __esri.GraphicsLayer) => void;
 
+  yellowGeometriesGraphicsLayer: __esri.GraphicsLayer | null;
+  setYellowGeometriesGraphicsLayer: (yellowGeometriesGraphicsLayer: __esri.GraphicsLayer) => void;
+
   redGraphicsLayer: __esri.GraphicsLayer | null;
   setRedGraphicsLayer: (redGraphicsLayer: __esri.GraphicsLayer) => void;
 
@@ -78,6 +81,10 @@ export const useMapViewState = create<{
   setYellowGraphicsLayer: (yellowGraphicsLayer: __esri.GraphicsLayer) =>
     set({ yellowGraphicsLayer }),
 
+  yellowGeometriesGraphicsLayer: null,
+  setYellowGeometriesGraphicsLayer: (yellowGeometriesGraphicsLayer: __esri.GraphicsLayer) =>
+    set({ yellowGeometriesGraphicsLayer }),
+
   searchWidget: null,
   setSearchWidget: (searchWidget) => set({ searchWidget }),
 
@@ -106,11 +113,12 @@ export const useMapViewState = create<{
   setRegios: (regios: RegionData) => set({ regios }),
 
   clearGraphics: () => {
-    const { graphicsLayer, graphicsLayerHover, yellowGraphicsLayer } = get();
+    const { graphicsLayer, graphicsLayerHover, yellowGraphicsLayer, yellowGeometriesGraphicsLayer } = get();
 
     // geometriesGraphicsLayer is not cleared - geometries persist
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
     yellowGraphicsLayer?.removeAll();
+    yellowGeometriesGraphicsLayer?.removeAll();
   },
 }));

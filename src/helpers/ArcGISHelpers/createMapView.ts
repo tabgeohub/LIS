@@ -67,6 +67,7 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
     title: "Aandachtspunten",
   });
   const yellowGraphicsLayer = new GraphicsLayer();
+  const yellowGeometriesGraphicsLayer = new GraphicsLayer();
   const redGraphicsLayer = new GraphicsLayer();
   const selectedPointGraphicsLayer = new GraphicsLayer();
   const geometriesGraphicsLayer = new GraphicsLayer({
@@ -75,6 +76,7 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
 
   mapView.map.add(pointsGraphicsLayer);
   mapView.map.add(yellowGraphicsLayer);
+  mapView.map.add(yellowGeometriesGraphicsLayer);
   mapView.map.add(graphicsLayer);
   mapView.map.add(geometriesGraphicsLayer);
   mapView.map.add(graphicsLayerHover);
@@ -83,10 +85,11 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
 
   map.layers.reorder(graphicsLayerHover, map.layers.length - 1);
   map.layers.reorder(yellowGraphicsLayer, map.layers.length - 2);
-  map.layers.reorder(redGraphicsLayer, map.layers.length - 3);
-  map.layers.reorder(graphicsLayer, map.layers.length - 4);
-  map.layers.reorder(geometriesGraphicsLayer, map.layers.length - 5);
-  map.layers.reorder(selectedPointGraphicsLayer, map.layers.length - 6);
+  map.layers.reorder(yellowGeometriesGraphicsLayer, map.layers.length - 3);
+  map.layers.reorder(redGraphicsLayer, map.layers.length - 4);
+  map.layers.reorder(graphicsLayer, map.layers.length - 5);
+  map.layers.reorder(geometriesGraphicsLayer, map.layers.length - 6);
+  map.layers.reorder(selectedPointGraphicsLayer, map.layers.length - 7);
 
   return {
     map,
@@ -95,6 +98,7 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
     graphicsLayerHover,
     pointsGraphicsLayer,
     yellowGraphicsLayer,
+    yellowGeometriesGraphicsLayer,
     redGraphicsLayer,
     selectedPointGraphicsLayer,
     geometriesGraphicsLayer,

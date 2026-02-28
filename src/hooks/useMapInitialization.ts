@@ -15,6 +15,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
     setGraphicsLayer,
     setGraphicsLayerHover,
     setYellowGraphicsLayer,
+    setYellowGeometriesGraphicsLayer,
     setRedGraphicsLayer,
     setSelectedPointGraphicsLayer,
     setGeometriesGraphicsLayer,
@@ -29,6 +30,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
         pointsGraphicsLayer,
         graphicsLayerHover,
         yellowGraphicsLayer,
+        yellowGeometriesGraphicsLayer,
         redGraphicsLayer,
         selectedPointGraphicsLayer,
         geometriesGraphicsLayer,
@@ -40,6 +42,7 @@ export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {
       setGraphicsLayerHover(graphicsLayerHover);
       setPointsGraphicsLayer(pointsGraphicsLayer);
       setYellowGraphicsLayer(yellowGraphicsLayer);
+      setYellowGeometriesGraphicsLayer(yellowGeometriesGraphicsLayer);
       setRedGraphicsLayer(redGraphicsLayer);
       setSelectedPointGraphicsLayer(selectedPointGraphicsLayer);
       setGeometriesGraphicsLayer(geometriesGraphicsLayer);

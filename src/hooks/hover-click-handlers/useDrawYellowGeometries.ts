@@ -22,12 +22,12 @@ export default function useDrawYellowGeometries({
   allGeometries,
   herhalenFilter,
 }: UseDrawYellowGeometriesOptions) {
-  const { mapView, yellowGraphicsLayer } = useMapViewState();
+  const { mapView, yellowGeometriesGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!validateMapView(mapView, yellowGraphicsLayer)) return;
+    if (!validateMapView(mapView, yellowGeometriesGraphicsLayer)) return;
 
-    yellowGraphicsLayer.graphics.removeAll();
+    yellowGeometriesGraphicsLayer.graphics.removeAll();
 
     if (!selectedGeometryIds || selectedGeometryIds.length === 0) {
       return;
@@ -38,20 +38,8 @@ export default function useDrawYellowGeometries({
       const geometry = allGeometries.find((g) => g.id === geometryId);
       if (!geometry || !geometry.points || geometry.points.length === 0) return;
 
-      // Filter by herhalen if herhalenFilter is provided
-      if (herhalenFilter !== null && herhalenFilter !== undefined) {
-        const geometryHerhalen =
-          typeof geometry.herhalen === "number"
-            ? geometry.herhalen === 1
-            : typeof geometry.herhalen === "string"
-              ? geometry.herhalen === "1"
-              : geometry.herhalen === true;
-
-        // Only draw geometries that match the herhalen filter
-        if (geometryHerhalen !== herhalenFilter) {
-          return;
-        }
-      }
+      // Selected geometries should always be drawn in yellow, regardless of herhalenFilter
+      // The filter only applies to which geometries appear in the list (blue layer)
 
       // Use the createGeometryGraphic utility with yellow symbol options
       const graphic = createGeometryGraphic(geometry, {
@@ -66,9 +54,9 @@ export default function useDrawYellowGeometries({
       });
 
       if (graphic) {
-        yellowGraphicsLayer.add(graphic);
+        yellowGeometriesGraphicsLayer.add(graphic);
       }
     });
-  }, [selectedGeometryIds, allGeometries, herhalenFilter, mapView, yellowGraphicsLayer]);
+  }, [selectedGeometryIds, allGeometries, mapView, yellowGeometriesGraphicsLayer]);
 }
 
