@@ -25,7 +25,7 @@ export default function Buttons({
     clear,
   } = useFlightPlanState();
 
-  const { mapView, yellowGraphicsLayer, clearGraphics } = useMapViewState();
+  const { mapView, yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } = useMapViewState();
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
 
@@ -47,6 +47,7 @@ export default function Buttons({
     });
 
     yellowGraphicsLayer?.graphics.removeAll();
+    yellowGeometriesGraphicsLayer?.graphics.removeAll();
   };
 
   const handleBack = () => {

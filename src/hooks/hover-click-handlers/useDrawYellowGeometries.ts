@@ -14,7 +14,7 @@ interface UseDrawYellowGeometriesOptions {
 
 /**
  * Hook for drawing yellow geometries on the map (similar to useDrawYellowMarkers)
- * Renders selected geometries in yellow on the yellowGraphicsLayer
+ * Renders selected geometries in yellow on the yellowGeometriesGraphicsLayer
  */
 export default function useDrawYellowGeometries({
   selectedGeometryIds,

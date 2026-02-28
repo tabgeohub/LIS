@@ -22,7 +22,7 @@ export default function Buttons({
   const { user } = useAuth();
   const { resetFilters } = usePointsFilterStore();
   const handleCancel = useCancelCreateFlightPlan();
-  const { yellowGraphicsLayer, clearGraphics } = useMapViewState();
+  const { yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } = useMapViewState();
 
   const { resetFeatures } = useResetFeatures();
 
@@ -134,6 +134,7 @@ export default function Buttons({
           });
 
           yellowGraphicsLayer?.graphics.removeAll();
+          yellowGeometriesGraphicsLayer?.graphics.removeAll();
         }}
         className="gray-button"
       >
