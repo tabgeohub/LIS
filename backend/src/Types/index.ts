@@ -110,7 +110,7 @@ export type TabType =
   | NabewerkingTabsType
   | "aandachtspuntenFilteren";
 
-export type PageType = "voorbereiding" | "nabewerking" | "tools";
+export type PageType = "voorbereiding" | "nabewerking" | "tools" | "timeslider";
 
 export type SpatialReference = "WGS84" | "RD";
 

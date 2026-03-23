@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import HeadButtonsVoorbereiding from "../HeadButtonsVoorbereiding";
 import HeadButtonsTools from "../HeadButtonsTools";
 import HeadButtonsNabewerking from "../HeadButtonsNabewerking";
+import HeadButtonsTimeslider from "../HeadButtonsTimeslider";
 
 export default function HeaderButtons() {
   const { selectedPage } = useTabState();
@@ -38,6 +39,16 @@ export default function HeaderButtons() {
               exit={{ opacity: 0 }}
             >
               <HeadButtonsNabewerking />
+            </motion.div>
+          )}
+
+          {selectedPage === "timeslider" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <HeadButtonsTimeslider />
             </motion.div>
           )}
         </div>

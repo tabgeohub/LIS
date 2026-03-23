@@ -7,7 +7,7 @@ import Search from "../Search";
 import useLogAction from "hooks/useLogAction";
 
 export default function Pages() {
-  const { selectedPage, setSelectedPage } = useTabState();
+  const { selectedPage, setSelectedPage, setSelectedTab } = useTabState();
 
   const { user } = useAuth();
 
@@ -25,6 +25,7 @@ export default function Pages() {
             animate={{ opacity: selectedPage === tab.value ? 1 : 0.6 }}
             onClick={() => {
               setSelectedPage(tab.value);
+              if (tab.value === "timeslider") setSelectedTab("none");
 
               logAction({ message: `User selected ${tab.label} page` });
             }}
