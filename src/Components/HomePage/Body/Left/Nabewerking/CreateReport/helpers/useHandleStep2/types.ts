@@ -1,20 +1,26 @@
 import { FinishedPointType, FinishedGeometryType } from "Types/finished_plans";
 
+export type AttachmentWithMeta = {
+  name: string;
+  blob: Blob;
+  taken_at?: number;
+};
+
 export type ProcessedItem = {
   filename: string;
   pdfData: ArrayBuffer;
-  attachments: { name: string; blob: Blob }[];
+  attachments: AttachmentWithMeta[];
   pointName: string;
 };
 
 export type PreloadPointResult = {
   pointId: number;
-  attachments: { name: string; blob: Blob }[];
+  attachments: AttachmentWithMeta[];
 };
 
 export type PreloadGeometryResult = {
   geometryId: number;
-  attachments: { name: string; blob: Blob }[];
+  attachments: AttachmentWithMeta[];
 };
 
 export type ProcessPointParams = {
@@ -24,7 +30,7 @@ export type ProcessPointParams = {
   selectedPlan: any;
   activities: any;
   organizations: any;
-  attachmentsByPoint: Map<number, { name: string; blob: Blob }[]>;
+  attachmentsByPoint: Map<number, AttachmentWithMeta[]>;
   featureLayerUrl: string;
   tempLayer: __esri.GraphicsLayer;
   mapServerUrl: string;
@@ -41,7 +47,7 @@ export type ProcessGeometryParams = {
   selectedPlan: any;
   activities: any;
   organizations: any;
-  attachmentsByGeometry: Map<number, { name: string; blob: Blob }[]>;
+  attachmentsByGeometry: Map<number, AttachmentWithMeta[]>;
   featureLayerUrl: string;
   tempLayer: __esri.GraphicsLayer;
   mapServerUrl: string;

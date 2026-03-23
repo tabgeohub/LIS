@@ -1,11 +1,12 @@
 import { FinishedPointType } from "Types/finished_plans";
 import { fetchWithRetry } from "./utils";
 import { refreshToken } from "@helpers/refreshToken";
+import type { AttachmentWithMeta } from "./types";
 
 export async function fetchAttachmentsForPoint(
   featureLayerUrl: string,
   objectId: number
-): Promise<{ name: string; blob: Blob }[]> {
+): Promise<AttachmentWithMeta[]> {
   let token = localStorage.getItem("credential_token");
   if (!token) {
     try {
@@ -29,14 +30,19 @@ export async function fetchAttachmentsForPoint(
       }`;
       const fileRes = await fetchWithRetry(url);
       const blob = await fileRes.blob();
-
-      return { name: att.name || `attachment_${att.id}`, blob };
+      const takenAt =
+        att.uploadDate != null
+          ? new Date(att.uploadDate).getTime()
+          : att.creationDate != null
+            ? new Date(att.creationDate).getTime()
+            : undefined;
+      return { name: att.name || `attachment_${att.id}`, blob, taken_at: takenAt };
     })
   );
 
   const ok = attachments
     .filter(
-      (r): r is PromiseFulfilledResult<{ name: string; blob: Blob }> =>
+      (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>
         r.status === "fulfilled"
     )
     .map((r) => r.value);
@@ -47,7 +53,7 @@ export async function fetchAttachmentsForPoint(
 export async function safeFetchPointAttachments(
   featureLayerUrl: string,
   point: FinishedPointType
-): Promise<{ name: string; blob: Blob }[]> {
+): Promise<AttachmentWithMeta[]> {
   const first = point.attachments?.[0];
   if (first && (first as any)?.attachmentid) {
     try {
@@ -60,11 +66,14 @@ export async function safeFetchPointAttachments(
 
   if (Array.isArray(point.attachments) && point.attachments.length > 0) {
     const list = point.attachments
-      .map((att: any) => att?.url)
-      .filter((u: string | undefined) => typeof u === "string" && u.length > 0);
+      .filter(
+        (att: any) =>
+          typeof att?.url === "string" && (att.url as string).length > 0
+      ) as Array<{ url: string; taken_at?: number }>;
 
     const results = await Promise.allSettled(
-      list.map(async (rawUrl: string) => {
+      list.map(async (att) => {
+        const rawUrl = att.url;
         let token = localStorage.getItem("credential_token");
         if (!token) {
           try {
@@ -88,13 +97,17 @@ export async function safeFetchPointAttachments(
             return "attachment";
           }
         })();
-        return { name: nameFromUrl, blob };
+        return {
+          name: nameFromUrl,
+          blob,
+          taken_at: att.taken_at,
+        };
       })
     );
 
     const ok = results
       .filter(
-        (r): r is PromiseFulfilledResult<{ name: string; blob: Blob }> =>
+        (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>
           r.status === "fulfilled"
       )
       .map((r) => r.value);

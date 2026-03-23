@@ -39,7 +39,7 @@ export async function generatePdfReport(
     label: string;
     value: string;
   }[],
-  attachments?: { name: string; blob: Blob }[],
+  attachments?: { name: string; blob: Blob; taken_at?: number }[],
   preloadedLogoDataUrl?: string
 ): Promise<Blob> {
   const doc = new jsPDF();
@@ -281,6 +281,31 @@ export async function generatePdfReport(
       doc.setFont("helvetica", "bold");
       doc.text(`Bijlage ${i + 1}: ${att.name}`, 25, 20);
       doc.addImage(scaledUrl, "JPEG", 25, 24, drawW, drawH);
+
+      const imgBottomY = 24 + drawH;
+      let takenAt = att.taken_at;
+      if ((takenAt == null || Number.isNaN(takenAt)) && att.name) {
+        const match = att.name.match(/attachment-(\d+)\./);
+        if (match) {
+          takenAt = parseInt(match[1], 10);
+        }
+      }
+      if (takenAt != null && !Number.isNaN(takenAt)) {
+        const date = new Date(takenAt);
+        const formatted =
+          date.toLocaleDateString("nl-NL", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }) || date.toISOString();
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+        doc.text(formatted, 25, imgBottomY + 8);
+        doc.setTextColor(0, 0, 0);
+      }
     }
 
     // If there are non-image attachments, list them on a summary page
