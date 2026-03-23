@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimeRange } from "hooks/useTimeRange";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import {
   format,
   differenceInMilliseconds,
@@ -84,6 +85,14 @@ export default function HeadButtonsTimeslider() {
     safeValues[1],
     stepIndexToDate,
   ]);
+
+  const { setDateRange } = useTimesliderState();
+  useEffect(() => {
+    setDateRange(
+      format(dateFrom, "yyyy-MM-dd"),
+      format(dateTo, "yyyy-MM-dd")
+    );
+  }, [dateFrom, dateTo, setDateRange]);
 
   const minDateStr = format(minDate, "dd/MM/yyyy");
   const maxDateStr = format(maxDate, "dd/MM/yyyy");

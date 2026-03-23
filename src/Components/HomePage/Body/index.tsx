@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import Left from "./Left";
 import MapViewComp from "./MapViewComp";
+import Right from "./Right";
 import NotLoggedInWarning from "./Common/NotLoggedInWarning";
 
 export default function Body({
@@ -21,6 +22,8 @@ export default function Body({
       />
 
       <MapViewComp mapDiv={mapDiv} vluchtnummer={vluchtnummer} />
+
+      <Right bodyStyle={bodyStyle} />
 
       <NotLoggedInWarning />
     </div>
