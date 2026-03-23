@@ -108,6 +108,7 @@ export type TabType =
   | VoorbereidingTabsType
   | ToolsTabsType
   | NabewerkingTabsType
+  | "timeslider"
   | "aandachtspuntenFilteren";
 
 export type PageType = "voorbereiding" | "nabewerking" | "tools" | "timeslider";

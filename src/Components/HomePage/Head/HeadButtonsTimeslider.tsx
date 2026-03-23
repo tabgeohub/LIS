@@ -1,80 +1,127 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Range, getTrackBackground } from "react-range";
+import DatePicker from "react-datepicker";
 import { useContent } from "hooks/useContent";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useTimeRange } from "hooks/useTimeRange";
 import {
   format,
-  parse,
-  addMonths,
-  differenceInMonths,
+  differenceInMilliseconds,
   startOfMonth,
   endOfMonth,
+  parseISO,
 } from "date-fns";
+import "react-datepicker/dist/react-datepicker.css";
 
-const MIN_DATE = new Date(2024, 0, 1);
-const MAX_DATE = new Date(2025, 11, 31);
-const STEP_MONTHS = 3;
-const INITIAL_FROM = MIN_DATE;
-const INITIAL_TO = MAX_DATE;
+const FALLBACK_MIN = new Date(2024, 0, 1);
+const FALLBACK_MAX = new Date(2025, 11, 31);
+const SLIDER_PARTS = 10;
 
-const STEP_COUNT = Math.floor(
-  differenceInMonths(MAX_DATE, MIN_DATE) / STEP_MONTHS
-) + 1;
-
-function stepIndexToDate(stepIndex: number): Date {
-  return startOfMonth(addMonths(MIN_DATE, stepIndex * STEP_MONTHS));
-}
-
-function dateToStepIndex(date: Date): number {
-  const monthsFromStart = differenceInMonths(date, MIN_DATE);
-  const stepIndex = Math.round(monthsFromStart / STEP_MONTHS);
-  return Math.max(0, Math.min(STEP_COUNT - 1, stepIndex));
+function clampToStepIndex(stepIndex: number, stepCount: number): number {
+  return Math.max(0, Math.min(stepCount - 1, stepIndex));
 }
 
 export default function HeadButtonsTimeslider() {
   const content = useContent();
-  const minDateStr = format(INITIAL_FROM, "yyyy-MM-dd");
-  const maxDateStr = format(INITIAL_TO, "yyyy-MM-dd");
+  const { user } = useAuth();
+  const regioId = user?.role || undefined;
+  const { range, loading } = useTimeRange(regioId);
 
-  const [values, setValues] = useState<[number, number]>([0, STEP_COUNT - 1]);
+  const { minDate, maxDate } = useMemo(() => {
+    let min = FALLBACK_MIN;
+    let max = FALLBACK_MAX;
+    if (range.from && range.to) {
+      const fromDate = parseISO(range.from);
+      const toDate = parseISO(range.to);
+      if (!isNaN(fromDate.getTime())) min = startOfMonth(fromDate);
+      if (!isNaN(toDate.getTime())) max = endOfMonth(toDate);
+    }
+    if (min > max) [min, max] = [max, min];
+    return {
+      minDate: min,
+      maxDate: max,
+    };
+  }, [range.from, range.to]);
 
-  const dateFrom = useMemo(() => stepIndexToDate(values[0]), [values[0]]);
-  const dateTo = useMemo(() => {
-    const periodEnd = addMonths(
-      MIN_DATE,
-      (values[1] + 1) * STEP_MONTHS - 1
-    );
-    return endOfMonth(
-      periodEnd > MAX_DATE ? MAX_DATE : periodEnd
-    );
-  }, [values[1]]);
+  const maxStep = SLIDER_PARTS;
+  const totalMs = Math.max(1, differenceInMilliseconds(maxDate, minDate));
 
-  const dateFromStr = format(dateFrom, "yyyy-MM-dd");
-  const dateToStr = format(dateTo, "yyyy-MM-dd");
+  const stepIndexToDate = useCallback(
+    (stepIndex: number): Date => {
+      const ratio = stepIndex / maxStep;
+      return new Date(minDate.getTime() + ratio * totalMs);
+    },
+    [minDate, totalMs, maxStep]
+  );
+
+  const dateToStepIndex = useCallback(
+    (date: Date): number => {
+      const distance = date.getTime() - minDate.getTime();
+      const ratio = distance / totalMs;
+      const stepIndex = Math.round(ratio * maxStep);
+      return clampToStepIndex(stepIndex, maxStep + 1);
+    },
+    [minDate, totalMs, maxStep]
+  );
+
+  const [values, setValues] = useState<[number, number]>(() => [0, maxStep]);
+
+  useEffect(() => {
+    setValues([0, maxStep]);
+  }, [maxStep]);
+
+  const safeValues: [number, number] = useMemo(() => {
+    const from = Math.max(0, Math.min(values[0], maxStep));
+    const to = Math.max(0, Math.min(values[1], maxStep));
+    return from <= to ? [from, to] : [to, to];
+  }, [values, maxStep]);
+
+  const dateFrom = useMemo(
+    () => stepIndexToDate(safeValues[0]),
+    [safeValues[0], stepIndexToDate]
+  );
+  const dateTo = useMemo(() => stepIndexToDate(safeValues[1]), [
+    safeValues[1],
+    stepIndexToDate,
+  ]);
+
+  const minDateStr = format(minDate, "dd/MM/yyyy");
+  const maxDateStr = format(maxDate, "dd/MM/yyyy");
 
   const handleSliderChange = useCallback((newValues: number[]) => {
     setValues([newValues[0], newValues[1]]);
   }, []);
 
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const parsed = parse(e.target.value, "yyyy-MM-dd", new Date());
-    const step = dateToStepIndex(parsed);
-    const clamped = Math.max(0, Math.min(step, values[1] - 1));
-    setValues([clamped, values[1]]);
+  const handleFromChange = (date: Date | null) => {
+    if (!date) return;
+    const step = dateToStepIndex(date);
+    const clamped = Math.max(0, Math.min(step, safeValues[1] - 1));
+    setValues([clamped, safeValues[1]]);
   };
 
-  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const parsed = parse(e.target.value, "yyyy-MM-dd", new Date());
-    const step = dateToStepIndex(parsed);
-    const clamped = Math.min(STEP_COUNT - 1, Math.max(step, values[0] + 1));
-    setValues([values[0], clamped]);
+  const handleToChange = (date: Date | null) => {
+    if (!date) return;
+    const step = dateToStepIndex(date);
+    const clamped = Math.min(maxStep, Math.max(step, safeValues[0] + 1));
+    setValues([safeValues[0], clamped]);
   };
 
   const trackBackground = getTrackBackground({
-    values,
+    values: safeValues,
     min: 0,
-    max: STEP_COUNT - 1,
+    max: maxStep,
     colors: ["#374151", "#90CAF9", "#374151"],
   });
+
+  if (loading) {
+    return (
+      <div className="flex gap-x-1">
+        <div className="border-gray-200 border-[1px] px-4 py-[1px] bg-white rounded-sm flex items-center justify-center max-h-[120px] w-full min-h-[60px]">
+          <p className="text-xs text-gray-400">Laden...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-x-1">
@@ -84,13 +131,13 @@ export default function HeadButtonsTimeslider() {
             <span className="text-orange-500 text-sm font-medium whitespace-nowrap">
               {content.layout.timeslider.van}
             </span>
-            <input
-              className="inputClass !py-1 !text-xs w-[110px]"
-              type="date"
-              min={minDateStr}
-              max={maxDateStr}
-              value={dateFromStr}
+            <DatePicker
+              selected={dateFrom}
               onChange={handleFromChange}
+              dateFormat="dd/MM/yyyy"
+              minDate={minDate}
+              maxDate={maxDate}
+              className="inputClass !py-1 !text-xs w-[110px] cursor-pointer"
             />
           </div>
 
@@ -98,8 +145,8 @@ export default function HeadButtonsTimeslider() {
             <Range
               step={1}
               min={0}
-              max={STEP_COUNT - 1}
-              values={values}
+              max={maxStep}
+              values={safeValues}
               onChange={handleSliderChange}
               renderTrack={({ props, children }) => (
                 <div
@@ -115,11 +162,14 @@ export default function HeadButtonsTimeslider() {
                   {children}
                 </div>
               )}
-              renderThumb={({ props }) => (
+              renderThumb={({ props }) => {
+                const { key, style, ...restProps } = props;
+                return (
                 <div
-                  {...props}
+                  key={key}
+                  {...restProps}
                   style={{
-                    ...props.style,
+                    ...style,
                     height: "18px",
                     width: "18px",
                     borderRadius: "50%",
@@ -129,18 +179,19 @@ export default function HeadButtonsTimeslider() {
                     outline: "none",
                   }}
                 />
-              )}
+                );
+              }}
             />
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <input
-              className="inputClass !py-1 !text-xs w-[110px]"
-              type="date"
-              min={minDateStr}
-              max={maxDateStr}
-              value={dateToStr}
+            <DatePicker
+              selected={dateTo}
               onChange={handleToChange}
+              dateFormat="dd/MM/yyyy"
+              minDate={minDate}
+              maxDate={maxDate}
+              className="inputClass !py-1 !text-xs w-[110px] cursor-pointer"
             />
             <span className="text-orange-500 text-sm font-medium whitespace-nowrap">
               {content.layout.timeslider.tot}
@@ -149,7 +200,7 @@ export default function HeadButtonsTimeslider() {
         </div>
 
         <p className="text-[10px] text-gray-400 tracking-normal text-center mt-1">
-          {format(dateFrom, "dd-MM-yyyy")} – {format(dateTo, "dd-MM-yyyy")}
+          {format(dateFrom, "dd/MM/yyyy")} – {format(dateTo, "dd/MM/yyyy")}
         </p>
       </div>
     </div>
