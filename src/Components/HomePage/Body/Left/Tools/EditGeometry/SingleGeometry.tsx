@@ -2,11 +2,13 @@ import { Geometry } from "hooks/features/useGeometriesStore";
 import { TbPolygon, TbLine } from "react-icons/tb";
 import ActionButtons from "./ActionButtons";
 
-export default function SingleGeometry({ 
+export default function SingleGeometry({
   geometry,
+  onEditClick,
   onDeleteClick,
-}: { 
+}: {
   geometry: Geometry;
+  onEditClick: (geometry: Geometry) => void;
   onDeleteClick: (geometry: Geometry) => void;
 }) {
   const geometryTypeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
@@ -29,7 +31,11 @@ export default function SingleGeometry({
         </div>
       </div>
 
-      <ActionButtons geometry={geometry} onDeleteClick={onDeleteClick} />
+      <ActionButtons
+        geometry={geometry}
+        onEditClick={onEditClick}
+        onDeleteClick={onDeleteClick}
+      />
     </div>
   );
 }

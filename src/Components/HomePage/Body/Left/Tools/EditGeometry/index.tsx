@@ -4,8 +4,8 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import Buttons from "./Buttons";
 import SingleGeometry from "./SingleGeometry";
 import ConfirmationModal from "./ConfirmationModal";
+import EditForm, { GeometryEditDraft } from "./EditForm";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
-import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useDeleteData } from "utils/useDeleteData";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
@@ -19,7 +19,7 @@ export default function EditGeometry() {
     const [selectedGeometry, setSelectedGeometry] = useState<Geometry | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const content = useContent();
+    const [editingGeometry, setEditingGeometry] = useState<Geometry | null>(null);
     const logAction = useLogAction();
     const { deleteData, loading } = useDeleteData(`/geometries`);
 
@@ -48,6 +48,35 @@ export default function EditGeometry() {
                 .includes(filterTerm.toLowerCase())
         );
     }, [dbGeometries, filterTerm]);
+
+    const handleEditClick = (geometry: Geometry) => {
+        setEditingGeometry(geometry);
+        logAction({
+            message: "User opened edit geometry form",
+            step: "Edit Geometry",
+            newData: {
+                geometryId: geometry.id,
+                omschrijving: geometry.omschrijving || `Geometrie ${geometry.id}`,
+            },
+        });
+    };
+
+    const handleEditCancel = () => {
+        setEditingGeometry(null);
+    };
+
+    const handleEditSave = (draft: GeometryEditDraft) => {
+        logAction({
+            message: "User saved geometry form (API pending)",
+            step: "Edit Geometry",
+            newData: {
+                omschrijving: draft.omschrijving,
+                organisatie: draft.organisatie,
+            },
+        });
+        // Backend: PATCH geometry — to be implemented
+        setEditingGeometry(null);
+    };
 
     const handleDeleteClick = (geometry: Geometry) => {
         setSelectedGeometry(geometry);
@@ -102,27 +131,38 @@ export default function EditGeometry() {
 
     return (
         <>
-            <Header setFilterTerm={setFilterTerm} />
+            {editingGeometry ? (
+                <EditForm
+                    geometry={editingGeometry}
+                    onCancel={handleEditCancel}
+                    onSave={handleEditSave}
+                />
+            ) : (
+                <>
+                    <Header setFilterTerm={setFilterTerm} />
 
-            <ScrollButtonsLayout className="h-[75%]" buttons={<Buttons />}>
-                <div className="pb-40">
-                    {dbGeometries?.length === 0 && (
-                        <div className="flex flex-col items-center justify-center">
-                            <p className="text-center text-gray-400 text-[12px]">
-                                Geen geometrieën gevonden
-                            </p>
+                    <ScrollButtonsLayout className="h-[75%]" buttons={<Buttons />}>
+                        <div className="pb-40">
+                            {dbGeometries?.length === 0 && (
+                                <div className="flex flex-col items-center justify-center">
+                                    <p className="text-center text-gray-400 text-[12px]">
+                                        Geen geometrieën gevonden
+                                    </p>
+                                </div>
+                            )}
+
+                            {filteredGeometries.map((geometry) => (
+                                <SingleGeometry
+                                    key={geometry.id}
+                                    geometry={geometry}
+                                    onEditClick={handleEditClick}
+                                    onDeleteClick={handleDeleteClick}
+                                />
+                            ))}
                         </div>
-                    )}
-
-                    {filteredGeometries.map((geometry) => (
-                        <SingleGeometry
-                            key={geometry.id}
-                            geometry={geometry}
-                            onDeleteClick={handleDeleteClick}
-                        />
-                    ))}
-                </div>
-            </ScrollButtonsLayout>
+                    </ScrollButtonsLayout>
+                </>
+            )}
 
             <ConfirmationModal
                 isOpen={showConfirmModal}
