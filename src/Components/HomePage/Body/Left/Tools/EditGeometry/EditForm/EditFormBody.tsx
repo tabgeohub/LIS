@@ -1,5 +1,9 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import type { GeometryEditDraft } from "./helpers/types";
+import {
+  geometryTypeDutchLabel,
+  selectOptionsWithFallback,
+} from "./helpers/labels";
 import EditFormHeader from "./EditFormHeader";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
@@ -16,21 +20,16 @@ export default function EditFormBody({
   const activities = useGetActiviteiten();
   const organizations = useGetOrganisaties();
 
-  const activiteitOptions = activities.some((opt) => opt.value === draft.activiteit)
-    ? activities
-    : draft.activiteit
-      ? [{ label: draft.activiteit, value: draft.activiteit }, ...activities]
-      : activities;
+  const activiteitOptions = selectOptionsWithFallback(
+    activities,
+    draft.activiteit
+  );
+  const organisatieOptions = selectOptionsWithFallback(
+    organizations,
+    draft.organisatie
+  );
 
-  const organisatieOptions = organizations.some(
-    (opt) => opt.value === draft.organisatie
-  )
-    ? organizations
-    : draft.organisatie
-      ? [{ label: draft.organisatie, value: draft.organisatie }, ...organizations]
-      : organizations;
-
-  const typeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
+  const typeLabel = geometryTypeDutchLabel(geometry.type);
   const pointCount = geometry.points?.length ?? 0;
 
   return (

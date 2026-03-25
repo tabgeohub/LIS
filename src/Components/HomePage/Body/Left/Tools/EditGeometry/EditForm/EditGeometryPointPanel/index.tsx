@@ -48,10 +48,6 @@ export default function EditGeometryPointPanel({
 
         {coordinateSystem === "WGS84" && <Wgs84Fields form={form} patch={patch} />}
         {coordinateSystem === "RD" && <RdFields form={form} patch={patch} />}
-
-        <p className="text-[10px] text-gray-400 pt-2">
-          Opslaan stuurt nog geen data naar de server; backend volgt.
-        </p>
       </div>
     </div>
   );

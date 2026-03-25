@@ -13,6 +13,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { calculateCenterAndZoom } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import useLogAction from "hooks/useLogAction";
 import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import { geometryDisplayName } from "./EditForm/helpers/labels";
 
 export default function EditGeometry() {
     const { dbGeometries, fetchGeometries, setGeometries, setDbGeometries } = useGeometriesStore();
@@ -95,7 +96,7 @@ export default function EditGeometry() {
             step: "Edit Geometry",
             newData: {
                 geometryId: geometry.id,
-                omschrijving: geometry.omschrijving || `Geometrie ${geometry.id}`,
+                omschrijving: geometryDisplayName(geometry),
             },
         });
     };
@@ -191,7 +192,7 @@ export default function EditGeometry() {
             message: "User clicked 'Delete' button to open confirmation modal",
             step: "Edit Geometry",
             newData: {
-                geometry: geometry.omschrijving || `Geometrie ${geometry.id}`,
+                geometry: geometryDisplayName(geometry),
             },
         });
     };
@@ -223,7 +224,7 @@ export default function EditGeometry() {
                     message: "User deleted a geometry",
                     step: "Edit Geometry",
                     newData: {
-                        geometry: selectedGeometry.omschrijving || `Geometrie ${selectedGeometry.id}`,
+                        geometry: geometryDisplayName(selectedGeometry),
                     },
                 });
             });

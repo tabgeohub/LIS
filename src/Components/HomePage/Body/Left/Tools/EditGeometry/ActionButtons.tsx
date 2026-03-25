@@ -1,6 +1,5 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
-import { MdEdit } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 
 export default function ActionButtons({
   geometry,

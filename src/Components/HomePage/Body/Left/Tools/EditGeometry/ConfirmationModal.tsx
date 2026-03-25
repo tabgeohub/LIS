@@ -4,6 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { geometryDisplayName } from "./EditForm/helpers/labels";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -32,14 +33,16 @@ export default function ConfirmationModal({
       setIsOpen={setIsOpen}
     >
       <div className="">
-        <div className="flex justify-between items-center px-2 py-2">
-          <p></p>
-
+        <div className="relative flex items-center justify-center px-2 py-2">
           <p className="text-gray-500 text-[16px]">
             {content.common.verwijderen}
           </p>
-
-          <button onClick={() => setIsOpen(false)}>
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5"
+            onClick={() => setIsOpen(false)}
+            aria-label="Sluiten"
+          >
             <IoMdClose className="text-gray-500 text-lg" />
           </button>
         </div>
@@ -48,7 +51,13 @@ export default function ConfirmationModal({
 
         <div className="py-2 px-3">
           <p className="text-[14px] text-gray-700">
-            Weet je zeker dat je <strong>{selectedGeometry?.omschrijving || `Geometrie ${selectedGeometry?.id}`}</strong> wilt verwijderen?
+            Weet je zeker dat je{" "}
+            <strong>
+              {selectedGeometry
+                ? geometryDisplayName(selectedGeometry)
+                : "deze geometrie"}
+            </strong>{" "}
+            wilt verwijderen?
           </p>
 
           <div className="flex justify-end mt-6 gap-x-2">

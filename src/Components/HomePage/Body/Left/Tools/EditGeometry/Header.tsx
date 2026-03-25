@@ -1,4 +1,3 @@
-import { useContent } from "hooks/useContent";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 
 export default function Header({
@@ -7,7 +6,6 @@ export default function Header({
   setFilterTerm: (value: string) => void;
 }) {
   const { dbGeometries } = useGeometriesStore();
-  const content = useContent();
 
   return (
     <>

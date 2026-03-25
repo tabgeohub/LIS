@@ -2,6 +2,7 @@ import { Geometry } from "hooks/features/useGeometriesStore";
 import { TbPolygon, TbLine } from "react-icons/tb";
 import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
 import ActionButtons from "./ActionButtons";
+import { geometryDisplayName, geometryTypeDutchLabel } from "./EditForm/helpers/labels";
 
 export default function SingleGeometry({
   geometry,
@@ -31,7 +32,7 @@ export default function SingleGeometry({
 
         <div className="flex-1">
           <p className="text-gray-900 text-[14px]">
-            {geometry.omschrijving || `Geometrie ${geometry.id}`}
+            {geometryDisplayName(geometry)}
           </p>
           <p className="text-[10px] text-gray-500 mt-0.5">
             Type: {geometryTypeLabel}
