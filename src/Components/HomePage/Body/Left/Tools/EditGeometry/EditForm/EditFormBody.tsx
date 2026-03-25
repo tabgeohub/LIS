@@ -1,5 +1,5 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
-import type { GeometryEditDraft } from "./types";
+import type { GeometryEditDraft } from "./helpers/types";
 import EditFormHeader from "./EditFormHeader";
 
 export default function EditFormBody({
@@ -131,8 +131,9 @@ export default function EditFormBody({
             Punten
           </label>
           <p className="text-[12px] text-gray-600">
-            {pointCount} punt{pointCount !== 1 ? "en" : ""} (coördinaten
-            bewerken volgt met backend)
+            {pointCount} punt{pointCount !== 1 ? "en" : ""}. Gebruik onderaan{" "}
+            <span className="font-medium">Punten bewerken</span> om coördinaten
+            per punt aan te passen.
           </p>
         </div>
       </div>

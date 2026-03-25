@@ -4,17 +4,24 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import Buttons from "./Buttons";
 import SingleGeometry from "./SingleGeometry";
 import ConfirmationModal from "./ConfirmationModal";
-import EditForm, { GeometryEditDraft } from "./EditForm";
+import EditForm, { GeometryEditDraft, GeometryPointRow } from "./EditForm";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useDeleteData } from "utils/useDeleteData";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { calculateCenterAndZoom } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import useLogAction from "hooks/useLogAction";
+import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
 
 export default function EditGeometry() {
     const { dbGeometries, fetchGeometries, setGeometries, setDbGeometries } = useGeometriesStore();
     const { user } = useAuth();
     const { mapView, geometriesGraphicsLayer, yellowGraphicsLayer, pointsGraphicsLayer } = useMapViewState();
+    const {
+        handleRemoveHoveredGeometry,
+        addEditGeometryHighlight,
+        removeEditGeometryHighlight,
+    } = useGeometryHover();
     const [filterTerm, setFilterTerm] = useState("");
     const [selectedGeometry, setSelectedGeometry] = useState<Geometry | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -50,7 +57,35 @@ export default function EditGeometry() {
     }, [dbGeometries, filterTerm]);
 
     const handleEditClick = (geometry: Geometry) => {
+        handleRemoveHoveredGeometry();
+        addEditGeometryHighlight(geometry);
         setEditingGeometry(geometry);
+
+        if (mapView && geometry.points?.length) {
+            const points = geometry.points
+                .filter(
+                    (p) =>
+                        typeof p.latitude === "number" &&
+                        typeof p.longitude === "number" &&
+                        Number.isFinite(p.latitude) &&
+                        Number.isFinite(p.longitude)
+                )
+                .map((p) => ({ latitude: p.latitude, longitude: p.longitude }));
+            if (points.length > 0) {
+                const { center, zoom } = calculateCenterAndZoom(points);
+                mapView.goTo({
+                    target: {
+                        geometry: {
+                            type: "point",
+                            x: center.longitude,
+                            y: center.latitude,
+                        },
+                    },
+                    zoom,
+                });
+            }
+        }
+
         logAction({
             message: "User opened edit geometry form",
             step: "Edit Geometry",
@@ -62,19 +97,25 @@ export default function EditGeometry() {
     };
 
     const handleEditCancel = () => {
+        removeEditGeometryHighlight();
         setEditingGeometry(null);
     };
 
-    const handleEditSave = (draft: GeometryEditDraft) => {
+    const handleEditSave = (
+        draft: GeometryEditDraft,
+        points?: GeometryPointRow[]
+    ) => {
         logAction({
             message: "User saved geometry form (API pending)",
             step: "Edit Geometry",
             newData: {
                 omschrijving: draft.omschrijving,
                 organisatie: draft.organisatie,
+                pointsCount: points?.length,
             },
         });
         // Backend: PATCH geometry — to be implemented
+        removeEditGeometryHighlight();
         setEditingGeometry(null);
     };
 

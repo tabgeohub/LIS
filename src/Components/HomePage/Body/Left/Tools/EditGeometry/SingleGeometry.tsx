@@ -1,5 +1,6 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { TbPolygon, TbLine } from "react-icons/tb";
+import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
 import ActionButtons from "./ActionButtons";
 
 export default function SingleGeometry({
@@ -11,16 +12,23 @@ export default function SingleGeometry({
   onEditClick: (geometry: Geometry) => void;
   onDeleteClick: (geometry: Geometry) => void;
 }) {
+  const { handleHoveredGeometry, handleRemoveHoveredGeometry } =
+    useGeometryHover();
   const geometryTypeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
 
   return (
-    <div className="p-2 transition-all shadow hover:bg-gray-50">
+    <div
+      className="p-2 transition-all shadow hover:bg-gray-50 cursor-pointer"
+      onMouseEnter={() => handleHoveredGeometry(geometry)}
+      onMouseLeave={handleRemoveHoveredGeometry}
+    >
       <div className="flex items-center gap-x-2">
         {geometry.type === "polygon" ? (
           <TbPolygon className="size-5 text-yellow-500" />
         ) : (
           <TbLine className="size-5 text-green-500" />
         )}
+
         <div className="flex-1">
           <p className="text-gray-900 text-[14px]">
             {geometry.omschrijving || `Geometrie ${geometry.id}`}
