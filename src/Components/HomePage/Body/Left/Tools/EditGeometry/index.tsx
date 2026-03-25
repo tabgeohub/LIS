@@ -8,6 +8,7 @@ import EditForm, { GeometryEditDraft, GeometryPointRow } from "./EditForm";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useDeleteData } from "utils/useDeleteData";
+import { useUpdateData } from "utils/useUpdateData";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { calculateCenterAndZoom } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import useLogAction from "hooks/useLogAction";
@@ -28,7 +29,10 @@ export default function EditGeometry() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [editingGeometry, setEditingGeometry] = useState<Geometry | null>(null);
     const logAction = useLogAction();
-    const { deleteData, loading } = useDeleteData(`/geometries`);
+    const { deleteData, loading: isDeletingGeometry } = useDeleteData(`/geometries`);
+    const { update: updateGeometry, loading: isUpdatingGeometry } = useUpdateData(
+        `/geometries/${editingGeometry?.id ?? 0}`
+    );
 
     // Hide points when entering EditGeometry tab
     useEffect(() => {
@@ -105,18 +109,48 @@ export default function EditGeometry() {
         draft: GeometryEditDraft,
         points?: GeometryPointRow[]
     ) => {
-        logAction({
-            message: "User saved geometry form (API pending)",
-            step: "Edit Geometry",
-            newData: {
-                omschrijving: draft.omschrijving,
-                organisatie: draft.organisatie,
-                pointsCount: points?.length,
-            },
+        if (!editingGeometry) return;
+
+        const payload = {
+            id: editingGeometry.id,
+            omschrijving: draft.omschrijving,
+            organisatie: draft.organisatie,
+            activiteit: draft.activiteit,
+            specifiek_letten_op: draft.specifiek_letten_op,
+            vertrouwelijk: draft.vertrouwelijk ? 1 : 0,
+            herhalen: draft.herhalen ? 1 : 0,
+            points: points ?? editingGeometry.points,
+        };
+
+        updateGeometry(payload, (responseData) => {
+            const result = responseData?.result;
+            const updatedGeometry: Geometry = {
+                ...editingGeometry,
+                ...payload,
+                ...(result ?? {}),
+                points: (result?.points ?? payload.points) as Geometry["points"],
+            };
+
+            const updatedGeometries = dbGeometries.map((g) =>
+                g.id === updatedGeometry.id ? updatedGeometry : g
+            );
+            setGeometries(updatedGeometries);
+            setDbGeometries(updatedGeometries);
+
+            logAction({
+                message: "User saved geometry form",
+                step: "Edit Geometry",
+                newData: {
+                    geometryId: updatedGeometry.id,
+                    omschrijving: updatedGeometry.omschrijving,
+                    organisatie: updatedGeometry.organisatie,
+                    pointsCount: updatedGeometry.points?.length,
+                },
+            });
+
+            removeEditGeometryHighlight();
+            setEditingGeometry(null);
         });
-        // Backend: PATCH geometry — to be implemented
-        removeEditGeometryHighlight();
-        setEditingGeometry(null);
     };
 
     const handlePointUpdated = (
@@ -208,6 +242,7 @@ export default function EditGeometry() {
                     onCancel={handleEditCancel}
                     onSave={handleEditSave}
                     onPointUpdated={handlePointUpdated}
+                    isSavingMetadata={isUpdatingGeometry}
                 />
             ) : (
                 <>
@@ -241,7 +276,7 @@ export default function EditGeometry() {
                 setIsOpen={setShowConfirmModal}
                 selectedGeometry={selectedGeometry}
                 handleDelete={handleDelete}
-                loading={loading}
+                loading={isDeletingGeometry}
                 isDeleting={isDeleting}
             />
         </>

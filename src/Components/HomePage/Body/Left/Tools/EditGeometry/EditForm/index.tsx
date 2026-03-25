@@ -27,6 +27,7 @@ export default function EditForm({
   onCancel,
   onSave,
   onPointUpdated,
+  isSavingMetadata = false,
 }: {
   geometry: Geometry;
   onCancel: () => void;
@@ -35,6 +36,7 @@ export default function EditForm({
     updatedPoint: GeometryPointRow,
     allPoints: GeometryPointRow[]
   ) => void;
+  isSavingMetadata?: boolean;
 }) {
   const content = useContent();
   const [draft, setDraft] = useState<GeometryEditDraft>(() =>
@@ -107,7 +109,7 @@ export default function EditForm({
     setHoveredVertexId(null);
     setScreen("pointsList");
     setPointForm(null);
-    // keep selected highlight while user is in pointEdit / pointsList
+    setSelectedVertexId(null);
   }
 
   function handleSubmitPoint(e: React.FormEvent) {
@@ -157,6 +159,7 @@ export default function EditForm({
             annulerenLabel={content.common.annuleren}
             opslaanLabel={content.common.opslaan}
             openPointsEditor={openPointsEditor}
+            isSaving={isSavingMetadata}
           />
         </form>
       )}

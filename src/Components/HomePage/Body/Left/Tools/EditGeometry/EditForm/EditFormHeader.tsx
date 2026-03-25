@@ -13,7 +13,6 @@ export default function EditFormHeader({ geometry }: { geometry: Geometry }) {
         <p className="text-[13px] font-semibold text-gray-800">
           Geometrie bewerken
         </p>
-        <p className="text-[10px] text-gray-500">ID: {geometry.id}</p>
       </div>
     </div>
   );
