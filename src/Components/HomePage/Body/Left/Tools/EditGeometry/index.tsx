@@ -119,6 +119,36 @@ export default function EditGeometry() {
         setEditingGeometry(null);
     };
 
+    const handlePointUpdated = (
+        updatedPoint: GeometryPointRow,
+        allPoints: GeometryPointRow[]
+    ) => {
+        if (!editingGeometry) return;
+
+        const updatedGeometry: Geometry = {
+            ...editingGeometry,
+            points: allPoints,
+        };
+
+        setEditingGeometry(updatedGeometry);
+        addEditGeometryHighlight(updatedGeometry);
+
+        const updateGeometryCollection = (geometries: Geometry[]) =>
+            geometries.map((g) =>
+                g.id === updatedGeometry.id
+                    ? {
+                          ...g,
+                          points: g.points.map((p) =>
+                              p.id === updatedPoint.id ? { ...p, ...updatedPoint } : p
+                          ),
+                      }
+                    : g
+            );
+
+        setGeometries(updateGeometryCollection(dbGeometries));
+        setDbGeometries(updateGeometryCollection(dbGeometries));
+    };
+
     const handleDeleteClick = (geometry: Geometry) => {
         setSelectedGeometry(geometry);
         setShowConfirmModal(true);
@@ -177,6 +207,7 @@ export default function EditGeometry() {
                     geometry={editingGeometry}
                     onCancel={handleEditCancel}
                     onSave={handleEditSave}
+                    onPointUpdated={handlePointUpdated}
                 />
             ) : (
                 <>

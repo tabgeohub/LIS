@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { useContent } from "hooks/useContent";
+import { useUpdateData } from "utils/useUpdateData";
 import EditFormBody from "./EditFormBody";
 import EditFormFooter from "./EditFormFooter";
 import EditGeometryPointsList from "./EditGeometryPointsList";
@@ -25,10 +26,15 @@ export default function EditForm({
   geometry,
   onCancel,
   onSave,
+  onPointUpdated,
 }: {
   geometry: Geometry;
   onCancel: () => void;
   onSave?: (draft: GeometryEditDraft, points?: GeometryPointRow[]) => void;
+  onPointUpdated?: (
+    updatedPoint: GeometryPointRow,
+    allPoints: GeometryPointRow[]
+  ) => void;
 }) {
   const content = useContent();
   const [draft, setDraft] = useState<GeometryEditDraft>(() =>
@@ -42,6 +48,9 @@ export default function EditForm({
   const [hoveredVertexId, setHoveredVertexId] = useState<number | null>(null);
   const [selectedVertexId, setSelectedVertexId] = useState<number | null>(
     null
+  );
+  const { update: updatePoint, loading: isUpdatingPoint } = useUpdateData(
+    `/points/${pointForm?.id ?? 0}`
   );
 
   const showVerticesOnMap = screen === "pointsList" || screen === "pointEdit";
@@ -107,10 +116,24 @@ export default function EditForm({
     const base = pointsDraft.find((p) => p.id === pointForm.id);
     if (!base) return;
     const updated = formToPointRow(base, pointForm);
-    setPointsDraft((prev) =>
-      prev.map((p) => (p.id === updated.id ? updated : p))
-    );
-    backToPointsList();
+    updatePoint(updated, (responseData) => {
+      if (!responseData?.result) return;
+
+      const nextUpdatedPoint = {
+        ...updated,
+        ...responseData.result,
+      } as GeometryPointRow;
+
+      setPointsDraft((prev) => {
+        const nextPoints = prev.map((p) =>
+          p.id === nextUpdatedPoint.id ? nextUpdatedPoint : p
+        );
+        onPointUpdated?.(nextUpdatedPoint, nextPoints);
+        return nextPoints;
+      });
+
+      setPointForm(pointToForm(nextUpdatedPoint));
+    });
   }
 
 
@@ -176,7 +199,7 @@ export default function EditForm({
               Terug naar punten
             </button>
             <button type="submit" className="gray-button">
-              Punt opslaan
+              {isUpdatingPoint ? "Updaten..." : "Update punt"}
             </button>
           </FormFooterBar>
         </form>
