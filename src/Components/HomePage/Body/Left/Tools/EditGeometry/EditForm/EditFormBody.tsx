@@ -1,6 +1,8 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import type { GeometryEditDraft } from "./helpers/types";
 import EditFormHeader from "./EditFormHeader";
+import useGetActiviteiten from "hooks/consts/useGetActiviteis";
+import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 
 export default function EditFormBody({
   geometry,
@@ -11,6 +13,23 @@ export default function EditFormBody({
   draft: GeometryEditDraft;
   setDraft: React.Dispatch<React.SetStateAction<GeometryEditDraft>>;
 }) {
+  const activities = useGetActiviteiten();
+  const organizations = useGetOrganisaties();
+
+  const activiteitOptions = activities.some((opt) => opt.value === draft.activiteit)
+    ? activities
+    : draft.activiteit
+      ? [{ label: draft.activiteit, value: draft.activiteit }, ...activities]
+      : activities;
+
+  const organisatieOptions = organizations.some(
+    (opt) => opt.value === draft.organisatie
+  )
+    ? organizations
+    : draft.organisatie
+      ? [{ label: draft.organisatie, value: draft.organisatie }, ...organizations]
+      : organizations;
+
   const typeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
   const pointCount = geometry.points?.length ?? 0;
 
@@ -46,28 +65,42 @@ export default function EditFormBody({
           <label className="block text-[11px] font-medium text-gray-600 mb-0.5">
             Organisatie
           </label>
-          <input
-            type="text"
+          <select
             value={draft.organisatie}
             onChange={(e) =>
               setDraft((d) => ({ ...d, organisatie: e.target.value }))
             }
-            className="inputClass w-full !p-1.5 text-[12px]"
-          />
+            className={`inputClass w-full !p-1.5 text-[12px] ${
+              draft.organisatie ? "text-black font-semibold" : "text-gray-400"
+            }`}
+          >
+            {organisatieOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
           <label className="block text-[11px] font-medium text-gray-600 mb-0.5">
             Activiteit
           </label>
-          <input
-            type="text"
+          <select
             value={draft.activiteit}
             onChange={(e) =>
               setDraft((d) => ({ ...d, activiteit: e.target.value }))
             }
-            className="inputClass w-full !p-1.5 text-[12px]"
-          />
+            className={`inputClass w-full !p-1.5 text-[12px] ${
+              draft.activiteit ? "text-black font-semibold" : "text-gray-400"
+            }`}
+          >
+            {activiteitOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
