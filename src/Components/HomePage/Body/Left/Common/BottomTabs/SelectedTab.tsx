@@ -8,6 +8,8 @@ import {
 import useLogAction from "hooks/useLogAction";
 import { IconType } from "react-icons";
 import { TbFilterQuestion } from "react-icons/tb";
+import { FaMagnifyingGlassChart } from "react-icons/fa6";
+import { useContent } from "hooks/useContent";
 
 export default function SelectedTab() {
   const { selectedTab } = useTabState();
@@ -15,11 +17,18 @@ export default function SelectedTab() {
     useSelectedBottomTabState();
 
   const logAction = useLogAction();
+  const content = useContent();
 
   const selectedTabItem = [
     ...voorbereidingTabs,
     ...toolsTabs,
     ...nabewerkingTabs,
+    {
+      id: "timeslider",
+      label: content.layout.pages.at(3)!,
+      icon: FaMagnifyingGlassChart,
+      disabled: false,
+    },
     {
       id: "aandachtspuntenFilteren",
       label: "Aandachtspuntent filteren",

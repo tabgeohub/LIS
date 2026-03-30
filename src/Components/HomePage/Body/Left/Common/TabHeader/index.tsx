@@ -68,6 +68,7 @@ export default function TabHeader() {
     aandachtspuntenFilteren: content.layout.tabHeaders.aandachtspuntenFilteren,
     bevragen: content.layout.tabHeaders.bevragen,
     vluchtZoeken: content.layout.tabHeaders.vluchtZoeken,
+    timeslider: content.layout.pages.at(3),
     reuseFlightPlan: content.layout.tabHeaders.reuseFlightPlan,
     waarnemings: content.layout.tabHeaders.waarnemings,
     vluchtplanStatus: content.layout.tabHeaders.vluchtplanStatus,

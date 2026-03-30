@@ -97,7 +97,7 @@ export function useHandleStep2(
 
     const attachmentsByPoint = new Map<
       number,
-      { name: string; blob: Blob }[]
+      import("./types").AttachmentWithMeta[]
     >();
     for (const item of preloadedPoints) {
       attachmentsByPoint.set(item.pointId, item.attachments);
@@ -105,7 +105,7 @@ export function useHandleStep2(
 
     const attachmentsByGeometry = new Map<
       number,
-      { name: string; blob: Blob }[]
+      import("./types").AttachmentWithMeta[]
     >();
     for (const item of preloadedGeometries) {
       attachmentsByGeometry.set(item.geometryId, item.attachments);

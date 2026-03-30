@@ -108,9 +108,10 @@ export type TabType =
   | VoorbereidingTabsType
   | ToolsTabsType
   | NabewerkingTabsType
+  | "timeslider"
   | "aandachtspuntenFilteren";
 
-export type PageType = "voorbereiding" | "nabewerking" | "tools";
+export type PageType = "voorbereiding" | "nabewerking" | "tools" | "timeslider";
 
 export type SpatialReference = "WGS84" | "RD";
 

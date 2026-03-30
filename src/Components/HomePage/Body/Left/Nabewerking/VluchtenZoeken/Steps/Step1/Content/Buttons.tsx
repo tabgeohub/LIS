@@ -3,7 +3,10 @@ import { useEffect } from "react";
 
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { calculateCenterAndZoom } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
+import {
+  calculateCenterAndZoom,
+  collectPointsForCenterAndZoom,
+} from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import useLogAction from "hooks/useLogAction";
 
@@ -31,20 +34,26 @@ export default function Buttons() {
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
 
-    const points = selectedPlan.points_data.sort((a, b) => a.order! - b.order!);
+    const points = collectPointsForCenterAndZoom(selectedPlan);
 
-    let { center, zoom } = calculateCenterAndZoom(points);
-
-    mapView.goTo({
-      target: {
-        geometry: {
-          type: "point",
-          x: center.longitude,
-          y: center.latitude,
-        },
-      },
-      zoom: zoom,
-    });
+    if (points.length > 0) {
+      const { center, zoom } = calculateCenterAndZoom(points);
+      if (
+        Number.isFinite(center.latitude) &&
+        Number.isFinite(center.longitude)
+      ) {
+        mapView.goTo({
+          target: {
+            geometry: {
+              type: "point",
+              x: center.longitude,
+              y: center.latitude,
+            },
+          },
+          zoom: zoom,
+        });
+      }
+    }
 
     logAction({
       message: "User clicked 'Next' button",

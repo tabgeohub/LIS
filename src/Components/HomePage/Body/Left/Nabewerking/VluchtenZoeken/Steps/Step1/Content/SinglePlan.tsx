@@ -1,6 +1,8 @@
 import Polygon from "@arcgis/core/geometry/Polygon";
+import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import dayjs from "dayjs";
 import useLogAction from "hooks/useLogAction";
@@ -8,7 +10,65 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import { useState } from "react";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { LuWaypoints } from "react-icons/lu";
-import { FinishedFlightPlanType } from "Types/finished_plans";
+import {
+  FinishedFlightPlanType,
+  FinishedGeometryType,
+} from "Types/finished_plans";
+
+function geometryCentroid(
+  g: FinishedGeometryType
+): { lat: number; lon: number } | null {
+  if (!g.points?.length) return null;
+  let sumLat = 0;
+  let sumLon = 0;
+  let n = 0;
+  for (const p of g.points) {
+    if (typeof p.latitude === "number" && typeof p.longitude === "number") {
+      sumLat += p.latitude;
+      sumLon += p.longitude;
+      n++;
+    }
+  }
+  if (n === 0) return null;
+  return { lat: sumLat / n, lon: sumLon / n };
+}
+
+function collectPlanLatLon(plan: FinishedFlightPlanType): { lat: number; lon: number }[] {
+  const out: { lat: number; lon: number }[] = [];
+  for (const p of plan.points_data || []) {
+    if (typeof p.latitude === "number" && typeof p.longitude === "number") {
+      out.push({ lat: p.latitude, lon: p.longitude });
+    }
+  }
+  for (const g of plan.geometries || []) {
+    const c = geometryCentroid(g);
+    if (c) out.push(c);
+  }
+  return out;
+}
+
+function addGeometryCentroidMarkers(
+  layer: __esri.GraphicsLayer,
+  plan: FinishedFlightPlanType,
+  symbol: SimpleMarkerSymbol
+) {
+  for (const g of plan.geometries || []) {
+    const c = geometryCentroid(g);
+    if (!c) continue;
+    const pt = new Point({
+      longitude: c.lon,
+      latitude: c.lat,
+      spatialReference: { wkid: 4326 },
+    });
+    layer.add(
+      new Graphic({
+        geometry: pt,
+        symbol,
+        attributes: { kind: "geometry-centroid" },
+      })
+    );
+  }
+}
 
 export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   const { graphicsLayerHover, graphicsLayer } = useMapViewState();
@@ -21,14 +81,13 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   function handleHover() {
     if (!graphicsLayerHover) return;
 
-    let points = plan?.points_data;
+    const coords = collectPlanLatLon(plan);
+    if (coords.length === 0) return;
 
-    if (!points) return;
-
-    const minLat = Math.min(...points.map((p) => p.latitude));
-    const maxLat = Math.max(...points.map((p) => p.latitude));
-    const minLon = Math.min(...points.map((p) => p.longitude));
-    const maxLon = Math.max(...points.map((p) => p.longitude));
+    const minLat = Math.min(...coords.map((c) => c.lat));
+    const maxLat = Math.max(...coords.map((c) => c.lat));
+    const minLon = Math.min(...coords.map((c) => c.lon));
+    const maxLon = Math.max(...coords.map((c) => c.lon));
 
     const polygon = new Polygon({
       rings: [
@@ -55,6 +114,13 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
 
     graphicsLayerHover.add(newPolygonGraphic);
     setPolygonGraphic(newPolygonGraphic);
+
+    const centroidSymbol = new SimpleMarkerSymbol({
+      color: [227, 139, 79, 0.95],
+      size: 9,
+      outline: { color: [180, 90, 40, 1], width: 1 },
+    });
+    addGeometryCentroidMarkers(graphicsLayerHover, plan, centroidSymbol);
   }
 
   function handleMouseLeave() {
@@ -71,14 +137,13 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
 
     graphicsLayer.removeAll();
 
-    let points = plan?.points_data;
+    const coords = collectPlanLatLon(plan);
+    if (coords.length === 0) return;
 
-    if (!points) return;
-
-    const minLat = Math.min(...points.map((p) => p.latitude));
-    const maxLat = Math.max(...points.map((p) => p.latitude));
-    const minLon = Math.min(...points.map((p) => p.longitude));
-    const maxLon = Math.max(...points.map((p) => p.longitude));
+    const minLat = Math.min(...coords.map((c) => c.lat));
+    const maxLat = Math.max(...coords.map((c) => c.lat));
+    const minLon = Math.min(...coords.map((c) => c.lon));
+    const maxLon = Math.max(...coords.map((c) => c.lon));
 
     const polygon = new Polygon({
       rings: [
@@ -105,6 +170,13 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
 
     graphicsLayer.add(newPolygonGraphic);
     setPolygonGraphic(newPolygonGraphic);
+
+    const centroidSymbol = new SimpleMarkerSymbol({
+      color: [0, 200, 80, 0.95],
+      size: 9,
+      outline: { color: [0, 100, 40, 1], width: 1 },
+    });
+    addGeometryCentroidMarkers(graphicsLayer, plan, centroidSymbol);
 
     logAction({
       message: `User clicked on flight plan ${plan.vluchtnummer}`,

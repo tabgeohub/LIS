@@ -27,6 +27,7 @@ import ResultTab from "./Common/ResultTab";
 import SearchedResultsTab from "./Common/SearchedResultsTab";
 import TemplateFlight from "./Voorbereiding/TemplateFlight";
 import DrawingTool from "./Voorbereiding/DrawingTool";
+import TimeSlider from "./TimeSlider";
 
 export default function Left({
   vluchtnummer,
@@ -56,6 +57,7 @@ export default function Left({
     removeFlightPlan: RemoveFlightPlan,
     // Nabewerking
     vluchtZoeken: VluchtenZoeken,
+    timeslider: TimeSlider,
     waarnemings: CreateReport,
     vluchtplanStatus: ChangeFlightPlanStatus,
     // Tools

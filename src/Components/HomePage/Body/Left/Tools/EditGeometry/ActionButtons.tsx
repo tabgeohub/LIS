@@ -1,22 +1,21 @@
-import { useContent } from "hooks/useContent";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import { MdEdit } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 
 export default function ActionButtons({
   geometry,
+  onEditClick,
   onDeleteClick,
 }: {
   geometry: Geometry;
+  onEditClick: (geometry: Geometry) => void;
   onDeleteClick: (geometry: Geometry) => void;
 }) {
-  const content = useContent();
-
   return (
     <div className="text-blue-500 text-xs font-medium mt-2.5 flex items-center gap-x-1">
       <span
-        onClick={() => {
-          console.log("Edit geometry:", geometry.id);
+        onClick={(e) => {
+          e.stopPropagation();
+          onEditClick(geometry);
         }}
         className="cursor-pointer hover:text-blue-600 underline hover:font-semibold transition-all flex items-center gap-x-1"
       >

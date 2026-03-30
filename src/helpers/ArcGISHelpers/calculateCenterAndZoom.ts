@@ -1,5 +1,61 @@
-import { EnrichedPointType } from "Types";
-import { FinishedPointType } from "Types/finished_plans";
+import {
+  FinishedFlightPlanType,
+  FinishedGeometryType,
+} from "Types/finished_plans";
+
+export function geometryCentroid(
+  g: FinishedGeometryType
+): { lat: number; lon: number } | null {
+  if (!g.points?.length) return null;
+  let sumLat = 0;
+  let sumLon = 0;
+  let n = 0;
+  for (const p of g.points) {
+    if (
+      typeof p.latitude === "number" &&
+      typeof p.longitude === "number" &&
+      Number.isFinite(p.latitude) &&
+      Number.isFinite(p.longitude)
+    ) {
+      sumLat += p.latitude;
+      sumLon += p.longitude;
+      n++;
+    }
+  }
+  if (n === 0) return null;
+  return { lat: sumLat / n, lon: sumLon / n };
+}
+
+/** All standalone points plus one centroid per geometry (for map extent / center). */
+export function collectPointsForCenterAndZoom(
+  plan: FinishedFlightPlanType | null | undefined
+): { latitude: number; longitude: number }[] {
+  if (!plan) return [];
+
+  const out: { latitude: number; longitude: number }[] = [];
+  const pointsData = Array.isArray(plan.points_data) ? plan.points_data : [];
+  for (const p of pointsData) {
+    if (
+      typeof p.latitude === "number" &&
+      typeof p.longitude === "number" &&
+      Number.isFinite(p.latitude) &&
+      Number.isFinite(p.longitude)
+    ) {
+      out.push({ latitude: p.latitude, longitude: p.longitude });
+    }
+  }
+
+  const geometries = Array.isArray(plan.geometries) ? plan.geometries : [];
+  for (const g of geometries) {
+    if (!g) continue;
+    const c = geometryCentroid(g);
+    if (c && Number.isFinite(c.lat) && Number.isFinite(c.lon)) {
+      out.push({ latitude: c.lat, longitude: c.lon });
+    }
+  }
+
+  return out;
+}
 
 function haversineDistance(
   lat1: number,
@@ -30,22 +86,34 @@ function calculateZoom(maxDistance: number): number {
   if (maxDistance < 20) return 11; // City to regional
   if (maxDistance < 40) return 10; // Regional
   if (maxDistance < 80) return 9; // Larger regional
-  if (maxDistance < 160) return 8; // Country-wide
+  if (maxDistance < 190) return 8; // Country-wide
 
   return 7; // Continental or global scale
 }
 
 export function calculateCenterAndZoom(
-  points: EnrichedPointType[] | FinishedPointType[]
+  points: Array<{ latitude: number; longitude: number }>
 ): {
   center: { latitude: number; longitude: number };
   zoom: number;
 } {
+  const valid = points.filter(
+    (p) =>
+      p != null && Number.isFinite(p.latitude) && Number.isFinite(p.longitude)
+  );
+
+  if (valid.length === 0) {
+    return {
+      center: { latitude: 52.1326, longitude: 5.2913 },
+      zoom: 8,
+    };
+  }
+
   let sumLat = 0;
   let sumLon = 0;
-  const numPoints = points.length;
+  const numPoints = valid.length;
 
-  points.forEach((point) => {
+  valid.forEach((point) => {
     sumLat += point.latitude;
     sumLon += point.longitude;
   });
@@ -54,8 +122,8 @@ export function calculateCenterAndZoom(
   const centerLon = sumLon / numPoints;
 
   let maxDistance = 0;
-  points.forEach((point) => {
-    points.forEach((otherPoint) => {
+  valid.forEach((point) => {
+    valid.forEach((otherPoint) => {
       const distance = haversineDistance(
         point.latitude,
         point.longitude,

@@ -2,12 +2,15 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { pages } from "../constants";
 import { motion } from "framer-motion";
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import Users from "../Users";
 import Search from "../Search";
 import useLogAction from "hooks/useLogAction";
 
 export default function Pages() {
-  const { selectedPage, setSelectedPage } = useTabState();
+  const { selectedPage, selectedTab, setSelectedPage, setSelectedTab } =
+    useTabState();
+  const { setOpenSideBar } = useOpeSideBarState();
 
   const { user } = useAuth();
 
@@ -25,6 +28,11 @@ export default function Pages() {
             animate={{ opacity: selectedPage === tab.value ? 1 : 0.6 }}
             onClick={() => {
               setSelectedPage(tab.value);
+              if (tab.value === "timeslider") {
+                // Reuse existing left panel flow and content.
+                if (selectedTab !== "timeslider") setSelectedTab("timeslider");
+                setOpenSideBar(true);
+              }
 
               logAction({ message: `User selected ${tab.label} page` });
             }}

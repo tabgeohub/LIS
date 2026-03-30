@@ -42,6 +42,10 @@ export const pages: {
     label: content.layout.pages.at(2)!,
     value: "tools",
   },
+  {
+    label: content.layout.pages.at(3)!,
+    value: "timeslider",
+  },
 ];
 
 export const voorbereidingTabs: {

@@ -3,7 +3,8 @@
     "pages": [
       "Voorbereiding",
       "Nabewerking",
-      "Tools"
+      "Tools",
+      "Timeslider"
     ],
     "login": {
       "notLoggedInWarning": {
@@ -21,6 +22,10 @@
         "annuleren": "Annuleren",
         "uitloggen": "Uitloggen"
       }
+    },
+    "timeslider": {
+      "van": "van",
+      "tot": "Tot"
     },
     "filterSection": {
       "filterBtnTab": "Aandachtspunten filteren",

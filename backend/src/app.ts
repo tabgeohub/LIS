@@ -18,6 +18,7 @@ import keycloakRouter from "./routes/keycloak";
 import constsRouter from "./routes/consts";
 import reportUploadRouter from "./routes/reportUpload";
 import geometriesRouter from "./routes/geometries";
+import timesliderRouter from "./routes/timeslider";
 import { requirePassword, uploadsDir } from "./helpers/requirePassword";
 import session from "express-session";
 import cookieParser from "cookie-parser";
@@ -96,6 +97,7 @@ app.use("/api/templateFlight", templateFlightsRouter);
 app.use("/api/logs", logsRouter);
 app.use("/api/consts", constsRouter);
 app.use("/api/geometries", geometriesRouter);
+app.use("/api/timeslider", timesliderRouter);
 
 /** ---------- Static + Upload/Download ---------- */
 // If you have a gated file browser, keep this; otherwise rely on /api/file-download
