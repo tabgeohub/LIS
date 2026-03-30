@@ -3,6 +3,7 @@ import { pages } from "../constants";
 import { motion } from "framer-motion";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
+import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import Users from "../Users";
 import Search from "../Search";
 import useLogAction from "hooks/useLogAction";
@@ -11,6 +12,7 @@ export default function Pages() {
   const { selectedPage, selectedTab, setSelectedPage, setSelectedTab } =
     useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
+  const { setSelectedBottomTab } = useSelectedBottomTabState();
 
   const { user } = useAuth();
 
@@ -27,6 +29,15 @@ export default function Pages() {
             whileTap={{ scale: 0.95 }}
             animate={{ opacity: selectedPage === tab.value ? 1 : 0.6 }}
             onClick={() => {
+              const leavingTimeSlider =
+                selectedPage === "timeslider" && tab.value !== "timeslider";
+
+              if (leavingTimeSlider) {
+                setOpenSideBar(false);
+                setSelectedTab("none");
+                setSelectedBottomTab("Kaartlagenlijst");
+              }
+
               setSelectedPage(tab.value);
               if (tab.value === "timeslider") {
                 // Reuse existing left panel flow and content.
