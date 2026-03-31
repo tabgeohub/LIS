@@ -1,7 +1,9 @@
-import { useState } from "react";
-import Modal from "Components/HomePage/Body/Common/Modal";
+import { useEffect, useMemo, useState } from "react";
+import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { attachmentDisplayUrl } from "./attachmentDisplayUrl";
-import { usePointPlanImages, type PointPlanImageRow } from "./usePointPlanImages";
+import { pointPlanImagesToAttachments } from "./pointPlanImagesToAttachments";
+import { usePointPlanImages } from "./usePointPlanImages";
 
 export default function SelectedPlanPointImagesPanel({
   pointId,
@@ -14,13 +16,45 @@ export default function SelectedPlanPointImagesPanel({
   regioId: string | undefined;
   isOpen: boolean;
 }) {
-  const [preview, setPreview] = useState<PointPlanImageRow | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const { images, loading, error } = usePointPlanImages({
     pointId,
     planIds,
     regioId,
     enabled: isOpen,
   });
+
+  const { plans } = useTimesliderState();
+  const vluchtnummerByPlanId = useMemo(() => {
+    const m = new Map<number, string>();
+    for (const p of plans) {
+      if (p.vluchtnummer) m.set(p.id, p.vluchtnummer);
+    }
+    return m;
+  }, [plans]);
+
+  const attachments = useMemo(
+    () => pointPlanImagesToAttachments(images),
+    [images]
+  );
+
+  useEffect(() => {
+    if (attachments.length === 0) setGalleryOpen(false);
+  }, [attachments.length]);
+
+  useEffect(() => {
+    if (activeIndex >= attachments.length && attachments.length > 0) {
+      setActiveIndex(attachments.length - 1);
+    }
+  }, [attachments.length, activeIndex]);
+
+  const openGalleryAt = (imageId: number) => {
+    const idx = attachments.findIndex((a) => a.id === imageId);
+    setActiveIndex(idx >= 0 ? idx : 0);
+    setGalleryOpen(true);
+  };
 
   return (
     <div className="space-y-2">
@@ -48,7 +82,7 @@ export default function SelectedPlanPointImagesPanel({
             <button
               key={img.id}
               type="button"
-              onClick={() => setPreview(img)}
+              onClick={() => openGalleryAt(img.id)}
               className="group block min-w-0 overflow-hidden rounded border border-gray-200 bg-gray-50 text-left outline-none ring-primary transition-shadow hover:ring-1 focus-visible:ring-2"
             >
               <div className="h-20 w-full bg-gray-100 sm:h-24">
@@ -68,50 +102,22 @@ export default function SelectedPlanPointImagesPanel({
                 />
               </div>
               <span className="block truncate px-0.5 py-px text-center text-[8px] leading-tight text-gray-500">
-                #{img.plan_id}
+                {vluchtnummerByPlanId.get(img.plan_id) ?? ""}
               </span>
             </button>
           ))}
         </div>
       )}
 
-      <Modal
-        isOpen={preview != null}
-        setIsOpen={(open) => {
-          if (!open) setPreview(null);
-        }}
-        className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-lg bg-white p-3 shadow-xl duration-300 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-      >
-        {preview ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-end gap-2">
-              <a
-                href={attachmentDisplayUrl(preview.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                Open in nieuw tabblad
-              </a>
-              <button
-                type="button"
-                onClick={() => setPreview(null)}
-                className="rounded px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
-              >
-                Sluiten
-              </button>
-            </div>
-            <div className="flex max-h-[min(80vh,720px)] min-h-0 items-center justify-center overflow-auto rounded-md bg-gray-100">
-              <img
-                src={attachmentDisplayUrl(preview.url)}
-                alt=""
-                className="max-h-[min(80vh,720px)] w-full object-contain"
-                decoding="async"
-              />
-            </div>
-          </div>
-        ) : null}
-      </Modal>
+      {attachments.length > 0 && (
+        <ImageGallery
+          isOpen={galleryOpen}
+          setIsOpen={setGalleryOpen}
+          attachments={attachments}
+          activeIndex={activeIndex}
+          setActiveIndex={setActiveIndex}
+        />
+      )}
     </div>
   );
 }
