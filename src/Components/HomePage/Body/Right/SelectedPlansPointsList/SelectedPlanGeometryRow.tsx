@@ -6,29 +6,23 @@ export default function SelectedPlanGeometryRow({
   geometry,
   geometryLabel,
   vluchtnummers,
-  onMouseEnter,
-  onMouseLeave,
   onGoTo,
   onDropdownClick,
+  accordionOpen,
 }: {
   geometry: FinishedGeometryType;
   geometryLabel: string;
   vluchtnummers: string[];
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
   onGoTo: () => void;
   onDropdownClick?: () => void;
+  accordionOpen?: boolean;
 }) {
   const isPolygon = (geometry.geometry_type || "")
     .toLowerCase()
     .includes("polygon");
 
   return (
-    <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className="px-3 py-2 transition-colors hover:bg-gray-50"
-    >
+    <div className="px-3 py-2 transition-colors hover:bg-gray-50">
       <div className="flex items-start gap-2">
         {isPolygon ? (
           <TbPolygon className="mt-0.5 size-4 shrink-0 text-yellow-500" />
@@ -46,6 +40,7 @@ export default function SelectedPlanGeometryRow({
         <SelectedPlanRowActions
           onGoTo={onGoTo}
           onDropdownClick={onDropdownClick}
+          accordionOpen={accordionOpen}
         />
       </div>
     </div>

@@ -4,11 +4,13 @@ import { LuSquareChevronDown } from "react-icons/lu";
 export default function SelectedPlanRowActions({
   onGoTo,
   onDropdownClick,
+  accordionOpen = false,
   goToTitle = "Ga naar op de kaart",
-  dropdownTitle = "Meer opties",
+  dropdownTitle = "Toon of verberg afbeeldingen",
 }: {
   onGoTo: () => void;
   onDropdownClick?: () => void;
+  accordionOpen?: boolean;
   goToTitle?: string;
   dropdownTitle?: string;
 }) {
@@ -30,15 +32,18 @@ export default function SelectedPlanRowActions({
         type="button"
         title={dropdownTitle}
         aria-label={dropdownTitle}
-        aria-haspopup="menu"
-        aria-expanded={false}
+        aria-expanded={accordionOpen}
         onClick={(e) => {
           e.stopPropagation();
           onDropdownClick?.();
         }}
         className="rounded p-1 text-primary transition-colors hover:bg-primary/10 hover:text-primary"
       >
-        <LuSquareChevronDown className="size-[1.125rem]" />
+        <LuSquareChevronDown
+          className={`size-[1.125rem] transition-transform duration-200 ease-out ${
+            accordionOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
     </div>
   );

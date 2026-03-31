@@ -5,24 +5,18 @@ import SelectedPlanRowActions from "./SelectedPlanRowActions";
 export default function SelectedPlanPointRow({
   point,
   vluchtnummers,
-  onMouseEnter,
-  onMouseLeave,
   onGoTo,
   onDropdownClick,
+  accordionOpen,
 }: {
   point: FinishedPointType;
   vluchtnummers: string[];
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
   onGoTo: () => void;
   onDropdownClick?: () => void;
+  accordionOpen?: boolean;
 }) {
   return (
-    <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className="px-3 py-2 transition-colors hover:bg-gray-50"
-    >
+    <div className="px-3 py-2 transition-colors hover:bg-gray-50">
       <div className="flex items-start gap-2">
         <FaMapPin className="mt-0.5 size-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
@@ -36,6 +30,7 @@ export default function SelectedPlanPointRow({
         <SelectedPlanRowActions
           onGoTo={onGoTo}
           onDropdownClick={onDropdownClick}
+          accordionOpen={accordionOpen}
         />
       </div>
     </div>
