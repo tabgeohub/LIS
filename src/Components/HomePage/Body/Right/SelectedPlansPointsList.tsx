@@ -12,7 +12,7 @@ import {
   collectSelectedData,
   drawGeometryHoverSkyBlue,
   drawHoverPin,
-} from "./helpers/selectedPlansPointsListHelpers";
+} from "@helpers/timeslider";
 
 export default function SelectedPlansPointsList() {
   const { plans, selectedPlanIds } = useTimesliderState();

@@ -58,7 +58,8 @@ export function collectSelectedData(
     }
 
     for (const g of plan.geometries || []) {
-      const label = g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`;
+      const label =
+        g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`;
       geometries.push({ geometry: g, vluchtnummer: vn, geometryLabel: label });
     }
   }
