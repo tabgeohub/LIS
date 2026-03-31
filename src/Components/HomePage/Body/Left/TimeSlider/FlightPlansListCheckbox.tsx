@@ -11,6 +11,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Graphic from "@arcgis/core/Graphic";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import Polygon from "@arcgis/core/geometry/Polygon";
+import Point from "@arcgis/core/geometry/Point";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
@@ -107,12 +108,11 @@ export default function FlightPlansListCheckbox() {
         if (!coords) continue;
         yellowGraphicsLayer.add(
           new Graphic({
-            geometry: {
-              type: "point",
+            geometry: new Point({
               longitude: coords.longitude,
               latitude: coords.latitude,
               spatialReference: { wkid: 4326 },
-            } as __esri.PointProperties,
+            }),
             symbol: pointSymbol,
             attributes: {
               label: TIMESLIDER_HIGHLIGHT_LABEL,
