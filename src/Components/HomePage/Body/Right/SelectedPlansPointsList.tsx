@@ -69,7 +69,7 @@ export default function SelectedPlansPointsList() {
           <div className="divide-y">
             {listItems.map((item) => {
               if (item.type === "point") {
-                const { point, vluchtnummer } = item;
+                const { point, vluchtnummers } = item;
                 return (
                   <div
                     key={item.key}
@@ -83,14 +83,16 @@ export default function SelectedPlansPointsList() {
                         <p className="text-[12px] font-medium text-gray-800 truncate">
                           {point.omschrijving || `Punt ${point.id}`}
                         </p>
-                        <p className="text-[10px] text-gray-500">{vluchtnummer}</p>
+                        <p className="text-[10px] text-gray-500 break-words">
+                          {vluchtnummers.join(" / ")}
+                        </p>
                       </div>
                     </div>
                   </div>
                 );
               }
 
-              const { geometry, vluchtnummer, geometryLabel } = item;
+              const { geometry, vluchtnummers, geometryLabel } = item;
               const isPolygon = (geometry.geometry_type || "")
                 .toLowerCase()
                 .includes("polygon");
@@ -112,8 +114,8 @@ export default function SelectedPlansPointsList() {
                       <p className="text-[12px] font-medium text-gray-800 truncate">
                         {geometryLabel}
                       </p>
-                      <p className="text-[10px] text-gray-500">
-                        {vluchtnummer}
+                      <p className="text-[10px] text-gray-500 break-words">
+                        {vluchtnummers.join(" / ")}
                       </p>
                     </div>
                   </div>
