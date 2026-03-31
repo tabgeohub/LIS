@@ -7,9 +7,9 @@ import { refreshToken } from "@helpers/refreshToken";
 
 import "@arcgis/core/assets/esri/themes/light/main.css";
 import Dashboard from "Components/DashboardPage";
-import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 
 export default function App() {
   useEffect(() => {
@@ -45,7 +45,9 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+
         <Route path="/dashboard" element={<Dashboard />} />
+
         <Route path="/images" element={<TimesliderItemDetailPage />} />
       </Routes>
 
