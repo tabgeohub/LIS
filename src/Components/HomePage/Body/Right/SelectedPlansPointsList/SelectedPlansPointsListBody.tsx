@@ -3,7 +3,7 @@ import type { SelectedListItem } from "@helpers/timeslider";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
-import SelectedPlanGeometryAccordionPlaceholder from "./SelectedPlanGeometryAccordionPlaceholder";
+import SelectedPlanGeometryImagesPanel from "./SelectedPlanGeometryImagesPanel";
 import SelectedPlanGeometryRow from "./SelectedPlanGeometryRow";
 import SelectedPlanPointImagesPanel from "./SelectedPlanPointImagesPanel";
 import SelectedPlanPointRow from "./SelectedPlanPointRow";
@@ -76,7 +76,14 @@ export default function SelectedPlansPointsListBody({
                   isOpen={isOpen}
                 />
               ) : (
-                <SelectedPlanGeometryAccordionPlaceholder />
+                <SelectedPlanGeometryImagesPanel
+                  geometryId={item.geometry.id}
+                  planIds={selectedPlanIds}
+                  regioId={
+                    user.role ? String(user.role) : undefined
+                  }
+                  isOpen={isOpen}
+                />
               )}
             </SelectedPlanRowAccordionPanel>
           </div>
