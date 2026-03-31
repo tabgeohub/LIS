@@ -5,13 +5,7 @@ import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimeRange } from "hooks/useTimeRange";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import {
-  format,
-  differenceInMilliseconds,
-  startOfMonth,
-  endOfMonth,
-  parseISO,
-} from "date-fns";
+import { format, differenceInMilliseconds, parseISO } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 
 const FALLBACK_MIN = new Date(2024, 0, 1);
@@ -34,8 +28,9 @@ export default function HeadButtonsTimeslider() {
     if (range.from && range.to) {
       const fromDate = parseISO(range.from);
       const toDate = parseISO(range.to);
-      if (!isNaN(fromDate.getTime())) min = startOfMonth(fromDate);
-      if (!isNaN(toDate.getTime())) max = endOfMonth(toDate);
+      // Exact inspectiedatum bounds (no month padding)
+      if (!isNaN(fromDate.getTime())) min = fromDate;
+      if (!isNaN(toDate.getTime())) max = toDate;
     }
     if (min > max) [min, max] = [max, min];
     return {
@@ -69,7 +64,7 @@ export default function HeadButtonsTimeslider() {
 
   useEffect(() => {
     setValues([0, maxStep]);
-  }, [maxStep]);
+  }, [maxStep, range.from, range.to]);
 
   const safeValues: [number, number] = useMemo(() => {
     const from = Math.max(0, Math.min(values[0], maxStep));

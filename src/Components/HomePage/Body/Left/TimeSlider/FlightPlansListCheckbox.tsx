@@ -18,6 +18,17 @@ import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 
 const TIMESLIDER_HIGHLIGHT_LABEL = "timeslider-selected-plan-highlight";
 
+/** Newest first (inspectiedatum, then created_at as fallback). */
+function sortPlansNewestFirst(plans: FinishedFlightPlanType[]) {
+  return [...plans].sort((a, b) => {
+    const ta = dayjs(a.datum || a.created_at).valueOf();
+    const tb = dayjs(b.datum || b.created_at).valueOf();
+    const sa = Number.isFinite(ta) ? ta : 0;
+    const sb = Number.isFinite(tb) ? tb : 0;
+    return sb - sa;
+  });
+}
+
 function removeTimesliderHighlights(layer: __esri.GraphicsLayer) {
   layer.graphics
     .toArray()
@@ -56,7 +67,7 @@ export default function FlightPlansListCheckbox() {
           params: { regio_id: user.role, from: fromStr, to: toStr },
         }
       )
-      .then((res) => setPlans(res.data || []))
+      .then((res) => setPlans(sortPlansNewestFirst(res.data || [])))
       .catch(() => setPlans([]))
       .finally(() => setLoading(false));
   }, [dateFrom, dateTo, user?.role, setPlans, setSelectedPlanIds]);
