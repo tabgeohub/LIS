@@ -170,6 +170,7 @@
   },
   "voorbereiding": {
     "label": "Voorbereiding",
+    "creatieBoxLabel": "Creatie",
     "tabs": {
       "enrichedAddPoint": "Aandachtspunt aanmaken",
       "templateFlights": "Vluchten-template",
