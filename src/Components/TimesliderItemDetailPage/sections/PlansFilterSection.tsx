@@ -2,12 +2,16 @@ import type { FinishedFlightPlanType } from "Types/finished_plans";
 
 type Props = {
   plans: FinishedFlightPlanType[];
+  selectedPlanId: number | null;
+  onSelectPlan: (plan: FinishedFlightPlanType) => void;
   loading: boolean;
   emptyHint?: string;
 };
 
 export default function PlansFilterSection({
   plans,
+  selectedPlanId,
+  onSelectPlan,
   loading,
   emptyHint,
 }: Props) {
@@ -28,15 +32,25 @@ export default function PlansFilterSection({
         <span className="text-xs text-gray-500">Geen plannen</span>
       ) : (
         <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
-          {plans.map((p) => (
-            <span
-              key={p.id}
-              className="inline-flex max-w-[10rem] truncate rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-gray-700 ring-1 ring-gray-200"
-              title={p.vluchtnummer || `Plan ${p.id}`}
-            >
-              {p.vluchtnummer || `#${p.id}`}
-            </span>
-          ))}
+          {plans.map((p) => {
+            const selected = p.id === selectedPlanId;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => onSelectPlan(p)}
+                title={p.vluchtnummer || `Plan ${p.id}`}
+                aria-pressed={selected}
+                className={`inline-flex max-w-[10rem] truncate rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                  selected
+                    ? "bg-primary text-white ring-1 ring-primary"
+                    : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50"
+                }`}
+              >
+                {p.vluchtnummer || `#${p.id}`}
+              </button>
+            );
+          })}
         </div>
       )}
     </section>

@@ -139,9 +139,28 @@ export function useTimesliderImagePageData() {
     return geometryResult.images;
   }, [ok, kind, pointResult.images, geometryResult.images]);
 
+  const [selectedPlan, setSelectedPlan] =
+    useState<FinishedFlightPlanType | null>(null);
+
+  useEffect(() => {
+    if (filteredPlans.length === 0) {
+      setSelectedPlan(null);
+      return;
+    }
+    setSelectedPlan((prev) => {
+      if (prev && filteredPlans.some((p) => p.id === prev.id)) return prev;
+      return filteredPlans[0];
+    });
+  }, [filteredPlans]);
+
+  const rowsForSelectedPlan = useMemo(() => {
+    if (!selectedPlan) return [];
+    return imageRows.filter((r) => r.plan_id === selectedPlan.id);
+  }, [imageRows, selectedPlan]);
+
   const images = useMemo(
-    () => pointPlanImagesToAttachments(imageRows),
-    [imageRows]
+    () => pointPlanImagesToAttachments(rowsForSelectedPlan),
+    [rowsForSelectedPlan]
   );
 
   const imagesLoading = kind === "point" ? pointResult.loading : geometryResult.loading;
@@ -172,6 +191,8 @@ export function useTimesliderImagePageData() {
     to,
     displayTitle,
     filteredPlans,
+    selectedPlan,
+    setSelectedPlan,
     planIds,
     allPlansLoading: plansLoading,
     plansError,

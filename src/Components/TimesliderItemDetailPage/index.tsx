@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import HeaderSection from "./sections/HeaderSection";
 import PlansFilterSection from "./sections/PlansFilterSection";
 import MainImageSection from "./sections/MainImageSection";
@@ -8,6 +8,8 @@ import { useTimesliderImagePageData } from "./useTimesliderImagePageData";
 const PLANS_SECTION_ID = "timeslider-item-plans";
 
 export default function TimesliderItemDetailPage() {
+  const [plansSectionVisible, setPlansSectionVisible] = useState(false);
+
   const {
     queryError,
     invalidQuery,
@@ -15,6 +17,8 @@ export default function TimesliderItemDetailPage() {
     to,
     displayTitle,
     filteredPlans,
+    selectedPlan,
+    setSelectedPlan,
     allPlansLoading,
     plansError,
     needsAuth,
@@ -31,11 +35,27 @@ export default function TimesliderItemDetailPage() {
     ? queryError ?? "Ongeldige link"
     : displayTitle || "—";
 
-  const scrollToPlans = useCallback(() => {
+  const scrollPlansIntoView = useCallback(() => {
     document
       .getElementById(PLANS_SECTION_ID)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
+
+  useEffect(() => {
+    if (!plansSectionVisible) return;
+    const t = window.setTimeout(() => scrollPlansIntoView(), 0);
+    return () => clearTimeout(t);
+  }, [plansSectionVisible, scrollPlansIntoView]);
+
+  const onMeerDatumsBekijken = useCallback(() => {
+    setPlansSectionVisible((visible) => {
+      if (visible) {
+        requestAnimationFrame(() => scrollPlansIntoView());
+        return visible;
+      }
+      return true;
+    });
+  }, [scrollPlansIntoView]);
 
   const plansEmptyHint = invalidQuery
     ? queryError ?? undefined
@@ -70,19 +90,38 @@ export default function TimesliderItemDetailPage() {
       ? images[Math.min(selectedIndex, images.length - 1)] ?? null
       : null;
 
+  const safeIndex = Math.min(
+    selectedIndex,
+    Math.max(0, images.length - 1)
+  );
+  const imageNav =
+    !blockImages && images.length > 1
+      ? {
+          canGoPrevious: safeIndex > 0,
+          canGoNext: safeIndex < images.length - 1,
+          onPrevious: () => setSelectedIndex((i) => Math.max(0, i - 1)),
+          onNext: () =>
+            setSelectedIndex((i) => Math.min(images.length - 1, i + 1)),
+        }
+      : undefined;
+
   return (
     <div className="flex h-screen min-h-0 flex-col bg-gray-100 text-gray-900">
       <HeaderSection
         itemName={headerItemName}
         dateFrom={from}
         dateTo={to}
-        onAllPlansClick={scrollToPlans}
+        onAllPlansClick={onMeerDatumsBekijken}
       />
-      <PlansFilterSection
-        plans={invalidQuery || needsAuth || plansError ? [] : filteredPlans}
-        loading={allPlansLoading}
-        emptyHint={plansEmptyHint}
-      />
+      {plansSectionVisible ? (
+        <PlansFilterSection
+          plans={invalidQuery || needsAuth || plansError ? [] : filteredPlans}
+          selectedPlanId={selectedPlan?.id ?? null}
+          onSelectPlan={setSelectedPlan}
+          loading={allPlansLoading}
+          emptyHint={plansEmptyHint}
+        />
+      ) : null}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <MainImageSection
           attachment={blockImages ? null : selectedAttachment}
@@ -90,6 +129,12 @@ export default function TimesliderItemDetailPage() {
           loading={!blockImages && imagesLoading}
           error={!blockImages ? imagesError : null}
           emptyMessage={emptyMain}
+          imageNav={imageNav}
+          imageIndex={
+            !blockImages && images.length > 0
+              ? { current: safeIndex + 1, total: images.length }
+              : undefined
+          }
         />
       </div>
       <ImagesSelectionSection
