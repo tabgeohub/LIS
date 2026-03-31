@@ -11,6 +11,32 @@ import "react-datepicker/dist/react-datepicker.css";
 const FALLBACK_MIN = new Date(2024, 0, 1);
 const FALLBACK_MAX = new Date(2025, 11, 31);
 const SLIDER_PARTS = 10;
+/** Tailwind theme primary */
+const PRIMARY_HEX = "#0070BC";
+const TRACK_OUTER_HEX = "#e5e7eb";
+
+function TimesliderDateInput({
+  selected,
+  onChange,
+}: {
+  selected: Date;
+  onChange: (date: Date | null) => void;
+}) {
+  return (
+    <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-200 ease-out hover:border-primary/40 hover:shadow-md focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 focus-within:shadow-md">
+      <DatePicker
+        selected={selected}
+        onChange={onChange}
+        dateFormat="dd/MM/yyyy"
+        wrapperClassName="timeslider-datepicker-wrapper"
+        calendarClassName="timeslider-datepicker-calendar"
+        popperClassName="timeslider-datepicker-popper"
+        popperPlacement="bottom-start"
+        className="!border-0 !rounded-lg !shadow-none bg-transparent py-2 px-2.5 w-[118px] !text-xs font-medium text-gray-800 cursor-pointer focus:outline-none"
+      />
+    </div>
+  );
+}
 
 function clampToStepIndex(stepIndex: number, stepCount: number): number {
   return Math.max(0, Math.min(stepCount - 1, stepIndex));
@@ -89,9 +115,6 @@ export default function HeadButtonsTimeslider() {
     );
   }, [dateFrom, dateTo, setDateRange]);
 
-  const minDateStr = format(minDate, "dd/MM/yyyy");
-  const maxDateStr = format(maxDate, "dd/MM/yyyy");
-
   const handleSliderChange = useCallback((newValues: number[]) => {
     setValues([newValues[0], newValues[1]]);
   }, []);
@@ -114,14 +137,14 @@ export default function HeadButtonsTimeslider() {
     values: safeValues,
     min: 0,
     max: maxStep,
-    colors: ["#374151", "#90CAF9", "#374151"],
+    colors: [TRACK_OUTER_HEX, PRIMARY_HEX, TRACK_OUTER_HEX],
   });
 
   if (loading) {
     return (
       <div className="flex gap-x-1">
-        <div className="border-gray-200 border-[1px] px-4 py-[1px] bg-white rounded-sm flex items-center justify-center max-h-[120px] w-full min-h-[60px]">
-          <p className="text-xs text-gray-400">Laden...</p>
+        <div className="border border-gray-200 px-4 py-2 bg-white rounded-lg shadow-sm flex items-center justify-center max-h-[120px] w-full min-h-[60px]">
+          <p className="text-xs text-gray-400 animate-pulse">Laden...</p>
         </div>
       </div>
     );
@@ -129,19 +152,15 @@ export default function HeadButtonsTimeslider() {
 
   return (
     <div className="flex gap-x-1">
-      <div className="border-gray-200 border-[1px] px-4 py-[1px] bg-white rounded-sm flex flex-col justify-between max-h-[120px] w-full">
-        <div className="flex items-center justify-center gap-3 pt-2 pb-1 flex-1 min-h-0">
+      <div className="border border-gray-200 px-4 py-2 bg-white rounded-lg shadow-sm flex flex-col justify-between max-h-[120px] w-full">
+        <div className="flex items-center justify-center gap-3 pt-1 pb-0.5 flex-1 min-h-0">
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-orange-500 text-sm font-medium whitespace-nowrap">
+            <span className="text-gray-600 text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
               {content.layout.timeslider.van}
             </span>
-            <DatePicker
+            <TimesliderDateInput
               selected={dateFrom}
               onChange={handleFromChange}
-              dateFormat="dd/MM/yyyy"
-              minDate={minDate}
-              maxDate={maxDate}
-              className="inputClass !py-1 !text-xs w-[110px] cursor-pointer"
             />
           </div>
 
@@ -157,9 +176,9 @@ export default function HeadButtonsTimeslider() {
                   {...props}
                   style={{
                     ...props.style,
-                    height: "8px",
+                    height: "10px",
                     width: "100%",
-                    borderRadius: "4px",
+                    borderRadius: "9999px",
                     background: trackBackground,
                   }}
                 >
@@ -172,14 +191,15 @@ export default function HeadButtonsTimeslider() {
                 <div
                   key={key}
                   {...restProps}
+                  className="transition-shadow duration-200 ease-out hover:shadow-[0_0_0_4px_rgba(0,112,188,0.22)] active:shadow-[0_0_0_3px_rgba(0,112,188,0.35)]"
                   style={{
                     ...style,
-                    height: "18px",
-                    width: "18px",
+                    height: "20px",
+                    width: "20px",
                     borderRadius: "50%",
-                    backgroundColor: "#90CAF9",
-                    border: "2px solid #1e293b",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                    backgroundColor: PRIMARY_HEX,
+                    border: "2px solid white",
+                    boxShadow: "0 2px 8px rgba(0, 112, 188, 0.4)",
                     outline: "none",
                   }}
                 />
@@ -189,21 +209,17 @@ export default function HeadButtonsTimeslider() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <DatePicker
+            <TimesliderDateInput
               selected={dateTo}
               onChange={handleToChange}
-              dateFormat="dd/MM/yyyy"
-              minDate={minDate}
-              maxDate={maxDate}
-              className="inputClass !py-1 !text-xs w-[110px] cursor-pointer"
             />
-            <span className="text-orange-500 text-sm font-medium whitespace-nowrap">
+            <span className="text-gray-600 text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
               {content.layout.timeslider.tot}
             </span>
           </div>
         </div>
 
-        <p className="text-[10px] text-gray-400 tracking-normal text-center mt-1">
+        <p className="text-[11px] text-gray-500 tracking-normal text-center mt-1 font-medium">
           {format(dateFrom, "dd/MM/yyyy")} – {format(dateTo, "dd/MM/yyyy")}
         </p>
       </div>
