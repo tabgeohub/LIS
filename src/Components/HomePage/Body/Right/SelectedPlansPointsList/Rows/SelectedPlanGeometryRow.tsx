@@ -6,14 +6,14 @@ export default function SelectedPlanGeometryRow({
   geometry,
   geometryLabel,
   vluchtnummers,
-  onGoTo,
+  detailHref,
   onDropdownClick,
   accordionOpen,
 }: {
   geometry: FinishedGeometryType;
   geometryLabel: string;
   vluchtnummers: string[];
-  onGoTo: () => void;
+  detailHref: string;
   onDropdownClick?: () => void;
   accordionOpen?: boolean;
 }) {
@@ -38,7 +38,7 @@ export default function SelectedPlanGeometryRow({
           </p>
         </div>
         <SelectedPlanRowActions
-          onGoTo={onGoTo}
+          detailHref={detailHref}
           onDropdownClick={onDropdownClick}
           accordionOpen={accordionOpen}
         />

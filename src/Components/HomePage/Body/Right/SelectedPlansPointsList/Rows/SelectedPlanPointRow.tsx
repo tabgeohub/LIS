@@ -5,13 +5,13 @@ import SelectedPlanRowActions from "./SelectedPlanRowActions";
 export default function SelectedPlanPointRow({
   point,
   vluchtnummers,
-  onGoTo,
+  detailHref,
   onDropdownClick,
   accordionOpen,
 }: {
   point: FinishedPointType;
   vluchtnummers: string[];
-  onGoTo: () => void;
+  detailHref: string;
   onDropdownClick?: () => void;
   accordionOpen?: boolean;
 }) {
@@ -28,7 +28,7 @@ export default function SelectedPlanPointRow({
           </p>
         </div>
         <SelectedPlanRowActions
-          onGoTo={onGoTo}
+          detailHref={detailHref}
           onDropdownClick={onDropdownClick}
           accordionOpen={accordionOpen}
         />

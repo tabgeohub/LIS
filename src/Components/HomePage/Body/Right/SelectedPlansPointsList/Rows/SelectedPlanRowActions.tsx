@@ -2,32 +2,31 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { LuSquareChevronDown } from "react-icons/lu";
 
 export default function SelectedPlanRowActions({
-  onGoTo,
+  detailHref,
   onDropdownClick,
   accordionOpen = false,
-  goToTitle = "Ga naar op de kaart",
+  externalLinkTitle = "Open details in nieuw tabblad",
   dropdownTitle = "Toon of verberg afbeeldingen",
 }: {
-  onGoTo: () => void;
+  detailHref: string;
   onDropdownClick?: () => void;
   accordionOpen?: boolean;
-  goToTitle?: string;
+  externalLinkTitle?: string;
   dropdownTitle?: string;
 }) {
   return (
     <div className="ml-auto flex shrink-0 items-center gap-0.5 self-start pt-0.5">
-      <button
-        type="button"
-        title={goToTitle}
-        aria-label={goToTitle}
-        onClick={(e) => {
-          e.stopPropagation();
-          onGoTo();
-        }}
+      <a
+        href={detailHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={externalLinkTitle}
+        aria-label={externalLinkTitle}
+        onClick={(e) => e.stopPropagation()}
         className="rounded p-1 text-primary transition-colors hover:bg-primary/10 hover:text-primary"
       >
         <FaExternalLinkAlt className="size-3.5" />
-      </button>
+      </a>
       <button
         type="button"
         title={dropdownTitle}

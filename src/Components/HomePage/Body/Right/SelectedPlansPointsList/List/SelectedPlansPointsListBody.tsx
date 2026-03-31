@@ -3,6 +3,7 @@ import type { SelectedListItem } from "@helpers/timeslider";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
+import { buildTimesliderItemDetailHref } from "../Common/buildTimesliderItemDetailHref";
 import SelectedPlanGeometryImagesPanel from "../Images/SelectedPlanGeometryImagesPanel";
 import SelectedPlanPointImagesPanel from "../Images/SelectedPlanPointImagesPanel";
 import SelectedPlanGeometryRow from "../Rows/SelectedPlanGeometryRow";
@@ -14,18 +15,14 @@ export default function SelectedPlansPointsListBody({
   onPointEnter,
   onGeometryEnter,
   onLeave,
-  onGoToPoint,
-  onGoToGeometry,
 }: {
   items: SelectedListItem[];
   onPointEnter: (point: FinishedPointType) => void;
   onGeometryEnter: (geometry: FinishedGeometryType) => void;
   onLeave: () => void;
-  onGoToPoint: (point: FinishedPointType) => void;
-  onGoToGeometry: (geometry: FinishedGeometryType) => void;
 }) {
   const { user } = useAuth();
-  const { selectedPlanIds } = useTimesliderState();
+  const { selectedPlanIds, dateFrom, dateTo } = useTimesliderState();
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const toggleAccordion = (key: string) => {
@@ -51,7 +48,12 @@ export default function SelectedPlansPointsListBody({
               <SelectedPlanPointRow
                 point={item.point}
                 vluchtnummers={item.vluchtnummers}
-                onGoTo={() => onGoToPoint(item.point)}
+                detailHref={buildTimesliderItemDetailHref({
+                  kind: "point",
+                  id: item.point.id,
+                  dateFrom,
+                  dateTo,
+                })}
                 onDropdownClick={() => toggleAccordion(item.key)}
                 accordionOpen={isOpen}
               />
@@ -60,7 +62,12 @@ export default function SelectedPlansPointsListBody({
                 geometry={item.geometry}
                 geometryLabel={item.geometryLabel}
                 vluchtnummers={item.vluchtnummers}
-                onGoTo={() => onGoToGeometry(item.geometry)}
+                detailHref={buildTimesliderItemDetailHref({
+                  kind: "geometry",
+                  id: item.geometry.id,
+                  dateFrom,
+                  dateTo,
+                })}
                 onDropdownClick={() => toggleAccordion(item.key)}
                 accordionOpen={isOpen}
               />

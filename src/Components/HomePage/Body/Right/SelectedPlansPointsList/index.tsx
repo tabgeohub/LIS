@@ -2,14 +2,12 @@ import SelectedPlansPointsListBody from "./List/SelectedPlansPointsListBody";
 import SelectedPlansPointsListEmpty from "./List/SelectedPlansPointsListEmpty";
 import SelectedPlansPointsListHeader from "./List/SelectedPlansPointsListHeader";
 import { useSelectedPlansListData } from "./Common/useSelectedPlansListData";
-import { useTimesliderListGoTo } from "./Common/useTimesliderListGoTo";
 import { useTimesliderRightListHover } from "./Common/useTimesliderRightListHover";
 
 export default function SelectedPlansPointsList() {
   const listItems = useSelectedPlansListData();
   const { onPointEnter, onGeometryEnter, onLeave } =
     useTimesliderRightListHover();
-  const { goToPoint, goToGeometry } = useTimesliderListGoTo();
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -23,8 +21,6 @@ export default function SelectedPlansPointsList() {
             onPointEnter={onPointEnter}
             onGeometryEnter={onGeometryEnter}
             onLeave={onLeave}
-            onGoToPoint={goToPoint}
-            onGoToGeometry={goToGeometry}
           />
         )}
       </div>
