@@ -1,8 +1,11 @@
 import { useState } from "react";
 import type { SelectedListItem } from "@helpers/timeslider";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
-import SelectedPlanAccordionImagePlaceholder from "./SelectedPlanAccordionImagePlaceholder";
+import SelectedPlanGeometryAccordionPlaceholder from "./SelectedPlanGeometryAccordionPlaceholder";
 import SelectedPlanGeometryRow from "./SelectedPlanGeometryRow";
+import SelectedPlanPointImagesPanel from "./SelectedPlanPointImagesPanel";
 import SelectedPlanPointRow from "./SelectedPlanPointRow";
 import SelectedPlanRowAccordionPanel from "./SelectedPlanRowAccordionPanel";
 
@@ -21,6 +24,8 @@ export default function SelectedPlansPointsListBody({
   onGoToPoint: (point: FinishedPointType) => void;
   onGoToGeometry: (geometry: FinishedGeometryType) => void;
 }) {
+  const { user } = useAuth();
+  const { selectedPlanIds } = useTimesliderState();
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const toggleAccordion = (key: string) => {
@@ -61,7 +66,18 @@ export default function SelectedPlansPointsListBody({
               />
             )}
             <SelectedPlanRowAccordionPanel open={isOpen}>
-              <SelectedPlanAccordionImagePlaceholder />
+              {item.type === "point" ? (
+                <SelectedPlanPointImagesPanel
+                  pointId={item.point.id}
+                  planIds={selectedPlanIds}
+                  regioId={
+                    user.role ? String(user.role) : undefined
+                  }
+                  isOpen={isOpen}
+                />
+              ) : (
+                <SelectedPlanGeometryAccordionPlaceholder />
+              )}
             </SelectedPlanRowAccordionPanel>
           </div>
         );
