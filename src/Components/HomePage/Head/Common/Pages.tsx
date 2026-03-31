@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import {
+  clearRightListHover,
+  removeTimesliderHighlights,
+} from "@helpers/timeslider";
 import Users from "../Users";
 import Search from "../Search";
 import useLogAction from "hooks/useLogAction";
@@ -13,6 +19,9 @@ export default function Pages() {
     useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
   const { setSelectedBottomTab } = useSelectedBottomTabState();
+  const resetTimeslider = useTimesliderState((s) => s.reset);
+  const yellowGraphicsLayer = useMapViewState((s) => s.yellowGraphicsLayer);
+  const graphicsLayerHover = useMapViewState((s) => s.graphicsLayerHover);
 
   const { user } = useAuth();
 
@@ -33,6 +42,13 @@ export default function Pages() {
                 selectedPage === "timeslider" && tab.value !== "timeslider";
 
               if (leavingTimeSlider) {
+                if (yellowGraphicsLayer) {
+                  removeTimesliderHighlights(yellowGraphicsLayer);
+                }
+                if (graphicsLayerHover) {
+                  clearRightListHover(graphicsLayerHover);
+                }
+                resetTimeslider();
                 setOpenSideBar(false);
                 setSelectedTab("none");
                 setSelectedBottomTab("Kaartlagenlijst");

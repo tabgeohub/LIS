@@ -10,6 +10,8 @@ export const useTimesliderState = create<{
   setPlans: (plans: FinishedFlightPlanType[]) => void;
   setSelectedPlanIds: (ids: number[]) => void;
   togglePlan: (id: number) => void;
+  /** Clears range, plans, and selection (e.g. when leaving the Timeslider page). */
+  reset: () => void;
 }>((set) => ({
   dateFrom: "",
   dateTo: "",
@@ -24,5 +26,12 @@ export const useTimesliderState = create<{
         ? s.selectedPlanIds.filter((x) => x !== id)
         : [...s.selectedPlanIds, id];
       return { selectedPlanIds: next };
+    }),
+  reset: () =>
+    set({
+      dateFrom: "",
+      dateTo: "",
+      selectedPlanIds: [],
+      plans: [],
     }),
 }));
