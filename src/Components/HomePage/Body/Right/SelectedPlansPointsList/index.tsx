@@ -1,9 +1,9 @@
-import SelectedPlansPointsListBody from "./SelectedPlansPointsListBody";
-import SelectedPlansPointsListEmpty from "./SelectedPlansPointsListEmpty";
-import SelectedPlansPointsListHeader from "./SelectedPlansPointsListHeader";
-import { useSelectedPlansListData } from "./useSelectedPlansListData";
-import { useTimesliderListGoTo } from "./useTimesliderListGoTo";
-import { useTimesliderRightListHover } from "./useTimesliderRightListHover";
+import SelectedPlansPointsListBody from "./List/SelectedPlansPointsListBody";
+import SelectedPlansPointsListEmpty from "./List/SelectedPlansPointsListEmpty";
+import SelectedPlansPointsListHeader from "./List/SelectedPlansPointsListHeader";
+import { useSelectedPlansListData } from "./Common/useSelectedPlansListData";
+import { useTimesliderListGoTo } from "./Common/useTimesliderListGoTo";
+import { useTimesliderRightListHover } from "./Common/useTimesliderRightListHover";
 
 export default function SelectedPlansPointsList() {
   const listItems = useSelectedPlansListData();

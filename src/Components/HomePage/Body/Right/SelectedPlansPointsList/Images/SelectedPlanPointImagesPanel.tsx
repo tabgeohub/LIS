@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import { attachmentDisplayUrl } from "./attachmentDisplayUrl";
-import { pointPlanImagesToAttachments } from "./pointPlanImagesToAttachments";
-import { usePointPlanImages } from "./usePointPlanImages";
+import { attachmentDisplayUrl } from "../Common/attachmentDisplayUrl";
+import { pointPlanImagesToAttachments } from "../Common/pointPlanImagesToAttachments";
+import { usePointPlanImages } from "../Common/usePointPlanImages";
 
 export default function SelectedPlanPointImagesPanel({
   pointId,

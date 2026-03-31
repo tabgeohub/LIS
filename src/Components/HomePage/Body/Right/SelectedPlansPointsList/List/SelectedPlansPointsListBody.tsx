@@ -3,11 +3,11 @@ import type { SelectedListItem } from "@helpers/timeslider";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
-import SelectedPlanGeometryImagesPanel from "./SelectedPlanGeometryImagesPanel";
-import SelectedPlanGeometryRow from "./SelectedPlanGeometryRow";
-import SelectedPlanPointImagesPanel from "./SelectedPlanPointImagesPanel";
-import SelectedPlanPointRow from "./SelectedPlanPointRow";
-import SelectedPlanRowAccordionPanel from "./SelectedPlanRowAccordionPanel";
+import SelectedPlanGeometryImagesPanel from "../Images/SelectedPlanGeometryImagesPanel";
+import SelectedPlanPointImagesPanel from "../Images/SelectedPlanPointImagesPanel";
+import SelectedPlanGeometryRow from "../Rows/SelectedPlanGeometryRow";
+import SelectedPlanPointRow from "../Rows/SelectedPlanPointRow";
+import SelectedPlanRowAccordionPanel from "../Rows/SelectedPlanRowAccordionPanel";
 
 export default function SelectedPlansPointsListBody({
   items,

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import { attachmentDisplayUrl } from "./attachmentDisplayUrl";
-import { pointPlanImagesToAttachments } from "./pointPlanImagesToAttachments";
-import { useGeometryPlanImages } from "./useGeometryPlanImages";
+import { attachmentDisplayUrl } from "../Common/attachmentDisplayUrl";
+import { pointPlanImagesToAttachments } from "../Common/pointPlanImagesToAttachments";
+import { useGeometryPlanImages } from "../Common/useGeometryPlanImages";
 
 export default function SelectedPlanGeometryImagesPanel({
   geometryId,
