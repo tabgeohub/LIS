@@ -25,7 +25,8 @@
     },
     "timeslider": {
       "van": "van",
-      "tot": "Tot"
+      "tot": "Tot",
+      "invalidRangeHint": "Einddatum moet op of na de startdatum liggen."
     },
     "filterSection": {
       "filterBtnTab": "Aandachtspunten filteren",
@@ -169,6 +170,7 @@
   },
   "voorbereiding": {
     "label": "Voorbereiding",
+    "creatieBoxLabel": "Creatie",
     "tabs": {
       "enrichedAddPoint": "Aandachtspunt aanmaken",
       "templateFlights": "Vluchten-template",

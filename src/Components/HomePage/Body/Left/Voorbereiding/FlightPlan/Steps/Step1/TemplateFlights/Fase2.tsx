@@ -32,9 +32,6 @@ export default function Fase2({
     );
   }, [flightTemplate, filterTerm]);
 
-
-  console.log({ filteredTemplates })
-
   return (
     <ScrollButtonsLayout
       buttons={

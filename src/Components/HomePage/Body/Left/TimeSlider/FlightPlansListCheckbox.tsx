@@ -7,9 +7,16 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import {
+  sortPlansNewestFirst,
+  removeTimesliderHighlights,
+  drawSelectedPlansYellowHighlights,
+} from "@helpers/timeslider";
 
 export default function FlightPlansListCheckbox() {
   const { user } = useAuth();
+  const { yellowGraphicsLayer } = useMapViewState();
   const {
     dateFrom,
     dateTo,
@@ -38,10 +45,24 @@ export default function FlightPlansListCheckbox() {
           params: { regio_id: user.role, from: fromStr, to: toStr },
         }
       )
-      .then((res) => setPlans(res.data || []))
+      .then((res) => setPlans(sortPlansNewestFirst(res.data || [])))
       .catch(() => setPlans([]))
       .finally(() => setLoading(false));
   }, [dateFrom, dateTo, user?.role, setPlans, setSelectedPlanIds]);
+
+  useEffect(() => {
+    if (!yellowGraphicsLayer) return;
+
+    removeTimesliderHighlights(yellowGraphicsLayer);
+
+    if (selectedPlanIds.length === 0 || plans.length === 0) return;
+
+    drawSelectedPlansYellowHighlights(
+      yellowGraphicsLayer,
+      plans,
+      selectedPlanIds
+    );
+  }, [plans, selectedPlanIds, yellowGraphicsLayer]);
 
   const hasRange = !!dateFrom && !!dateTo;
 
