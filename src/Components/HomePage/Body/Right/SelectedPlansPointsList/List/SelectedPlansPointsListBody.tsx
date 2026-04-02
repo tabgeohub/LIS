@@ -53,6 +53,7 @@ export default function SelectedPlansPointsListBody({
                   id: item.point.id,
                   dateFrom,
                   dateTo,
+                  planId: item.planId,
                 })}
                 onDropdownClick={() => toggleAccordion(item.key)}
                 accordionOpen={isOpen}
@@ -67,6 +68,7 @@ export default function SelectedPlansPointsListBody({
                   id: item.geometry.id,
                   dateFrom,
                   dateTo,
+                  planId: item.planId,
                 })}
                 onDropdownClick={() => toggleAccordion(item.key)}
                 accordionOpen={isOpen}

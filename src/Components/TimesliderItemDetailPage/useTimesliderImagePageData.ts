@@ -20,6 +20,8 @@ type ParsedQuery =
       id: number;
       from: string;
       to: string;
+      /** Present when opening from a specific list row; scopes images to that plan. */
+      planId: number | null;
     }
   | { ok: false; reason: string };
 
@@ -43,7 +45,16 @@ function parseQuery(searchParams: URLSearchParams): ParsedQuery {
   ) {
     return { ok: false, reason: "Ongeldige link (periode)." };
   }
-  return { ok: true, kind, id, from, to };
+  const planIdStr = searchParams.get("plan_id");
+  let planId: number | null = null;
+  if (planIdStr != null && planIdStr !== "") {
+    const pid = Number(planIdStr);
+    if (!Number.isFinite(pid) || pid <= 0) {
+      return { ok: false, reason: "Ongeldige link (plan_id)." };
+    }
+    planId = pid;
+  }
+  return { ok: true, kind, id, from, to, planId };
 }
 
 export function useTimesliderImagePageData() {
@@ -60,6 +71,7 @@ export function useTimesliderImagePageData() {
   const to = ok ? parsed.to : "";
   const itemId = ok ? parsed.id : 0;
   const kind = ok ? parsed.kind : "point";
+  const planIdFromQuery = ok ? parsed.planId : null;
 
   useEffect(() => {
     if (!ok || !user?.role) {
@@ -96,10 +108,12 @@ export function useTimesliderImagePageData() {
     [allPlans, ok, kind, itemId]
   );
 
-  const planIds = useMemo(
-    () => filteredPlans.map((p) => p.id),
-    [filteredPlans]
-  );
+  const planIds = useMemo(() => {
+    const ids = filteredPlans.map((p) => p.id);
+    if (planIdFromQuery == null) return ids;
+    if (ids.includes(planIdFromQuery)) return [planIdFromQuery];
+    return ids;
+  }, [filteredPlans, planIdFromQuery]);
 
   const displayTitle = useMemo(
     () =>
@@ -147,11 +161,18 @@ export function useTimesliderImagePageData() {
       setSelectedPlan(null);
       return;
     }
+    if (planIdFromQuery != null) {
+      const match = filteredPlans.find((p) => p.id === planIdFromQuery);
+      if (match) {
+        setSelectedPlan(match);
+        return;
+      }
+    }
     setSelectedPlan((prev) => {
       if (prev && filteredPlans.some((p) => p.id === prev.id)) return prev;
       return filteredPlans[0];
     });
-  }, [filteredPlans]);
+  }, [filteredPlans, planIdFromQuery]);
 
   const rowsForSelectedPlan = useMemo(() => {
     if (!selectedPlan) return [];
