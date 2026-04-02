@@ -12,6 +12,7 @@ import {
 import { usePointPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/usePointPlanImages";
 import { useGeometryPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/useGeometryPlanImages";
 import { pointPlanImagesToAttachments } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/pointPlanImagesToAttachments";
+import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
 
 type ParsedQuery =
   | {
@@ -108,12 +109,11 @@ export function useTimesliderImagePageData() {
     [allPlans, ok, kind, itemId]
   );
 
-  const planIds = useMemo(() => {
-    const ids = filteredPlans.map((p) => p.id);
-    if (planIdFromQuery == null) return ids;
-    if (ids.includes(planIdFromQuery)) return [planIdFromQuery];
-    return ids;
-  }, [filteredPlans, planIdFromQuery]);
+  /** All matching plans — used for image fetch so every plan can show a thumbnail in the picker. */
+  const planIds = useMemo(
+    () => filteredPlans.map((p) => p.id),
+    [filteredPlans]
+  );
 
   const displayTitle = useMemo(
     () =>
@@ -152,6 +152,16 @@ export function useTimesliderImagePageData() {
     if (kind === "point") return pointResult.images;
     return geometryResult.images;
   }, [ok, kind, pointResult.images, geometryResult.images]);
+
+  /** First image URL per plan for this item (same order as API rows). */
+  const firstImageUrlByPlanId = useMemo(() => {
+    const acc: Record<number, string> = {};
+    for (const row of imageRows) {
+      if (acc[row.plan_id] || !row.url) continue;
+      acc[row.plan_id] = attachmentDisplayUrl(row.url);
+    }
+    return acc;
+  }, [imageRows]);
 
   const [selectedPlan, setSelectedPlan] =
     useState<FinishedFlightPlanType | null>(null);
@@ -219,6 +229,7 @@ export function useTimesliderImagePageData() {
     plansError,
     needsAuth: ok && !user?.role,
     images,
+    firstImageUrlByPlanId,
     imagesLoading,
     imagesError,
     selectedIndex,

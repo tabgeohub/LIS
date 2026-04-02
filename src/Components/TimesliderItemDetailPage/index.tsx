@@ -32,6 +32,7 @@ export default function TimesliderItemDetailPage() {
     setSelectedIndex,
     noPlansInRange,
     noMatchingPlans,
+    firstImageUrlByPlanId,
   } = useTimesliderImagePageData();
 
   const headerItemName = invalidQuery
@@ -110,7 +111,7 @@ export default function TimesliderItemDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-x-0 top-0 z-30 max-h-[min(45vh,15rem)] overflow-y-auto rounded-b-lg shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+              className="absolute inset-x-0 top-0 z-30 max-h-[min(45vh,15rem)] overflow-y-auto rounded-b-lg bg-gray-50 px-3 pb-2 pt-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
             >
               <PlansFilterSection
                 plans={
@@ -120,6 +121,8 @@ export default function TimesliderItemDetailPage() {
                 onSelectPlan={setSelectedPlan}
                 loading={allPlansLoading}
                 emptyHint={plansEmptyHint}
+                firstImageUrlByPlanId={firstImageUrlByPlanId}
+                imagesLoading={imagesLoading}
               />
             </motion.div>
           )}
