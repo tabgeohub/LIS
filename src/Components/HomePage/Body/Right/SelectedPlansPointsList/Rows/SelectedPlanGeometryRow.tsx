@@ -34,6 +34,7 @@ export default function SelectedPlanGeometryRow({
             {geometryLabel}
           </p>
           <p className="break-words text-[10px] text-gray-500">
+            <span className="text-gray-400">Vluchtnummer : </span>
             {vluchtnummers.join(" / ")}
           </p>
         </div>

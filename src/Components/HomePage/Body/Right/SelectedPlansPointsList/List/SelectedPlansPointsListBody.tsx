@@ -22,7 +22,7 @@ export default function SelectedPlansPointsListBody({
   onLeave: () => void;
 }) {
   const { user } = useAuth();
-  const { selectedPlanIds, dateFrom, dateTo } = useTimesliderState();
+  const { dateFrom, dateTo } = useTimesliderState();
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const toggleAccordion = (key: string) => {
@@ -76,7 +76,7 @@ export default function SelectedPlansPointsListBody({
               {item.type === "point" ? (
                 <SelectedPlanPointImagesPanel
                   pointId={item.point.id}
-                  planIds={selectedPlanIds}
+                  planIds={[item.planId]}
                   regioId={
                     user.role ? String(user.role) : undefined
                   }
@@ -85,7 +85,7 @@ export default function SelectedPlansPointsListBody({
               ) : (
                 <SelectedPlanGeometryImagesPanel
                   geometryId={item.geometry.id}
-                  planIds={selectedPlanIds}
+                  planIds={[item.planId]}
                   regioId={
                     user.role ? String(user.role) : undefined
                   }

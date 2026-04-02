@@ -15,17 +15,19 @@ import {
 
 export const TIMESLIDER_RIGHT_HOVER_LABEL = "timeslider-right-list-hover";
 
-/** One row per unique point id; vluchtnummers = distinct plans that include this point. */
+/** One row per point per plan (same point id appears once per plan that contains it). */
 export type PointWithPlan = {
   point: FinishedPointType;
   vluchtnummers: string[];
+  planId: number;
 };
 
-/** One row per unique geometry id; vluchtnummers = distinct plans that include this geometry. */
+/** One row per geometry per plan (same geometry id appears once per plan that contains it). */
 export type GeometryWithPlan = {
   geometry: FinishedGeometryType;
   vluchtnummers: string[];
   geometryLabel: string;
+  planId: number;
 };
 
 export type SelectedListItem =
@@ -34,6 +36,7 @@ export type SelectedListItem =
       type: "point";
       point: FinishedPointType;
       vluchtnummers: string[];
+      planId: number;
     }
   | {
       key: string;
@@ -41,24 +44,15 @@ export type SelectedListItem =
       geometry: FinishedGeometryType;
       geometryLabel: string;
       vluchtnummers: string[];
+      planId: number;
     };
-
-function appendUnique(list: string[], value: string) {
-  if (!list.includes(value)) list.push(value);
-}
 
 export function collectSelectedData(
   plans: FinishedFlightPlanType[],
   selectedIds: number[]
 ): { points: PointWithPlan[]; geometries: GeometryWithPlan[] } {
-  const pointMap = new Map<
-    number,
-    { point: FinishedPointType; vluchtnummers: string[] }
-  >();
-  const geometryMap = new Map<
-    number,
-    { geometry: FinishedGeometryType; vluchtnummers: string[]; geometryLabel: string }
-  >();
+  const points: PointWithPlan[] = [];
+  const geometries: GeometryWithPlan[] = [];
   const selectedSet = new Set(selectedIds);
 
   for (const plan of plans) {
@@ -66,34 +60,26 @@ export function collectSelectedData(
     const vn = plan.vluchtnummer || `Plan ${plan.id}`;
 
     for (const p of plan.points_data || []) {
-      const existing = pointMap.get(p.id);
-      if (!existing) {
-        pointMap.set(p.id, { point: p, vluchtnummers: [vn] });
-      } else {
-        appendUnique(existing.vluchtnummers, vn);
-      }
+      points.push({
+        point: p,
+        vluchtnummers: [vn],
+        planId: plan.id,
+      });
     }
 
     for (const g of plan.geometries || []) {
       const label =
         g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`;
-      const existing = geometryMap.get(g.id);
-      if (!existing) {
-        geometryMap.set(g.id, {
-          geometry: g,
-          vluchtnummers: [vn],
-          geometryLabel: label,
-        });
-      } else {
-        appendUnique(existing.vluchtnummers, vn);
-      }
+      geometries.push({
+        geometry: g,
+        vluchtnummers: [vn],
+        geometryLabel: label,
+        planId: plan.id,
+      });
     }
   }
 
-  return {
-    points: Array.from(pointMap.values()),
-    geometries: Array.from(geometryMap.values()),
-  };
+  return { points, geometries };
 }
 
 export function buildListItems(
@@ -101,18 +87,20 @@ export function buildListItems(
   geometries: GeometryWithPlan[]
 ): SelectedListItem[] {
   return [
-    ...points.map(({ point, vluchtnummers }) => ({
-      key: `point-${point.id}`,
+    ...points.map(({ point, vluchtnummers, planId }) => ({
+      key: `point-${point.id}-plan-${planId}`,
       type: "point" as const,
       point,
       vluchtnummers,
+      planId,
     })),
-    ...geometries.map(({ geometry, vluchtnummers, geometryLabel }) => ({
-      key: `geometry-${geometry.id}`,
+    ...geometries.map(({ geometry, vluchtnummers, geometryLabel, planId }) => ({
+      key: `geometry-${geometry.id}-plan-${planId}`,
       type: "geometry" as const,
       geometry,
       geometryLabel,
       vluchtnummers,
+      planId,
     })),
   ];
 }
