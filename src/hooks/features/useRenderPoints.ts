@@ -8,6 +8,8 @@ import { usePointsStore } from "./usePointsStore";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
@@ -16,7 +18,8 @@ export function useRenderPoints() {
   const { points, fetchPoints } = usePointsStore();
   const { setClickedPointId, setClickedPoint } = usePopUpState();
   const { user } = useAuth();
-  const { selectedTab } = useTabState();
+  const { selectedTab, selectedPage } = useTabState();
+  const timesliderPlans = useTimesliderState((s) => s.plans);
 
   useEffect(() => {
     if (user.user_id === undefined || user.user_id === 0) return;
@@ -48,6 +51,29 @@ export function useRenderPoints() {
       },
     });
 
+    // Timeslider page: only points that belong to the current flight plan list
+    if (selectedPage === "timeslider") {
+      if (timesliderPlans.length === 0) {
+        pointsGraphicsLayer?.removeAll();
+        return;
+      }
+      const { pointIds } = getPointAndGeometryIdsFromPlans(timesliderPlans);
+      const filteredPoints = points.filter((p) => pointIds.has(p.id));
+      const graphicsTs = filteredPoints.map((point) => {
+        const geometry = new Point({
+          x: point.longitude,
+          y: point.latitude,
+        });
+        return new Graphic({
+          geometry,
+          symbol: blueSymbol,
+          attributes: point,
+        });
+      });
+      replaceGraphics(pointsGraphicsLayer, graphicsTs);
+      return;
+    }
+
     const graphics = points.map((point) => {
       const geometry = new Point({
         x: point.longitude,
@@ -62,7 +88,7 @@ export function useRenderPoints() {
     });
 
     replaceGraphics(pointsGraphicsLayer, graphics);
-  }, [map, points, user.user_id, selectedTab]);
+  }, [map, points, user.user_id, selectedTab, selectedPage, timesliderPlans]);
 
   useEffect(() => {
     if (!validateMapView(mapView, pointsGraphicsLayer)) return;

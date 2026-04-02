@@ -216,7 +216,7 @@ export default function HeadButtonsTimeslider() {
   if (loading) {
     return (
       <div className="flex w-full justify-center px-1">
-        <div className="flex min-h-[88px] w-full max-w-5xl items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-2.5 shadow-sm">
+        <div className="flex min-h-[88px] w-full max-w-7xl items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-2.5 shadow-sm">
           <p className="animate-pulse text-xs text-gray-400">Laden...</p>
         </div>
       </div>
@@ -225,7 +225,7 @@ export default function HeadButtonsTimeslider() {
 
   return (
     <div className="flex w-full justify-center px-1">
-      <div className="flex min-h-[88px] w-full max-w-5xl items-center rounded-lg border border-gray-200 bg-white px-6 py-2.5 shadow-sm">
+      <div className="flex min-h-[88px] w-full max-w-7xl items-center rounded-lg border border-gray-200 bg-white px-6 py-2.5 shadow-sm">
         <div className="flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <TimesliderDateField
             variant="from"
@@ -234,7 +234,7 @@ export default function HeadButtonsTimeslider() {
             onChange={handleFromChange}
           />
 
-          <div className="flex min-w-[min(100%,240px)] max-w-2xl flex-[1_1_240px] items-center px-1 sm:px-2">
+          <div className="flex min-w-[min(100%,320px)] max-w-5xl flex-[1_1_400px] items-center px-1 sm:px-2">
             <Range
               step={1}
               min={0}
