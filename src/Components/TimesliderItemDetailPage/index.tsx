@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import HeaderSection from "./sections/HeaderSection";
 import PlansFilterSection from "./sections/PlansFilterSection";
 import MainImageSection from "./sections/MainImageSection";
 import ImagesSelectionSection from "./sections/ImagesSelectionSection";
 import { useTimesliderImagePageData } from "./useTimesliderImagePageData";
-
-const PLANS_SECTION_ID = "timeslider-item-plans";
 
 export default function TimesliderItemDetailPage() {
   const [plansSectionVisible, setPlansSectionVisible] = useState(false);
@@ -35,27 +34,9 @@ export default function TimesliderItemDetailPage() {
     ? queryError ?? "Ongeldige link"
     : displayTitle || "—";
 
-  const scrollPlansIntoView = useCallback(() => {
-    document
-      .getElementById(PLANS_SECTION_ID)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
-
-  useEffect(() => {
-    if (!plansSectionVisible) return;
-    const t = window.setTimeout(() => scrollPlansIntoView(), 0);
-    return () => clearTimeout(t);
-  }, [plansSectionVisible, scrollPlansIntoView]);
-
-  const onMeerDatumsBekijken = useCallback(() => {
-    setPlansSectionVisible((visible) => {
-      if (visible) {
-        requestAnimationFrame(() => scrollPlansIntoView());
-        return visible;
-      }
-      return true;
-    });
-  }, [scrollPlansIntoView]);
+  const onMeerDatumsBekijken = () => {
+    setPlansSectionVisible((visible) => !visible);
+  };
 
   const plansEmptyHint = invalidQuery
     ? queryError ?? undefined
@@ -113,36 +94,51 @@ export default function TimesliderItemDetailPage() {
         dateTo={to}
         onAllPlansClick={onMeerDatumsBekijken}
       />
-      {plansSectionVisible ? (
-        <PlansFilterSection
-          plans={invalidQuery || needsAuth || plansError ? [] : filteredPlans}
-          selectedPlanId={selectedPlan?.id ?? null}
-          onSelectPlan={setSelectedPlan}
-          loading={allPlansLoading}
-          emptyHint={plansEmptyHint}
-        />
-      ) : null}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <MainImageSection
-          attachment={blockImages ? null : selectedAttachment}
-          plansLoading={allPlansLoading}
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+        <AnimatePresence>
+          {plansSectionVisible && (
+            <motion.div
+              key="timeslider-plans-overlay"
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-x-0 top-0 z-30 max-h-[min(45vh,15rem)] overflow-y-auto rounded-b-lg shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+            >
+              <PlansFilterSection
+                plans={
+                  invalidQuery || needsAuth || plansError ? [] : filteredPlans
+                }
+                selectedPlanId={selectedPlan?.id ?? null}
+                onSelectPlan={setSelectedPlan}
+                loading={allPlansLoading}
+                emptyHint={plansEmptyHint}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <MainImageSection
+            attachment={blockImages ? null : selectedAttachment}
+            plansLoading={allPlansLoading}
+            loading={!blockImages && imagesLoading}
+            error={!blockImages ? imagesError : null}
+            emptyMessage={emptyMain}
+            imageNav={imageNav}
+            imageIndex={
+              !blockImages && images.length > 0
+                ? { current: safeIndex + 1, total: images.length }
+                : undefined
+            }
+          />
+        </div>
+        <ImagesSelectionSection
+          images={blockImages ? [] : images}
+          selectedIndex={selectedIndex}
+          onSelect={setSelectedIndex}
           loading={!blockImages && imagesLoading}
-          error={!blockImages ? imagesError : null}
-          emptyMessage={emptyMain}
-          imageNav={imageNav}
-          imageIndex={
-            !blockImages && images.length > 0
-              ? { current: safeIndex + 1, total: images.length }
-              : undefined
-          }
         />
       </div>
-      <ImagesSelectionSection
-        images={blockImages ? [] : images}
-        selectedIndex={selectedIndex}
-        onSelect={setSelectedIndex}
-        loading={!blockImages && imagesLoading}
-      />
     </div>
   );
 }
