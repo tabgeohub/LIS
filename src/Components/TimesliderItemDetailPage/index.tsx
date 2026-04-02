@@ -7,8 +7,11 @@ import ImagesSelectionSection from "./sections/ImagesSelectionSection";
 import LoginRequiredModal from "./sections/LoginRequiredModal";
 import { useTimesliderImagePageData } from "./useTimesliderImagePageData";
 
+const GALLERY_HEIGHT_PX = 144; // matches Tailwind h-36 (thumbnail strip)
+
 export default function TimesliderItemDetailPage() {
   const [plansSectionVisible, setPlansSectionVisible] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(true);
 
   const {
     queryError,
@@ -91,6 +94,9 @@ export default function TimesliderItemDetailPage() {
     <div className="flex h-screen min-h-0 flex-col bg-gray-100 text-gray-900">
       <HeaderSection
         itemName={headerItemName}
+        vluchtnummer={
+          invalidQuery ? null : (selectedPlan?.vluchtnummer ?? null)
+        }
         dateFrom={from}
         dateTo={to}
         onAllPlansClick={onMeerDatumsBekijken}
@@ -118,7 +124,7 @@ export default function TimesliderItemDetailPage() {
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
           <MainImageSection
             attachment={blockImages ? null : selectedAttachment}
             plansLoading={allPlansLoading}
@@ -131,14 +137,39 @@ export default function TimesliderItemDetailPage() {
                 ? { current: safeIndex + 1, total: images.length }
                 : undefined
             }
+            galleryToggle={
+              !blockImages && selectedAttachment
+                ? {
+                    open: galleryOpen,
+                    onToggle: () => setGalleryOpen((o) => !o),
+                  }
+                : undefined
+            }
           />
+          <motion.div
+            initial={false}
+            animate={{
+              height:
+                !blockImages && galleryOpen ? GALLERY_HEIGHT_PX : 0,
+              opacity: !blockImages && galleryOpen ? 1 : 0,
+            }}
+            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            className={`absolute bottom-2 left-2 right-2 z-20 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_-6px_24px_rgba(0,0,0,0.12)] ${
+              !blockImages && galleryOpen
+                ? "pointer-events-auto"
+                : "pointer-events-none"
+            }`}
+          >
+            <div className="h-36">
+              <ImagesSelectionSection
+                images={blockImages ? [] : images}
+                selectedIndex={selectedIndex}
+                onSelect={setSelectedIndex}
+                loading={!blockImages && imagesLoading}
+              />
+            </div>
+          </motion.div>
         </div>
-        <ImagesSelectionSection
-          images={blockImages ? [] : images}
-          selectedIndex={selectedIndex}
-          onSelect={setSelectedIndex}
-          loading={!blockImages && imagesLoading}
-        />
       </div>
 
       <LoginRequiredModal open={needsAuth} />

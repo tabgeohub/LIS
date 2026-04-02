@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuImages } from "react-icons/lu";
 import type { AttachmentType } from "Types/finished_plans";
 import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
 
@@ -18,6 +18,11 @@ type Props = {
   };
   /** 1-based current index and total count, shown under the image. */
   imageIndex?: { current: number; total: number };
+  /** When set, shows a gallery toggle at the bottom-right of the image viewer. */
+  galleryToggle?: {
+    open: boolean;
+    onToggle: () => void;
+  };
 };
 
 export default function MainImageSection({
@@ -28,6 +33,7 @@ export default function MainImageSection({
   emptyMessage,
   imageNav,
   imageIndex,
+  galleryToggle,
 }: Props) {
   const url = attachment ? attachmentDisplayUrl(attachment.url) : "";
   const takenLabel =
@@ -66,19 +72,19 @@ export default function MainImageSection({
                     type="button"
                     onClick={imageNav.onPrevious}
                     disabled={!imageNav.canGoPrevious}
-                    className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-35"
+                    className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-35"
                     aria-label="Vorige afbeelding"
                   >
-                    <LuChevronLeft className="h-6 w-6" strokeWidth={2.25} />
+                    <LuChevronLeft className="h-7 w-7" strokeWidth={2.35} />
                   </button>
                   <button
                     type="button"
                     onClick={imageNav.onNext}
                     disabled={!imageNav.canGoNext}
-                    className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-35"
+                    className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-35"
                     aria-label="Volgende afbeelding"
                   >
-                    <LuChevronRight className="h-6 w-6" strokeWidth={2.25} />
+                    <LuChevronRight className="h-7 w-7" strokeWidth={2.35} />
                   </button>
                 </>
               ) : null}
@@ -87,6 +93,35 @@ export default function MainImageSection({
                 alt=""
                 className="max-h-full max-w-full object-contain"
               />
+              {galleryToggle ? (
+                <button
+                  type="button"
+                  onClick={galleryToggle.onToggle}
+                  title={
+                    galleryToggle.open
+                      ? "Galerij verbergen"
+                      : "Galerij tonen"
+                  }
+                  aria-expanded={galleryToggle.open}
+                  aria-label={
+                    galleryToggle.open
+                      ? "Galerij verbergen"
+                      : "Galerij tonen"
+                  }
+                  className={`absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-[bottom,colors] duration-200 hover:bg-white ${
+                    galleryToggle.open
+                      ? "bottom-[calc(9rem+0.5rem)]"
+                      : "bottom-2"
+                  }`}
+                >
+                  <LuImages
+                    className={`h-5 w-5 transition-opacity ${
+                      galleryToggle.open ? "opacity-100" : "opacity-70"
+                    }`}
+                    strokeWidth={2}
+                  />
+                </button>
+              ) : null}
             </div>
             {imageIndex || takenLabel ? (
               <div className="shrink-0 space-y-0.5 border-t border-gray-100 px-3 py-1.5 text-center">
