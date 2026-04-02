@@ -1,24 +1,19 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src", // This must be set if you're using "paths"
     "paths": {
-      "@helpers/*": ["helpers/*"],
-      "@components/*": ["components/*"],
-      "@types/*": ["types/*"],
-      "@constants/*": ["constants/*"],
-      // Path aliases for baseUrl imports
-      "hooks/*": ["hooks/*"],
-      "Components/*": ["Components/*"],
-      "utils/*": ["utils/*"],
+      "*": ["./src/*"],
+      "@helpers/*": ["./src/helpers/*"],
+      "@components/*": ["./src/Components/*"],
+      "@types/*": ["./src/Types/*"],
+      "@constants/*": ["./src/constants/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "Components/*": ["./src/Components/*"],
+      "Types/*": ["./src/Types/*"],
+      "utils/*": ["./src/utils/*"]
     },
     // "strictNullChecks": false,
     "noImplicitAny": false,
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -33,8 +28,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
