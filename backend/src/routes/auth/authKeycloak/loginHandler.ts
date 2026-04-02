@@ -2,6 +2,7 @@
 import type { RequestHandler } from "express";
 import { getOidcClientFor, newNonce, newState } from "../oidc";
 import { resolveProfile } from "./resolveProfile";
+import { safeReturnPath } from "./safeReturnPath";
 
 // @ts-ignore
 export const loginHandler: RequestHandler = async (req, res) => {
@@ -24,6 +25,11 @@ export const loginHandler: RequestHandler = async (req, res) => {
     req.session.oidcProfile = profileKey;
     // @ts-ignore
     req.session.loginMode = req.query.mode === "desktop" ? "desktop" : "web";
+
+    const returnTo = safeReturnPath(req.query.return_to);
+    if (returnTo) {
+      req.session.afterLoginRedirect = returnTo;
+    }
 
     const redirectUri = `${appBaseUrl}/auth/callback`;
 

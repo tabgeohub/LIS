@@ -31,6 +31,14 @@ export const callbackHandler: RequestHandler = async (req, res) => {
 
     if (mode === "desktop") return res.redirect("/auth/desktop-ok");
 
+    const afterPath = req.session.afterLoginRedirect;
+    delete req.session.afterLoginRedirect;
+
+    const base = OIDC_PROFILES[profileKey].frontendUrl.replace(/\/$/, "");
+    if (typeof afterPath === "string" && afterPath.startsWith("/")) {
+      return res.redirect(`${base}${afterPath}`);
+    }
+
     return res.redirect(OIDC_PROFILES[profileKey].frontendUrl);
   } catch (err) {
     console.error("OIDC callback error >>>", err);

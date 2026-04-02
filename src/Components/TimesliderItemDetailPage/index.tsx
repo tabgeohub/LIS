@@ -4,6 +4,7 @@ import HeaderSection from "./sections/HeaderSection";
 import PlansFilterSection from "./sections/PlansFilterSection";
 import MainImageSection from "./sections/MainImageSection";
 import ImagesSelectionSection from "./sections/ImagesSelectionSection";
+import LoginRequiredModal from "./sections/LoginRequiredModal";
 import { useTimesliderImagePageData } from "./useTimesliderImagePageData";
 
 export default function TimesliderItemDetailPage() {
@@ -139,6 +140,8 @@ export default function TimesliderItemDetailPage() {
           loading={!blockImages && imagesLoading}
         />
       </div>
+
+      <LoginRequiredModal open={needsAuth} />
     </div>
   );
 }

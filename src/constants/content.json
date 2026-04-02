@@ -10,7 +10,8 @@
       "notLoggedInWarning": {
         "title": "U bent niet ingelogd",
         "body": "Log in met uw Lis-account om de functies van de applicatie te kunnen gebruiken.",
-        "cta": "Inloggen"
+        "cta": "Inloggen",
+        "afterLoginReturnHint": "Na inloggen wordt u teruggebracht naar deze pagina."
       },
       "noRoleWarning": {
         "title": "Geen Toegang",
