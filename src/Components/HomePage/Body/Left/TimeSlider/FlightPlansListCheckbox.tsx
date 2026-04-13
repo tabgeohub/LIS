@@ -73,16 +73,40 @@ export default function FlightPlansListCheckbox() {
           Selecteer een periode met de timeslider.
         </p>
       )}
+      
       {hasRange && loading && (
         <p className="text-[12px] text-gray-400 px-2 py-2">Laden...</p>
       )}
+
       {hasRange && !loading && plans.length === 0 && (
         <p className="text-[12px] text-gray-400 px-2 py-2">
           Er zijn geen vluchtplannen in deze periode.
         </p>
       )}
+
       {hasRange && !loading && plans.length > 0 && (
-        <div className="divide-y-2">
+        <>
+          <div className="flex gap-x-2 pl-2 pt-2">
+            <button
+              type="button"
+              className="text-primary text-xs font-semibold"
+              onClick={() => setSelectedPlanIds(plans.map((p) => p.id))}
+            >
+              Selecteer alle
+            </button>
+
+            <span className="text-gray-500 text-xs font-semibold">|</span>
+
+            <button
+              type="button"
+              className="text-primary text-xs font-semibold"
+              onClick={() => setSelectedPlanIds([])}
+            >
+              Deselecteer alle
+            </button>
+          </div>
+
+          <div className="divide-y-2 border-t border-gray-200 mt-1">
           {plans.map((plan) => (
             <label
               key={plan.id}
@@ -117,7 +141,8 @@ export default function FlightPlansListCheckbox() {
               </div>
             </label>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

@@ -2,6 +2,9 @@
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
 import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
@@ -13,6 +16,8 @@ export function useRenderGeometries() {
   const { user } = useAuth();
   const { map, geometriesGraphicsLayer } = useMapViewState();
   const { geometries, fetchGeometries } = useGeometriesStore();
+  const { selectedPage } = useTabState();
+  const timesliderPlans = useTimesliderState((s) => s.plans);
   const { step } = useFinishedPlansState();
   const { step: flightPlanStep } = useFlightPlanState();
 
@@ -28,8 +33,40 @@ export function useRenderGeometries() {
 
   // Render geometries on the map
   useEffect(() => {
-    if (!validateMapView(map, geometriesGraphicsLayer) || !geometries || geometries.length === 0) return;
+    if (!validateMapView(map, geometriesGraphicsLayer) || !geometries) return;
     if (user.user_id === undefined || user.user_id === 0) return;
+
+    // Timeslider page: only geometries that belong to the current flight plan list
+    if (selectedPage === "timeslider") {
+      if (timesliderPlans.length === 0) {
+        geometriesGraphicsLayer.removeAll();
+        return;
+      }
+      const { geometryIds } = getPointAndGeometryIdsFromPlans(timesliderPlans);
+      const filtered = geometries.filter((g) => geometryIds.has(g.id));
+      const graphicsTs = filtered
+        .map((geometry) => {
+          return createGeometryGraphic(geometry, {
+            attributes: {
+              organisatie: geometry.organisatie,
+              vertrouwelijk: geometry.vertrouwelijk,
+              herhalen: geometry.herhalen,
+              activiteit: geometry.activiteit,
+              specifiek_letten_op: geometry.specifiek_letten_op,
+              regio_id: geometry.regio_id,
+            },
+          });
+        })
+        .filter((graphic): graphic is NonNullable<typeof graphic> => graphic !== null);
+      replaceGraphics(geometriesGraphicsLayer, graphicsTs);
+      return () => {
+        if (geometriesGraphicsLayer) {
+          geometriesGraphicsLayer.removeAll();
+        }
+      };
+    }
+
+    if (geometries.length === 0) return;
     // Skip rendering when in Step2 - useRenderPlanGeometries handles rendering plan geometries
     if (step === 2) return;
     // Skip rendering when in FlightPlan Step2 or Step3 - GeometriesList handles rendering
@@ -60,6 +97,15 @@ export function useRenderGeometries() {
         geometriesGraphicsLayer.removeAll();
       }
     };
-  }, [map, geometriesGraphicsLayer, geometries, user.user_id, step, flightPlanStep]);
+  }, [
+    map,
+    geometriesGraphicsLayer,
+    geometries,
+    user.user_id,
+    selectedPage,
+    timesliderPlans,
+    step,
+    flightPlanStep,
+  ]);
 }
 

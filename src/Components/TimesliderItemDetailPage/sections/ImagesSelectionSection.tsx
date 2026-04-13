@@ -16,7 +16,7 @@ export default function ImagesSelectionSection({
 }: Props) {
   return (
     <section
-      className="flex h-36 shrink-0 flex-col border-t border-gray-200 bg-white px-2 py-2"
+      className="flex h-36 shrink-0 flex-col bg-white px-2 py-2"
       aria-label="Afbeeldingen selectie"
     >
       <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-gray-400">

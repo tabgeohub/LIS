@@ -5,7 +5,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 
 export default function Section1() {
-  const { pointsGraphicsLayer } = useMapViewState();
+  const { pointsGraphicsLayer, geometriesGraphicsLayer } = useMapViewState();
 
   const [layers, setLayers] = useState([
     {
@@ -15,13 +15,13 @@ export default function Section1() {
       checked: true,
       regio: ["ZD", "NN", "WNN", "MN", "WNZ", "ON", "ZN"],
     },
-    // {
-    //   id: "2",
-    //   title: "Aandachtspunten (inactief)",
-    //   layer: null,
-    //   checked: false,
-    //   regio: ["ZD", "NN", "WNN", "ON", "ZN"],
-    // },
+    {
+      id: "2",
+      title: "Geometries",
+      layer: geometriesGraphicsLayer,
+      checked: true,
+      regio: ["ZD", "NN", "WNN", "MN", "WNZ", "ON", "ZN"],
+    },
   ]);
 
   const handleLayerChange = useHandleLayerChange(setLayers);
