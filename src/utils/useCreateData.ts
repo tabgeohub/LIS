@@ -38,6 +38,7 @@ export function useCreateData<T, R extends { message?: string; id?: number }>(
         `${getBackEndUrl()}/api${path}`,
         data,
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },

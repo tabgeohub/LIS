@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { hashPassword } from "../../helpers/passwordHash";
 
 export async function updateUser(req: Request, res: Response): Promise<void> {
   const { user_id, user_name, role, password } = req.body;
@@ -10,14 +11,35 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
   }
 
   try {
+    const fields: string[] = [];
+    const params: any[] = [];
+
+    if (user_name !== undefined) {
+      params.push(user_name);
+      fields.push(`user_name = $${params.length}`);
+    }
+    if (role !== undefined) {
+      params.push(role);
+      fields.push(`role = $${params.length}`);
+    }
+    if (password !== undefined && String(password).length > 0) {
+      const hashedPassword = await hashPassword(String(password));
+      params.push(hashedPassword);
+      fields.push(`password = $${params.length}`);
+    }
+
+    if (fields.length === 0) {
+      res.status(400).json({ message: "No update fields provided" });
+      return;
+    }
+
+    params.push(user_id);
     const result = await pool.query(
       `UPDATE lis.users
-       SET user_name = $1,
-           role = $2,
-           password = $3
-       WHERE user_id = $4
+       SET ${fields.join(", ")}
+       WHERE user_id = $${params.length}
        RETURNING *`,
-      [user_name, role, password, user_id]
+      params
     );
 
     if (result.rowCount === 0) {

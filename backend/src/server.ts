@@ -7,6 +7,10 @@ const requiredEnvVars = [
   "PGHOST",
   "PGDATABASE",
   "PGPASSWORD",
+  "ARCGIS_TOKEN_ENDPOINT",
+  "ARCGIS_CLIENT_ID",
+  "ARCGIS_CLIENT_SECRET",
+  "ARCGIS_SERVER_URL",
 ];
 
 const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);

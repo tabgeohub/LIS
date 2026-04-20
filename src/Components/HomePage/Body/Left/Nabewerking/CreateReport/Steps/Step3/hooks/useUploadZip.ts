@@ -34,6 +34,7 @@ export function useUploadZip() {
 
         const res = await fetch(`${getBackEndUrl()}/api/upload-report`, {
           method: "POST",
+          credentials: "include",
           body: formData,
         });
 

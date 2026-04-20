@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { hashPassword } from "../../helpers/passwordHash";
 
 export async function createUser(req: Request, res: Response) {
   const { user_name, password, role } = req.body;
@@ -12,9 +13,10 @@ export async function createUser(req: Request, res: Response) {
   }
 
   try {
+    const hashedPassword = await hashPassword(String(password));
     const result = await pool.query(
       "INSERT INTO lis.users (user_name, role, password) VALUES ($1, $2, $3) RETURNING *",
-      [user_name, role, password]
+      [user_name, role, hashedPassword]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

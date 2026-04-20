@@ -36,7 +36,7 @@ export function useDeleteData<T = undefined>(
     try {
       const response = await axios.delete<{ message?: string }>(
         `${getBackEndUrl()}/api${path}/${id}`,
-        { data }
+        { data, withCredentials: true }
       );
 
       const { message } = response.data;

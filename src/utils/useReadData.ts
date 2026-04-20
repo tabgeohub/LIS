@@ -152,7 +152,9 @@ export function useReadData<T>(path: string): UseReadDataResult<T> {
     setLoading(true);
     setError(null);
 
-    const requestPromise = axios.get<T>(`${getBackEndUrl()}/api${path}`);
+    const requestPromise = axios.get<T>(`${getBackEndUrl()}/api${path}`, {
+      withCredentials: true,
+    });
 
     // Store the in-flight request for deduplication
     inFlightRequests.set(cacheKey, {

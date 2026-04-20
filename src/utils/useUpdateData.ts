@@ -32,6 +32,7 @@ export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
         `${getBackEndUrl()}/api${path}`,
         data,
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },

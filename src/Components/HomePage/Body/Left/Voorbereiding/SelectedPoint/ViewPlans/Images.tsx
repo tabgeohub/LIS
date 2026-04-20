@@ -4,6 +4,7 @@ import { FlightPlanType } from "Types";
 import { AttachmentType } from "Types/finished_plans";
 import { useReadData } from "utils/useReadData";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
+import { getArcGISToken } from "@helpers/arcgisTokenStore";
 
 export default function Images({
   selectedPlan,
@@ -21,7 +22,7 @@ export default function Images({
 
   const { data: attachments } = useReadData<AttachmentType[]>(attachmentsUrl);
 
-  const token = localStorage.getItem("credential_token");
+  const token = getArcGISToken();
 
   const sortedAttachments = attachments
     ? [...attachments].sort((a, b) => (a.taken_at || 0) - (b.taken_at || 0))

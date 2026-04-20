@@ -1,5 +1,6 @@
 import { useMemo, useEffect } from "react";
 import { AttachmentType } from "Types/finished_plans";
+import { getArcGISToken } from "@helpers/arcgisTokenStore";
 
 // Lightweight inline SVG icons (replaces react-icons - saves ~80-120 KB)
 const CloseIcon = () => (
@@ -113,7 +114,7 @@ export default function ImageGallery({
   onDelete?: (attachmentId: number) => void;
   onShowLocation?: (location: string) => void;
 }) {
-  const token = localStorage.getItem("credential_token");
+  const token = getArcGISToken();
 
   // Memoize image URLs to avoid recalculating on every render
   const getImageUrl = useMemo(
