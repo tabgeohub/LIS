@@ -1,5 +1,6 @@
 import esriId from "@arcgis/core/identity/IdentityManager";
 import { getBackEndUrl } from "./getBackEndUrl";
+import { setArcGISToken } from "./arcgisTokenStore";
 
 export async function refreshToken() {
   async function fetchAndRegisterToken() {
@@ -26,9 +27,7 @@ export async function refreshToken() {
       server: serverUrl,
     };
 
-    localStorage.setItem("credential_token", token);
-    localStorage.setItem("credential_server", serverUrl);
-
+    setArcGISToken(token, serverUrl);
     esriId.registerToken(credential);
   }
 

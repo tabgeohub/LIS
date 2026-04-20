@@ -7,8 +7,10 @@ import { handleUpdateUserRoles } from "./updateUserRoles";
 import { handleCreateUser } from "./createUser";
 import { handleDeleteUser } from "./deleteUser";
 import { handleResetPassword } from "./resetPassword";
+import { requireAdminRole } from "../../../../helpers/requireAdminRole";
 
 const router = Router();
+router.use(requireAdminRole);
 
 // GET routes
 router.get("/users", handleGetAllUsers);

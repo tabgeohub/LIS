@@ -22,6 +22,7 @@ import timesliderRouter from "./routes/timeslider";
 import arcgisRouter from "./routes/arcgis";
 import { requirePassword, uploadsDir } from "./helpers/requirePassword";
 import { requireSessionAuth } from "./helpers/requireSessionAuth";
+import { enforceRegioScope } from "./helpers/enforceRegioScope";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 
@@ -91,15 +92,25 @@ app.use("/auth", authKeycloak);
 app.use("/api/keycloak", requireSessionAuth, keycloakRouter);
 app.use("/api/auth", requireSessionAuth, authRouter);
 app.use("/api/users", requireSessionAuth, usersRouter);
-app.use("/api/flightPlans", requireSessionAuth, flightPlansRouter);
-app.use("/api/points", requireSessionAuth, pointsRouter);
-app.use("/api/emails", requireSessionAuth, emailsRouter);
-app.use("/api/finished_plans", requireSessionAuth, finishedPlansRouter);
-app.use("/api/templateFlight", requireSessionAuth, templateFlightsRouter);
+app.use("/api/flightPlans", requireSessionAuth, enforceRegioScope, flightPlansRouter);
+app.use("/api/points", requireSessionAuth, enforceRegioScope, pointsRouter);
+app.use("/api/emails", requireSessionAuth, enforceRegioScope, emailsRouter);
+app.use(
+  "/api/finished_plans",
+  requireSessionAuth,
+  enforceRegioScope,
+  finishedPlansRouter
+);
+app.use(
+  "/api/templateFlight",
+  requireSessionAuth,
+  enforceRegioScope,
+  templateFlightsRouter
+);
 app.use("/api/logs", requireSessionAuth, logsRouter);
 app.use("/api/consts", requireSessionAuth, constsRouter);
-app.use("/api/geometries", requireSessionAuth, geometriesRouter);
-app.use("/api/timeslider", requireSessionAuth, timesliderRouter);
+app.use("/api/geometries", requireSessionAuth, enforceRegioScope, geometriesRouter);
+app.use("/api/timeslider", requireSessionAuth, enforceRegioScope, timesliderRouter);
 app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
 
 /** ---------- Static + Upload/Download ---------- */
