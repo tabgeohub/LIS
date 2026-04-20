@@ -11,7 +11,6 @@ import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { MdLocationOn } from "react-icons/md";
-import { getArcGISToken } from "@helpers/arcgisTokenStore";
 
 export default function Foto({
   setAction,
@@ -26,7 +25,7 @@ export default function Foto({
 
   const { mapView, redGraphicsLayer } = useMapViewState();
 
-  const token = getArcGISToken();
+  const token = localStorage.getItem("credential_token");
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

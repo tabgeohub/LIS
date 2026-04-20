@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import {
-  hashPassword,
-  isHashedPassword,
-  verifyPassword,
-} from "../../helpers/passwordHash";
 
 export async function loginUser(req: Request, res: Response): Promise<void> {
   const { username, password } = req.body;
@@ -31,21 +26,11 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
 
     const user = result.rows[0];
 
-    const isValid = await verifyPassword(password, user.password);
-    if (!isValid) {
+    if (password !== user.password) {
       res
         .status(401)
         .json({ message: "Ongeldige gebruikersnaam of wachtwoord" });
       return;
-    }
-
-    // Seamless migration for legacy plaintext passwords.
-    if (!isHashedPassword(user.password)) {
-      const hashed = await hashPassword(password);
-      await pool.query("UPDATE lis.users SET password = $1 WHERE user_id = $2", [
-        hashed,
-        user.user_id,
-      ]);
     }
 
     res.status(200).json({
