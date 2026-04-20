@@ -23,7 +23,9 @@ export function useDirectDownload(
         "/api/direct-download/"
       );
 
-      const res = await fetch(directUrl);
+      const res = await fetch(directUrl, {
+        credentials: "include",
+      });
       if (!res.ok) {
         const msg = `Download failed (${res.status})`;
         fail(msg);
