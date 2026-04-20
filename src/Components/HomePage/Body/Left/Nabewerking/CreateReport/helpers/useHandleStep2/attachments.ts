@@ -1,18 +1,17 @@
 import { FinishedPointType } from "Types/finished_plans";
 import { fetchWithRetry } from "./utils";
 import { refreshToken } from "@helpers/refreshToken";
-import { getArcGISToken } from "@helpers/arcgisTokenStore";
 import type { AttachmentWithMeta } from "./types";
 
 export async function fetchAttachmentsForPoint(
   featureLayerUrl: string,
   objectId: number
 ): Promise<AttachmentWithMeta[]> {
-  let token = getArcGISToken();
+  let token = localStorage.getItem("credential_token");
   if (!token) {
     try {
       await refreshToken();
-      token = getArcGISToken();
+      token = localStorage.getItem("credential_token");
     } catch {}
   }
 
@@ -75,11 +74,11 @@ export async function safeFetchPointAttachments(
     const results = await Promise.allSettled(
       list.map(async (att) => {
         const rawUrl = att.url;
-        let token = getArcGISToken();
+        let token = localStorage.getItem("credential_token");
         if (!token) {
           try {
             await refreshToken();
-            token = getArcGISToken();
+            token = localStorage.getItem("credential_token");
           } catch {}
         }
         const needsToken = token && /arcgis\.com/.test(rawUrl);
