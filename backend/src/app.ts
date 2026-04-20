@@ -19,6 +19,7 @@ import constsRouter from "./routes/consts";
 import reportUploadRouter from "./routes/reportUpload";
 import geometriesRouter from "./routes/geometries";
 import timesliderRouter from "./routes/timeslider";
+import arcgisRouter from "./routes/arcgis";
 import { requirePassword, uploadsDir } from "./helpers/requirePassword";
 import { requireSessionAuth } from "./helpers/requireSessionAuth";
 import session from "express-session";
@@ -99,6 +100,7 @@ app.use("/api/logs", requireSessionAuth, logsRouter);
 app.use("/api/consts", requireSessionAuth, constsRouter);
 app.use("/api/geometries", requireSessionAuth, geometriesRouter);
 app.use("/api/timeslider", requireSessionAuth, timesliderRouter);
+app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
 
 /** ---------- Static + Upload/Download ---------- */
 // If you have a gated file browser, keep this; otherwise rely on /api/file-download
