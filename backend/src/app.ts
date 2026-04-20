@@ -19,7 +19,10 @@ import constsRouter from "./routes/consts";
 import reportUploadRouter from "./routes/reportUpload";
 import geometriesRouter from "./routes/geometries";
 import timesliderRouter from "./routes/timeslider";
+import arcgisRouter from "./routes/arcgis";
 import { requirePassword, uploadsDir } from "./helpers/requirePassword";
+import { requireSessionAuth } from "./helpers/requireSessionAuth";
+import { enforceRegioScope } from "./helpers/enforceRegioScope";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 
@@ -86,30 +89,41 @@ setupSwagger(app);
 /** ---------- Routes ---------- */
 app.use("/", main);
 app.use("/auth", authKeycloak);
-app.use("/api/keycloak", keycloakRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/flightPlans", flightPlansRouter);
-app.use("/api/points", pointsRouter);
-app.use("/api/emails", emailsRouter);
-app.use("/api/finished_plans", finishedPlansRouter);
-app.use("/api/templateFlight", templateFlightsRouter);
-app.use("/api/logs", logsRouter);
-app.use("/api/consts", constsRouter);
-app.use("/api/geometries", geometriesRouter);
-app.use("/api/timeslider", timesliderRouter);
+app.use("/api/keycloak", requireSessionAuth, keycloakRouter);
+app.use("/api/auth", requireSessionAuth, authRouter);
+app.use("/api/users", requireSessionAuth, usersRouter);
+app.use("/api/flightPlans", requireSessionAuth, enforceRegioScope, flightPlansRouter);
+app.use("/api/points", requireSessionAuth, enforceRegioScope, pointsRouter);
+app.use("/api/emails", requireSessionAuth, enforceRegioScope, emailsRouter);
+app.use(
+  "/api/finished_plans",
+  requireSessionAuth,
+  enforceRegioScope,
+  finishedPlansRouter
+);
+app.use(
+  "/api/templateFlight",
+  requireSessionAuth,
+  enforceRegioScope,
+  templateFlightsRouter
+);
+app.use("/api/logs", requireSessionAuth, logsRouter);
+app.use("/api/consts", requireSessionAuth, constsRouter);
+app.use("/api/geometries", requireSessionAuth, enforceRegioScope, geometriesRouter);
+app.use("/api/timeslider", requireSessionAuth, enforceRegioScope, timesliderRouter);
+app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
 
 /** ---------- Static + Upload/Download ---------- */
 // If you have a gated file browser, keep this; otherwise rely on /api/file-download
 app.use("/uploads", requirePassword, express.static(uploadsDir));
 
-// Public upload endpoint (secured in reportUpload with type/size filter)
-app.use("/api/upload-report", reportUploadRouter);
+// Upload endpoint (now session-authenticated; route keeps type/size filtering)
+app.use("/api/upload-report", requireSessionAuth, reportUploadRouter);
 
 // Password-gated download flow
-app.use("/api/file-download", fileDownloadRouter);
+app.use("/api/file-download", requireSessionAuth, fileDownloadRouter);
 
-// Direct download (no password gate)
-app.use("/api/direct-download", directDownloadRouter);
+// Direct download (session-authenticated)
+app.use("/api/direct-download", requireSessionAuth, directDownloadRouter);
 
 export default app;

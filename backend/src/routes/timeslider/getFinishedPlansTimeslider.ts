@@ -52,11 +52,12 @@ export async function getFinishedPlansTimeslider(
       JOIN lis.points pt ON pt.id = ppp.point_id
       LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
       WHERE fp.status = 'finished'
-        AND fp.created_at::date >= $1::date
-        AND fp.created_at::date <= $2::date
+        AND fp.datum IS NOT NULL
+        AND fp.datum::date >= $1::date
+        AND fp.datum::date <= $2::date
         ${shouldFilter ? `AND fp.regio_id = $3` : ""}
       GROUP BY fp.id
-      ORDER BY fp.created_at DESC;
+      ORDER BY fp.datum DESC NULLS LAST, fp.created_at DESC;
     `;
 
     const params: any[] = [from, to];

@@ -45,6 +45,7 @@ export function useCopyLink(
         )}/password`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ password: trimmed }),
         }

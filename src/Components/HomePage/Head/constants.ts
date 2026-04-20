@@ -29,6 +29,7 @@ export type Content = typeof content;
 export const pages: {
   label: string;
   value: PageType;
+  new?: boolean;
 }[] = [
   {
     label: content.layout.pages.at(0)!,
@@ -45,6 +46,7 @@ export const pages: {
   {
     label: content.layout.pages.at(3)!,
     value: "timeslider",
+    new: true,
   },
 ];
 

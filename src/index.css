@@ -177,6 +177,67 @@ code {
   animation-delay: 0s;
 }
 
+/* Timeslider header date pickers — scoped popper + wrapper */
+.timeslider-datepicker-wrapper {
+  width: auto !important;
+}
+
+.timeslider-datepicker-popper {
+  z-index: 50 !important;
+  animation: timeslider-datepicker-fade 0.2s ease-out;
+}
+
+@keyframes timeslider-datepicker-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.timeslider-datepicker-calendar.react-datepicker {
+  font-family: inherit;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.08),
+    0 4px 6px -4px rgb(0 0 0 / 0.06);
+  overflow: hidden;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__header {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__current-month,
+.timeslider-datepicker-calendar .react-datepicker__day-name {
+  color: #374151;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__day:hover {
+  background-color: rgba(0, 112, 188, 0.12) !important;
+  border-radius: 0.35rem;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__day--selected,
+.timeslider-datepicker-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #0070bc !important;
+  color: white !important;
+  border-radius: 0.35rem;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__day--today {
+  font-weight: 700;
+  color: #0070bc;
+}
+
+.timeslider-datepicker-calendar .react-datepicker__navigation:hover *::before {
+  border-color: #0070bc;
+}
+
 /* Prevent scroll-into-view when ArcGIS elements receive focus during drawing */
 .esri-view,
 .esri-view-root,

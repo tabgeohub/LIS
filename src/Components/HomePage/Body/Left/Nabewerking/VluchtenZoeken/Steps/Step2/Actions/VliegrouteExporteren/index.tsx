@@ -85,6 +85,7 @@ export default function VliegrouteExporteren({
     try {
       const res = await fetch(`${getBackEndUrl()}/api/upload-report`, {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
 

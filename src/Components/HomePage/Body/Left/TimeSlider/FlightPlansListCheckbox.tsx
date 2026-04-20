@@ -7,9 +7,16 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import {
+  sortPlansNewestFirst,
+  removeTimesliderHighlights,
+  drawSelectedPlansYellowHighlights,
+} from "@helpers/timeslider";
 
 export default function FlightPlansListCheckbox() {
   const { user } = useAuth();
+  const { yellowGraphicsLayer } = useMapViewState();
   const {
     dateFrom,
     dateTo,
@@ -38,10 +45,24 @@ export default function FlightPlansListCheckbox() {
           params: { regio_id: user.role, from: fromStr, to: toStr },
         }
       )
-      .then((res) => setPlans(res.data || []))
+      .then((res) => setPlans(sortPlansNewestFirst(res.data || [])))
       .catch(() => setPlans([]))
       .finally(() => setLoading(false));
   }, [dateFrom, dateTo, user?.role, setPlans, setSelectedPlanIds]);
+
+  useEffect(() => {
+    if (!yellowGraphicsLayer) return;
+
+    removeTimesliderHighlights(yellowGraphicsLayer);
+
+    if (selectedPlanIds.length === 0 || plans.length === 0) return;
+
+    drawSelectedPlansYellowHighlights(
+      yellowGraphicsLayer,
+      plans,
+      selectedPlanIds
+    );
+  }, [plans, selectedPlanIds, yellowGraphicsLayer]);
 
   const hasRange = !!dateFrom && !!dateTo;
 
@@ -52,16 +73,40 @@ export default function FlightPlansListCheckbox() {
           Selecteer een periode met de timeslider.
         </p>
       )}
+      
       {hasRange && loading && (
         <p className="text-[12px] text-gray-400 px-2 py-2">Laden...</p>
       )}
+
       {hasRange && !loading && plans.length === 0 && (
         <p className="text-[12px] text-gray-400 px-2 py-2">
           Er zijn geen vluchtplannen in deze periode.
         </p>
       )}
+
       {hasRange && !loading && plans.length > 0 && (
-        <div className="divide-y-2">
+        <>
+          <div className="flex gap-x-2 pl-2 pt-2">
+            <button
+              type="button"
+              className="text-primary text-xs font-semibold"
+              onClick={() => setSelectedPlanIds(plans.map((p) => p.id))}
+            >
+              Selecteer alle
+            </button>
+
+            <span className="text-gray-500 text-xs font-semibold">|</span>
+
+            <button
+              type="button"
+              className="text-primary text-xs font-semibold"
+              onClick={() => setSelectedPlanIds([])}
+            >
+              Deselecteer alle
+            </button>
+          </div>
+
+          <div className="divide-y-2 border-t border-gray-200 mt-1">
           {plans.map((plan) => (
             <label
               key={plan.id}
@@ -96,7 +141,8 @@ export default function FlightPlansListCheckbox() {
               </div>
             </label>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
