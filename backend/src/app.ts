@@ -100,7 +100,7 @@ app.use("/api/logs", requireSessionAuth, logsRouter);
 app.use("/api/consts", requireSessionAuth, constsRouter);
 app.use("/api/geometries", requireSessionAuth, geometriesRouter);
 app.use("/api/timeslider", requireSessionAuth, timesliderRouter);
-app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
+app.use("/api/arcgis", arcgisRouter);
 
 /** ---------- Static + Upload/Download ---------- */
 // If you have a gated file browser, keep this; otherwise rely on /api/file-download
