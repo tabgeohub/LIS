@@ -1,11 +1,26 @@
 import esriId from "@arcgis/core/identity/IdentityManager";
+import esriConfig from "@arcgis/core/config";
 import { getBackEndUrl } from "./getBackEndUrl";
 
 export async function refreshToken() {
+  const backendUrl = getBackEndUrl();
+  const tokenEndpoint = `${backendUrl}/api/arcgis/token`;
+  const servers = [
+    "https://www.arcgis.com/sharing/rest",
+    "https://services.arcgis.com",
+    "https://tiles.arcgis.com",
+    "https://utility.arcgis.com",
+    "https://basemaps.arcgis.com",
+    "https://rijkswaterstaat.maps.arcgis.com/sharing/rest",
+  ];
+
+  esriConfig.request.proxyUrl = `${backendUrl}/api/arcgis/proxy`;
+  esriConfig.request.useIdentity = true;
+
   async function fetchAndRegisterToken() {
-    const response = await fetch(`${getBackEndUrl()}/api/arcgis/token`, {
+    const response = await fetch(tokenEndpoint, {
       method: "GET",
-      credentials: "include",
+      credentials: "omit",
     });
 
     if (!response.ok) {
@@ -15,20 +30,16 @@ export async function refreshToken() {
 
     const data = await response.json();
     const token = String(data?.access_token || "");
-    const serverUrl = String(data?.server || "");
-
-    if (!token || !serverUrl) {
+    if (!token) {
       throw new Error("Invalid ArcGIS token response from backend");
     }
 
-    const credential = {
-      token,
-      server: serverUrl,
-    };
+    servers.forEach((server) => {
+      esriId.registerToken({ server, token });
+    });
 
     localStorage.setItem("credential_token", token);
-    localStorage.setItem("credential_server", serverUrl);
-    esriId.registerToken(credential);
+    localStorage.setItem("credential_server", servers[0]);
   }
 
   await fetchAndRegisterToken();
