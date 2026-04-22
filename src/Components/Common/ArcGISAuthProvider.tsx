@@ -21,6 +21,7 @@ export default function ArcGISAuthProvider({ children }: Props) {
         setReady(true);
       } catch (error) {
         console.error("ArcGIS auth bootstrap failed", error);
+        setReady(true);
       }
     })();
 

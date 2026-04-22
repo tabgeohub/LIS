@@ -49,6 +49,10 @@ export async function refreshArcGISUserToken(
     const proxyUrl = `${backendUrl}/api/arcgis/proxy`;
     esriConfig.request.proxyUrl = proxyUrl;
     esriConfig.request.useIdentity = true;
+    const backendHost = new URL(backendUrl).host;
+    esriConfig.request.trustedServers = Array.from(
+      new Set([...(esriConfig.request.trustedServers || []), backendHost])
+    );
     [
       "https://www.arcgis.com",
       "https://services.arcgis.com",
@@ -64,10 +68,16 @@ export async function refreshArcGISUserToken(
     esriConfig.request.useIdentity = true;
   }
 
-  async function fetchAndRegister(): Promise<void> {
+  async function fetchAndRegister(): Promise<boolean> {
     const res = await fetch(tokenEndpoint, {
-      credentials: "omit",
+      credentials: "include",
     });
+
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("credential_token");
+      localStorage.removeItem("credential_server");
+      return false;
+    }
 
     if (!res.ok) {
       const text = await res.text();
@@ -86,10 +96,15 @@ export async function refreshArcGISUserToken(
     registerTokenForServers(access_token, servers);
     localStorage.setItem("credential_token", access_token);
     localStorage.setItem("credential_server", servers[0]);
+    return true;
   }
 
   await fetchAndRegister();
-  const intervalId = window.setInterval(fetchAndRegister, refreshEveryMs);
+  const intervalId = window.setInterval(() => {
+    fetchAndRegister().catch((error) => {
+      console.error("ArcGIS token refresh failed", error);
+    });
+  }, refreshEveryMs);
 
   return () => clearInterval(intervalId);
 }
