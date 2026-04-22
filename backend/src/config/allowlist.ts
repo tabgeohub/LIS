@@ -1,6 +1,7 @@
 export const ALLOWED_ARCGIS_HOSTS = [
   "www.arcgis.com",
   "services.arcgis.com",
+  "services-eu1.arcgis.com",
   "tiles.arcgis.com",
   "route-api.arcgis.com",
   "geocode-api.arcgis.com",

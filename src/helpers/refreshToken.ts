@@ -1,5 +1,6 @@
 import esriId from "@arcgis/core/identity/IdentityManager";
 import esriConfig from "@arcgis/core/config";
+import * as urlUtils from "@arcgis/core/core/urlUtils";
 import { getBackEndUrl } from "./getBackEndUrl";
 
 export async function refreshToken() {
@@ -8,19 +9,33 @@ export async function refreshToken() {
   const servers = [
     "https://www.arcgis.com/sharing/rest",
     "https://services.arcgis.com",
+    "https://services-eu1.arcgis.com",
     "https://tiles.arcgis.com",
     "https://utility.arcgis.com",
     "https://basemaps.arcgis.com",
+    "https://rijkswaterstaat.maps.arcgis.com",
     "https://rijkswaterstaat.maps.arcgis.com/sharing/rest",
   ];
 
-  esriConfig.request.proxyUrl = `${backendUrl}/api/arcgis/proxy`;
+  const proxyUrl = `${backendUrl}/api/arcgis/proxy`;
+  esriConfig.request.proxyUrl = proxyUrl;
   esriConfig.request.useIdentity = true;
+  [
+    "https://www.arcgis.com",
+    "https://services.arcgis.com",
+    "https://services-eu1.arcgis.com",
+    "https://tiles.arcgis.com",
+    "https://utility.arcgis.com",
+    "https://basemaps.arcgis.com",
+    "https://rijkswaterstaat.maps.arcgis.com",
+  ].forEach((urlPrefix) => {
+    urlUtils.addProxyRule({ urlPrefix, proxyUrl });
+  });
 
   async function fetchAndRegisterToken() {
     const response = await fetch(tokenEndpoint, {
       method: "GET",
-      credentials: "omit",
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -43,6 +58,4 @@ export async function refreshToken() {
   }
 
   await fetchAndRegisterToken();
-
-  setInterval(fetchAndRegisterToken, 5 * 60 * 1000);
 }

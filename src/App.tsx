@@ -3,19 +3,15 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from "./Components/HomePage";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
-import { refreshToken } from "@helpers/refreshToken";
 
 import "@arcgis/core/assets/esri/themes/light/main.css";
 import Dashboard from "Components/DashboardPage";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
+import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";
 
 export default function App() {
-  useEffect(() => {
-    refreshToken();
-  }, []);
-
   const { setUser } = useAuth();
 
   useEffect(() => {
@@ -43,15 +39,17 @@ export default function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
+      <ArcGISAuthProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route path="/images" element={<TimesliderItemDetailPage />} />
-      </Routes>
+          <Route path="/images" element={<TimesliderItemDetailPage />} />
+        </Routes>
 
-      <Toaster position="top-center" reverseOrder={false} />
+        <Toaster position="top-center" reverseOrder={false} />
+      </ArcGISAuthProvider>
     </Router>
   );
 }

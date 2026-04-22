@@ -29,7 +29,10 @@ router.get("/proxy", async (req, res) => {
         if (typeof value === "string") {
           try {
             const decoded = decodeURIComponent(value);
-            if (decoded.startsWith("http://") || decoded.startsWith("https://")) {
+            if (
+              decoded.startsWith("http://") ||
+              decoded.startsWith("https://")
+            ) {
               targetUrl = decoded;
               break;
             }
