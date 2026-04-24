@@ -38,12 +38,22 @@ export default function PointItemCheckBox({
     (act) => act.value === point.activiteit_id
   )?.label;
 
+  const attachmentCount =
+    "attachments" in point && Array.isArray(point.attachments)
+      ? point.attachments.filter(
+          (attachment) =>
+            attachment !== null &&
+            typeof attachment === "object" &&
+            typeof (attachment as { url?: unknown }).url === "string" &&
+            (attachment as { url: string }).url.length > 0
+        ).length
+      : 0;
+
   const hasAttachments =
     showAttachments &&
     "attachments" in point &&
     point.attachments &&
-    point.attachments[0] !== null &&
-    point.attachments.length > 0;
+    attachmentCount > 0;
   const herhalenValue =
     typeof point.herhalen === "number"
       ? point.herhalen === 1
@@ -79,7 +89,7 @@ export default function PointItemCheckBox({
           <div className="absolute mt-4 bottom-0 right-4">
             <IoMdImage className="size-4 text-gray-500" />
             <div className="absolute bottom-2 -right-3 bg-[#3B82F6] rounded-full px-1 text-white text-[10px]">
-              {point.attachments.length}
+              {attachmentCount}
             </div>
           </div>
         )}

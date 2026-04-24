@@ -11,6 +11,7 @@ import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { MdLocationOn } from "react-icons/md";
+import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
 
 export default function Foto({
   setAction,
@@ -20,7 +21,6 @@ export default function Foto({
   const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
     useFinishedPlansState();
   const { mapView, redGraphicsLayer } = useMapViewState();
-  const token = localStorage.getItem("credential_token");
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -32,13 +32,20 @@ export default function Foto({
   );
 
   const content = useContent();
+  const validAttachments = (selectedPoint?.attachments ?? []).filter(
+    (attachment): attachment is NonNullable<typeof selectedPoint.attachments>[number] =>
+      attachment !== null &&
+      typeof attachment === "object" &&
+      typeof attachment.url === "string" &&
+      attachment.url.length > 0
+  );
 
   // Store references to image markers for cleanup
   const imageMarkersRef = useRef<Graphic[]>([]);
 
   // Handle map clicks on image markers
   useEffect(() => {
-    if (!mapView || !selectedPoint?.attachments || !redGraphicsLayer) return;
+    if (!mapView || !redGraphicsLayer || validAttachments.length === 0) return;
 
     const handleMapClick = async (event: __esri.ViewClickEvent) => {
       try {
@@ -62,7 +69,7 @@ export default function Foto({
 
           if (attachmentId !== undefined) {
             // Find the index in the sorted array
-            const sortedIndex = selectedPoint.attachments
+            const sortedIndex = [...validAttachments]
               .sort((a, b) => a.taken_at - b.taken_at)
               .findIndex((att) => att.id === attachmentId);
             
@@ -82,11 +89,11 @@ export default function Foto({
     return () => {
       handle.remove();
     };
-  }, [mapView, selectedPoint?.attachments, redGraphicsLayer, setIsOpen, setActiveIndex]);
+  }, [mapView, validAttachments, redGraphicsLayer, setIsOpen, setActiveIndex]);
 
   // Create numbered markers on the map for images with locations
   useEffect(() => {
-    if (!selectedPoint || !selectedPoint.attachments || !mapView || !redGraphicsLayer) {
+    if (!selectedPoint || !mapView || !redGraphicsLayer) {
       return;
     }
 
@@ -97,7 +104,7 @@ export default function Foto({
     imageMarkersRef.current = [];
 
     // Get sorted attachments with their indices
-    const sortedAttachments = [...selectedPoint.attachments]
+    const sortedAttachments = [...validAttachments]
       .sort((a, b) => a.taken_at - b.taken_at)
       .map((attachment, originalIndex) => ({
         attachment,
@@ -199,7 +206,7 @@ export default function Foto({
       });
       imageMarkersRef.current = [];
     };
-  }, [selectedPoint?.attachments, mapView, redGraphicsLayer]);
+  }, [validAttachments, selectedPoint, mapView, redGraphicsLayer]);
 
   // Parse location string (format: "lat,long") and navigate to it
   const navigateToLocation = (location: string | null | undefined) => {
@@ -260,8 +267,7 @@ export default function Foto({
 
   if (
     !selectedPoint ||
-    !selectedPoint.attachments ||
-    selectedPoint.attachments.length === 0
+    validAttachments.length === 0
   ) {
     return (
       <div className="p-4">
@@ -283,8 +289,8 @@ export default function Foto({
 
   function deleteImage(attachmentId: number) {
     const currentIndex = activeIndex;
-    const newAttachments = selectedPoint?.attachments.filter(
-      (attachment) => attachment.id !== attachmentId
+    const newAttachments = validAttachments.filter(
+      (attachment) => attachment && attachment.id !== attachmentId
     );
 
     // Calculate new index after deletion
@@ -328,9 +334,7 @@ export default function Foto({
       setSelectedPoint({
         ...selectedPoint,
         // @ts-ignore
-        attachments: selectedPoint?.attachments.filter(
-          (attachment) => attachment.id !== attachmentId
-        ),
+        attachments: validAttachments.filter((attachment) => attachment.id !== attachmentId),
       });
     });
   }
@@ -339,7 +343,7 @@ export default function Foto({
     <div className="h-full">
       <div className="overflow-y-scroll pb-20 thin-scrollbar flex-grow">
         <div className="grid grid-cols-2 gap-2 p-2">
-          {selectedPoint.attachments
+          {validAttachments
             .sort((attachment) => attachment.taken_at)
             .map(
               (attachment, index) =>
@@ -350,9 +354,7 @@ export default function Foto({
                       {index + 1}
                     </div>
                     <img
-                      src={`${attachment.url
-                        .split("token=")
-                        .at(0)}token=${token}`}
+                      src={attachmentDisplayUrl(attachment.url)}
                       alt={String(attachment.id)}
                       onClick={() => {
                         setActiveIndex(index);
@@ -376,12 +378,11 @@ export default function Foto({
                 )
             )}
 
-          {selectedPoint.attachments &&
-            selectedPoint.attachments.length > 0 && (
+          {validAttachments.length > 0 && (
               <ImageGallery
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                attachments={selectedPoint.attachments}
+                attachments={validAttachments}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
                 onDelete={deleteImage}
