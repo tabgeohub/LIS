@@ -29,9 +29,10 @@ export default function Step2() {
 
   const content = useContent();
 
-  const { data: finishedPlan, loading: finishedPlanLoading } = useReadData<FinishedFlightPlanType>(
-    "/finished_plans/getSingleFinishedFlightPlan/" + selectedPlan?.id
-  );
+  const { data: finishedPlan, loading: finishedPlanLoading } =
+    useReadData<FinishedFlightPlanType>(
+      "/finished_plans/getSingleFinishedFlightPlan/" + selectedPlan?.id
+    );
 
   const { loadingPath } = useDrawPath(finishedPlanLoading);
 
@@ -47,7 +48,7 @@ export default function Step2() {
   useRenderPlanGeometries();
 
   return (
-    <div className="p-1.5 h-full relative">
+    <div className="p-1.5 h-full">
       {action === "none" && (
         <>
           <NoneAction />
@@ -65,9 +66,9 @@ export default function Step2() {
       )}
 
       {loadingPath && (
-        <div className="absolute inset-0 z-20 bg-gray-200/80 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
-            <p className="text-primary font-semibold text-lg animate-pulse text-center">
+        <div className="absolute bg-white/80 inset-0 z-20 flex items-center justify-center">
+          <div className="flex flex-col bg-gray-200 items-center -space-y-2 mt-4 w-fit px-4 py-8 rounded-xl mx-auto z-10 relative">
+            <p className="text-primary font-semibold text-lg animate-pulse">
               {content.nabewerking.vluchtenZoeken.step2.loadingPath}
             </p>
             <LoadingBars />

@@ -18,8 +18,13 @@ export default function Waarnemingen({
 }) {
   const logAction = useLogAction();
 
-  const { selectedPlan, selectedPoint, setSelectedPoint, selectedGeometry, setSelectedGeometry } =
-    useFinishedPlansState();
+  const {
+    selectedPlan,
+    selectedPoint,
+    setSelectedPoint,
+    selectedGeometry,
+    setSelectedGeometry,
+  } = useFinishedPlansState();
 
   const { setSelectedTab } = useTabState();
 
@@ -50,34 +55,6 @@ export default function Waarnemingen({
   useEffect(() => {
     setValue("");
   }, [openEdit]);
-
-  useEffect(() => {
-    const points = selectedPlan?.points_data ?? [];
-    console.log("[Waarnemingen] points_data summary", {
-      totalPoints: points.length,
-      searchValue: value,
-    });
-
-    points.forEach((point) => {
-      const attachments = Array.isArray(point.attachments) ? point.attachments : [];
-      const nonNullAttachments = attachments.filter(Boolean);
-
-      console.log("[Waarnemingen] point attachments", {
-        pointId: point.id,
-        omschrijving: point.omschrijving,
-        attachmentsRawLength: attachments.length,
-        attachmentsNonNullLength: nonNullAttachments.length,
-        firstAttachment: attachments[0] ?? null,
-      });
-    });
-  }, [selectedPlan?.points_data, value]);
-
-  useEffect(() => {
-    console.log("[Waarnemingen] filtered points", {
-      filteredCount: filteredPoints?.length ?? 0,
-      filteredPointIds: filteredPoints?.map((point) => point.id) ?? [],
-    });
-  }, [filteredPoints]);
 
   return (
     <div className="h-full">
@@ -166,7 +143,9 @@ export default function Waarnemingen({
         </>
       )}
 
-      {openEdit && selectedPoint && <EditPointDetails setOpenEdit={setOpenEdit} />}
+      {openEdit && selectedPoint && (
+        <EditPointDetails setOpenEdit={setOpenEdit} />
+      )}
       {openEdit && selectedGeometry && !selectedPoint && (
         <EditGeometryDetails setOpenEdit={setOpenEdit} />
       )}
