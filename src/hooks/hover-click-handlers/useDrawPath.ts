@@ -135,37 +135,42 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
     // Only check if loadingPath is currently true
     if (!loadingPath) return;
 
+    // Fallback guard: never keep loader forever due to async layer timing mismatches
+    const fallbackTimeout = window.setTimeout(() => {
+      setLoadingPath(false);
+    }, 3000);
+
     // Condition 1: finishedPlan is completely fetched
-    if (finishedPlanLoading) return;
+    if (finishedPlanLoading) {
+      return () => window.clearTimeout(fallbackTimeout);
+    }
 
     // Condition 2: Path is fetched from flight plan and added to map
     if (!selectedPlan?.path || !Array.isArray(selectedPlan.path) || selectedPlan.path.length === 0) {
-      return;
+      return () => window.clearTimeout(fallbackTimeout);
     }
 
     if (!featureLayerRef.current || !mapView) {
-      return;
+      return () => window.clearTimeout(fallbackTimeout);
     }
 
     if (!mapView.map.layers.includes(featureLayerRef.current)) {
-      return;
+      return () => window.clearTimeout(fallbackTimeout);
     }
 
-    // Condition 3: Points are completely added to the map
-    if (!selectedPlan.points_data || !Array.isArray(selectedPlan.points_data) || selectedPlan.points_data.length === 0) {
-      return;
-    }
-
-    if (!pointsGraphicsLayer) {
-      return;
-    }
-
-    // Verify points are actually on the map by checking graphics count
-    // Use a small delay to ensure graphics are fully added
+    // Condition 3 (soft): if points layer is available, prefer waiting for graphics.
+    // If points are not expected/available yet, still allow loader to close.
     const checkPoints = () => {
+      const expectedPointsCount = Array.isArray(selectedPlan.points_data)
+        ? selectedPlan.points_data.length
+        : 0;
+
+      if (!pointsGraphicsLayer || expectedPointsCount === 0) {
+        setLoadingPath(false);
+        return;
+      }
+
       const graphicsCount = pointsGraphicsLayer.graphics.length;
-      const expectedPointsCount = selectedPlan.points_data.length;
-      
       if (graphicsCount >= expectedPointsCount) {
         setLoadingPath(false);
       }
@@ -177,6 +182,8 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
         checkPoints();
       });
     });
+
+    return () => window.clearTimeout(fallbackTimeout);
   }, [
     loadingPath,
     finishedPlanLoading,
