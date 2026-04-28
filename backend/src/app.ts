@@ -10,6 +10,7 @@ import templateFlightsRouter from "./routes/template_plans";
 import authRouter from "./routes/auth";
 import fileDownloadRouter from "./routes/fileDownload";
 import directDownloadRouter from "./routes/directDownload";
+import installersRouter from "./routes/installers";
 import main from "./routes/main";
 import logsRouter from "./routes/logs";
 import { setupSwagger } from "./routes/swagger";
@@ -114,5 +115,6 @@ app.use("/api/file-download", requireSessionAuth, fileDownloadRouter);
 
 // Direct download (session-authenticated)
 app.use("/api/direct-download", requireSessionAuth, directDownloadRouter);
+app.use("/api/installers", requireSessionAuth, installersRouter);
 
 export default app;

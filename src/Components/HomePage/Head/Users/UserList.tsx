@@ -92,6 +92,15 @@ export default function UserList({
                 </a>
               )}
 
+              {location.pathname !== "/installations" && (
+                <a
+                  className="block capitalize px-4 py-2 text-sm text-blue-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  href="/installations"
+                >
+                  installations
+                </a>
+              )}
+
               <button
                 onClick={() => {
                   setOpenLogoutModal(true);

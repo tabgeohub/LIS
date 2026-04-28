@@ -10,6 +10,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";
+import InstallationsPage from "Components/InstallationsPage";
 
 export default function App() {
   const { setUser } = useAuth();
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/images" element={<TimesliderItemDetailPage />} />
+          <Route path="/installations" element={<InstallationsPage />} />
         </Routes>
 
         <Toaster position="top-center" reverseOrder={false} />
