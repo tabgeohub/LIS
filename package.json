@@ -58,7 +58,7 @@
   "scripts": {
     "dev": "vite",
     "start": "concurrently \"vite\" \"cd ./backend/ && npm run dev\"",
-    "build": "set NODE_OPTIONS=--max-old-space-size=8192 && vite build",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview",
     "test": "vitest"
   },
