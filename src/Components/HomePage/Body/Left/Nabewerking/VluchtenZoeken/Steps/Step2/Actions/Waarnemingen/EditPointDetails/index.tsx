@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Form from "./Actions/Form";
 import Foto from "./Actions/Foto";
 import ChangePoint from "./Actions/ChangePoint";
 import EditPointCoordinates from "./Actions/EditPointCoordinates";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function EditPointDetails({
   setOpenEdit,
@@ -12,13 +11,12 @@ export default function EditPointDetails({
   setOpenEdit: (value: boolean) => void;
 }) {
   const [actions, setAction] = useState("form");
-  const { resetFeatures } = useResetFeatures();
 
-  useEffect(() => {
-    if (actions === "form") {
-      resetFeatures();
-    }
-  }, [actions]);
+  // useEffect(() => {
+  //   if (actions === "form") {
+  //     resetFeatures();
+  //   }
+  // }, [actions]);
 
   return (
     <div className="h-[70vh] overflow-auto thin-scrollbar">

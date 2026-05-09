@@ -111,10 +111,10 @@ app.use("/uploads", requirePassword, express.static(uploadsDir));
 app.use("/api/upload-report", requireSessionAuth, reportUploadRouter);
 
 // Password-gated download flow
-app.use("/api/file-download", requireSessionAuth, fileDownloadRouter);
+app.use("/api/file-download", fileDownloadRouter);
 
 // Direct download (session-authenticated)
-app.use("/api/direct-download", requireSessionAuth, directDownloadRouter);
+app.use("/api/direct-download", directDownloadRouter);
 app.use("/api/installers", requireSessionAuth, installersRouter);
 
 export default app;
