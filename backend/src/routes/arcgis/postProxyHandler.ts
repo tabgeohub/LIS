@@ -6,10 +6,10 @@ import { decodeMaybeEncodedUrl, extractTargetUrlFromRequest } from "./proxyShare
 
 /**
  * ArcGIS JS sends applyEdits / addAttachment as POST with a form or multipart body.
- * Global express.urlencoded() parses the body into an object; the old proxy only
- * forwarded body when typeof req.body === "string", so the real payload was dropped
- * and ArcGIS returned HTML error pages ("Unexpected token '<'" on the client).
- * This handler runs with express.raw() so the body is forwarded unchanged.
+ * For application/x-www-form-urlencoded, ArcGIS Hosted layers can return
+ * "Cannot perform query. Invalid query parameters" if auth `token` is only on the
+ * URL query string — the server mis-handles the request. Merge token into the body
+ * and POST to path-only URL (no query string).
  */
 export default async function arcgisPostProxyHandler(
   req: Request,
@@ -41,28 +41,57 @@ export default async function arcgisPostProxyHandler(
     }
 
     const { access_token } = await getValidToken();
-
     const outgoing = new URL(targetUrl);
-    if (!outgoing.searchParams.has("token")) {
-      outgoing.searchParams.set("token", access_token);
+    const contentType = req.headers["content-type"] || "";
+
+    const hasUrlencodedBody =
+      contentType.includes("application/x-www-form-urlencoded") &&
+      Buffer.isBuffer(req.body) &&
+      req.body.length > 0;
+
+    let arcgisRes: Awaited<ReturnType<typeof fetch>>;
+
+    if (hasUrlencodedBody) {
+      const merged = new URLSearchParams(req.body.toString("utf8"));
+      outgoing.searchParams.forEach((value, key) => {
+        if (!merged.has(key)) {
+          merged.set(key, value);
+        }
+      });
+      if (!merged.has("token")) {
+        merged.set("token", access_token);
+      }
+
+      const pathOnly = `${outgoing.origin}${outgoing.pathname}`;
+      arcgisRes = await fetch(pathOnly, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: merged.toString(),
+      });
+    } else {
+      if (!outgoing.searchParams.has("token")) {
+        outgoing.searchParams.set("token", access_token);
+      }
+
+      const forwardHeaders: Record<string, string> = {
+        Accept: "application/json",
+      };
+      if (contentType) {
+        forwardHeaders["Content-Type"] = contentType;
+      }
+
+      const body =
+        Buffer.isBuffer(req.body) && req.body.length > 0 ? req.body : undefined;
+
+      arcgisRes = await fetch(outgoing, {
+        method: "POST",
+        headers: forwardHeaders,
+        body,
+      });
     }
-
-    const forwardHeaders: Record<string, string> = {
-      Accept: "application/json",
-    };
-    const contentType = req.headers["content-type"];
-    if (contentType) {
-      forwardHeaders["Content-Type"] = contentType;
-    }
-
-    const body =
-      Buffer.isBuffer(req.body) && req.body.length > 0 ? req.body : undefined;
-
-    const arcgisRes = await fetch(outgoing, {
-      method: "POST",
-      headers: forwardHeaders,
-      body,
-    });
 
     res.status(arcgisRes.status);
     const resCt = arcgisRes.headers.get("content-type");

@@ -38,18 +38,27 @@ export async function getFinishedFlightPlans(
       JOIN lis.finished_plans ffp ON ffp.plan_id = fp.id
       JOIN lis.points pt ON pt.id = ffp.point_id
       LEFT JOIN LATERAL (
-        SELECT jsonb_agg(
-          jsonb_build_object(
-            'id', a.id,
-            'url', a.url,
-            'point_id', a.point_id,
-            'attachmentid', a.attachmentid,
-            'taken_at', a.taken_at,
-            'location', a.location
-          )
+        SELECT COALESCE(
+          (
+            SELECT jsonb_agg(obj ORDER BY ord)
+            FROM (
+              SELECT
+                u.ord,
+                jsonb_build_object(
+                  'id', a.id,
+                  'url', a.url,
+                  'point_id', a.point_id,
+                  'attachmentid', a.attachmentid,
+                  'taken_at', a.taken_at,
+                  'location', a.location
+                ) AS obj
+              FROM unnest(COALESCE(ffp.attachments_id, ARRAY[]::integer[]))
+                WITH ORDINALITY AS u(att_id, ord)
+              JOIN lis.attachments a ON a.id = u.att_id
+            ) sub
+          ),
+          '[]'::jsonb
         ) AS attachments
-        FROM lis.attachments a
-        WHERE a.id = ANY(ffp.attachments_id)
       ) AS att_list ON true
       LEFT JOIN lis.finished_plans_path fpp ON fpp.planid = fp.id
       WHERE fp.status = 'finished'
