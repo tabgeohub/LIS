@@ -21,6 +21,7 @@ import reportUploadRouter from "./routes/reportUpload";
 import geometriesRouter from "./routes/geometries";
 import timesliderRouter from "./routes/timeslider";
 import arcgisRouter from "./routes/arcgis";
+import arcgisPostProxyHandler from "./routes/arcgis/postProxyHandler";
 import { requirePassword, uploadsDir } from "./helpers/requirePassword";
 import { requireSessionAuth } from "./helpers/requireSessionAuth";
 import session from "express-session";
@@ -74,6 +75,14 @@ app.use(
 const JSON_LIMIT = process.env.JSON_LIMIT || "20gb"; // large but finite
 const URLENC_LIMIT = process.env.URLENC_LIMIT || "20gb"; // large but finite
 const PARAM_LIMIT = parseInt(process.env.PARAM_LIMIT || "1000000", 10); // many fields
+
+// ArcGIS POST (applyEdits, addAttachment) must forward raw body; urlencoded/json parsers would drop it.
+app.post(
+  "/api/arcgis/proxy",
+  requireSessionAuth,
+  express.raw({ type: () => true, limit: URLENC_LIMIT }),
+  arcgisPostProxyHandler
+);
 
 app.use(express.json({ limit: JSON_LIMIT }));
 app.use(
