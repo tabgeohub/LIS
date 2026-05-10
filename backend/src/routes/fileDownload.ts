@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
 import { setPassword, hasPassword, verifyPassword } from "./passwordStore";
+import { requireSessionAuth } from "../helpers/requireSessionAuth";
 
 dotenv.config();
 
@@ -64,7 +65,12 @@ const setPasswordHandler: RequestHandler<
   res.status(204).end(); // no content
 };
 
-router.post("/:filename/password", express.json(), setPasswordHandler);
+router.post(
+  "/:filename/password",
+  requireSessionAuth,
+  express.json(),
+  setPasswordHandler
+);
 
 // Show password page
 // @ts-ignore

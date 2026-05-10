@@ -14,6 +14,7 @@ import type {
   PreloadPointResult,
   PreloadGeometryResult,
 } from "./types";
+import { ATTACHMENTS_FEATURE_LAYER_URL } from "@helpers/arcgis/deleteArcgisAttachment";
 
 export function useHandleStep2(
   selectedPlan: FinishedFlightPlanType,
@@ -53,15 +54,12 @@ export function useHandleStep2(
     const totalItems = selectedPointsData.length + selectedGeometriesData.length;
     setZippingStatus("Waarnemingsrapporten worden gegenereerd...");
 
-    const featureLayerUrl =
-      "https://services-eu1.arcgis.com/4D1GBrbE6xp1T4YG/arcgis/rest/services/attachments_layer/FeatureServer";
-
     // Preload attachments for points
     const pointPreloadTasks: (() => Promise<PreloadPointResult>)[] =
       selectedPointsData.map((p) => async () => {
         try {
           const list = await safeFetchPointAttachments(
-            featureLayerUrl,
+            ATTACHMENTS_FEATURE_LAYER_URL,
             p as FinishedPointType
           );
           return { pointId: p.id, attachments: list };
@@ -79,7 +77,7 @@ export function useHandleStep2(
             return { geometryId: g.id, attachments: [] };
           }
           const list = await safeFetchPointAttachments(
-            featureLayerUrl,
+            ATTACHMENTS_FEATURE_LAYER_URL,
             firstPoint as FinishedPointType
           );
           return { geometryId: g.id, attachments: list };
@@ -121,7 +119,7 @@ export function useHandleStep2(
         activities,
         organizations,
         attachmentsByPoint,
-        featureLayerUrl,
+        featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
         tempLayer,
         mapServerUrl: MAPSERVER_URL,
         pilootOptions,
@@ -141,7 +139,7 @@ export function useHandleStep2(
         activities,
         organizations,
         attachmentsByGeometry,
-        featureLayerUrl,
+        featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
         tempLayer,
         mapServerUrl: MAPSERVER_URL,
         pilootOptions,

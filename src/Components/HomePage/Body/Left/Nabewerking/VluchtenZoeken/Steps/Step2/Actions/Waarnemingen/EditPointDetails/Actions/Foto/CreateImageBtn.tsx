@@ -61,12 +61,19 @@ export default function CreateImageBtn({
         newImage
       );
 
+      const first = attachments[0];
+      if (!first?.url || first.objectId == null) {
+        setLoading(false);
+        setNewImage(null);
+        return;
+      }
+
       create(
         {
-          url: attachments[0].url,
+          url: first.url,
           pointId: selectedPoint.id,
-          attachmentId: attachments[0].objectId,
-          taken_at: attachments[0].taken_at,
+          attachmentId: first.objectId,
+          taken_at: first.taken_at,
           long: selectedPoint.longitude,
           lat: selectedPoint.latitude,
         },
@@ -74,11 +81,11 @@ export default function CreateImageBtn({
           if (selectedPoint.attachments.at(0) === null) {
             const newAttachment = [
               {
-                attachmentid: Number(attachments[0].objectId),
+                attachmentid: Number(first.objectId),
                 // @ts-ignore
                 id: Number(responseData.result.id),
                 point_id: Number(selectedPoint.id),
-                taken_at: Number(attachments[0].taken_at),
+                taken_at: Number(first.taken_at),
                 // @ts-ignore
                 url: responseData.result.url,
               },
@@ -122,11 +129,11 @@ export default function CreateImageBtn({
             const newAttachments = [
               ...selectedPoint.attachments,
               {
-                attachmentid: Number(attachments[0].objectId),
+                attachmentid: Number(first.objectId),
                 // @ts-ignore
                 id: Number(responseData.result.id),
                 point_id: Number(selectedPoint.id),
-                taken_at: Number(attachments[0].taken_at),
+                taken_at: Number(first.taken_at),
                 // @ts-ignore
                 url: responseData.result.url,
               },

@@ -1,34 +1,28 @@
 import { FinishedPointType } from "Types/finished_plans";
 import { fetchWithRetry } from "./utils";
-import { refreshToken } from "@helpers/refreshToken";
+import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
 import type { AttachmentWithMeta } from "./types";
+
+const proxyFetchInit: RequestInit = { credentials: "include" };
 
 export async function fetchAttachmentsForPoint(
   featureLayerUrl: string,
   objectId: number
 ): Promise<AttachmentWithMeta[]> {
-  let token = localStorage.getItem("credential_token");
-  if (!token) {
-    try {
-      await refreshToken();
-      token = localStorage.getItem("credential_token");
-    } catch {}
-  }
-
-  const metaUrl = `${featureLayerUrl}/0/${objectId}/attachments?f=json${
-    token ? `&token=${token}` : ""
-  }`;
-  const metadataRes = await fetchWithRetry(metaUrl);
+  const metaUrl = attachmentDisplayUrl(
+    `${featureLayerUrl}/0/${objectId}/attachments?f=json`
+  );
+  const metadataRes = await fetchWithRetry(metaUrl, proxyFetchInit);
   const metadata = await metadataRes.json();
 
   if (!metadata.attachmentInfos) return [];
 
   const attachments = await Promise.allSettled(
     metadata.attachmentInfos.map(async (att: any) => {
-      const url = `${featureLayerUrl}/0/${objectId}/attachments/${att.id}${
-        token ? `?token=${token}` : ""
-      }`;
-      const fileRes = await fetchWithRetry(url);
+      const url = attachmentDisplayUrl(
+        `${featureLayerUrl}/0/${objectId}/attachments/${att.id}`
+      );
+      const fileRes = await fetchWithRetry(url, proxyFetchInit);
       const blob = await fileRes.blob();
       const takenAt =
         att.uploadDate != null
@@ -54,38 +48,27 @@ export async function safeFetchPointAttachments(
   featureLayerUrl: string,
   point: FinishedPointType
 ): Promise<AttachmentWithMeta[]> {
-  const first = point.attachments?.[0];
-  if (first && (first as any)?.attachmentid) {
-    try {
-      return await fetchAttachmentsForPoint(
-        featureLayerUrl,
-        (first as any).attachmentid as number
-      );
-    } catch {}
-  }
+  const list =
+    Array.isArray(point.attachments) && point.attachments.length > 0
+      ? (point.attachments.filter(
+          (att: { url?: string }) =>
+            typeof att?.url === "string" && att.url.length > 0
+        ) as Array<{ url: string; taken_at?: number }>)
+      : [];
 
-  if (Array.isArray(point.attachments) && point.attachments.length > 0) {
-    const list = point.attachments
-      .filter(
-        (att: any) =>
-          typeof att?.url === "string" && (att.url as string).length > 0
-      ) as Array<{ url: string; taken_at?: number }>;
-
+  // Prefer DB-backed rows (URLs on the plan) so reports match VluchtenZoeken after edits.
+  // ArcGIS feature enumeration can still list attachments that were removed from lis.finished_plans only.
+  if (list.length > 0) {
     const results = await Promise.allSettled(
       list.map(async (att) => {
         const rawUrl = att.url;
-        let token = localStorage.getItem("credential_token");
-        if (!token) {
-          try {
-            await refreshToken();
-            token = localStorage.getItem("credential_token");
-          } catch {}
-        }
-        const needsToken = token && /arcgis\.com/.test(rawUrl);
-        const finalUrl = needsToken
-          ? `${rawUrl}${rawUrl.includes("?") ? "&" : "?"}token=${token}`
+        const fetchUrl = /arcgis\.com/i.test(rawUrl)
+          ? attachmentDisplayUrl(rawUrl)
           : rawUrl;
-        const res = await fetchWithRetry(finalUrl);
+        const res = await fetchWithRetry(
+          fetchUrl,
+          /arcgis\.com/i.test(rawUrl) ? proxyFetchInit : {}
+        );
         const blob = await res.blob();
         const nameFromUrl = (() => {
           try {
@@ -105,13 +88,24 @@ export async function safeFetchPointAttachments(
       })
     );
 
-    const ok = results
+    return results
       .filter(
         (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>
           r.status === "fulfilled"
       )
       .map((r) => r.value);
-    return ok;
+  }
+
+  const first = point.attachments?.[0];
+  if (first?.attachmentid != null) {
+    try {
+      return await fetchAttachmentsForPoint(
+        featureLayerUrl,
+        first.attachmentid
+      );
+    } catch {
+      /* fall through */
+    }
   }
 
   return [];

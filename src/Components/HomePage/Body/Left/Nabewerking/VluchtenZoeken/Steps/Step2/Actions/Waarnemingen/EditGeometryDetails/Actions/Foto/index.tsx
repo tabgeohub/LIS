@@ -12,6 +12,8 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { MdLocationOn } from "react-icons/md";
 import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
+import { deleteArcgisPointAttachment } from "@helpers/arcgis/deleteArcgisAttachment";
+import toast from "react-hot-toast";
 
 export default function Foto({
   setAction,
@@ -291,15 +293,31 @@ export default function Foto({
     );
   }
 
-  function deleteImage(attachmentId: number) {
+  async function deleteImage(attachmentId: number) {
     if (!firstPoint || !selectedGeometry || !selectedPlan) return;
+
+    const removed = validAttachments.find((a) => a.id === attachmentId);
+    if (!removed?.url) return;
+
+    setLoading(true);
+    try {
+      await deleteArcgisPointAttachment(
+        removed.url,
+        removed.attachmentid ?? null
+      );
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "Verwijderen op kaartlaag mislukt"
+      );
+      setLoading(false);
+      return;
+    }
 
     const currentIndex = activeIndex;
     const newAttachments = validAttachments.filter(
       (attachment) => attachment && attachment.id !== attachmentId
     );
 
-    // Calculate new index after deletion
     let newIndex = 0;
     if (newAttachments && newAttachments.length > 0) {
       if (currentIndex >= newAttachments.length) {
@@ -317,40 +335,44 @@ export default function Foto({
       attachments_id: newAttachments.flatMap((attachment) => attachment.id),
     };
 
-    update(body, (responseData) => {
-      setActiveIndex(newIndex);
+    update(
+      body,
+      () => {
+        setActiveIndex(newIndex);
 
-      // Update the first point's attachments
-      const updatedFirstPoint: typeof firstPoint = {
-        ...firstPoint,
-        attachments: newAttachments,
-      };
+        const updatedFirstPoint: typeof firstPoint = {
+          ...firstPoint,
+          attachments: newAttachments,
+        };
 
-      // Update all points in geometry with the same attachments (if they share the same point)
-      const updatedPoints = selectedGeometry.points.map((point) =>
-        point.id === firstPoint.id ? updatedFirstPoint : point
-      );
+        const updatedPoints = selectedGeometry.points.map((point) =>
+          point.id === firstPoint.id ? updatedFirstPoint : point
+        );
 
-      const updatedGeometry: typeof selectedGeometry = {
-        ...selectedGeometry,
-        points: updatedPoints,
-      };
+        const updatedGeometry: typeof selectedGeometry = {
+          ...selectedGeometry,
+          points: updatedPoints,
+        };
 
-      setSelectedGeometry(updatedGeometry);
+        setSelectedGeometry(updatedGeometry);
 
-      setSelectedPlan({
-        ...selectedPlan,
-        geometries: selectedPlan.geometries.map((geom) =>
-          geom.id === selectedGeometry.id ? updatedGeometry : geom
-        ),
-        points_data: selectedPlan.points_data.map((point) => {
-          if (point.id === firstPoint.id) {
-            return updatedFirstPoint;
-          }
-          return point;
-        }),
-      });
-    });
+        setSelectedPlan({
+          ...selectedPlan,
+          geometries: selectedPlan.geometries.map((geom) =>
+            geom.id === selectedGeometry.id ? updatedGeometry : geom
+          ),
+          points_data: selectedPlan.points_data.map((point) => {
+            if (point.id === firstPoint.id) {
+              return updatedFirstPoint;
+            }
+            return point;
+          }),
+        });
+
+        setLoading(false);
+      },
+      () => setLoading(false)
+    );
   }
 
   return (

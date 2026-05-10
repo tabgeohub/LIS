@@ -12,6 +12,8 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { MdLocationOn } from "react-icons/md";
 import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
+import { deleteArcgisPointAttachment } from "@helpers/arcgis/deleteArcgisAttachment";
+import toast from "react-hot-toast";
 
 export default function Foto({
   setAction,
@@ -287,56 +289,75 @@ export default function Foto({
     );
   }
 
-  function deleteImage(attachmentId: number) {
+  async function deleteImage(attachmentId: number) {
+    const removed = validAttachments.find((a) => a.id === attachmentId);
+    if (!removed?.url || !selectedPoint || !selectedPlan) return;
+
+    setLoading(true);
+    try {
+      await deleteArcgisPointAttachment(
+        removed.url,
+        removed.attachmentid ?? null
+      );
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "Verwijderen op kaartlaag mislukt"
+      );
+      setLoading(false);
+      return;
+    }
+
     const currentIndex = activeIndex;
     const newAttachments = validAttachments.filter(
       (attachment) => attachment && attachment.id !== attachmentId
     );
 
-    // Calculate new index after deletion
     let newIndex = 0;
     if (newAttachments && newAttachments.length > 0) {
       if (currentIndex >= newAttachments.length) {
-        // If we deleted the last item, show the new last item
         newIndex = newAttachments.length - 1;
       } else {
-        // Otherwise, keep the same index (next image moves up)
         newIndex = currentIndex;
       }
     } else {
-      // No attachments left - close gallery
       setIsOpen(false);
     }
 
     const body = {
-      point_id: selectedPoint?.id,
-      plan_id: selectedPlan?.id,
-      attachments_id: newAttachments?.flatMap((attachment) => attachment.id),
+      point_id: selectedPoint.id,
+      plan_id: selectedPlan.id,
+      attachments_id: newAttachments.flatMap((attachment) => attachment.id),
     };
 
-    update(body, (responseData) => {
-      setActiveIndex(newIndex);
+    update(
+      body,
+      () => {
+        setActiveIndex(newIndex);
 
-      setSelectedPlan({
-        ...selectedPlan,
-        // @ts-ignore
-        points_data: selectedPlan?.points_data.map((point) => {
-          if (point.id === selectedPoint?.id) {
-            return {
-              ...point,
-              attachments: newAttachments,
-            };
-          }
-          return point;
-        }),
-      });
+        setSelectedPlan({
+          ...selectedPlan,
+          // @ts-ignore
+          points_data: selectedPlan?.points_data.map((point) => {
+            if (point.id === selectedPoint.id) {
+              return {
+                ...point,
+                attachments: newAttachments,
+              };
+            }
+            return point;
+          }),
+        });
 
-      setSelectedPoint({
-        ...selectedPoint,
-        // @ts-ignore
-        attachments: validAttachments.filter((attachment) => attachment.id !== attachmentId),
-      });
-    });
+        setSelectedPoint({
+          ...selectedPoint,
+          // @ts-ignore
+          attachments: newAttachments,
+        });
+
+        setLoading(false);
+      },
+      () => setLoading(false)
+    );
   }
 
   return (

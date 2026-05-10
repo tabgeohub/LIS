@@ -7,7 +7,8 @@ import { invalidateCache } from "./useReadData";
 type UseUpdateDataResult<T> = {
   update: (
     data: T,
-    onCallbackSuccess?: (responseData: any) => void
+    onCallbackSuccess?: (responseData: any) => void,
+    onError?: () => void
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -21,7 +22,8 @@ export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
 
   async function update(
     data: any,
-    onCallbackSuccess?: (responseData: any) => void
+    onCallbackSuccess?: (responseData: any) => void,
+    onError?: () => void
   ) {
     setLoading(true);
     setError(null);
@@ -58,6 +60,7 @@ export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
 
       toast.error(message);
       setError(message);
+      onError?.();
     } finally {
       setLoading(false);
     }

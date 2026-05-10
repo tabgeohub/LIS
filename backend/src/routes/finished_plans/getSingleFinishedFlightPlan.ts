@@ -26,24 +26,39 @@ export async function getSingleFinishedFlightPlan(
         FROM ffp_rows
         GROUP BY plan_id, point_id
       ),
-      /* Gather unique attachments per point (attachments_id may be NULL) */
+      /* Attachments in finished_plans.attachments_id order (same as reports / UI) */
+      fp_point_attachments AS (
+        SELECT DISTINCT ON (point_id)
+          point_id,
+          attachments_id
+        FROM ffp_rows
+        ORDER BY point_id, point_order DESC NULLS LAST
+      ),
       attachments_per_point AS (
         SELECT
-          f.point_id,
-          jsonb_agg(DISTINCT 
-            jsonb_build_object(
-              'id', a.id,
-              'url', a.url,
-              'point_id', a.point_id,
-              'attachmentid', a.attachmentid,
-              'taken_at', a.taken_at,
-              'location', a.location
-            )
+          fpa.point_id,
+          COALESCE(
+            (
+              SELECT jsonb_agg(obj ORDER BY ord)
+              FROM (
+                SELECT
+                  u.ord,
+                  jsonb_build_object(
+                    'id', a.id,
+                    'url', a.url,
+                    'point_id', a.point_id,
+                    'attachmentid', a.attachmentid,
+                    'taken_at', a.taken_at,
+                    'location', a.location
+                  ) AS obj
+                FROM unnest(COALESCE(fpa.attachments_id, ARRAY[]::integer[]))
+                  WITH ORDINALITY AS u(att_id, ord)
+                JOIN lis.attachments a ON a.id = u.att_id
+              ) sub
+            ),
+            '[]'::jsonb
           ) AS attachments
-        FROM ffp_rows f
-        LEFT JOIN lis.attachments a
-          ON a.id = ANY(f.attachments_id)
-        GROUP BY f.point_id
+        FROM fp_point_attachments fpa
       )
       SELECT
         fp.*,

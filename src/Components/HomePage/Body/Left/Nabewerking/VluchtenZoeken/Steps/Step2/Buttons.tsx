@@ -16,8 +16,13 @@ export default function Buttons({
 
   const logAction = useLogAction();
 
-  const { graphicsLayer, graphicsLayerHover, redGraphicsLayer, geometriesGraphicsLayer, mapView } =
-    useMapViewState();
+  const {
+    graphicsLayer,
+    graphicsLayerHover,
+    redGraphicsLayer,
+    geometriesGraphicsLayer,
+    mapView,
+  } = useMapViewState();
 
   const handleClear = useHandleClearFinishedPlan();
 
@@ -35,7 +40,7 @@ export default function Buttons({
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
     redGraphicsLayer?.removeAll();
-    
+
     // Clear geometries layer first to remove plan geometries, then reset features to restore all geometries
     geometriesGraphicsLayer?.removeAll();
     resetFeatures();
