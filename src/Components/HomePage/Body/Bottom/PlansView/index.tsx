@@ -51,10 +51,9 @@ export default function PlansView({
         }}
       >
         <div
-          className="h-full w-full overflow-auto thin-scrollbar"
+          className="h-full w-full min-w-0 max-w-full overflow-x-auto overflow-y-auto thin-scrollbar"
           style={{
             maxHeight: containerHeight ? `${containerHeight}px` : undefined,
-            maxWidth: containerWidth ? `${containerWidth}px` : undefined,
           }}
         >
           {renderTabContent()}

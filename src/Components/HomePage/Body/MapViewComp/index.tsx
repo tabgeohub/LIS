@@ -127,13 +127,13 @@ export default function MapViewComp({
     <motion.div
       ref={containerRef}
       variants={{
-        visible: { width: "100vw", transition: { duration: 0.5 } },
-        semiVisible: { width: "60vw", transition: { duration: 0.5 } },
+        visible: { width: "100%", transition: { duration: 0.5 } },
+        semiVisible: { width: "60%", transition: { duration: 0.5 } },
       }}
       initial="semiVisible"
       animate="visible"
       exit="semiVisible"
-      className="relative h-full"
+      className="relative h-full min-w-0 flex-1 overflow-hidden flex flex-col"
     >
       {/* ---------------- TOP (Map) ---------------- */}
       <div
@@ -186,7 +186,7 @@ export default function MapViewComp({
       {openTable && (
         <div
           ref={bottomContainerRef}
-          className="bg-white"
+          className="bg-white w-full min-w-0 shrink-0 overflow-hidden flex flex-col"
           style={{ height: `${panelVh}vh` }}
         >
           <Bottom

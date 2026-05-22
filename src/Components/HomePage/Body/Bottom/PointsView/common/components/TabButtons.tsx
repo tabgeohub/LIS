@@ -29,7 +29,7 @@ export default function TabButtons({
     <div
       role="tablist"
       aria-label="Tabelweergave"
-      className="flex gap-1 px-3 pt-2 pb-0 shrink-0 border-b border-gray-200 bg-gray-50"
+      className="flex gap-1 px-3 pt-2 pb-0 shrink-0 min-w-0 max-w-full overflow-hidden border-b border-gray-200 bg-gray-50"
     >
       {tabs.map(({ id, label, count }) => {
         const isActive = tab === id;

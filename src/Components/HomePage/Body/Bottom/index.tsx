@@ -19,7 +19,7 @@ export default function Bottom({
   const [showTableDiv, setShowTableDiv] = useState(false);
 
   return (
-    <div className="relative h-full w-full flex flex-col">
+    <div className="relative h-full w-full min-w-0 max-w-full flex flex-col overflow-hidden">
       {showTableDiv && (
         <div className="absolute bottom-full right-4 w-full bg-white max-w-80 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] z-10">
           <ClickedTableFunctions />

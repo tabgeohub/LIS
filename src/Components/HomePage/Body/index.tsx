@@ -21,7 +21,9 @@ export default function Body({
         bodyStyle={bodyStyle}
       />
 
-      <MapViewComp mapDiv={mapDiv} vluchtnummer={vluchtnummer} />
+      <div className="flex-1 min-w-0 h-full overflow-hidden">
+        <MapViewComp mapDiv={mapDiv} vluchtnummer={vluchtnummer} />
+      </div>
 
       <Right bodyStyle={bodyStyle} />
 

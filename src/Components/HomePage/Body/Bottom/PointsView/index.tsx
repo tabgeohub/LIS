@@ -62,13 +62,12 @@ export default function PointsView({
   );
   useScrollOrResize(setClickedPointPosition);
   const headerHeight = useHeaderHeight(headerRef);
-  const tableScrollWidth = useTableScrollWidth({
+  const { tableScrollWidth, scrollContainerWidth } = useTableScrollWidth({
     tableScrollRef,
     tab,
     pointsTableLength: pointsTable.length,
     flightPlansLength: flightPlans.length,
     geometriesTableLength: geometriesTable.length,
-    containerWidth,
     starredPointsLength: starredPoints.length,
     starredPlansLength: starredPlans.length,
     starredGeometriesLength: starredGeometries.length,
@@ -78,7 +77,7 @@ export default function PointsView({
       containerHeight,
       headerHeight,
       tableScrollWidth,
-      containerWidth
+      scrollContainerWidth
     );
 
   useMapGraphics({
@@ -120,7 +119,7 @@ export default function PointsView({
 
   return (
     <div className="h-full w-full flex flex-col min-w-0 min-h-0">
-      <div ref={headerRef}>
+      <div ref={headerRef} className="shrink-0 min-w-0 max-w-full overflow-hidden">
         <TabButtons
           tab={tab}
           setTab={setTab}
@@ -131,7 +130,7 @@ export default function PointsView({
       </div>
 
       <div
-        className="flex-1 min-h-0 min-w-0"
+        className="flex-1 min-h-0 min-w-0 max-w-full overflow-hidden flex flex-col"
         style={{
           maxHeight:
             typeof availableHeight === "number"
@@ -147,7 +146,7 @@ export default function PointsView({
           syncingRef={syncingRef}
         />
         <div
-          className="h-full w-full overflow-auto overscroll-contain thin-scrollbar"
+          className="flex-1 min-h-0 min-w-0 max-w-full w-full overflow-x-auto overflow-y-auto overscroll-contain thin-scrollbar"
           ref={tableScrollRef}
           onScroll={() => handleScrollSync("table")}
           style={{
@@ -155,7 +154,6 @@ export default function PointsView({
               typeof scrollAreaHeight === "number"
                 ? `${scrollAreaHeight}px`
                 : undefined,
-            maxWidth: containerWidth ? `${containerWidth}px` : undefined,
           }}
         >
           {tab === "points" ? (

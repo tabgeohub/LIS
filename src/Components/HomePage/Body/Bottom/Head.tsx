@@ -19,8 +19,8 @@ export default function Head({
   const { openAllTable, setOpenAllTable } = useOpenAllTable();
 
   return (
-    <div>
-      <div className="relative flex items-center justify-center py-2 border-[1px]">
+    <div className="min-w-0 max-w-full overflow-hidden">
+      <div className="relative flex items-center justify-center py-2 border-[1px] min-w-0">
         <h4 className="text-md text-gray-400">
           Aandachtspunten vluchtplan '{vluchtnummer}' ({pointsTable.length})
         </h4>

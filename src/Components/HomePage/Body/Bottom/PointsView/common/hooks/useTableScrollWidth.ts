@@ -6,7 +6,6 @@ interface UseTableScrollWidthParams {
   pointsTableLength: number;
   flightPlansLength: number;
   geometriesTableLength: number;
-  containerWidth: number;
   starredPointsLength: number;
   starredPlansLength: number;
   starredGeometriesLength: number;
@@ -18,34 +17,33 @@ export const useTableScrollWidth = ({
   pointsTableLength,
   flightPlansLength,
   geometriesTableLength,
-  containerWidth,
   starredPointsLength,
   starredPlansLength,
   starredGeometriesLength,
 }: UseTableScrollWidthParams) => {
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
+  const [scrollContainerWidth, setScrollContainerWidth] = useState(0);
 
   useEffect(() => {
     const wrapper = tableScrollRef.current;
     if (!wrapper) {
       setTableScrollWidth(0);
+      setScrollContainerWidth(0);
       return;
     }
 
-    const tableEl = wrapper.querySelector("table");
-    if (!tableEl) {
-      setTableScrollWidth(0);
-      return;
-    }
-
-    const updateWidth = () => {
-      setTableScrollWidth(tableEl.scrollWidth);
+    const updateWidths = () => {
+      const tableEl = wrapper.querySelector("table");
+      setScrollContainerWidth(wrapper.clientWidth);
+      setTableScrollWidth(tableEl?.scrollWidth ?? 0);
     };
 
-    updateWidth();
+    updateWidths();
 
-    const observer = new ResizeObserver(updateWidth);
-    observer.observe(tableEl);
+    const observer = new ResizeObserver(updateWidths);
+    observer.observe(wrapper);
+    const tableEl = wrapper.querySelector("table");
+    if (tableEl) observer.observe(tableEl);
 
     return () => observer.disconnect();
   }, [
@@ -54,12 +52,10 @@ export const useTableScrollWidth = ({
     pointsTableLength,
     flightPlansLength,
     geometriesTableLength,
-    containerWidth,
     starredPointsLength,
     starredPlansLength,
     starredGeometriesLength,
   ]);
 
-  return tableScrollWidth;
+  return { tableScrollWidth, scrollContainerWidth };
 };
-

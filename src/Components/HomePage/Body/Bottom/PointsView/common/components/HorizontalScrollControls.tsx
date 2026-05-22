@@ -27,7 +27,7 @@ export default function HorizontalScrollControls({
   };
 
   return (
-    <div className="flex items-center gap-2 mb-1">
+    <div className="flex items-center gap-2 mb-1 min-w-0 max-w-full shrink-0">
       <button
         type="button"
         onClick={() => scrollHorizontally("left", tableScrollRef, topScrollRef)}

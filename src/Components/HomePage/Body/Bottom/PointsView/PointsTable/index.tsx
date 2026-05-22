@@ -113,13 +113,12 @@ export default function PointsTable({
 
   return (
     <div
-      className="w-full"
+      className="w-max min-w-full"
       style={{
         minHeight:
           typeof containerHeight === "number"
             ? `${containerHeight}px`
             : undefined,
-        maxWidth: containerWidth ? `${containerWidth}px` : undefined,
       }}
     >
       <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
