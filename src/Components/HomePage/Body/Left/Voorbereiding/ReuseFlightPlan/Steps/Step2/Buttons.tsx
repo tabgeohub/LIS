@@ -8,13 +8,17 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
 
 export default function Buttons() {
   const {
     clear,
     setStep,
     currentPoints,
+    currentGeometries,
     newPoints,
+    newGeometries,
     omschrijving,
     waarnemer,
     piloot,
@@ -28,6 +32,7 @@ export default function Buttons() {
     selectedPlan,
   } = useReuseFlightPlan();
   const { user } = useAuth();
+  const { dbGeometries } = useGeometriesStore();
 
   const { create, loading } = useCreateData(`/flightPlans`);
 
@@ -40,6 +45,15 @@ export default function Buttons() {
   const logAction = useLogAction();
 
   const handleSubmit = async () => {
+    const points = buildReuseFlightPlanPointIds(
+      currentPoints,
+      newPoints,
+      currentGeometries,
+      newGeometries,
+      dbGeometries,
+      selectedPlan?.geometries ?? []
+    );
+
     const newPlan = {
       vluchtnummer,
       omschrijving,
@@ -51,7 +65,7 @@ export default function Buttons() {
       passagiers: aantalPassagiers,
       hoofdthema: doelEnHoofdthema,
       aanvullende: aanvullendeInfo,
-      points: [...currentPoints, ...newPoints],
+      points,
       basemap: selectedBasemap,
       layers: selectedLayers.join(","),
       user_id: user.user_id,

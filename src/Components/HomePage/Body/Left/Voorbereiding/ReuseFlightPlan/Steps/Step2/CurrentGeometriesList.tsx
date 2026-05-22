@@ -2,7 +2,10 @@
 import { useContent } from "hooks/useContent";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { useEffect, useState } from "react";
-import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
+import {
+  useGeometriesStore,
+  Geometry,
+} from "hooks/features/useGeometriesStore";
 
 export default function CurrentGeometriesList() {
   const { selectedPlan, currentGeometries, setCurrentGeometries } =
@@ -47,13 +50,13 @@ export default function CurrentGeometriesList() {
   }
 
   return (
-    <div>
+    <div className="px-2">
       <p className="text-[12px] text-gray-700 pt-1.5">
-        {content.voorbereiding.vluchtplanHergebruiken.step2.text1} (Geometrieën)
+        {content.voorbereiding.vluchtplanHergebruiken.step2.geometriesText1}
       </p>
 
       <p className="text-[12px] text-gray-700 pt-2">
-        {content.voorbereiding.vluchtplanHergebruiken.step2.text2}
+        {content.voorbereiding.vluchtplanHergebruiken.step2.geometriesText2}
       </p>
 
       <div className="pr-2 mt-2 mb-4 pl-10">
@@ -82,5 +85,3 @@ export default function CurrentGeometriesList() {
     </div>
   );
 }
-
-

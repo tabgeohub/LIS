@@ -43,7 +43,7 @@ export default function NewPointsList() {
 
   return (
     <>
-      <p className="text-[12px] text-gray-700">
+      <p className="text-[12px] text-gray-700 px-2">
         {content.voorbereiding.vluchtplanHergebruiken.step2.text3}
       </p>
 

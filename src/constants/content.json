@@ -321,9 +321,11 @@
         "inspecteerdatum": "Inspectiedatum"
       },
       "step2": {
-        "text1": "Voeg aandachtspunten toe aan vluchtplan. Gebruik de 'ctrl'-toets om een aandachtspunt te deselecteren.",
+        "text1": "Voeg aandachtspunten toe aan vluchtplan.",
         "text2": "Aandachtspunten uit gekopieerde vluchtplan:",
-        "text3": "Aandachtspunten die op 'herhalend' staan:"
+        "text3": "Aandachtspunten die op 'herhalend' staan:",
+        "geometriesText1": "Voeg geometrieën toe aan het vluchtplan.",
+        "geometriesText2": "Geometrieën uit gekopieerde vluchtplan:"
       }
     },
     "vluchtplanVoorbereiding": {

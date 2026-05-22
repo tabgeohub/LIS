@@ -1,12 +1,16 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useContent } from "hooks/useContent";
-import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
+import {
+  useGeometriesStore,
+  Geometry,
+} from "hooks/features/useGeometriesStore";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { useEffect, useState } from "react";
 import { TbLine, TbPolygon } from "react-icons/tb";
 
 export default function NewGeometriesList() {
-  const { selectedPlan, newGeometries, setNewGeometries } = useReuseFlightPlan();
+  const { selectedPlan, newGeometries, setNewGeometries } =
+    useReuseFlightPlan();
   const { graphicsLayer } = useMapViewState();
   const { dbGeometries } = useGeometriesStore();
   const [planGeometries, setPlanGeometries] = useState<Geometry[]>([]);
@@ -15,7 +19,7 @@ export default function NewGeometriesList() {
   useEffect(() => {
     const planGeoms = (selectedPlan as any)?.geometries || [];
     const planGeometryIds = planGeoms.map((g: any) => g.id);
-    
+
     const availableGeometries = dbGeometries.filter(
       (geometry) => !planGeometryIds.includes(geometry.id)
     );
@@ -40,7 +44,7 @@ export default function NewGeometriesList() {
 
   return (
     <>
-      <p className="text-[12px] text-gray-700">
+      <p className="text-[12px] text-gray-700 px-2">
         {content.voorbereiding.vluchtplanHergebruiken.step2.text3} (Geometrieën)
       </p>
 
@@ -77,5 +81,3 @@ export default function NewGeometriesList() {
     </>
   );
 }
-
-

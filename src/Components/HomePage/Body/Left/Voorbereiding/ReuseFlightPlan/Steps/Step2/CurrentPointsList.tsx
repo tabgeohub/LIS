@@ -24,7 +24,7 @@ export default function CurrentPointsList() {
   const content = useContent();
 
   return (
-    <div>
+    <div className="px-2">
       <p className="text-[12px] text-gray-700 pt-1.5">
         {content.voorbereiding.vluchtplanHergebruiken.step2.text1}
       </p>
