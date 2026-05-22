@@ -1,80 +1,39 @@
-import { create } from "zustand";
-import axios from "axios";
-import { FlightPlanType } from "Types";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+/**
+ * @deprecated Use `useFlightPlansList` from `hooks/queries/useFlightPlanQueries` instead.
+ * This module is kept temporarily for any remaining imports during migration.
+ */
+import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
 
-interface FlightPlansState {
-  flightPlans: FlightPlanType[];
-  setFlightPlans: (plans: FlightPlanType[]) => void;
+export function useFlightPlansStore() {
+  const { user } = useAuth();
+  const { data, isPending, refetch } = useFlightPlansList(
+    user.role,
+    user.user_id
+  );
 
-  // Cache: regio_id -> { data, timestamp }
-  cache: Record<string, { data: FlightPlanType[]; timestamp: number }>;
-  
-  // Cache duration in milliseconds (5 minutes)
-  cacheDuration: number;
+  const flightPlans = data ?? EMPTY_FLIGHT_PLANS;
 
-  fetchFlightPlans: (regio_id: string | number) => Promise<void>;
-  refetchFlightPlans: (regio_id: string | number) => Promise<void>;
-  clearFlightPlans: () => void;
+  return {
+    flightPlans,
+    fetchFlightPlans: async (_regio_id: string | number) => {
+      await refetch();
+    },
+    refetchFlightPlans: async (_regio_id: string | number) => {
+      await refetch();
+    },
+    setFlightPlans: () => {
+      console.warn(
+        "useFlightPlansStore.setFlightPlans is deprecated; update via TanStack Query mutations."
+      );
+    },
+    clearFlightPlans: () => {
+      console.warn(
+        "useFlightPlansStore.clearFlightPlans is deprecated; use queryClient.invalidateQueries."
+      );
+    },
+    /** @deprecated use isPending from useFlightPlansList */
+    loading: isPending,
+  };
 }
-
-export const useFlightPlansStore = create<FlightPlansState>((set, get) => ({
-  flightPlans: [],
-  setFlightPlans: (plans) => set({ flightPlans: plans }),
-
-  cache: {},
-  cacheDuration: 5 * 60 * 1000, // 5 minutes
-
-  fetchFlightPlans: async (regio_id: string | number) => {
-    const state = get();
-    const cacheKey = String(regio_id);
-    const now = Date.now();
-    const cached = state.cache[cacheKey];
-
-    // Check if we have cached data that's still fresh
-    if (cached && now - cached.timestamp < state.cacheDuration) {
-      // Data is cached and fresh, use cached data
-      set({ flightPlans: cached.data });
-      return;
-    }
-
-    try {
-      const url = `${getBackEndUrl()}/api/flightPlans?regio_id=${regio_id}`;
-      const res = await axios.get<FlightPlanType[]>(url);
-
-      set({
-        flightPlans: res.data,
-        cache: {
-          ...state.cache,
-          [cacheKey]: { data: res.data, timestamp: now },
-        },
-      });
-    } catch (error) {
-      console.error("Failed to fetch flight plans:", error);
-    }
-  },
-
-  refetchFlightPlans: async (regio_id: string | number) => {
-    const state = get();
-    const cacheKey = String(regio_id);
-    const now = Date.now();
-
-    try {
-      const url = `${getBackEndUrl()}/api/flightPlans?regio_id=${regio_id}`;
-      const res = await axios.get<FlightPlanType[]>(url);
-
-      set({
-        flightPlans: res.data,
-        cache: {
-          ...state.cache,
-          [cacheKey]: { data: res.data, timestamp: now },
-        },
-      });
-    } catch (error) {
-      console.error("Failed to refetch flight plans:", error);
-    }
-  },
-
-  clearFlightPlans: () => set({ flightPlans: [], cache: {} }),
-}));
-

@@ -3,7 +3,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { FlightPlanType } from "Types";
-import { useReadData } from "utils/useReadData";
+import { useUnPreparedPlans } from "hooks/queries/useFlightPlanQueries";
 
 export default function Step1({
   setOpenModal,
@@ -17,9 +17,7 @@ export default function Step1({
   const logAction = useLogAction();
   const { user } = useAuth();
 
-  const { data: unPreparedPlans } = useReadData<FlightPlanType[]>(
-    `/flightPlans/unPreparedPlans?regio_id=${user.role}`
-  );
+  const { data: unPreparedPlans } = useUnPreparedPlans(user.role, user.user_id);
 
   const options = [
     { id: 0, vluchtnummer: "Selecteer een vlucht" },

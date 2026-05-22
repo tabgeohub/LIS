@@ -1,14 +1,12 @@
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
-import { useReadData } from "utils/useReadData";
+import { useVluchtnummerExists } from "hooks/queries/useFlightPlanQueries";
 
 export default function Vluchtnummer() {
   const { vluchtnummer, setVluchtnummer } = useReuseFlightPlan();
 
-  const { data: nbrVluchtNummer } = useReadData(
-    `/flightPlans/vluchtnummer/${vluchtnummer}`
-  );
+  const { data: nbrVluchtNummer } = useVluchtnummerExists(vluchtnummer);
 
   return (
     <>

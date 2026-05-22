@@ -11,7 +11,8 @@ import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import CongfirmationModal from "./CongfirmationModal";
 import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
+import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
+import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
 
 export default function RemoveFlightPlan() {
   const {
@@ -27,19 +28,18 @@ export default function RemoveFlightPlan() {
   const filterPlans = useFilterPlans();
 
   const { user } = useAuth();
-  const { flightPlans, fetchFlightPlans, refetchFlightPlans } = useFlightPlansStore();
+  const {
+    data,
+    isPending,
+    refetch: refetchFlightPlans,
+  } = useFlightPlansList(user.role, user.user_id);
 
-  // Fetch flight plans when component mounts or user changes
-  useEffect(() => {
-    if (user.user_id === undefined || user.user_id === 0) return;
-    fetchFlightPlans(user.role);
-  }, [user.user_id, user.role, fetchFlightPlans]);
+  const plans = data ?? EMPTY_FLIGHT_PLANS;
 
-  const plans = flightPlans;
-  const loading = flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0;
+  const loading = isPending;
   const refetch = () => {
     if (user.user_id === undefined || user.user_id === 0) return;
-    refetchFlightPlans(user.role);
+    refetchFlightPlans();
   };
 
   useEffect(() => {

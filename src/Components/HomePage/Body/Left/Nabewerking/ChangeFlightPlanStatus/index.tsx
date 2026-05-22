@@ -3,7 +3,7 @@ import { FlightPlanType } from "Types";
 import SinglePlan from "./FlightPlan";
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "../../Common/ScrollButtonsLayout";
-import { useReadData } from "utils/useReadData";
+import { useFullPreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
 import Filter from "./Filter";
 import { useFilterPlans } from "hooks/filters/useFilterPlans";
@@ -14,8 +14,9 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 export default function ChangeFlightPlanStatus() {
   const { user } = useAuth();
 
-  const { data: preparedFlightPlans } = useReadData<FlightPlanType[]>(
-    `/flightPlans/fullPreparedFlightPlans?regio_id=${user.role}`
+  const { data: preparedFlightPlans } = useFullPreparedFlightPlans(
+    user.role,
+    user.user_id
   );
 
   const { setFilterTerm, openFilter, filterTerm } = useChangePlanStatusState();

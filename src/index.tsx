@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import axios from "axios";
 import "./index.css";
 import App from "./App";
 import proj4 from "proj4";
+import { queryClient } from "lib/queryClient";
 
 axios.defaults.withCredentials = true;
 
@@ -20,6 +22,8 @@ proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
 
 root.render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </React.StrictMode>
 );

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useReadData } from "utils/useReadData";
+import { useUnPreparedPlans } from "hooks/queries/useFlightPlanQueries";
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { FlightPlanType } from "Types";
@@ -12,9 +12,7 @@ export default function Step1() {
 
   const { user } = useAuth();
 
-  const { data: unPreparedPlans } = useReadData<FlightPlanType[]>(
-    `/flightPlans/unPreparedPlans?regio_id=${user.role}`
-  );
+  const { data: unPreparedPlans } = useUnPreparedPlans(user.role, user.user_id);
 
   const logAction = useLogAction();
 

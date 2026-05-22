@@ -1,4 +1,4 @@
-import { useReadData } from "utils/useReadData";
+import { useVluchtnummerExists } from "hooks/queries/useFlightPlanQueries";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
@@ -7,9 +7,7 @@ import { useContent } from "hooks/useContent";
 export default function Vluchtnummer() {
   const { vluchtnummer, setVluchtnummer } = usePlanDuplicateState();
 
-  const { data: nbrVluchtNummer } = useReadData(
-    `/flightPlans/vluchtnummer/${vluchtnummer}`
-  );
+  const { data: nbrVluchtNummer } = useVluchtnummerExists(vluchtnummer);
 
   const content = useContent();
 

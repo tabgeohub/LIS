@@ -1,7 +1,8 @@
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useState } from "react";
 import { FlightPlanType } from "Types";
-import { useReadData } from "utils/useReadData";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { usePrepreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import Buttons from "./Buttons";
 import useLogAction from "hooks/useLogAction";
 
@@ -16,9 +17,10 @@ export default function StepNo({
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);
 
   const { clickedPoint } = usePopUpState();
+  const { user } = useAuth();
 
-  const { data: prepreparedFlightPlans } = useReadData<FlightPlanType[]>(
-    "/flightPlans/prepreparedFlightPlans"
+  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
+    user.user_id
   );
 
   if (!prepreparedFlightPlans) return null;

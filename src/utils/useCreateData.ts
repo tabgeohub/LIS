@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { invalidateRelatedQueries } from "lib/invalidateRelatedQueries";
 import { invalidateCache } from "./useReadData";
 
 type UseCreateDataResult<T, R> = {
@@ -19,6 +21,7 @@ type UseCreateDataResult<T, R> = {
 export function useCreateData<T, R extends { message?: string; id?: number }>(
   path: string
 ): UseCreateDataResult<T, R> {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -53,6 +56,7 @@ export function useCreateData<T, R extends { message?: string; id?: number }>(
 
       // Invalidate related caches to ensure real-time updates
       invalidateRelatedCaches(path);
+      invalidateRelatedQueries(queryClient, path);
 
       if (onCallbackSuccess) onCallbackSuccess(response.data);
 
