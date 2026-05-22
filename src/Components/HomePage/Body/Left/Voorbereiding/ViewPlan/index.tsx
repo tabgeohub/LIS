@@ -77,22 +77,9 @@ export default function ViewPlan({
   useEffect(() => {
     if (!initialPlans.length && !flightPlans.length) return;
 
-    const nextFiltered = filterPlans(
-      initialPlans,
-      filterInput,
-      dateVan,
-      dateTot
+    setFilteredPlans(
+      filterPlans(initialPlans, filterInput, dateVan, dateTot)
     );
-
-    const { filteredPlans: currentFiltered } = useViewPlanState.getState();
-    if (
-      currentFiltered.length === nextFiltered.length &&
-      currentFiltered.every((p, i) => p.id === nextFiltered[i]?.id)
-    ) {
-      return;
-    }
-
-    setFilteredPlans(nextFiltered);
   }, [dateVan, dateTot, filterInput, initialPlans, flightPlans.length, setFilteredPlans]);
 
   useEffect(() => {

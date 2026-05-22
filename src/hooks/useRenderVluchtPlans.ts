@@ -3,19 +3,14 @@ import { useViewPlanState } from "Components/HomePage/Body/Left/Voorbereiding/Vi
 import { useEffect, useRef } from "react";
 import { FlightPlanType } from "Types";
 
-function plansEqual(a: FlightPlanType[], b: FlightPlanType[]): boolean {
-  if (a === b) return true;
-  if (a.length !== b.length) return false;
-  return a.every((p, i) => p.id === b[i]?.id);
-}
-
 export function useRenderVluchtplans(plans: FlightPlanType[]) {
   const setInitialPlans = useViewPlanState((s) => s.setInitialPlans);
   const syncedRef = useRef<FlightPlanType[] | null>(null);
 
   useEffect(() => {
     if (!plans) return;
-    if (syncedRef.current && plansEqual(syncedRef.current, plans)) return;
+    // React Query returns a new array reference after refetch — do not compare by id only
+    if (syncedRef.current === plans) return;
 
     syncedRef.current = plans;
     setInitialPlans(plans);

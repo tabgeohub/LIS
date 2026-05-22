@@ -1,9 +1,15 @@
+import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
 import { useViewPlanState } from "../../helpers/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import {
+  buildUpdatedPlanFromForm,
+  buildViewPlanUpdatePayload,
+  replacePlanInList,
+} from "./helpers/buildUpdatedPlanFromForm";
 
 export default function Buttons({
   vluchtnummer,
@@ -15,6 +21,7 @@ export default function Buttons({
   refetch: () => void;
 }) {
   const logAction = useLogAction();
+  const { user } = useAuth();
 
   const {
     setStep,
@@ -32,60 +39,67 @@ export default function Buttons({
     setFilteredPlans,
     filteredPlans,
     setSelectedPlan,
+    setInitialPlans,
+    initialPlans,
   } = useViewPlanState();
 
   const { update } = useUpdateData(`/flightPlans/vluchtplans`);
 
-  const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
+  const { pointsTable, geometriesTable, setPointsTable, setGeometriesTable, setOpenTable } =
+    useOpenTable();
 
   const { resetFeatures } = useResetFeatures();
 
   const { yellowGraphicsLayer } = useMapViewState();
 
   const submitStep2 = () => {
-    if (selectedPlan) {
-      const pointIds = selectedPlan.points.map((p) => Number(p.id));
+    if (!selectedPlan || user.user_id === undefined || user.user_id === 0) {
+      return;
+    }
 
-      const payload = {
-        vluchtnummer: vluchtnummer,
-        omschrijving: omschrijving,
-        waarnemer: waarnemer,
-        piloot: piloot,
-        datum: datum,
-        vliegduur: geplandeVliegduur,
-        luchtvaartuig: typeLuchtvaartuig,
-        passagiers: aantalPassagiers,
-        hoofdthema: doelEnHoofdthema,
-        aanvullende: aanvullendeInfo,
-        points: pointIds,
-        id: selectedPlan.id,
-        status: selectedPlan.status,
-        user_id: 1,
-      };
+    const form = {
+      vluchtnummer,
+      omschrijving,
+      waarnemer,
+      piloot,
+      datum,
+      geplandeVliegduur,
+      typeLuchtvaartuig,
+      aantalPassagiers,
+      doelEnHoofdthema,
+      aanvullendeInfo,
+    };
 
-      update(payload);
+    const payload = buildViewPlanUpdatePayload(
+      selectedPlan,
+      form,
+      pointsTable,
+      geometriesTable,
+      user.user_id
+    );
 
-      refetch();
+    const updatedPlan = buildUpdatedPlanFromForm(
+      selectedPlan,
+      form,
+      pointsTable,
+      geometriesTable
+    );
 
-      const updatedFilteredPlans = filteredPlans.map((plan) => {
-        if (plan.id === selectedPlan.id) {
-          return {
-            ...plan,
-            status: selectedPlan.status,
-          };
-        }
-        return plan;
-      });
+    update(payload, async () => {
+      setFilteredPlans(replacePlanInList(filteredPlans, updatedPlan));
+      setInitialPlans(replacePlanInList(initialPlans, updatedPlan));
+      setSelectedPlan(updatedPlan);
 
-      setFilteredPlans(updatedFilteredPlans);
+      await refetch();
 
       setStep(1);
 
       logAction({
         message: "User clicked 'Save' button",
         step: "View plan - Step 2",
+        newData: payload,
       });
-    }
+    });
   };
 
   return (
