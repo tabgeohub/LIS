@@ -16,7 +16,7 @@ export default function FlightPlanDetails({
         setFlightPlanDetails={setFlightPlanDetails}
       />
 
-      <Details flightPlan={flightPlan!} />
+      {flightPlan && <Details flightPlan={flightPlan} />}
     </div>
   );
 }

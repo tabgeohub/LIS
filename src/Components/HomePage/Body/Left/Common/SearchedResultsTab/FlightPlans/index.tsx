@@ -75,9 +75,9 @@ export default function FlightPlans({
         />
       )}
 
-      {flightPlanDetails && (
+      {flightPlanDetails && flightPlan && (
         <FlightPlanDetails
-          flightPlan={flightPlan!}
+          flightPlan={flightPlan}
           setFlightPlanDetails={setFlightPlanDetails}
         />
       )}

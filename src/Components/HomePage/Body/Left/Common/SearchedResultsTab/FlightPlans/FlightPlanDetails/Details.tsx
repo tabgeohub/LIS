@@ -9,6 +9,8 @@ export default function Details({
   const { beginTime, endTime, durationSeconds, totalDistance } =
     useGetFlightTimesDistance(flightPlan);
 
+  if (!flightPlan) return null;
+
   return (
     <div className="space-y-2 px-2 h-[65vh] overflow-y-scroll">
       <div className="py-2">Details</div>
@@ -113,7 +115,9 @@ export default function Details({
       <div>
         <p className="text-gray-500 text-sm">Gevlogen afstand</p>
         <p className="text-sm">
-          {totalDistance ? totalDistance.toFixed(4) : "-"} m
+          {typeof totalDistance === "number"
+            ? `${totalDistance.toFixed(4)} m`
+            : "-"}
         </p>
       </div>
 
@@ -129,10 +133,7 @@ export default function Details({
 
 function formatDate(input: string) {
   const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return input;
 
-  const formatted = `${
-    date.getMonth() + 1
-  }/${date.getDate()}/${date.getFullYear()}`;
-
-  return formatted;
+  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 }

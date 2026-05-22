@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useReadData } from "utils/useReadData";
 
 export function useGetFlightTimesDistance(flightPlan: any) {
-  const { data: planPath } = useReadData<{
-    flighttime: {
-      time: number;
-      action: string;
-    }[];
-  }>(`/finished_plans/getPlanPath/${flightPlan?.id}`);
+  const { data: planPath } = useReadData<
+    {
+      path?: { latitude: number; longitude: number }[] | null;
+      flighttime?: { time: number; action: string }[] | null;
+    }[]
+  >(`/finished_plans/getPlanPath/${flightPlan?.id}`);
 
   const [beginTime, setBeginTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
@@ -16,13 +16,18 @@ export function useGetFlightTimesDistance(flightPlan: any) {
   const [totalDistance, setTotalDistance] = useState<number | null>(null);
 
   useEffect(() => {
-    if (planPath === null || planPath === undefined) return;
+    if (!planPath?.[0]) {
+      setBeginTime(null);
+      setEndTime(null);
+      setDurationSeconds(null);
+      setTotalDistance(null);
+      return;
+    }
 
-    if (planPath[0].path === null || planPath[0].path === undefined) return;
+    const row = planPath[0];
+    const pathPoints = row.path;
 
-    const pathPoints = planPath[0].path;
-
-    if (pathPoints.length >= 2) {
+    if (Array.isArray(pathPoints) && pathPoints.length >= 2) {
       let distanceSum = 0;
       for (let i = 1; i < pathPoints.length; i++) {
         const p1 = pathPoints[i - 1];
@@ -35,14 +40,18 @@ export function useGetFlightTimesDistance(flightPlan: any) {
         );
       }
       setTotalDistance(distanceSum);
+    } else {
+      setTotalDistance(null);
     }
 
-    if (!planPath[0].flighttime || !Array.isArray(planPath[0].flighttime))
+    if (!row.flighttime || !Array.isArray(row.flighttime) || row.flighttime.length === 0) {
+      setBeginTime(null);
+      setEndTime(null);
+      setDurationSeconds(null);
       return;
+    }
 
-    const flighttimes = planPath[0].flighttime.filter(
-      (item) => item.action === "start"
-    );
+    const flighttimes = row.flighttime.filter((item) => item.action === "start");
 
     if (flighttimes.length >= 1) {
       const startTimestamps = flighttimes.map((item) => item.time).sort();
@@ -54,6 +63,10 @@ export function useGetFlightTimesDistance(flightPlan: any) {
       setDurationSeconds(
         Math.round((endTimestamp - beginTimestamp) / 1000 / 60)
       );
+    } else {
+      setBeginTime(null);
+      setEndTime(null);
+      setDurationSeconds(null);
     }
   }, [planPath]);
 
