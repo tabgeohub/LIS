@@ -4,16 +4,24 @@ import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { FlightPlanType } from "Types";
+import {
+  buildUniquePointIds,
+  drawYellowGeometries,
+  drawYellowPoint,
+  getGeometryVertexIds,
+  mergeGeometries,
+  resolveStandalonePoints,
+} from "./helpers";
 
 export default function Buttons({
   selectedPointIds,
+  selectedGeometryIds,
   update,
 }: {
   selectedPointIds: number[];
+  selectedGeometryIds: number[];
   update: any;
 }) {
   const content = useContent();
@@ -27,82 +35,85 @@ export default function Buttons({
   } = useViewPlanState();
 
   const { dbPoints } = usePointsStore();
+  const { dbGeometries, setGeometries } = useGeometriesStore();
   const { yellowGraphicsLayer } = useMapViewState();
-  const { setPointsTable, setGeometriesTable } = useOpenTable();
+  const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
 
   const logAction = useLogAction();
 
   function handleSubmit() {
     if (!selectedPlan) return;
 
-    const checkedPoints = dbPoints.filter((p) =>
-      selectedPointIds.includes(p.id)
+    const uniquePointIds = buildUniquePointIds(
+      selectedPlan,
+      selectedPointIds,
+      selectedGeometryIds,
+      dbGeometries
     );
 
-    const mergedPointsIds = [
-      ...(selectedPlan.points.flatMap((p) => p.id) || []),
-      ...selectedPointIds,
-    ];
+    const updatedGeometries = mergeGeometries(
+      selectedPlan.geometries,
+      selectedGeometryIds,
+      dbGeometries
+    );
 
-    const uniqueIds = Array.from(new Set(mergedPointsIds));
+    const standalonePoints = resolveStandalonePoints(
+      uniquePointIds,
+      dbPoints,
+      updatedGeometries
+    );
+
+    const vertexIds = getGeometryVertexIds(updatedGeometries);
+    const newlySelectedStandalonePoints = dbPoints.filter(
+      (p) => selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
+    );
 
     update(
       {
-        points: uniqueIds,
-        id: selectedPlan?.id,
+        points: uniquePointIds,
+        id: selectedPlan.id,
       },
       () => {
-        const updatedPoints = dbPoints.filter((p) => uniqueIds.includes(p.id));
-
-        setSelectedPlan({
+        const updatedPlan: FlightPlanType = {
           ...selectedPlan,
-          points: updatedPoints,
-          pointsObjects: updatedPoints,
-        });
+          points: standalonePoints,
+          pointsObjects: standalonePoints,
+          geometries: updatedGeometries,
+        };
 
-        setPointsTable(updatedPoints);
-        setGeometriesTable(selectedPlan.geometries || []);
+        setSelectedPlan(updatedPlan);
+        setPointsTable(standalonePoints);
+        setGeometriesTable(updatedGeometries);
+        setGeometries(updatedGeometries);
+        setOpenTable(true);
 
-        // Add yellow points to the map from checkedPoints array
-        checkedPoints?.forEach((selectedPoint) => {
-          const yellow = new SimpleMarkerSymbol({
-            color: "yellow",
-            size: 12,
-            style: "circle",
-            outline: {
-              color: "white",
-              width: 1,
-            },
-          });
-
-          // Prefer WGS84 if available; otherwise convert RD -> WGS84
-          const coords = getPointCoordinates(selectedPoint as any);
-          if (!coords) return;
-
-          const geometry = new Point({
-            longitude: coords.longitude,
-            latitude: coords.latitude,
-            spatialReference: { wkid: 4326 },
-          });
-
-          const graphic = new Graphic({
-            geometry,
-            symbol: yellow,
-            attributes: selectedPoint,
-          });
-
-          yellowGraphicsLayer?.add(graphic);
-        });
-
-        // Update only plan with id === selectedPlan?.id inside filteredPlans
-        setFilteredPlans(
-          filteredPlans.map((p) => ({
-            ...p,
-            points: p.id === selectedPlan?.id ? updatedPoints : p.points,
-            pointsObjects:
-              p.id === selectedPlan?.id ? updatedPoints : p.pointsObjects,
-          }))
+        newlySelectedStandalonePoints.forEach((point) =>
+          drawYellowPoint(point, yellowGraphicsLayer)
         );
+
+        drawYellowGeometries(updatedGeometries, yellowGraphicsLayer);
+
+        setFilteredPlans(
+          filteredPlans.map((p) =>
+            p.id === selectedPlan.id
+              ? {
+                  ...p,
+                  points: standalonePoints,
+                  pointsObjects: standalonePoints,
+                  geometries: updatedGeometries,
+                }
+              : p
+          )
+        );
+
+        logAction({
+          message: "User saved points and geometries to flight plan",
+          newData: {
+            planId: selectedPlan.id,
+            pointIds: uniquePointIds,
+            geometryIds: updatedGeometries.map((g) => g.id),
+          },
+        });
 
         setStep(2);
       }

@@ -1,7 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
+import {
+  useGeometriesStore,
+  Geometry,
+} from "hooks/features/useGeometriesStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
@@ -58,7 +61,7 @@ export default function AddPointToPlan() {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch { }
+      } catch {}
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -98,7 +101,7 @@ export default function AddPointToPlan() {
     // Remove pins that are no longer selected
     pinRefs.current.forEach((value, key) => {
       if (!currentIds.has(key)) {
-        mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
+        mapView?.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
         pinRefs.current.delete(key);
       }
     });
@@ -106,7 +109,7 @@ export default function AddPointToPlan() {
     // Add pins for newly selected
     dbPoints.forEach((pt) => {
       if (!currentIds.has(pt.id) || pinRefs.current.has(pt.id)) return;
-      const res = createPin(pt as any, mapView, pt.omschrijving);
+      const res = createPin(pt as any, mapView as any, pt.omschrijving);
       pinRefs.current.set(pt.id, res);
     });
   }, [selectedPointIds, mapView, dbPoints]);
@@ -128,7 +131,13 @@ export default function AddPointToPlan() {
 
   return (
     <ScrollButtonsLayout
-      buttons={<Buttons selectedPointIds={selectedPointIds} update={update} />}
+      buttons={
+        <Buttons
+          selectedPointIds={selectedPointIds}
+          selectedGeometryIds={selectedGeometryIds}
+          update={update}
+        />
+      }
     >
       <Loading loading={loading} />
 
