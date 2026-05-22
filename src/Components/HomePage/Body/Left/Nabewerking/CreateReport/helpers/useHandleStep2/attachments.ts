@@ -5,7 +5,7 @@ import type { AttachmentWithMeta } from "./types";
 
 const proxyFetchInit: RequestInit = { credentials: "include" };
 
-export async function fetchAttachmentsForPoint(
+async function fetchAttachmentsForPoint(
   featureLayerUrl: string,
   objectId: number
 ): Promise<AttachmentWithMeta[]> {
@@ -30,7 +30,11 @@ export async function fetchAttachmentsForPoint(
           : att.creationDate != null
             ? new Date(att.creationDate).getTime()
             : undefined;
-      return { name: att.name || `attachment_${att.id}`, blob, taken_at: takenAt };
+      return {
+        name: att.name || `attachment_${att.id}`,
+        blob,
+        taken_at: takenAt,
+      };
     })
   );
 
@@ -90,8 +94,13 @@ export async function safeFetchPointAttachments(
 
     return results
       .filter(
-        (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>
-          r.status === "fulfilled"
+        (
+          r
+        ): r is PromiseFulfilledResult<{
+          name: string;
+          blob: Blob;
+          taken_at: number | undefined;
+        }> => r.status === "fulfilled"
       )
       .map((r) => r.value);
   }
@@ -110,4 +119,3 @@ export async function safeFetchPointAttachments(
 
   return [];
 }
-

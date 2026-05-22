@@ -36,7 +36,7 @@ const CACHE_DURATION = 5 * 60 * 1000;
  */
 export function invalidateCache(pattern: string, exactMatch = false): void {
   const keysToInvalidate: string[] = [];
-  
+
   if (exactMatch) {
     keysToInvalidate.push(pattern);
   } else {
@@ -47,12 +47,12 @@ export function invalidateCache(pattern: string, exactMatch = false): void {
       }
     });
   }
-  
+
   // Invalidate cache and trigger refetch for active hooks
   keysToInvalidate.forEach((key) => {
     cache.delete(key);
     inFlightRequests.delete(key);
-    
+
     // Trigger refetch for all active hooks using this path
     const callbacks = activeRefetchCallbacks.get(key);
     if (callbacks) {
@@ -65,7 +65,7 @@ export function invalidateCache(pattern: string, exactMatch = false): void {
         }
       });
     }
-    
+
     // Also trigger refetch for hooks with paths that contain the invalidated key
     activeRefetchCallbacks.forEach((callbacks, activeKey) => {
       if (activeKey.includes(pattern) && activeKey !== key) {
@@ -81,29 +81,11 @@ export function invalidateCache(pattern: string, exactMatch = false): void {
   });
 }
 
-/**
- * Clear all cache entries
- */
-export function clearAllCache(): void {
-  cache.clear();
-  inFlightRequests.clear();
-  // Trigger refetch for all active hooks
-  activeRefetchCallbacks.forEach((callbacks) => {
-    callbacks.forEach((refetch) => {
-      try {
-        refetch();
-      } catch (err) {
-        console.warn("Error during cache clear refetch:", err);
-      }
-    });
-  });
-}
-
 export function useReadData<T>(path: string): UseReadDataResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Use ref to store the latest fetchData function to avoid stale closures
   const fetchDataRef = useRef<(bypassCache?: boolean) => Promise<void>>();
 
@@ -187,7 +169,7 @@ export function useReadData<T>(path: string): UseReadDataResult<T> {
       setLoading(false);
     }
   };
-  
+
   // Store the latest fetchData in ref
   fetchDataRef.current = fetchData;
 
@@ -205,21 +187,21 @@ export function useReadData<T>(path: string): UseReadDataResult<T> {
   // Register refetch callback for automatic cache invalidation
   useEffect(() => {
     if (!path || path === "") return;
-    
+
     const cacheKey = path;
     if (!activeRefetchCallbacks.has(cacheKey)) {
       activeRefetchCallbacks.set(cacheKey, new Set());
     }
-    
+
     // Create a stable refetch wrapper that always calls the latest fetchData
     const refetchWrapper = () => {
       if (fetchDataRef.current) {
         fetchDataRef.current(true);
       }
     };
-    
+
     activeRefetchCallbacks.get(cacheKey)!.add(refetchWrapper);
-    
+
     // Cleanup: remove refetch callback when component unmounts or path changes
     return () => {
       const callbacks = activeRefetchCallbacks.get(cacheKey);

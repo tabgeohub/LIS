@@ -15,7 +15,7 @@ export type ViewPlanFormFields = {
 };
 
 /** All point IDs to persist: standalone (table) + geometry vertices. */
-export function collectPointIdsFromTables(
+function collectPointIdsFromTables(
   pointsTable: EnrichedPointType[],
   geometriesTable: Geometry[]
 ): number[] {

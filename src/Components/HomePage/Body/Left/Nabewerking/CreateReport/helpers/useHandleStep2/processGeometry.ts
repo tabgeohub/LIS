@@ -10,7 +10,7 @@ import { getStaticMapImage } from "./mapImage";
 import { safeFetchPointAttachments } from "./attachments";
 import { ProcessGeometryParams, ProcessedItem } from "./types";
 
-export function calculateGeometryCentroid(geometry: FinishedGeometryType): {
+function calculateGeometryCentroid(geometry: FinishedGeometryType): {
   longitude: number;
   latitude: number;
 } | null {
@@ -147,16 +147,13 @@ export async function processGeometry(
     luchtvaartuig: selectedPlan.luchtvaartuig,
     hoofdthema: selectedPlan.hoofdthema,
     organisatie:
-      organizations.find(
-        (org: any) => org.value === firstPoint.organisatie_id
-      )?.label || "",
+      organizations.find((org: any) => org.value === firstPoint.organisatie_id)
+        ?.label || "",
     activiteit:
-      activities.find(
-        (act: any) => act.value === firstPoint.activiteit_id
-      )?.label || "",
+      activities.find((act: any) => act.value === firstPoint.activiteit_id)
+        ?.label || "",
     regio: firstPoint.regio_id,
-    omschrijving:
-      geometry.geometry_omschrijving || `Geometrie ${geometry.id}`,
+    omschrijving: geometry.geometry_omschrijving || `Geometrie ${geometry.id}`,
     aanvullende: geometry.id,
     rdX: firstPoint.xcoordinaat_rd,
     rdY: firstPoint.ycoordinaat_rd,
@@ -202,4 +199,3 @@ export async function processGeometry(
     pointName: safeName,
   };
 }
-

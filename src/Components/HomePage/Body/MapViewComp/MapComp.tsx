@@ -129,7 +129,9 @@ export default function MapComp({
               attrs.name ||
               attrs.label ||
               attrs.title ||
-              (geometryType === "polygon" ? "Onbekend veelhoek" : "Onbekend lijn");
+              (geometryType === "polygon"
+                ? "Onbekend veelhoek"
+                : "Onbekend lijn");
           } else {
             label =
               attrs.omschrijving ||
@@ -151,7 +153,10 @@ export default function MapComp({
           graphicsLayerHover?.removeAll();
 
           // Choose appropriate hover symbol based on geometry type
-          let hoverSymbol: SimpleMarkerSymbol | SimpleFillSymbol | SimpleLineSymbol;
+          let hoverSymbol:
+            | SimpleMarkerSymbol
+            | SimpleFillSymbol
+            | SimpleLineSymbol;
           if (geometryType === "polygon") {
             hoverSymbol = polygonHoverSymbol;
           } else if (geometryType === "polyline") {
@@ -190,8 +195,6 @@ export default function MapComp({
   return (
     <div className="mapView h-full w-full" ref={mapDiv}>
       <BasemapWidget />
-
-      {/* <LayersWidget /> */}
     </div>
   );
 }

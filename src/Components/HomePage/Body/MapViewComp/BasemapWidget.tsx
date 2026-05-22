@@ -30,7 +30,7 @@ export default function BasemapWidget() {
   }, []);
 
   return (
-    <div className="absolute bottom-24 left-6 z-[10]">
+    <div className="absolute bottom-8 left-6 z-[10]">
       <button
         onClick={() => setOpen((v) => !v)}
         className="rounded-md bg-white shadow-sm border p-1 flex items-center justify-center hover:bg-gray-50"
