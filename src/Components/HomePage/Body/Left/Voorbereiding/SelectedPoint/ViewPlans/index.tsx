@@ -1,7 +1,7 @@
 import PlansList from "./PlansList";
 import { useState } from "react";
 import PlanInformation from "./PlanInformation";
-import { useReadData } from "utils/useReadData";
+import { usePointFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import { FlightPlanType } from "Types";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 
@@ -12,9 +12,7 @@ export default function ViewPlans() {
 
   const [step, setStep] = useState(1);
 
-  const { data: plans } = useReadData<FlightPlanType[]>(
-    `/points/flightPlans/${clickedPoint?.id}`
-  );
+  const { data: plans } = usePointFlightPlans(clickedPoint?.id);
 
   if (!plans) return null;
 

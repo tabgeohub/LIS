@@ -18,7 +18,8 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";
 import AddPointToPlan from "./Steps/AddPointToPlan";
-import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
+import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
+import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
 
 export default function ViewPlan({
   vluchtnummer,
@@ -56,43 +57,43 @@ export default function ViewPlan({
     setDoelEnHoofdthema,
     setAanvullendeInfo,
     setSelectedPlan,
-    setInitialPlans,
   } = useViewPlanState();
 
-  const { flightPlans, fetchFlightPlans, refetchFlightPlans } = useFlightPlansStore();
+  const {
+    data,
+    isPending,
+    refetch: refetchFlightPlans,
+  } = useFlightPlansList(user.role, user.user_id);
 
-  // Fetch flight plans when component mounts or user changes
-  useEffect(() => {
-    if (user.user_id === undefined || user.user_id === 0) return;
-    fetchFlightPlans(user.role);
-  }, [user.user_id, user.role]);
-
-  // Update initialPlans when flightPlans are fetched
-  useEffect(() => {
-    if (flightPlans.length > 0) {
-      setInitialPlans(flightPlans);
-    }
-  }, [flightPlans, setInitialPlans]);
+  const flightPlans = data ?? EMPTY_FLIGHT_PLANS;
 
   const refetch = () => {
     if (user.user_id === undefined || user.user_id === 0) return;
-    refetchFlightPlans(user.role);
+    refetchFlightPlans();
   };
 
   useRenderVluchtplans(flightPlans);
 
   useEffect(() => {
-    if (!initialPlans) return;
+    if (!initialPlans.length && !flightPlans.length) return;
 
-    const filteredPlans = filterPlans(
+    const nextFiltered = filterPlans(
       initialPlans,
       filterInput,
       dateVan,
       dateTot
     );
 
-    setFilteredPlans(filteredPlans);
-  }, [dateVan, dateTot, filterInput, initialPlans]);
+    const { filteredPlans: currentFiltered } = useViewPlanState.getState();
+    if (
+      currentFiltered.length === nextFiltered.length &&
+      currentFiltered.every((p, i) => p.id === nextFiltered[i]?.id)
+    ) {
+      return;
+    }
+
+    setFilteredPlans(nextFiltered);
+  }, [dateVan, dateTot, filterInput, initialPlans, flightPlans.length, setFilteredPlans]);
 
   useEffect(() => {
     setFilterInput("");
@@ -124,7 +125,7 @@ export default function ViewPlan({
     setStep(1);
   }
 
-  const loading = flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0;
+  const loading = isPending;
 
   return (
     <>

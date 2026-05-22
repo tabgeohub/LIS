@@ -9,7 +9,9 @@
       "hooks/*": ["./src/hooks/*"],
       "Components/*": ["./src/Components/*"],
       "Types/*": ["./src/Types/*"],
-      "utils/*": ["./src/utils/*"]
+      "utils/*": ["./src/utils/*"],
+      "lib/*": ["./src/lib/*"],
+      "api/*": ["./src/api/*"]
     },
     // "strictNullChecks": false,
     "noImplicitAny": false,

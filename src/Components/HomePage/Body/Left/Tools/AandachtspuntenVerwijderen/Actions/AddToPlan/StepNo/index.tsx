@@ -1,7 +1,8 @@
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { useState } from "react";
 import { FlightPlanType } from "Types";
-import { useReadData } from "utils/useReadData";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { usePrepreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import Buttons from "./Buttons";
 import Step2 from "./Step2";
 import { useContent } from "hooks/useContent";
@@ -11,9 +12,10 @@ export default function StepNo() {
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);
 
   const { selectedPoint } = useDeletePointState();
+  const { user } = useAuth();
 
-  const { data: prepreparedFlightPlans } = useReadData<FlightPlanType[]>(
-    "/flightPlans/prepreparedFlightPlans"
+  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
+    user.user_id
   );
 
   const content = useContent();

@@ -1,7 +1,7 @@
 import PlansList from "./PlansList";
 import { useState } from "react";
 import PlanInformation from "./PlanInformation";
-import { useReadData } from "utils/useReadData";
+import { usePointFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { FlightPlanType } from "Types";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
@@ -13,8 +13,8 @@ export default function ViewPlans() {
 
   const [step, setStep] = useState(1);
 
-  const { data: plans, loading } = useReadData<FlightPlanType[]>(
-    `/points/flightPlans/${selectedPoint?.id}`
+  const { data: plans, isPending: loading } = usePointFlightPlans(
+    selectedPoint?.id
   );
 
   if (!plans) return null;

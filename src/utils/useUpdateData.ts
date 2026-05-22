@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { invalidateRelatedQueries } from "lib/invalidateRelatedQueries";
 import { invalidateCache } from "./useReadData";
 
 type UseUpdateDataResult<T> = {
@@ -16,6 +18,7 @@ type UseUpdateDataResult<T> = {
 };
 
 export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -47,6 +50,7 @@ export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
 
       // Invalidate related caches to ensure real-time updates
       invalidateRelatedCaches(path);
+      invalidateRelatedQueries(queryClient, path);
 
       if (onCallbackSuccess) onCallbackSuccess(response.data);
     } catch (err) {

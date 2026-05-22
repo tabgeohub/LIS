@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FlightPlanType } from "Types";
-import { useReadData } from "utils/useReadData";
+import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { usePrepreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import Buttons from "./Buttons";
 
 export default function StepMultiplePoints({
@@ -10,9 +11,10 @@ export default function StepMultiplePoints({
 }) {
   const [subStep, setSubStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);
+  const { user } = useAuth();
 
-  const { data: prepreparedFlightPlans } = useReadData<FlightPlanType[]>(
-    "/flightPlans/prepreparedFlightPlans"
+  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
+    user.user_id
   );
 
   if (!prepreparedFlightPlans) return null;

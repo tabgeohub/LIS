@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SearchedResults from "./SearchedResults";
 import FlightPlans from "./FlightPlans";
 import { useReadData } from "utils/useReadData";
+import { useSearchedFlightPlans } from "hooks/queries/useFlightPlanQueries";
 import { useSearchKeyword } from "@helpers/ZustandStates/searchKeyword";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import PointsBuffer from "./Functions/PointsBuffer";
@@ -24,9 +25,7 @@ export default function SearchedResultsTab() {
 
   const { searchKeyword } = useSearchKeyword();
 
-  const { data: flightPlansData } = useReadData<FlightPlanType[]>(
-    `/flightPlans/searchedFlightplan?search=${searchKeyword}`
-  );
+  const { data: flightPlansData } = useSearchedFlightPlans(searchKeyword);
 
   const { data: pointsData } = useReadData<EnrichedPointType[]>(
     `/points/searchedPoints/${searchKeyword}`

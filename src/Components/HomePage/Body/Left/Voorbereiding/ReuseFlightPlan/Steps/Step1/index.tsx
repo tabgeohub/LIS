@@ -8,23 +8,18 @@ import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Filter from "../../Common/Filter";
 import Loading from "../../Common/Loading";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
-import { useEffect } from "react";
+import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
+import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
 
 export default function Step1() {
   const { openFilter, filterTerm, setFilterTerm } = useReuseFlightPlan();
 
   const { user } = useAuth();
-  const { flightPlans, fetchFlightPlans } = useFlightPlansStore();
+  const { data, isPending } = useFlightPlansList(user.role, user.user_id);
 
-  // Fetch flight plans when component mounts or user changes
-  useEffect(() => {
-    if (user.user_id === undefined || user.user_id === 0) return;
-    fetchFlightPlans(user.role);
-  }, [user.user_id, user.role, fetchFlightPlans]);
+  const plans = data ?? EMPTY_FLIGHT_PLANS;
 
-  const plans = flightPlans;
-  const loading = flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0;
+  const loading = isPending;
 
   const filteredPlans = useMemo(() => {
     if (!plans) return [];

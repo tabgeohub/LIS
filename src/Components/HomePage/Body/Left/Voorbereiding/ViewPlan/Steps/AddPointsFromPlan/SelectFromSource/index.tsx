@@ -2,8 +2,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import { useFlightPlansStore } from "hooks/features/useFlightPlansStore";
-import { useReadData } from "utils/useReadData";
+import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
+import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
+import { useTemplateFlights } from "hooks/queries/useTemplateFlightQueries";
 import { useContent } from "hooks/useContent";
 import { useViewPlanState } from "../../../helpers/useViewPlanState";
 import PlansList from "./PlansList";
@@ -42,24 +43,23 @@ export default function SelectFromSource({ source }: { source: Source }) {
 
   const { selectedPlan } = useViewPlanState();
   const { dbPoints } = usePointsStore();
-  const { flightPlans, fetchFlightPlans } = useFlightPlansStore();
+  const { data: flightPlansData, isPending: flightPlansPending } =
+    useFlightPlansList(user.role, user.user_id, source === "flightPlans");
 
-  // Fetch flight plans when component mounts or user changes (only for flightPlans source)
-  useEffect(() => {
-    if (source === "flightPlans" && user.user_id !== undefined && user.user_id !== 0) {
-      fetchFlightPlans(user.role);
-    }
-  }, [source, user.user_id, user.role, fetchFlightPlans]);
+  const flightPlans = flightPlansData ?? EMPTY_FLIGHT_PLANS;
 
-  // Use shared store for flightPlans, useReadData for templates
-  const { data: templateData, loading: templateLoading } = useReadData<Template[]>(
-    source === "templates" ? `/templateFlight?regio_id=${user.role}` : ""
+  const { data: templateData, isPending: templatePending } = useTemplateFlights(
+    user.role,
+    user.user_id,
+    source === "templates"
   );
 
-  const data = source === "flightPlans" ? (flightPlans as FlightPlanType[] | Template[]) : templateData;
-  const dataLoading = source === "flightPlans"
-    ? (flightPlans.length === 0 && user.user_id !== undefined && user.user_id !== 0)
-    : templateLoading;
+  const data =
+    source === "flightPlans"
+      ? (flightPlans as FlightPlanType[] | Template[])
+      : templateData;
+  const dataLoading =
+    source === "flightPlans" ? flightPlansPending : templatePending;
 
   const items: ItemModel[] = useMemo(() => {
     if (!data) return [];
