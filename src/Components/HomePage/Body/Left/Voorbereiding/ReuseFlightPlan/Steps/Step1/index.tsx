@@ -9,7 +9,7 @@ import Filter from "../../Common/Filter";
 import Loading from "../../Common/Loading";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
-import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
+import { useFlightPlansList } from "api-hooks/flightPlans";
 
 export default function Step1() {
   const { openFilter, filterTerm, setFilterTerm } = useReuseFlightPlan();

@@ -5,7 +5,7 @@ import Step1Buttons from "./Steps/Step1/Buttons";
 import Step2Buttons from "./Steps/Step2/Buttons";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
-import { useReadData } from "utils/useReadData";
+import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
@@ -13,8 +13,8 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 export default function CreateReport() {
   const { user } = useAuth();
 
-  const { data: plans, loading } = useReadData<FinishedFlightPlanType[]>(
-    `/finished_plans/getPartialFinishedFlightPlans?regio_id=${user.role}`
+  const { data: plans, isPending: loading } = usePartialFinishedPlans(
+    user.role
   );
 
   const { step, selectedPlan } = useCreateReportState();

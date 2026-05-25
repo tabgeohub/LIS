@@ -1,12 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { usePilotenQuery } from "api-hooks/consts";
 
 export default function useGetPiloot() {
-  const { data } = useReadData<
-    {
-      id: string;
-      naam: string;
-    }[]
-  >("/consts/piloten");
+  const { data } = usePilotenQuery();
 
   const formattedPolooten = data?.map((item) => ({
     label: item.naam,
@@ -14,13 +9,11 @@ export default function useGetPiloot() {
   }));
 
   if (formattedPolooten) {
-    const pilootOptions = [
+    return [
       { label: "Selecteer een piloot", value: "" },
-      ...formattedPolooten!,
+      ...formattedPolooten,
     ];
-
-    return pilootOptions;
-  } else {
-    return [];
   }
+
+  return [];
 }

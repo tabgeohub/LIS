@@ -7,7 +7,7 @@ import VliegrouteExporteren from "./Actions/VliegrouteExporteren";
 import Waarnemingen from "./Actions/Waarnemingen";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import useDrawPath from "hooks/hover-click-handlers/useDrawPath";
-import { useReadData } from "utils/useReadData";
+import { useSingleFinishedPlan } from "api-hooks/finishedPlans";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useContent } from "hooks/useContent";
@@ -29,10 +29,8 @@ export default function Step2() {
 
   const content = useContent();
 
-  const { data: finishedPlan, loading: finishedPlanLoading } =
-    useReadData<FinishedFlightPlanType>(
-      "/finished_plans/getSingleFinishedFlightPlan/" + selectedPlan?.id
-    );
+  const { data: finishedPlan, isPending: finishedPlanLoading } =
+    useSingleFinishedPlan(selectedPlan?.id);
 
   const { loadingPath } = useDrawPath(finishedPlanLoading);
 

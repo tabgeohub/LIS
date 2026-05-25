@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FlightPlanType } from "Types";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { usePrepreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
+import { usePrepreparedFlightPlans } from "api-hooks/flightPlans";
 import Buttons from "./Buttons";
 
 export default function StepMultiplePoints({

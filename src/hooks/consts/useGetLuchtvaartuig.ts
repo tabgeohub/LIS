@@ -1,12 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { useLuchtvaartuigQuery } from "api-hooks/consts";
 
 export default function useGetLuchtvaartuig() {
-  const { data } = useReadData<
-    {
-      id: string;
-      naam: string;
-    }[]
-  >("/consts/luchtvaartuig");
+  const { data } = useLuchtvaartuigQuery();
 
   const formattedLuchtvaartuig = data?.map((item) => ({
     label: item.naam,
@@ -14,13 +9,11 @@ export default function useGetLuchtvaartuig() {
   }));
 
   if (formattedLuchtvaartuig) {
-    const luchtvaartuig = [
+    return [
       { label: "Selecteer een luchtvaartuig", value: "" },
-      ...formattedLuchtvaartuig!,
+      ...formattedLuchtvaartuig,
     ];
-
-    return luchtvaartuig;
-  } else {
-    return [];
   }
+
+  return [];
 }

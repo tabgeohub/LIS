@@ -1,10 +1,15 @@
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { invalidateRelatedQueries } from "lib/invalidateRelatedQueries";
-import { invalidateCache } from "./useReadData";
+import { invalidateAfterMutation } from "lib/invalidateAfterMutation";
+
+type DeleteVariables<T> = {
+  id: string | number;
+  data?: T;
+  onSuccess?: () => void;
+  refetch?: () => void;
+};
 
 type UseDeleteDataResult<T> = {
   deleteData: (
@@ -22,9 +27,22 @@ export function useDeleteData<T = undefined>(
   path: string
 ): UseDeleteDataResult<T> {
   const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: async ({ id, data }: DeleteVariables<T>) => {
+      const response = await axios.delete<{ message?: string }>(
+        `${getBackEndUrl()}/api${path}/${id}`,
+        { data, withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: async (_data, variables) => {
+      toast.success(_data.message || "Deleted successfully");
+      await invalidateAfterMutation(queryClient, path);
+      variables.refetch?.();
+      variables.onSuccess?.();
+    },
+  });
 
   async function deleteData(
     id: string | number,
@@ -32,76 +50,27 @@ export function useDeleteData<T = undefined>(
     onSuccess?: () => void,
     refetch?: () => void
   ): Promise<void> {
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
+    mutation.reset();
     try {
-      const response = await axios.delete<{ message?: string }>(
-        `${getBackEndUrl()}/api${path}/${id}`,
-        { data, withCredentials: true }
-      );
-
-      const { message } = response.data;
-
-      setSuccess(true);
-      toast.success(message || "Deleted successfully");
-
-      // Invalidate related caches to ensure real-time updates
-      invalidateRelatedCaches(path);
-      invalidateRelatedQueries(queryClient, path);
-
-      if (refetch) refetch();
-      if (onSuccess) onSuccess();
+      await mutation.mutateAsync({ id, data, onSuccess, refetch });
     } catch (err) {
       const error = err as AxiosError<{ message?: string; error?: string }>;
-
       const message =
         error.response?.data?.error || error.message || "Unknown error";
 
       toast.error(message);
-      setError(message);
-    } finally {
-      setLoading(false);
     }
   }
 
-  return { deleteData, loading, error, success };
-}
+  const lastError = mutation.error as AxiosError<{
+    message?: string;
+    error?: string;
+  }> | null;
 
-/**
- * Invalidate caches related to the API path being modified
- * This ensures real-time updates across all components
- */
-function invalidateRelatedCaches(path: string): void {
-  // Invalidate flight plan related caches
-  if (path.includes("/flightPlans")) {
-    invalidateCache("/flightPlans");
-  }
-  
-  // Invalidate points related caches
-  if (path.includes("/points")) {
-    invalidateCache("/points");
-  }
-  
-  // Invalidate geometries related caches
-  if (path.includes("/geometries")) {
-    invalidateCache("/geometries");
-  }
-  
-  // Invalidate template plans related caches
-  if (path.includes("/templateFlight") || path.includes("/template_plans")) {
-    invalidateCache("/templateFlight");
-    invalidateCache("/template_plans");
-  }
-  
-  // Invalidate finished plans related caches
-  if (path.includes("/finished_plans")) {
-    invalidateCache("/finished_plans");
-  }
-  
-  // Invalidate emails related caches
-  if (path.includes("/emails")) {
-    invalidateCache("/emails");
-  }
+  return {
+    deleteData,
+    loading: mutation.isPending,
+    error: lastError?.response?.data?.error || lastError?.message || null,
+    success: mutation.isSuccess,
+  };
 }

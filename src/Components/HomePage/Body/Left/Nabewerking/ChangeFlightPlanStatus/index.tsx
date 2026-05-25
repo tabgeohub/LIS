@@ -3,7 +3,7 @@ import { FlightPlanType } from "Types";
 import SinglePlan from "./FlightPlan";
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "../../Common/ScrollButtonsLayout";
-import { useFullPreparedFlightPlans } from "hooks/queries/useFlightPlanQueries";
+import { useFullPreparedFlightPlans } from "api-hooks/flightPlans";
 import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
 import Filter from "./Filter";
 import { useFilterPlans } from "hooks/filters/useFilterPlans";

@@ -23,6 +23,10 @@ export interface Geometry {
   [key: string]: any;
 }
 
+type GeometryFilters = {
+  regio?: string | number;
+};
+
 interface GeometriesState {
   geometries: Geometry[];
   setGeometries: (geometries: Geometry[]) => void;
@@ -30,66 +34,60 @@ interface GeometriesState {
   dbGeometries: Geometry[];
   setDbGeometries: (dbGeometries: Geometry[]) => void;
 
-  fetchGeometries: (filters?: {
-    regio?: string | number;
-  }) => Promise<void>;
+  lastFetchFilters: GeometryFilters | null;
+  refetchGeometries: () => Promise<void>;
 
-  fetchDBGeometries: (filters?: {
-    regio?: string | number;
-  }) => Promise<void>;
+  fetchGeometries: (filters?: GeometryFilters) => Promise<void>;
+
+  fetchDBGeometries: (filters?: GeometryFilters) => Promise<void>;
 
   clearGeometries: () => void;
 }
 
-export const useGeometriesStore = create<GeometriesState>((set) => ({
+async function loadGeometries(
+  filters: GeometryFilters,
+  set: (partial: Partial<GeometriesState>) => void
+): Promise<void> {
+  try {
+    const url = `${getBackEndUrl()}/api/geometries`;
+
+    const params: Record<string, string | number> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") {
+        params[key] = typeof value === "number" ? value : String(value);
+      }
+    });
+
+    const res = await axios.get<Geometry[]>(url, { params });
+    set({ geometries: res.data, dbGeometries: res.data });
+  } catch (error) {
+    console.error("Failed to fetch geometries:", error);
+  }
+}
+
+export const useGeometriesStore = create<GeometriesState>((set, get) => ({
   geometries: [],
   setGeometries: (geometries) => set({ geometries }),
 
   dbGeometries: [],
   setDbGeometries: (dbGeometries) => set({ dbGeometries }),
 
+  lastFetchFilters: null,
+
+  refetchGeometries: async () => {
+    const { lastFetchFilters } = get();
+    await loadGeometries(lastFetchFilters ?? {}, set);
+  },
+
   fetchGeometries: async (filters = {}) => {
-    try {
-      const url = `${getBackEndUrl()}/api/geometries`;
-
-      // Only send defined, non-empty values as query params
-      const params: Record<string, string | number> = {};
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== "") {
-          params[key] = typeof value === "number" ? value : String(value);
-        }
-      });
-
-      const res = await axios.get<Geometry[]>(url, { params });
-
-      // Populate both geometries and dbGeometries with the same data to avoid duplicate API calls
-      set({ geometries: res.data, dbGeometries: res.data });
-    } catch (error) {
-      console.error("Failed to fetch geometries:", error);
-    }
+    set({ lastFetchFilters: filters });
+    await loadGeometries(filters, set);
   },
 
   fetchDBGeometries: async (filters = {}) => {
-    try {
-      const url = `${getBackEndUrl()}/api/geometries`;
-
-      // Only send defined, non-empty values as query params
-      const params: Record<string, string | number> = {};
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== "") {
-          params[key] = typeof value === "number" ? value : String(value);
-        }
-      });
-
-      const res = await axios.get<Geometry[]>(url, { params });
-
-      // Populate both geometries and dbGeometries with the same data to avoid duplicate API calls
-      set({ geometries: res.data, dbGeometries: res.data });
-    } catch (error) {
-      console.error("Failed to fetch geometries:", error);
-    }
+    set({ lastFetchFilters: filters });
+    await loadGeometries(filters, set);
   },
 
   clearGeometries: () => set({ geometries: [] }),
 }));
-

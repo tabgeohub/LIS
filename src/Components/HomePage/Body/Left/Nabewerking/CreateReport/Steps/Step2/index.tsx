@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useReadData } from "utils/useReadData";
+import { useSingleFinishedPlan } from "api-hooks/finishedPlans";
 import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
 import { useRenderPoints } from "./hooks/useRenderPoints";
 import { useRenderGeometries } from "./hooks/useRenderGeometries";
@@ -22,9 +22,7 @@ export default function Step2() {
 
   const { points, setPoints } = usePointsStore();
 
-  const { data: finishedPlan } = useReadData<FinishedFlightPlanType>(
-    "/finished_plans/getSingleFinishedFlightPlan/" + selectedPlan?.id
-  );
+  const { data: finishedPlan } = useSingleFinishedPlan(selectedPlan?.id);
 
   // Filter points to only show plan points
   useEffect(() => {

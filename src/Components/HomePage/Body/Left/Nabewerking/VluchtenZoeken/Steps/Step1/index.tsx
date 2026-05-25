@@ -4,7 +4,7 @@ import SinglePlan from "./Content/SinglePlan";
 import Buttons from "./Content/Buttons";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Loading from "./Content/Loading";
-import { useReadData } from "utils/useReadData";
+import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFilterAndSortPlans } from "../../hooks/useFilterAndSortPlans";
@@ -15,8 +15,8 @@ export default function Step1() {
 
   const { user } = useAuth();
 
-  const { data: plans, loading } = useReadData<FinishedFlightPlanType[]>(
-    `/finished_plans/getPartialFinishedFlightPlans?regio_id=${user.role}`
+  const { data: plans, isPending: loading } = usePartialFinishedPlans(
+    user.role
   );
 
   const { filteredPlans } = useFinishedPlansState();

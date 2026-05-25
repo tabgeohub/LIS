@@ -1,12 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { useOrganisatiesQuery } from "api-hooks/consts";
 
 export default function useGetOrganisaties() {
-  const { data } = useReadData<
-    {
-      id: string;
-      naam: string;
-    }[]
-  >("/consts/organisaties");
+  const { data } = useOrganisatiesQuery();
 
   const formattedOrganisaties = data?.map((item) => ({
     label: item.naam,
@@ -14,13 +9,11 @@ export default function useGetOrganisaties() {
   }));
 
   if (formattedOrganisaties) {
-    const activities = [
+    return [
       { label: "Selecteer een organisatie", value: "" },
-      ...formattedOrganisaties!,
+      ...formattedOrganisaties,
     ];
-
-    return activities;
-  } else {
-    return [];
   }
+
+  return [];
 }

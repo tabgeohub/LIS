@@ -1,7 +1,7 @@
 import PlansList from "./PlansList";
 import { useState } from "react";
 import PlanInformation from "./PlanInformation";
-import { usePointFlightPlans } from "hooks/queries/useFlightPlanQueries";
+import { usePointFlightPlans } from "api-hooks/flightPlans";
 import { FlightPlanType } from "Types";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 

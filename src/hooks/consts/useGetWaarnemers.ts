@@ -1,12 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { useWaarnemersQuery } from "api-hooks/consts";
 
 export default function useGetWaarnemers() {
-  const { data } = useReadData<
-    {
-      id: string;
-      naam: string;
-    }[]
-  >("/consts/waarnemers");
+  const { data } = useWaarnemersQuery();
 
   const formattedWaarnemers = data?.map((item) => ({
     label: item.naam,
@@ -14,13 +9,11 @@ export default function useGetWaarnemers() {
   }));
 
   if (formattedWaarnemers) {
-    const waarnemersOptions = [
+    return [
       { label: "Selecteer een waarnemer", value: "" },
-      ...formattedWaarnemers!,
+      ...formattedWaarnemers,
     ];
-
-    return waarnemersOptions;
-  } else {
-    return [];
   }
+
+  return [];
 }

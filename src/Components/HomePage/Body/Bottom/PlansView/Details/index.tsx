@@ -2,7 +2,7 @@ import { haversine } from "@helpers/haversine";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useContent } from "hooks/useContent";
 import { useEffect, useState } from "react";
-import { useReadData } from "utils/useReadData";
+import { useFinishedPlanPath } from "api-hooks/finishedPlans";
 
 type DetailFieldProps = {
   label: string;
@@ -22,12 +22,12 @@ export default function Details() {
   const { flightPlanData } = useOpenTable();
   const content = useContent();
 
-  const { data: planPath } = useReadData<{
-    flighttime: {
-      time: number;
-      action: string;
-    }[];
-  }>(`/finished_plans/getPlanPath/${flightPlanData?.id}`);
+  const { data: planPathRaw } = useFinishedPlanPath(flightPlanData?.id);
+  const planPath = Array.isArray(planPathRaw)
+    ? planPathRaw
+    : planPathRaw
+      ? [planPathRaw]
+      : undefined;
 
   const [beginTime, setBeginTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);

@@ -1,14 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { useRegiosQuery } from "api-hooks/consts";
 
 export default function useGetRegios() {
-  const { data } = useReadData<
-    {
-      id: string;
-      naam: string;
-      shape_Length: number;
-      shape_Area: number;
-    }[]
-  >("/consts/regios");
+  const { data } = useRegiosQuery();
 
   const formattedRegios = data?.map((item) => ({
     label: item.naam,
@@ -16,16 +9,11 @@ export default function useGetRegios() {
   }));
 
   if (formattedRegios) {
-    const regios = [
-      {
-        label: "ALL",
-        value: "admin",
-      },
-      ...formattedRegios!,
+    return [
+      { label: "ALL", value: "admin" },
+      ...formattedRegios,
     ];
-
-    return regios;
-  } else {
-    return [];
   }
+
+  return [];
 }

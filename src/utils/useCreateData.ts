@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { invalidateRelatedQueries } from "lib/invalidateRelatedQueries";
-import { invalidateCache } from "./useReadData";
+import { invalidateAfterMutation } from "lib/invalidateAfterMutation";
+
+type CreateVariables<T> = {
+  data: T;
+  disableErrorMessage?: boolean;
+  disableSuccessMessage?: boolean;
+};
 
 type UseCreateDataResult<T, R> = {
   create: (
@@ -22,9 +26,26 @@ export function useCreateData<T, R extends { message?: string; id?: number }>(
   path: string
 ): UseCreateDataResult<T, R> {
   const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: async ({ data }: CreateVariables<T>) => {
+      const response = await axios.post<R>(
+        `${getBackEndUrl()}/api${path}`,
+        data,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: async (responseData, variables) => {
+      if (!variables.disableSuccessMessage) {
+        toast.success(responseData.message || "Created successfully");
+      }
+      await invalidateAfterMutation(queryClient, path);
+    },
+  });
 
   async function create(
     data: T,
@@ -32,89 +53,44 @@ export function useCreateData<T, R extends { message?: string; id?: number }>(
     disableErrorMessage = false,
     disableSuccessMessage = false
   ): Promise<number | null> {
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
+    mutation.reset();
     try {
-      const response = await axios.post<R>(
-        `${getBackEndUrl()}/api${path}`,
+      const responseData = await mutation.mutateAsync({
         data,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        disableErrorMessage,
+        disableSuccessMessage,
+      });
 
-      const { message, id } = response.data;
+      if (onCallbackSuccess) onCallbackSuccess(responseData);
 
-      setSuccess(true);
-      if (!disableSuccessMessage)
-        toast.success(message || "Created successfully");
-
-      // Invalidate related caches to ensure real-time updates
-      invalidateRelatedCaches(path);
-      invalidateRelatedQueries(queryClient, path);
-
-      if (onCallbackSuccess) onCallbackSuccess(response.data);
-
-      return id ?? null;
+      return responseData.id ?? null;
     } catch (err) {
       const error = err as AxiosError<{ message?: string; error?: string }>;
-
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.message ||
         "Unknown error";
 
-      setError(message);
       if (!disableErrorMessage) toast.error(message);
 
       return null;
-    } finally {
-      setLoading(false);
     }
   }
 
-  return { create, loading, error, success };
-}
+  const lastError = mutation.error as AxiosError<{
+    message?: string;
+    error?: string;
+  }> | null;
 
-/**
- * Invalidate caches related to the API path being modified
- * This ensures real-time updates across all components
- */
-function invalidateRelatedCaches(path: string): void {
-  // Invalidate flight plan related caches
-  if (path.includes("/flightPlans")) {
-    invalidateCache("/flightPlans");
-  }
-  
-  // Invalidate points related caches
-  if (path.includes("/points")) {
-    invalidateCache("/points");
-  }
-  
-  // Invalidate geometries related caches
-  if (path.includes("/geometries")) {
-    invalidateCache("/geometries");
-  }
-  
-  // Invalidate template plans related caches
-  if (path.includes("/templateFlight") || path.includes("/template_plans")) {
-    invalidateCache("/templateFlight");
-    invalidateCache("/template_plans");
-  }
-  
-  // Invalidate finished plans related caches
-  if (path.includes("/finished_plans")) {
-    invalidateCache("/finished_plans");
-  }
-  
-  // Invalidate emails related caches
-  if (path.includes("/emails")) {
-    invalidateCache("/emails");
-  }
+  return {
+    create,
+    loading: mutation.isPending,
+    error:
+      lastError?.response?.data?.message ||
+      lastError?.response?.data?.error ||
+      lastError?.message ||
+      null,
+    success: mutation.isSuccess,
+  };
 }

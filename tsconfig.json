@@ -11,7 +11,8 @@
       "Types/*": ["./src/Types/*"],
       "utils/*": ["./src/utils/*"],
       "lib/*": ["./src/lib/*"],
-      "api/*": ["./src/api/*"]
+      "api/*": ["./src/api/*"],
+      "api-hooks/*": ["./src/api-hooks/*"]
     },
     // "strictNullChecks": false,
     "noImplicitAny": false,

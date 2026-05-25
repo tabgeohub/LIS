@@ -19,7 +19,7 @@ import { useResetFeatures } from "hooks/features/useResetFeatures";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";
 import AddPointToPlan from "./Steps/AddPointToPlan";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
-import { useFlightPlansList } from "hooks/queries/useFlightPlanQueries";
+import { useFlightPlansList } from "api-hooks/flightPlans";
 
 export default function ViewPlan({
   vluchtnummer,

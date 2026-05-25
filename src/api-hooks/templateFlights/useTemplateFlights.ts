@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { templateFlightKeys } from "lib/queryKeys";
-
-type TemplatePoint = { id: number; omschrijving: string };
-export type Template = { id: number; name: string; points: TemplatePoint[] };
+import { Template } from "./types";
 
 export function useTemplateFlights(
   regioId: string | number | undefined,

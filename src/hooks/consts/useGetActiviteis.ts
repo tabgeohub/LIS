@@ -1,12 +1,7 @@
-import { useReadData } from "utils/useReadData";
+import { useActiviteitenQuery } from "api-hooks/consts";
 
 export default function useGetActiviteiten() {
-  const { data } = useReadData<
-    {
-      id: string;
-      activiteit: string;
-    }[]
-  >("/consts/activiteiten");
+  const { data } = useActiviteitenQuery();
 
   const formattedActivities = data?.map((item) => ({
     label: item.activiteit,
@@ -14,13 +9,11 @@ export default function useGetActiviteiten() {
   }));
 
   if (formattedActivities) {
-    const activities = [
+    return [
       { label: "Selecteer een activiteit", value: "" },
-      ...formattedActivities!,
+      ...formattedActivities,
     ];
-
-    return activities;
-  } else {
-    return [];
   }
+
+  return [];
 }

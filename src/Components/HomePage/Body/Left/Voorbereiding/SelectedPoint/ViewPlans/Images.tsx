@@ -2,7 +2,7 @@ import { useState } from "react";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { FlightPlanType } from "Types";
 import { AttachmentType } from "Types/finished_plans";
-import { useReadData } from "utils/useReadData";
+import { usePlanPointAttachments } from "api-hooks/finishedPlans";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 
 export default function Images({
@@ -14,12 +14,11 @@ export default function Images({
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const attachmentsUrl =
-    selectedPlan.is_finished && clickedPoint
-      ? `/finished_plans/getAttachmentsPlanSinglePoint?planId=${selectedPlan.id}&pointId=${clickedPoint.id}`
-      : "";
-
-  const { data: attachments } = useReadData<AttachmentType[]>(attachmentsUrl);
+  const { data: attachments } = usePlanPointAttachments(
+    selectedPlan.id,
+    clickedPoint?.id,
+    Boolean(selectedPlan.is_finished && clickedPoint)
+  );
 
   const token = localStorage.getItem("credential_token");
 

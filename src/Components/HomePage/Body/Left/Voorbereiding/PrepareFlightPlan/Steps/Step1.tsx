@@ -3,7 +3,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { FlightPlanType } from "Types";
-import { useUnPreparedPlans } from "hooks/queries/useFlightPlanQueries";
+import { useUnPreparedPlans } from "api-hooks/flightPlans";
 
 export default function Step1({
   setOpenModal,

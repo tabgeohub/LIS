@@ -1,14 +1,15 @@
 import { haversine } from "@helpers/haversine";
+import { useFinishedPlanPath } from "api-hooks/finishedPlans";
 import { useEffect, useState } from "react";
-import { useReadData } from "utils/useReadData";
 
-export function useGetFlightTimesDistance(flightPlan: any) {
-  const { data: planPath } = useReadData<
-    {
-      path?: { latitude: number; longitude: number }[] | null;
-      flighttime?: { time: number; action: string }[] | null;
-    }[]
-  >(`/finished_plans/getPlanPath/${flightPlan?.id}`);
+export function useGetFlightTimesDistance(flightPlan: { id?: number }) {
+  const { data: planPathRaw } = useFinishedPlanPath(flightPlan?.id);
+
+  const planPath = Array.isArray(planPathRaw)
+    ? planPathRaw
+    : planPathRaw
+      ? [planPathRaw]
+      : undefined;
 
   const [beginTime, setBeginTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
@@ -44,7 +45,11 @@ export function useGetFlightTimesDistance(flightPlan: any) {
       setTotalDistance(null);
     }
 
-    if (!row.flighttime || !Array.isArray(row.flighttime) || row.flighttime.length === 0) {
+    if (
+      !row.flighttime ||
+      !Array.isArray(row.flighttime) ||
+      row.flighttime.length === 0
+    ) {
       setBeginTime(null);
       setEndTime(null);
       setDurationSeconds(null);

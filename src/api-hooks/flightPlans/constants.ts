@@ -1,0 +1,1 @@
+export const FLIGHT_PLAN_DEBOUNCE_MS = 400;

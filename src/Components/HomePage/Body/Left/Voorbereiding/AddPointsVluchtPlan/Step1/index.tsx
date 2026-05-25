@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useUnPreparedPlans } from "hooks/queries/useFlightPlanQueries";
+import { useUnPreparedPlans } from "api-hooks/flightPlans";
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { FlightPlanType } from "Types";

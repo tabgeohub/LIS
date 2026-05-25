@@ -1,7 +1,7 @@
 import PlansList from "./PlansList";
 import { useState } from "react";
 import PlanInformation from "./PlanInformation";
-import { usePointFlightPlans } from "hooks/queries/useFlightPlanQueries";
+import { usePointFlightPlans } from "api-hooks/flightPlans";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { FlightPlanType } from "Types";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";

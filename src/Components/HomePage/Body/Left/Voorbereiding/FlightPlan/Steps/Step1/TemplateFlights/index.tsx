@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFlightPlanState } from "../../../helpers/flightPlanStates";
-import { useReadData } from "utils/useReadData";
+import { useTemplateFlights } from "api-hooks/templateFlights";
 import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
@@ -38,9 +38,7 @@ export default function TemplateFlight({
 
   const { user } = useAuth();
 
-  const { data: flightTemplate } = useReadData<FlightPlanTemplate[]>(
-    `/templateFlight?regio_id=${user.role}`
-  );
+  const { data: flightTemplate } = useTemplateFlights(user.role, user.user_id);
 
   const { create } = useCreateData("/flightPlans");
 
