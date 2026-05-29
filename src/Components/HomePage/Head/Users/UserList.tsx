@@ -92,6 +92,15 @@ export default function UserList({
                 </a>
               )}
 
+              {user.role === "admin" && location.pathname !== "/devices-updates" && (
+                <a
+                  className="block capitalize px-4 py-2 text-sm text-blue-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  href="/devices-updates"
+                >
+                  device updates
+                </a>
+              )}
+
               {location.pathname !== "/installations" && (
                 <a
                   className="block capitalize px-4 py-2 text-sm text-blue-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"

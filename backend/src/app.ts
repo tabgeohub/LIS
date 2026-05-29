@@ -11,6 +11,7 @@ import authRouter from "./routes/auth";
 import fileDownloadRouter from "./routes/fileDownload";
 import directDownloadRouter from "./routes/directDownload";
 import installersRouter from "./routes/installers";
+import devicesUpdatesRouter from "./routes/devices-updates";
 import main from "./routes/main";
 import logsRouter from "./routes/logs";
 import { setupSwagger } from "./routes/swagger";
@@ -125,5 +126,6 @@ app.use("/api/file-download", fileDownloadRouter);
 // Direct download (session-authenticated)
 app.use("/api/direct-download", directDownloadRouter);
 app.use("/api/installers", requireSessionAuth, installersRouter);
+app.use("/api/devices-updates", devicesUpdatesRouter);
 
 export default app;

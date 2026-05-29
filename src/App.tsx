@@ -11,6 +11,7 @@ import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";
 import InstallationsPage from "Components/InstallationsPage";
+import DevicesUpdatesPage from "Components/DevicesUpdatesPage";
 
 export default function App() {
   const { setUser } = useAuth();
@@ -48,6 +49,7 @@ export default function App() {
 
           <Route path="/images" element={<TimesliderItemDetailPage />} />
           <Route path="/installations" element={<InstallationsPage />} />
+          <Route path="/devices-updates" element={<DevicesUpdatesPage />} />
         </Routes>
 
         <Toaster position="top-center" reverseOrder={false} />
