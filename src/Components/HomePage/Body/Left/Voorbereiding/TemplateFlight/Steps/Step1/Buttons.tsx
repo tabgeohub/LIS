@@ -13,28 +13,20 @@ export default function Buttons({ name }: { name: string }) {
   const content = useContent();
 
   const handleNext = () => {
-    try {
-      create(
-        {
-          name: name,
-        },
-        () => {
-          setStep(step + 1);
+    create(
+      { name },
+      () => {
+        setStep(step + 1);
 
-          logAction({
-            message: "User clicked 'Next' button to create a flight template",
-            step: "First step",
-            newData: {
-              name: name,
-            },
-          });
-        },
-        false,
-        true
-      );
-    } catch (err) {
-      console.error(err);
-    }
+        logAction({
+          message: "User clicked 'Next' button to create a flight template",
+          step: "First step",
+          newData: { name },
+        });
+      },
+      false,
+      true
+    );
   };
 
   return (
