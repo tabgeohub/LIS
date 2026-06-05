@@ -102,9 +102,22 @@ export default function DevicesUpdatesPage() {
     }
   }
 
-  function startPolling(deviceId: string) {
+  function startPolling(deviceId: string, action: "check-status" | "update") {
     stopPolling();
+    const startedAt = Date.now();
+    const timeoutMs = action === "update" ? 15 * 60 * 1000 : 90 * 1000;
     pollRef.current = window.setInterval(async () => {
+      if (Date.now() - startedAt > timeoutMs) {
+        stopPolling();
+        setActionDeviceId(null);
+        setError(
+          action === "update"
+            ? "Update timed out after 15 minutes. Check the agent terminal, then click Reset if needed."
+            : "Command timed out after 90 seconds. Click Reset, then try again."
+        );
+        return;
+      }
+
       const latest = await fetchDevices();
       const device = latest.find((item) => item.id === deviceId);
       if (!device || !isWaitingForCommand(device)) {
@@ -112,6 +125,32 @@ export default function DevicesUpdatesPage() {
         setActionDeviceId(null);
       }
     }, 5000);
+  }
+
+  async function resetDevice(deviceId: string) {
+    setError(null);
+    stopPolling();
+    setActionDeviceId(null);
+
+    try {
+      const response = await fetch(
+        `${getBackEndUrl()}/api/devices-updates/devices/${deviceId}/reset`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Reset failed");
+      }
+
+      await fetchDevices();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
+    }
   }
 
   async function queueAction(deviceId: string, action: "check-status" | "update") {
@@ -133,7 +172,7 @@ export default function DevicesUpdatesPage() {
       }
 
       await fetchDevices();
-      startPolling(deviceId);
+      startPolling(deviceId, action);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
@@ -230,6 +269,14 @@ export default function DevicesUpdatesPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex gap-2">
+                            <button
+                              type="button"
+                              disabled={busy && actionDeviceId !== device.id}
+                              onClick={() => resetDevice(device.id)}
+                              className="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-900 ring-1 ring-amber-300 hover:bg-amber-200 disabled:opacity-50"
+                            >
+                              Reset
+                            </button>
                             <button
                               type="button"
                               disabled={busy}

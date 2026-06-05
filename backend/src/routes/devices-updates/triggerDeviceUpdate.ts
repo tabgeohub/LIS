@@ -1,8 +1,9 @@
 import type { RequestHandler } from "express";
-import { getDeviceById, queueDeviceCommand } from "./db";
+import { getDeviceById, queueDeviceCommand, releaseStaleCommands } from "./db";
 
 export const triggerDeviceUpdate: RequestHandler = async (req, res) => {
   const id = String(req.params.id || "");
+  await releaseStaleCommands(1, id);
   const device = await getDeviceById(id);
 
   if (!device) {

@@ -149,6 +149,7 @@ export async function getDeviceByToken(
 
 export async function listDevices(): Promise<GetacDevice[]> {
   await ensureDevicesUpdatesSchema();
+  await releaseStaleCommands(1);
 
   const result = await pool.query(
     `SELECT * FROM lis.getac_devices ORDER BY hostname ASC`
@@ -167,11 +168,74 @@ export async function getDeviceById(id: string): Promise<GetacDevice | null> {
   return mapRow(result.rows[0]);
 }
 
+export async function releaseStaleCommands(
+  staleAfterMinutes = 3,
+  deviceId?: string
+): Promise<void> {
+  await ensureDevicesUpdatesSchema();
+
+  if (deviceId) {
+    await pool.query(
+      `
+        UPDATE lis.getac_devices
+        SET
+          status = 'failed',
+          pending_command = NULL,
+          command_status = 'failed',
+          last_error = 'Command timed out. Click Check Status to try again.',
+          updated_at = NOW()
+        WHERE id = $1
+          AND command_status IN ('queued', 'in_progress')
+          AND updated_at < NOW() - ($2 * INTERVAL '1 minute');
+      `,
+      [deviceId, staleAfterMinutes]
+    );
+    return;
+  }
+
+  await pool.query(
+    `
+      UPDATE lis.getac_devices
+      SET
+        status = 'failed',
+        pending_command = NULL,
+        command_status = 'failed',
+        last_error = 'Command timed out. Click Check Status to try again.',
+        updated_at = NOW()
+      WHERE command_status IN ('queued', 'in_progress')
+        AND updated_at < NOW() - ($1 * INTERVAL '1 minute');
+    `,
+    [staleAfterMinutes]
+  );
+}
+
+export async function resetDeviceCommand(id: string): Promise<GetacDevice | null> {
+  await ensureDevicesUpdatesSchema();
+
+  const result = await pool.query(
+    `
+      UPDATE lis.getac_devices
+      SET
+        pending_command = NULL,
+        command_status = NULL,
+        status = CASE WHEN status IN ('checking', 'updating') THEN 'unknown' ELSE status END,
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *;
+    `,
+    [id]
+  );
+
+  if (!result.rows[0]) return null;
+  return mapRow(result.rows[0]);
+}
+
 export async function queueDeviceCommand(
   id: string,
   command: DeviceCommand
 ): Promise<GetacDevice | null> {
   await ensureDevicesUpdatesSchema();
+  await releaseStaleCommands(1, id);
 
   const result = await pool.query(
     `
@@ -194,15 +258,17 @@ export async function queueDeviceCommand(
 
 export async function claimPendingCommand(deviceId: string): Promise<DeviceCommand | null> {
   await ensureDevicesUpdatesSchema();
+  await releaseStaleCommands(1, deviceId);
 
   const result = await pool.query(
     `
       UPDATE lis.getac_devices
       SET
         command_status = 'in_progress',
-        last_seen_at = NOW(),
         updated_at = NOW()
-      WHERE id = $1 AND pending_command IS NOT NULL AND command_status = 'queued'
+      WHERE id = $1
+        AND pending_command IS NOT NULL
+        AND command_status = 'queued'
       RETURNING pending_command;
     `,
     [deviceId]
@@ -216,7 +282,7 @@ export async function touchDeviceSeen(deviceId: string): Promise<void> {
   await pool.query(
     `
       UPDATE lis.getac_devices
-      SET last_seen_at = NOW(), updated_at = NOW()
+      SET last_seen_at = NOW()
       WHERE id = $1
     `,
     [deviceId]
@@ -246,12 +312,12 @@ export async function applyAgentReport(
         pending_update_count = COALESCE($5, pending_update_count),
         last_error = $6,
         last_seen_at = NOW(),
-        last_checked_at = CASE WHEN $7 = 'CHECK_STATUS' THEN NOW() ELSE last_checked_at END,
-        last_updated_at = CASE WHEN $7 = 'UPDATE' THEN NOW() ELSE last_updated_at END,
-        pending_command = CASE WHEN $8 THEN NULL ELSE pending_command END,
+        last_checked_at = CASE WHEN $7::text = 'CHECK_STATUS' THEN NOW() ELSE last_checked_at END,
+        last_updated_at = CASE WHEN $7::text = 'UPDATE' THEN NOW() ELSE last_updated_at END,
+        pending_command = CASE WHEN $8::boolean THEN NULL ELSE pending_command END,
         command_status = CASE
-          WHEN $8 THEN 'completed'
-          WHEN $6 IS NOT NULL THEN 'failed'
+          WHEN $8::boolean THEN 'completed'
+          WHEN $6::text IS NOT NULL THEN 'failed'
           ELSE command_status
         END,
         updated_at = NOW()
