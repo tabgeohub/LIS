@@ -12,17 +12,13 @@ import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 export default function Buttons({
   setOpenFilter,
   name,
-  selectedGeometries,
-  setSelectedGeometries,
 }: {
   setOpenFilter: (value: boolean) => void;
   name: string;
-  selectedGeometries: number[];
-  setSelectedGeometries: (value: number[]) => void;
 }) {
   const { resetFilters } = usePointsFilterStore();
   const handleCancel = useCancelCreateFlightPlan();
-  const { yellowGraphicsLayer, clearGraphics, geometriesGraphicsLayer, mapView } = useMapViewState();
+  const { yellowGraphicsLayer, clearGraphics, mapView } = useMapViewState();
   const { resetFeatures } = useResetFeatures();
 
   const { create, loading } = useCreateData("/templateFlight");
@@ -40,30 +36,38 @@ export default function Buttons({
     setSelectedGraphics,
     hoveredGraphic,
     setHoveredGraphic,
+    selectedGeometries,
+    selectedGeometries2,
+    setSelectedGeometries2,
   } = useTemplateFlightState();
 
   const { dbGeometries } = useGeometriesStore();
 
   const handleSubmit = () => {
-    // Get all selected geometries
-    const safeSelectedGeometries = Array.isArray(selectedGeometries) ? selectedGeometries : [];
+    const safeSelectedGeometries = Array.isArray(selectedGeometries)
+      ? selectedGeometries
+      : [];
+    const safeSelectedGeometries2 = Array.isArray(selectedGeometries2)
+      ? selectedGeometries2
+      : [];
+    const allSelectedGeometryIds = [
+      ...safeSelectedGeometries,
+      ...safeSelectedGeometries2,
+    ];
+    const uniqueSelectedGeometryIds = Array.from(new Set(allSelectedGeometryIds));
 
-    // Get the actual geometry objects
     const selectedGeometryObjects = dbGeometries.filter((geometry) =>
-      safeSelectedGeometries.includes(geometry.id)
+      uniqueSelectedGeometryIds.includes(geometry.id)
     );
 
-    // Extract all point IDs from selected geometries
     const geometryPointIds = selectedGeometryObjects.flatMap((geometry) =>
       geometry.points.map((point) => point.id)
     );
 
-    // Combine all point IDs (selected points + points from selected geometries)
     const safeSelectedPoints = Array.isArray(selectedPoints) ? selectedPoints : [];
     const safeSelectedPoints2 = Array.isArray(selectedPoints2) ? selectedPoints2 : [];
     const allPointIds = [...safeSelectedPoints, ...safeSelectedPoints2, ...geometryPointIds];
 
-    // Remove duplicates
     const uniquePointIds = Array.from(new Set(allPointIds));
 
     const attributes = {
@@ -78,10 +82,9 @@ export default function Buttons({
       newData: {
         name: name,
         points: uniquePointIds,
-        geometries: safeSelectedGeometries,
+        geometries: uniqueSelectedGeometryIds,
       },
     });
-
 
     create(attributes, () => {
       clear();
@@ -93,11 +96,9 @@ export default function Buttons({
     setStep(2);
     resetFilters();
     setSelectedPoints2([]);
-    setSelectedGeometries([]);
+    setSelectedGeometries2([]);
 
-    // Reset features back to initial DB state
     resetFeatures();
-
     clearGraphics();
 
     selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
@@ -110,10 +111,7 @@ export default function Buttons({
   };
 
   const handleCancelClick = () => {
-    // Reset features back to initial DB state
     resetFeatures();
-
-    setSelectedGeometries([]);
     handleCancel();
     resetFilters();
     clear();
@@ -130,10 +128,7 @@ export default function Buttons({
 
   return (
     <>
-      <button
-        onClick={handlePrevious}
-        className="gray-button"
-      >
+      <button onClick={handlePrevious} className="gray-button">
         Vorige
       </button>
 
@@ -145,10 +140,7 @@ export default function Buttons({
         Opslaan
       </button>
 
-      <button
-        onClick={handleCancelClick}
-        className="gray-button"
-      >
+      <button onClick={handleCancelClick} className="gray-button">
         Annuleren
       </button>
 

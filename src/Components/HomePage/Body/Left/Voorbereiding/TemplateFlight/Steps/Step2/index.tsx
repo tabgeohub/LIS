@@ -15,9 +15,13 @@ export default function Step2({
   setOpenFilter: (value: boolean) => void;
   filteredPoints: EnrichedPointType[];
 }) {
-  const { selectedPoints, setSelectedPoints } = useTemplateFlightState();
+  const {
+    selectedPoints,
+    setSelectedPoints,
+    selectedGeometries,
+    setSelectedGeometries,
+  } = useTemplateFlightState();
   const { dbGeometries, setGeometries } = useGeometriesStore();
-  const [selectedGeometries, setSelectedGeometries] = useState<number[]>([]);
   const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
 
   useEffect(() => {
@@ -61,7 +65,7 @@ export default function Step2({
   return (
     <ScrollButtonsLayout
       className="h-[100%]"
-      buttons={<Buttons setOpenFilter={setOpenFilter} setSelectedGeometries={setSelectedGeometries} />}
+      buttons={<Buttons setOpenFilter={setOpenFilter} />}
     >
       <p className="text-gray-800 leading-3 text-[10px] p-3">
         {content.voorbereiding.vluchtenTemplate.step2.text}

@@ -8,10 +8,8 @@ import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function Buttons({
   setOpenFilter,
-  setSelectedGeometries,
 }: {
   setOpenFilter: (value: boolean) => void;
-  setSelectedGeometries: (value: number[]) => void;
 }) {
   const {
     step,
@@ -22,6 +20,7 @@ export default function Buttons({
     setHoveredGraphic,
     clear,
     setSelectedPoints,
+    setSelectedGeometries,
   } = useTemplateFlightState();
 
   const logAction = useLogAction();
