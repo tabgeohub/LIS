@@ -38,7 +38,7 @@
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5",
+    "xlsx": "npm:@e965/xlsx@0.20.3",
     "zustand": "^4.5.5"
   },
   "scripts": {
