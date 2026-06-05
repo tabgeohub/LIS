@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import dayjs from "dayjs";
 import "dayjs/locale/nl";
 import { buildErrorPayload } from "../../helpers/buildErrorPayload";
+import { escapeHtml } from "../../helpers/escapeHtml";
 
 dayjs.locale("nl");
 
@@ -13,6 +14,15 @@ const MAIL_PORT = Number(25);
 const MAIL_SENDER = "no-reply@rws.nl";
 const REQUIRE_TLS = String("true") === "true";
 
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/pjpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
 const transporter = nodemailer.createTransport({
   host: MAIL_SERVER,
   port: MAIL_PORT,
@@ -20,6 +30,26 @@ const transporter = nodemailer.createTransport({
   requireTLS: REQUIRE_TLS,
   tls: {},
 });
+
+function sanitizeHeaderValue(value: string): string {
+  return value.replace(/[\r\n]/g, "");
+}
+
+function encodeImageDataUrl(file: Express.Multer.File): string | null {
+  const mime = file.mimetype?.toLowerCase();
+  if (!mime || !ALLOWED_IMAGE_TYPES.has(mime)) return null;
+  return `data:${mime};base64,${file.buffer.toString("base64")}`;
+}
+
+function imageTag(file: Express.Multer.File): string {
+  const src = encodeImageDataUrl(file);
+  if (!src) return "";
+  return `<div><img src="${escapeHtml(src)}" alt=""/></div>`;
+}
+
+function buildImageTags(files: Express.Multer.File[]): string {
+  return files.map(imageTag).join("");
+}
 
 export const sendEmail: RequestHandler = async (req, res) => {
   const requestId = randomUUID();
@@ -69,14 +99,29 @@ export const sendEmail: RequestHandler = async (req, res) => {
       return;
     }
 
-    const encode = (f: Express.Multer.File) =>
-      `data:${f.mimetype};base64,${f.buffer.toString("base64")}`;
+    const safeFlightNumber = escapeHtml(flightNumber);
+    const safeRegioId = escapeHtml(regio_id);
+    const safeOmschrijving = escapeHtml(omschrijving);
+    const safeWaarnemer = escapeHtml(waarnemer ?? "");
+    const safeVertrouwelijk = escapeHtml(
+      vertrouwelijk === "1" ? "Ja" : "Nee"
+    );
+    const safeLongitude = escapeHtml(Number(longitude).toFixed(4));
+    const safeLatitude = escapeHtml(Number(latitude).toFixed(4));
+    const when = escapeHtml(dayjs().format("dddd D MMMM YYYY HH:mm"));
+    const screenshotTags = buildImageTags(screenshots);
+    const imageTags = buildImageTags(images);
 
-    const when = dayjs().format("dddd D MMMM YYYY HH:mm");
+    if (!imageTags) {
+      res.status(400).json({
+        error: "No supported image files uploaded (jpeg, png, webp, gif)",
+      });
+      return;
+    }
 
     const emailHtml = `
       <p>
-        Deze mail bevat informatie over een incident tijdens vluchtnummer ${flightNumber}.
+        Deze mail bevat informatie over een incident tijdens vluchtnummer ${safeFlightNumber}.
         Open de bijlage voor meer informatie.
       </p>
     `;
@@ -96,38 +141,29 @@ export const sendEmail: RequestHandler = async (req, res) => {
         </head>
         <body>
           <h3>Waarneming</h3>
-          <p><strong>Vlucht:</strong> ${flightNumber}</p>
-          <p><strong>Regio:</strong> ${regio_id}</p>
-          <p><strong>Omschrijving:</strong> ${omschrijving}</p>
+          <p><strong>Vlucht:</strong> ${safeFlightNumber}</p>
+          <p><strong>Regio:</strong> ${safeRegioId}</p>
+          <p><strong>Omschrijving:</strong> ${safeOmschrijving}</p>
           <p><strong>Datum:</strong> ${when}</p>
-          <p><strong>Waarnemer:</strong> ${waarnemer ?? ""}</p>
-          <p><strong>Vertrouwelijk:</strong> ${
-            vertrouwelijk === "1" ? "Ja" : "Nee"
-          }</p>
-          <p><strong>Locatie (WGS84):</strong> ${Number(longitude).toFixed(
-            4
-          )}, ${Number(latitude).toFixed(4)}</p>
+          <p><strong>Waarnemer:</strong> ${safeWaarnemer}</p>
+          <p><strong>Vertrouwelijk:</strong> ${safeVertrouwelijk}</p>
+          <p><strong>Locatie (WGS84):</strong> ${safeLongitude}, ${safeLatitude}</p>
 
           <h3>Aanvullende info</h3>
           <div class="img-block">
-            ${screenshots
-              .map((s) => `<div><img src="${encode(s)}"/></div>`)
-              .join("")}
+            ${screenshotTags}
           </div>
 
           <div class="section">
             <h3 style="margin-top:20px;">Waarneming</h3>
             <div class="img-block">
-              ${images
-                .map((img) => `<div><img src="${encode(img)}"/></div>`)
-                .join("")}
+              ${imageTags}
             </div>
           </div>
         </body>
       </html>
     `;
 
-    // Render PDF via Puppeteer
     const browser = await puppeteer.launch({
       headless: true,
       executablePath:
@@ -191,10 +227,10 @@ export const sendEmail: RequestHandler = async (req, res) => {
     ];
 
     await transporter.sendMail({
-      from: `${senderName} <${MAIL_SENDER}>`,
+      from: `${sanitizeHeaderValue(senderName)} <${MAIL_SENDER}>`,
       replyTo: senderEmail,
       to: recipients,
-      subject: `Waarneming tijdens vluchtnummer ${flightNumber}`,
+      subject: `Waarneming tijdens vluchtnummer ${sanitizeHeaderValue(flightNumber)}`,
       html: emailHtml,
       attachments,
     });

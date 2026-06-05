@@ -4,6 +4,12 @@ import fs from "fs";
 import dotenv from "dotenv";
 import { setPassword, hasPassword, verifyPassword } from "./passwordStore";
 import { requireSessionAuth } from "../helpers/requireSessionAuth";
+import {
+  renderDownloadPage,
+  renderExpiredDownloadPage,
+  renderWrongPasswordPage,
+  sendHtml,
+} from "../helpers/renderDownloadPage";
 
 dotenv.config();
 
@@ -22,25 +28,23 @@ function isExpiredFromName(name: string): boolean {
   return now - ts > sevenDays;
 }
 
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+function parseValidFilename(raw: string): string | null {
+  const filename = String(raw || "");
+  return FILE_RE.test(filename) ? filename : null;
 }
 
-// --- NEW: set password for a specific file
-// body: { password: string }
+function buildDownloadActionPath(filename: string): string {
+  return `/api/file-download/${encodeURIComponent(filename)}`;
+}
+
 const setPasswordHandler: RequestHandler<
   { filename: string },
   any,
   { password: string }
 > = (req, res) => {
-  const filename = String(req.params.filename || "");
+  const filename = parseValidFilename(req.params.filename || "");
 
-  if (!FILE_RE.test(filename)) {
+  if (!filename) {
     res.status(400).send("❌ Ongeldige bestandsnaam");
     return;
   }
@@ -62,7 +66,7 @@ const setPasswordHandler: RequestHandler<
   }
 
   setPassword(filename, password);
-  res.status(204).end(); // no content
+  res.status(204).end();
 };
 
 router.post(
@@ -72,43 +76,26 @@ router.post(
   setPasswordHandler
 );
 
-// Show password page
-// @ts-ignore
 router.get("/:filename", (req, res) => {
-  const filename = String(req.params.filename || "");
+  const filename = parseValidFilename(req.params.filename || "");
 
-  if (!FILE_RE.test(filename)) {
-    return res.status(400).send("❌ Ongeldige bestandsnaam");
+  if (!filename) {
+    res.status(400).send("❌ Ongeldige bestandsnaam");
+    return;
   }
 
   if (isExpiredFromName(filename)) {
-    return res.send(`
-      <html>
-        <body style="font-family: sans-serif; padding: 20px;">
-          <h2>Beveiligde download</h2>
-          <p style="color: red;">❌ Deze downloadlink is verlopen (ouder dan 7 dagen)</p>
-        </body>
-      </html>
-    `);
+    sendHtml(res, renderExpiredDownloadPage());
+    return;
   }
 
-  const safeAction = `/api/file-download/${encodeURIComponent(filename)}`;
-  const note = hasPassword(filename)
-    ? ""
-    : `<p style="color:#666">⚠️ Er is nog geen wachtwoord ingesteld voor dit bestand.</p>`;
-
-  res.send(`
-    <html>
-      <body style="font-family: sans-serif; padding: 20px;">
-        <h2>Beveiligde download</h2>
-        ${note}
-        <form method="POST" action="${escapeHtml(safeAction)}">
-          <input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />
-          <button type="submit">Download</button>
-        </form>
-      </body>
-    </html>
-  `);
+  sendHtml(
+    res,
+    renderDownloadPage({
+      actionPath: buildDownloadActionPath(filename),
+      showNoPasswordNote: !hasPassword(filename),
+    })
+  );
 });
 
 const downloadWithPasswordHandler: RequestHandler<
@@ -116,57 +103,34 @@ const downloadWithPasswordHandler: RequestHandler<
   any,
   { password: string }
 > = (req, res) => {
-  const filename = String(req.params.filename || "");
+  const filename = parseValidFilename(req.params.filename || "");
   const password = String(req.body?.password || "");
 
-  if (!FILE_RE.test(filename)) {
+  if (!filename) {
     res.status(400).send("❌ Ongeldige bestandsnaam");
     return;
   }
 
   if (isExpiredFromName(filename)) {
-    res.send(`
-      <html>
-        <body style="font-family: sans-serif; padding: 20px;">
-          <h2>Beveiligde download</h2>
-          <p style="color: red;">❌ Deze downloadlink is verlopen (ouder dan 7 dagen)</p>
-        </body>
-      </html>
-    `);
+    sendHtml(res, renderExpiredDownloadPage());
     return;
   }
 
+  const actionPath = buildDownloadActionPath(filename);
+
   if (!hasPassword(filename)) {
-    const safeAction = `/api/file-download/${encodeURIComponent(filename)}`;
-    res.send(`
-      <html>
-        <body style="font-family: sans-serif; padding: 20px;">
-          <h2>Beveiligde download</h2>
-          <p style="color: red;">❌ Geen wachtwoord ingesteld voor dit bestand.</p>
-          <form method="POST" action="${escapeHtml(safeAction)}">
-            <input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />
-            <button type="submit">Download</button>
-          </form>
-        </body>
-      </html>
-    `);
+    sendHtml(
+      res,
+      renderDownloadPage({
+        actionPath,
+        message: "❌ Geen wachtwoord ingesteld voor dit bestand.",
+      })
+    );
     return;
   }
 
   if (!verifyPassword(filename, password)) {
-    const safeAction = `/api/file-download/${encodeURIComponent(filename)}`;
-    res.send(`
-      <html>
-        <body style="font-family: sans-serif; padding: 20px;">
-          <h2>Beveiligde download</h2>
-          <form method="POST" action="${escapeHtml(safeAction)}">
-            <input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />
-            <button type="submit">Download</button>
-          </form>
-          <p style="color: red; margin-top: 10px;">❌ Ongeldig wachtwoord, probeer opnieuw</p>
-        </body>
-      </html>
-    `);
+    sendHtml(res, renderWrongPasswordPage(actionPath));
     return;
   }
 
