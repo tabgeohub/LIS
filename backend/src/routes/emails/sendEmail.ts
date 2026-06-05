@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import puppeteer from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
 import nodemailer from "nodemailer";
 import { randomUUID } from "crypto";
 import dayjs from "dayjs";
@@ -49,6 +49,25 @@ function imageTag(file: Express.Multer.File): string {
 
 function buildImageTags(files: Express.Multer.File[]): string {
   return files.map(imageTag).join("");
+}
+
+function isAllowedPuppeteerRequest(url: string): boolean {
+  return (
+    url.startsWith("data:") ||
+    url === "about:blank" ||
+    url.startsWith("about:srcdoc")
+  );
+}
+
+async function blockExternalPuppeteerRequests(page: Page): Promise<void> {
+  await page.setRequestInterception(true);
+  page.on("request", (request) => {
+    if (isAllowedPuppeteerRequest(request.url())) {
+      request.continue();
+      return;
+    }
+    request.abort();
+  });
 }
 
 export const sendEmail: RequestHandler = async (req, res) => {
@@ -182,8 +201,9 @@ export const sendEmail: RequestHandler = async (req, res) => {
     let pdfBuffer: Buffer;
     try {
       const page = await browser.newPage();
+      await blockExternalPuppeteerRequests(page);
       await page.setContent(pdfHtml, {
-        waitUntil: ["load", "domcontentloaded", "networkidle0"],
+        waitUntil: "domcontentloaded",
       });
       await page.emulateMediaType("screen");
 

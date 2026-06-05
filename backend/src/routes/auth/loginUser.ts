@@ -1,5 +1,16 @@
+import { timingSafeEqual } from "crypto";
 import { Request, Response } from "express";
 import { pool } from "../../db";
+
+function secretsEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a, "utf8");
+  const bufB = Buffer.from(b, "utf8");
+  if (bufA.length !== bufB.length) {
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
 
 export async function loginUser(req: Request, res: Response): Promise<void> {
   const { username, password } = req.body;
@@ -26,7 +37,7 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
 
     const user = result.rows[0];
 
-    if (password !== user.password) {
+    if (!secretsEqual(password, user.password)) {
       res
         .status(401)
         .json({ message: "Ongeldige gebruikersnaam of wachtwoord" });
