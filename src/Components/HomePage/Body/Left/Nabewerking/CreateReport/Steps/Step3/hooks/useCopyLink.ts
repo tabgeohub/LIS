@@ -16,13 +16,13 @@ export function useCopyLink(
   const handleCopyLink = async () => {
     if (!downloadInfo?.url) return;
 
-    const password = window.prompt(
+    const promptResult = window.prompt(
       content.nabewerking.createReport.step3.done.passwordPrompt
     );
 
-    if (password == null) return;
+    if (typeof promptResult !== "string") return;
 
-    const trimmed = password.trim();
+    const trimmed = promptResult.trim();
     if (!trimmed) {
       const msg =
         content.nabewerking.createReport.step3.toasts.passwordRequired;
