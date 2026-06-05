@@ -1,27 +1,9 @@
 import { create } from "zustand";
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import type { Geometry } from "Types/geometry";
 
-interface GeometryPoint {
-  id: number;
-  longitude: number;
-  latitude: number;
-  [key: string]: any;
-}
-
-export interface Geometry {
-  id: number;
-  omschrijving: string;
-  type: "polygon" | "line";
-  points: GeometryPoint[];
-  organisatie?: string;
-  vertrouwelijk?: boolean | number;
-  herhalen?: boolean | number;
-  activiteit?: string;
-  specifiek_letten_op?: string;
-  regio_id?: string;
-  [key: string]: any;
-}
+export type { Geometry } from "Types/geometry";
 
 type GeometryFilters = {
   regio?: string | number;

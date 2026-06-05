@@ -2,7 +2,11 @@
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import { YELLOW_MARKER_SYMBOL, STARRED_POINT_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import {
+  YELLOW_MARKER_SYMBOL,
+  STARRED_POINT_SYMBOL,
+} from "@helpers/ArcGISHelpers/createSymbols";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
@@ -201,7 +205,7 @@ export default function Points({
         attributes: point,
       });
 
-      yellowGraphicsLayer.add(graphic);
+      yellowGraphicsLayer?.add(graphic);
 
       const alreadyStarred = starredPoints.find((p) => p.id === point.id);
 

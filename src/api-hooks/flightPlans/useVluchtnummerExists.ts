@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
-import { useDebouncedValue } from "hooks/useDebouncedValue";
+import { useDebouncedValue } from "utils/useDebouncedValue";
 import { flightPlanKeys } from "lib/queryKeys";
 import { FLIGHT_PLAN_DEBOUNCE_MS } from "./constants";
 

@@ -1,4 +1,4 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
+import type { Geometry } from "./geometry";
 
 export interface EnrichedPointType {
   id: number;

@@ -1,4 +1,4 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
+import type { Geometry } from "Types/geometry";
 
 export type TemplatePoint = {
   id: number;

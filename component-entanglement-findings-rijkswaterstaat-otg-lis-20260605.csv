@@ -1,0 +1,11 @@
+Description,Severity,Status,Issue age,Type,Length,Source component,Target component
+Cyclic dependency between src/api-hooks and src/hooks,HIGH,RAW,1,CYCLIC_DEPENDENCY,-,src/api-hooks,src/hooks
+Cyclic dependency between src/hooks and src/Components/HomePage,HIGH,RAW,1,CYCLIC_DEPENDENCY,-,src/hooks,src/Components/HomePage
+High communication density on src/hooks,MEDIUM,RAW,1,COMMUNICATION_DENSITY,-,-,-
+High communication density on src/Components/HomePage,MEDIUM,RAW,1,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/helpers,LOW,RAW,1,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/api-hooks,LOW,RAW,1,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/utils,LOW,RAW,1,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/Components/TimesliderItemDetailPage,LOW,RAW,1,COMMUNICATION_DENSITY,-,-,-
+Transitive dependency between src/Components/TimesliderItemDetailPage and src/hooks,LOW,RAW,1,LAYER_BYPASSING_DEPENDENCY,-,src/Components/TimesliderItemDetailPage,src/hooks
+Transitive dependency between src/Components/TimesliderItemDetailPage and src/helpers,LOW,RAW,1,LAYER_BYPASSING_DEPENDENCY,-,src/Components/TimesliderItemDetailPage,src/helpers

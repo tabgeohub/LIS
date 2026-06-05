@@ -39,7 +39,7 @@ export function useRenderGeometries() {
     // Timeslider page: only geometries that belong to the current flight plan list
     if (selectedPage === "timeslider") {
       if (timesliderPlans.length === 0) {
-        geometriesGraphicsLayer.removeAll();
+        geometriesGraphicsLayer?.removeAll();
         return;
       }
       const { geometryIds } = getPointAndGeometryIdsFromPlans(timesliderPlans);
@@ -57,7 +57,9 @@ export function useRenderGeometries() {
             },
           });
         })
-        .filter((graphic): graphic is NonNullable<typeof graphic> => graphic !== null);
+        .filter(
+          (graphic): graphic is NonNullable<typeof graphic> => graphic !== null
+        );
       replaceGraphics(geometriesGraphicsLayer, graphicsTs);
       return () => {
         if (geometriesGraphicsLayer) {
@@ -87,7 +89,9 @@ export function useRenderGeometries() {
           },
         });
       })
-      .filter((graphic): graphic is NonNullable<typeof graphic> => graphic !== null);
+      .filter(
+        (graphic): graphic is NonNullable<typeof graphic> => graphic !== null
+      );
 
     replaceGraphics(geometriesGraphicsLayer, graphics);
 
@@ -108,4 +112,3 @@ export function useRenderGeometries() {
     flightPlanStep,
   ]);
 }
-
