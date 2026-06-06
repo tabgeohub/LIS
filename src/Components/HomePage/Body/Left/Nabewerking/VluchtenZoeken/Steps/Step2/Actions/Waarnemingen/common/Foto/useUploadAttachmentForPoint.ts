@@ -27,7 +27,6 @@ export function useUploadAttachmentForPoint() {
       taken_at: number;
     }[] = [];
 
-    // Create dummy feature for attachments
     const dummyGraphic = new Graphic({ geometry: null, attributes: {} });
     const { addFeatureResults } = await attachmentsLayerArcgis.applyEdits({
       addFeatures: [dummyGraphic],
@@ -51,7 +50,6 @@ export function useUploadAttachmentForPoint() {
     try {
       await attachmentsLayerArcgis.addAttachment(graphicWithObjectId, formData);
 
-      // Wait for ArcGIS indexing
       await sleep(1000);
 
       const queryResult = await attachmentsLayerArcgis.queryAttachments({
@@ -82,4 +80,3 @@ export function useUploadAttachmentForPoint() {
     return attachments;
   };
 }
-
