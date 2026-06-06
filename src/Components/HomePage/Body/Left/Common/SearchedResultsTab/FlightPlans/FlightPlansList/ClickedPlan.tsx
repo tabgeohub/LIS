@@ -1,9 +1,10 @@
-import Point from "@arcgis/core/geometry/Point";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
-import { EnrichedPointType, FlightPlanType } from "Types";
+import { FlightPlanType } from "Types";
+import { computeFlightPlanCentroid } from "@helpers/ArcGISHelpers/computeFlightPlanCentroid";
+import { getFlightPlanPoints } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 
 export default function ClickedPlan({
   flightPlan,
@@ -14,36 +15,12 @@ export default function ClickedPlan({
 
   const { mapView } = useMapViewState();
 
-  const computeCentroid = (): Point | null => {
-    if (!flightPlan?.points?.length) return null;
-
-    const coords = flightPlan.points.map((pt: EnrichedPointType) => ({
-      x: pt.longitude,
-      y: pt.latitude,
-    }));
-
-    const sum = coords.reduce(
-      (acc, coord) => {
-        acc.x += coord.x;
-        acc.y += coord.y;
-        return acc;
-      },
-      { x: 0, y: 0 }
-    );
-
-    const centerX = sum.x / coords.length;
-    const centerY = sum.y / coords.length;
-
-    return new Point({
-      longitude: centerX,
-      latitude: centerY,
-      spatialReference: { wkid: 4326 },
-    });
-  };
+  const getPlanCenter = () =>
+    computeFlightPlanCentroid(getFlightPlanPoints(flightPlan));
 
   const zoomToPoint = () => {
     if (mapView && flightPlan) {
-      const center = computeCentroid();
+      const center = getPlanCenter();
       if (center) {
         mapView.goTo({ target: center, zoom: 8 });
 
@@ -61,7 +38,7 @@ export default function ClickedPlan({
 
   const goToPoint = () => {
     if (mapView && flightPlan) {
-      const center = computeCentroid();
+      const center = getPlanCenter();
       if (center) {
         mapView.goTo(center);
 

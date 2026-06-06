@@ -1,4 +1,3 @@
-import Point from "@arcgis/core/geometry/Point";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -14,9 +13,10 @@ import {
   MdOutlineZoomInMap,
   MdDelete,
 } from "react-icons/md";
-import { EnrichedPointType } from "Types";
 import { useDeleteData } from "utils/useDeleteData";
 import MenuItem from "../common/MenuItem";
+import { computeFlightPlanCentroid } from "@helpers/ArcGISHelpers/computeFlightPlanCentroid";
+import { getFlightPlanPoints } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 
 export default function PlansList() {
   const { mapView } = useMapViewState();
@@ -32,36 +32,12 @@ export default function PlansList() {
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const { selectedTab } = useTabState();
 
-  const computeCentroid = () => {
-    if (!flightPlan?.points?.length) return null;
-
-    const coords = flightPlan.points.map((pt: EnrichedPointType) => ({
-      x: pt.longitude,
-      y: pt.latitude,
-    }));
-
-    const sum = coords.reduce(
-      (acc, coord) => {
-        acc.x += coord.x;
-        acc.y += coord.y;
-        return acc;
-      },
-      { x: 0, y: 0 }
-    );
-
-    const centerX = sum.x / coords.length;
-    const centerY = sum.y / coords.length;
-
-    return new Point({
-      longitude: centerX,
-      latitude: centerY,
-      spatialReference: { wkid: 4326 },
-    });
-  };
+  const getPlanCenter = () =>
+    flightPlan ? computeFlightPlanCentroid(getFlightPlanPoints(flightPlan)) : null;
 
   const zoomToPoint = () => {
     if (mapView && flightPlan) {
-      const center = computeCentroid();
+      const center = getPlanCenter();
       if (center) {
         mapView.goTo({ target: center, zoom: 8 });
       }
@@ -70,7 +46,7 @@ export default function PlansList() {
 
   const goToPoint = () => {
     if (mapView && flightPlan) {
-      const center = computeCentroid();
+      const center = getPlanCenter();
       if (center) {
         mapView.goTo(center);
       }

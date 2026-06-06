@@ -1,121 +1,30 @@
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaLock } from "react-icons/fa6";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import Graphic from "@arcgis/core/Graphic";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { GoCheckCircleFill } from "react-icons/go";
 import { TbCancel } from "react-icons/tb";
 import dayjs from "dayjs";
 import useLogAction from "hooks/useLogAction";
 import { classNames } from "@helpers/classNames";
+import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
+import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
 
 export default function SinglePlan({
-  index,
   plan,
 }: {
   index: number;
   plan: FlightPlanType;
 }) {
   const logAction = useLogAction();
-
-  const { graphicsLayerHover, graphicsLayer } = useMapViewState();
-
+  const { handleClick } = usePlanClick();
+  const { handleHover, handleMouseLeave } = usePlanHover();
   const { setHoveredPoints } = useHoveredPlanState();
-
   const { setSelectedPlan, selectedPlan } = useViewPlanState();
-
-  const selectPlan = (plan: FlightPlanType) => {
-    setSelectedPlan(plan);
-
-    if (!graphicsLayer) return;
-
-    setSelectedPlan(plan);
-
-    graphicsLayer.removeAll();
-
-    const points = plan?.points;
-    if (!points || points.length === 0) return;
-
-    const minLat = Math.min(...points.map((p) => p.latitude));
-    const maxLat = Math.max(...points.map((p) => p.latitude));
-    const minLon = Math.min(...points.map((p) => p.longitude));
-    const maxLon = Math.max(...points.map((p) => p.longitude));
-
-    const polygon = new Polygon({
-      rings: [
-        [
-          [minLon, maxLat],
-          [maxLon, maxLat],
-          [maxLon, minLat],
-          [minLon, minLat],
-          [minLon, maxLat],
-        ],
-      ],
-      spatialReference: { wkid: 4326 },
-    });
-
-    const fillSymbol = new SimpleFillSymbol({
-      color: [227, 139, 79, 0],
-      outline: { color: [0, 255, 0, 1], width: 2 },
-    });
-
-    const newPolygonGraphic = new Graphic({
-      geometry: polygon,
-      symbol: fillSymbol,
-    });
-
-    graphicsLayer.add(newPolygonGraphic);
-
-    logAction({
-      message: "User selected a flight plan",
-      step: "View plan",
-      newData: { vluchtnummer: plan.vluchtnummer, planId: plan.id },
-    });
-  };
-
-  const HoveredPlan = (index: number) => {
-    if (!graphicsLayerHover) return;
-
-    let points = plan?.points;
-
-    if (!points) return;
-
-    const minLat = Math.min(...points.map((p) => p.latitude));
-    const maxLat = Math.max(...points.map((p) => p.latitude));
-    const minLon = Math.min(...points.map((p) => p.longitude));
-    const maxLon = Math.max(...points.map((p) => p.longitude));
-
-    const polygon = new Polygon({
-      rings: [
-        [
-          [minLon, maxLat],
-          [maxLon, maxLat],
-          [maxLon, minLat],
-          [minLon, minLat],
-          [minLon, maxLat],
-        ],
-      ],
-    });
-
-    const fillSymbol = new SimpleFillSymbol({
-      color: [227, 139, 79, 0],
-      outline: { color: [227, 139, 79, 1], width: 2 },
-    });
-
-    const newPolygonGraphic = new Graphic({
-      geometry: polygon,
-      symbol: fillSymbol,
-    });
-
-    graphicsLayerHover.add(newPolygonGraphic);
-  };
 
   const exportExcel = (plan: FlightPlanType) => {
     const columns = [
@@ -201,15 +110,18 @@ export default function SinglePlan({
 
   return (
     <div
-      onMouseEnter={() => HoveredPlan(index)}
+      onMouseEnter={() => handleHover(plan)}
       onMouseLeave={() => {
         setHoveredPoints(null);
-        if (graphicsLayerHover) {
-          graphicsLayerHover.removeAll();
-        }
+        handleMouseLeave();
       }}
       onClick={() => {
-        selectPlan(plan);
+        handleClick(plan, setSelectedPlan);
+        logAction({
+          message: "User selected a flight plan",
+          step: "View plan",
+          newData: { vluchtnummer: plan.vluchtnummer, planId: plan.id },
+        });
       }}
       className={classNames(
         "hover:cursor-pointer hover:bg-gray-100 relative p-2",

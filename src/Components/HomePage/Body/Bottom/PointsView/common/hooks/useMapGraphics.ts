@@ -10,6 +10,7 @@ import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
 import { YELLOW_MARKER_SYMBOL, STARRED_POINT_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { addPlanStarGraphic } from "hooks/hover-click-handlers/usePlanStarGraphic";
 
 interface UseMapGraphicsParams {
   tab: string;
@@ -168,34 +169,7 @@ export const useMapGraphics = ({
             const oldGraphic = originalGraphicsMap.current?.get(plan.id);
             if (oldGraphic) graphicsLayer?.remove(oldGraphic);
 
-            const minLat = Math.min(...plan.points.map((p) => p.latitude));
-            const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-            const minLon = Math.min(...plan.points.map((p) => p.longitude));
-            const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-            const polygon = new Polygon({
-              rings: [
-                [
-                  [minLon, maxLat],
-                  [maxLon, maxLat],
-                  [maxLon, minLat],
-                  [minLon, minLat],
-                  [minLon, maxLat],
-                ],
-              ],
-              spatialReference: { wkid: 4326 },
-            });
-
-            const fillSymbol = new SimpleFillSymbol({
-              color: [0, 255, 0, 0],
-              outline: { color: [0, 0, 255, 1], width: 2 },
-            });
-
-            const graphic = new Graphic({
-              geometry: polygon,
-              symbol: fillSymbol,
-            });
-            graphicsLayer?.graphics.add(graphic);
+            addPlanStarGraphic(plan, graphicsLayer, "table");
           }
         });
       }

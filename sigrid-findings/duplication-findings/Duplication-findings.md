@@ -35,6 +35,8 @@ Merged duplicate point/geometry foto screens into `…/Waarnemingen/common/Foto/
 - Plan sync: `syncAttachmentsInPlan.ts`
 - Thin wrappers remain in `EditPointDetails/Actions/Foto/` and `EditGeometryDetails/Actions/Foto/`
 
+**Test:** see `Duplication-test-checklist.md` → *Foto / attachments*.
+
 ---
 
 ## By application area
@@ -387,6 +389,7 @@ Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain
 | ---------------------------------------- | -------------------------------------------------- |
 | `Duplication findings.csv`               | 398 duplicate clusters — one row per cluster       |
 | `Duplicates.csv`                         | 1,038 rows — one row per file location per cluster |
-| `Duplication-findings.md`                | This document                                      |
+| `Duplication-findings.md`                | Cluster status & fix priority                      |
+| `Duplication-test-checklist.md`          | Regression tests to run after each duplication fix |
 
 

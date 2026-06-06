@@ -3,11 +3,17 @@ import { TfiMoreAlt } from "react-icons/tfi";
 import ClickedPlan from "./ClickedPlan";
 import { FlightPlanType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import { FaStar } from "react-icons/fa6";
 import useLogAction from "hooks/useLogAction";
+import {
+  createPlanBoundingBoxGraphic,
+  getFlightPlanPoints,
+  PLAN_BOUNDING_BOX_SYMBOLS,
+} from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import {
+  addPlanStarGraphic,
+  removePlanStarGraphics,
+} from "hooks/hover-click-handlers/usePlanStarGraphic";
 
 export default function List({
   flightPlansData,
@@ -52,35 +58,13 @@ export default function List({
 
     graphicsLayerHover.removeAll();
 
-    const minLat = Math.min(...plan.points.map((p) => p.latitude));
-    const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-    const minLon = Math.min(...plan.points.map((p) => p.longitude));
-    const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-    const polygon = new Polygon({
-      rings: [
-        [
-          [minLon, maxLat],
-          [maxLon, maxLat],
-          [maxLon, minLat],
-          [minLon, minLat],
-          [minLon, maxLat],
-        ],
-      ],
-      spatialReference: { wkid: 4326 },
+    const hoverGraphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
+      symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hoverSearchList,
     });
 
-    const fillSymbol = new SimpleFillSymbol({
-      color: [0, 255, 0, 0.1],
-      outline: { color: [0, 255, 0, 1], width: 2 },
-    });
-
-    const hoverGraphic = new Graphic({
-      geometry: polygon,
-      symbol: fillSymbol,
-    });
-
-    graphicsLayerHover.add(hoverGraphic);
+    if (hoverGraphic) {
+      graphicsLayerHover.add(hoverGraphic);
+    }
   };
 
   const handleMouseLeave = (plan: FlightPlanType) => {
@@ -101,13 +85,7 @@ export default function List({
 
     if (alreadyStarred) {
       setStarredPlans((prev) => prev.filter((p) => p.id !== plan.id));
-      const toRemove = redGraphicsLayer?.graphics.find(
-        (g) => g.attributes?.id === plan.id
-      );
-      if (toRemove)
-        redGraphicsLayer.graphics.removeMany(
-          redGraphicsLayer.graphics.filter((g) => g.attributes?.id === plan.id)
-        );
+      removePlanStarGraphics(plan.id, redGraphicsLayer);
 
       logAction({
         message: "User unstarred a flight plan",
@@ -118,36 +96,7 @@ export default function List({
       });
     } else {
       setStarredPlans((prev) => [...prev, plan]);
-      const minLat = Math.min(...plan.points.map((p) => p.latitude));
-      const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-      const minLon = Math.min(...plan.points.map((p) => p.longitude));
-      const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-      const polygon = new Polygon({
-        rings: [
-          [
-            [minLon, maxLat],
-            [maxLon, maxLat],
-            [maxLon, minLat],
-            [minLon, minLat],
-            [minLon, maxLat],
-          ],
-        ],
-        spatialReference: { wkid: 4326 },
-      });
-
-      const fillSymbol = new SimpleFillSymbol({
-        color: [0, 255, 0, 0],
-        outline: { color: [0, 0, 255, 1], width: 5 },
-      });
-
-      const graphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-        attributes: { id: plan.id },
-      });
-
-      redGraphicsLayer.graphics.add(graphic);
+      addPlanStarGraphic(plan, redGraphicsLayer, "search");
 
       logAction({
         message: "User starred a flight plan",

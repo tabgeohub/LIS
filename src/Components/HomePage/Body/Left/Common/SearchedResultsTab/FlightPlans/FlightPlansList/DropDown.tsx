@@ -27,10 +27,8 @@ import shpwrite from "@mapbox/shp-write";
 import { FeatureCollection, Polygon as pl } from "geojson";
 import * as XLSX from "xlsx";
 
-import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import { useContent } from "hooks/useContent";
+import { addPlanStarGraphics } from "hooks/hover-click-handlers/usePlanStarGraphic";
 
 export default function DropDown({
   starredPlans,
@@ -77,38 +75,7 @@ export default function DropDown({
     const unique = Array.from(new Map(combined.map((p) => [p.id, p])).values());
     setStarredPlans(unique);
 
-    newStars.forEach((plan) => {
-      const minLat = Math.min(...plan.points.map((p) => p.latitude));
-      const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-      const minLon = Math.min(...plan.points.map((p) => p.longitude));
-      const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-      const polygon = new Polygon({
-        rings: [
-          [
-            [minLon, maxLat],
-            [maxLon, maxLat],
-            [maxLon, minLat],
-            [minLon, minLat],
-            [minLon, maxLat],
-          ],
-        ],
-        spatialReference: { wkid: 4326 },
-      });
-
-      const fillSymbol = new SimpleFillSymbol({
-        color: [0, 255, 0, 0],
-        outline: { color: [0, 0, 255, 1], width: 5 },
-      });
-
-      const graphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-        attributes: { id: plan.id },
-      });
-
-      redGraphicsLayer.graphics.add(graphic);
-    });
+    addPlanStarGraphics(newStars, redGraphicsLayer, "search");
   };
 
   const exportCsv = async () => {

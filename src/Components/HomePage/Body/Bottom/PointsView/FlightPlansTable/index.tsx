@@ -1,6 +1,4 @@
-import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useState } from "react";
@@ -11,6 +9,15 @@ import { RxDragHandleDots2 } from "react-icons/rx";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { FlightPlanType } from "Types";
 import Data from "./Data";
+import {
+  createPlanBoundingBoxGraphic,
+  getFlightPlanPoints,
+  PLAN_BOUNDING_BOX_SYMBOLS,
+} from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import {
+  addPlanStarGraphic,
+  removePlanStarGraphics,
+} from "hooks/hover-click-handlers/usePlanStarGraphic";
 
 const allColumnsPlans = [
   "Aanmaker vlieplan",
@@ -78,13 +85,7 @@ export default function FlightPlansTable({
 
     if (alreadyStarred) {
       setStarredPlans((prev) => prev.filter((p) => p.id !== plan.id));
-      const toRemove = graphicsLayer?.graphics.find(
-        (g) => g.attributes?.id === plan.id
-      );
-      if (toRemove)
-        graphicsLayer.graphics.removeMany(
-          graphicsLayer.graphics.filter((g) => g.attributes?.id === plan.id)
-        );
+      removePlanStarGraphics(plan.id, graphicsLayer);
     } else {
       setStarredPlans((prev) => [...prev, plan]);
 
@@ -94,37 +95,7 @@ export default function FlightPlansTable({
       }
 
       graphicsLayerHover?.removeAll();
-
-      const minLat = Math.min(...plan.points.map((p) => p.latitude));
-      const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-      const minLon = Math.min(...plan.points.map((p) => p.longitude));
-      const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-      const polygon = new Polygon({
-        rings: [
-          [
-            [minLon, maxLat],
-            [maxLon, maxLat],
-            [maxLon, minLat],
-            [minLon, minLat],
-            [minLon, maxLat],
-          ],
-        ],
-        spatialReference: { wkid: 4326 },
-      });
-
-      const fillSymbol = new SimpleFillSymbol({
-        color: [0, 255, 0, 0],
-        outline: { color: [0, 0, 255, 1], width: 2 },
-      });
-
-      const graphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-        attributes: { id: plan.id },
-      });
-
-      graphicsLayer.graphics.add(graphic);
+      addPlanStarGraphic(plan, graphicsLayer, "table");
     }
   };
 
@@ -138,35 +109,13 @@ export default function FlightPlansTable({
 
     graphicsLayerHover.removeAll();
 
-    const minLat = Math.min(...plan.points.map((p) => p.latitude));
-    const maxLat = Math.max(...plan.points.map((p) => p.latitude));
-    const minLon = Math.min(...plan.points.map((p) => p.longitude));
-    const maxLon = Math.max(...plan.points.map((p) => p.longitude));
-
-    const polygon = new Polygon({
-      rings: [
-        [
-          [minLon, maxLat],
-          [maxLon, maxLat],
-          [maxLon, minLat],
-          [minLon, minLat],
-          [minLon, maxLat],
-        ],
-      ],
-      spatialReference: { wkid: 4326 },
+    const hoverGraphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
+      symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hoverSearchList,
     });
 
-    const fillSymbol = new SimpleFillSymbol({
-      color: [0, 255, 0, 0.1],
-      outline: { color: [0, 255, 0, 1], width: 2 },
-    });
-
-    const hoverGraphic = new Graphic({
-      geometry: polygon,
-      symbol: fillSymbol,
-    });
-
-    graphicsLayerHover.add(hoverGraphic);
+    if (hoverGraphic) {
+      graphicsLayerHover.add(hoverGraphic);
+    }
   };
 
   return (
