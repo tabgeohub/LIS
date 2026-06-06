@@ -11,10 +11,10 @@
 
 | Metric                      | Value                                      |
 | --------------------------- | ------------------------------------------ |
-| **Duplicate clusters**      | **398** in export · **~383** remaining     |
+| **Duplicate clusters**      | **398** in export · **~343** remaining     |
 | **Severity**                | All **HIGH**                               |
-| **Status**                  | **15 FIXED** (Foto) · **383 RAW**          |
-| **Total redundant lines**   | **~6,361** · **~6,058** remaining          |
+| **Status**                  | **55 FIXED** · **343 RAW**                 |
+| **Total redundant lines**   | **~6,361** · **~5,154** remaining          |
 | **File locations affected** | **1,038** in export (pre-rescan)           |
 
 
@@ -37,6 +37,20 @@ Merged duplicate point/geometry foto screens into `…/Waarnemingen/common/Foto/
 
 **Test:** see `Duplication-test-checklist.md` → *Foto / attachments*.
 
+### Flight plan map & list UI *(2026-06-05)*
+
+**40 clusters · ~904 redundant lines · Search, bottom panel, hooks, SinglePlan**
+
+Shared helpers and hooks under `src/helpers/ArcGISHelpers/` and `src/hooks/hover-click-handlers/`:
+
+- `createPlanBoundingBoxGraphic.ts`, `computeFlightPlanCentroid.ts`, `finishedPlanMapGraphics.ts`
+- `usePlanClick.ts`, `usePlanHover.ts`, `usePlanStarGraphic.ts`, `useFinishedPlanMapHighlight.ts`
+- Wired: `FlightPlansList/List`, `DropDown`, `FlightPlansTable`, `useMapGraphics` (flightPlans tab)
+- Centroid menus: `ClickedPlan`, `PlansList`, `FlightPlanDetails/DropDown`
+- SinglePlan rows: `ViewPlan`, `VluchtenZoeken`, `CreateReport` (+ `ReuseFlightPlan` already used hooks)
+
+**Test:** see `Duplication-test-checklist.md` → *Flight plan map & list UI*.
+
 ---
 
 ## By application area
@@ -45,10 +59,10 @@ Merged duplicate point/geometry foto screens into `…/Waarnemingen/common/Foto/
 | Area                                 | Clusters | Redundant lines | Notes                                        |
 | ------------------------------------ | -------- | --------------- | -------------------------------------------- |
 | **Backend** (`backend/src/routes/…`) | 99       | ~1,626          | SQL fragments, validation, CRUD handlers     |
-| **HomePage — Search & tables**       | 61       | ~1,087          | Points/plans lists, bottom panel, search tab |
-| **HomePage — Voorbereiding**         | 78       | ~1,070          | Flight plan, view plan, drawing tool         |
-| **HomePage — Nabewerking**           | 40       | ~679            | Vluchten zoeken, create report *(foto fixed)* |
-| **hooks**                            | 52       | ~935            | Zustand stores, map handlers                 |
+| **HomePage — Search & tables**       | 45       | ~750            | Points/plans lists *(plan map fixed)*        |
+| **HomePage — Voorbereiding**         | 73       | ~990            | Flight plan, view plan, drawing tool         |
+| **HomePage — Nabewerking**           | 35       | ~620            | Vluchten zoeken, create report *(foto fixed)* |
+| **hooks**                            | 47       | ~850            | Zustand stores, map handlers *(plan hooks fixed)* |
 | **HomePage — Other**                 | 22       | ~281            | Layout, misc                                 |
 | **helpers**                          | 12       | ~149            | Shared utilities                             |
 | **Other pages**                      | 10       | ~137            | Dashboard, installations                     |
@@ -78,26 +92,7 @@ Clusters are grouped by **what is duplicated**, not by Sigrid row order.
 
 ---
 
-### 2. Flight plan map & list UI
-
-**40 clusters · ~904 redundant lines · Search, bottom panel, hooks**
-
-Repeated logic for drawing flight plans on the map and rendering plan rows.
-
-
-| Block size  | Occurrences         | Key files                                                                                                               |
-| ----------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **8 lines** | **14×** in 10 files | `FlightPlansList/DropDown`, `FlightPlansTable`, `SinglePlan.tsx` (×3), `usePlanClick`, `usePlanHover`, `useMapGraphics` |
-| **9 lines** | **10×** in 7 files  | Same cluster — plan highlight / go-to on map                                                                            |
-| **7 lines** | **12×** in 8 files  | Plan list row click handling                                                                                            |
-| 14–21 lines | 3–4×                | `ClickedPlan`, `PlansList`, `FlightPlanDetails/DropDown`                                                                |
-
-
-**Suggested fix:** Extract `usePlanMapHighlight()` and a shared `PlanListRow` / map graphic helper.
-
----
-
-### 3. Point list & star/highlight on map
+### 2. Point list & star/highlight on map
 
 **44 clusters · ~743 redundant lines · Search tab, result tab**
 
@@ -115,7 +110,7 @@ Star toggle, yellow markers, and hover graphics duplicated across point list com
 
 ---
 
-### 4. Backend — flight plan / point SQL queries
+### 3. Backend — flight plan / point SQL queries
 
 **29 clusters · ~567 redundant lines**
 
@@ -133,7 +128,7 @@ Same SELECT / JOIN / filter fragments across route handlers.
 
 ---
 
-### 5. Backend — route validation & CRUD
+### 4. Backend — route validation & CRUD
 
 **45 clusters · ~768 redundant lines**
 
@@ -152,7 +147,7 @@ Repeated request validation and create/update boilerplate.
 
 ---
 
-### 6. Drawing tool
+### 5. Drawing tool
 
 **6 clusters · ~121 redundant lines · Voorbereiding**
 
@@ -168,7 +163,7 @@ Repeated request validation and create/update boilerplate.
 
 ---
 
-### 7. Zustand store — initial state vs `clear()`
+### 6. Zustand store — initial state vs `clear()`
 
 **25 clusters · ~461 redundant lines · hooks**
 
@@ -187,7 +182,7 @@ Store `clear()` functions copy the entire initial state block — duplicated ins
 
 ---
 
-### 8. Geometry rendering & handlers
+### 7. Geometry rendering & handlers
 
 **12 clusters · ~186 redundant lines**
 
@@ -203,7 +198,7 @@ Store `clear()` functions copy the entire initial state block — duplicated ins
 
 ---
 
-### 9. Edit point form steps
+### 8. Edit point form steps
 
 **4 clusters · ~30 redundant lines · Tools vs Voorbereiding**
 
@@ -220,7 +215,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 10. Map legend / layers
+### 9. Map legend / layers
 
 **9 clusters · ~146 redundant lines**
 
@@ -237,7 +232,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 11. View plan — add points
+### 10. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -253,7 +248,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 12. Backend — finished plans queries
+### 11. Backend — finished plans queries
 
 **9 clusters · ~127 redundant lines**
 
@@ -269,7 +264,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 13. Layout components
+### 12. Layout components
 
 **3 clusters · ~38 redundant lines**
 
@@ -283,7 +278,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 14. Wizard / step buttons
+### 13. Wizard / step buttons
 
 **22 clusters · ~352 redundant lines**
 
@@ -300,7 +295,7 @@ Cancel / next / log-action / clear-graphics blocks repeated across wizard Button
 
 ---
 
-### 15. Miscellaneous
+### 14. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -328,12 +323,11 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | Phase | Theme                                             | Est. redundant lines removed | Effort |
 | ----- | ------------------------------------------------- | ---------------------------- | ------ |
 | **A** | Shared `finished_plans` types (#1)                | ~100                         | 1 h    |
-| **B** | Flight plan map & list UI (#2)                    | ~400+                        | 3–4 h  |
-| **C** | Backend queries + validation (#4, #5)             | ~600+                        | 4–6 h  |
-| **D** | Point list map graphics (#3)                      | ~400+                        | 3–4 h  |
-| **E** | Zustand clear/initial state (#7)                  | ~200+                        | 2 h    |
-| **F** | Geometry, drawing tool, legend (#6, #8, #10)      | ~450+                        | 6–8 h  |
-| **G** | Wizard buttons, view plan, layout (#11, #13, #14) | ~350+                        | 4–6 h  |
+| **B** | Backend queries + validation (#3, #4)             | ~600+                        | 4–6 h  |
+| **C** | Point list map graphics (#2)                      | ~400+                        | 3–4 h  |
+| **D** | Zustand clear/initial state (#6)                  | ~200+                        | 2 h    |
+| **E** | Geometry, drawing tool, legend (#5, #7, #9)       | ~450+                        | 6–8 h  |
+| **F** | Wizard buttons, view plan, layout (#10, #12, #13) | ~350+                        | 4–6 h  |
 
 
 Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain.
@@ -354,6 +348,7 @@ Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain
 | Work done                                             | Effect on duplication CSV                      |
 | ----------------------------------------------------- | ---------------------------------------------- |
 | **Foto / attachments refactor** (2026-06-05)        | 15 clusters (~303 lines) — shared `common/Foto/` |
+| **Flight plan map & list UI** (2026-06-05)          | 40 clusters (~904 lines) — shared ArcGIS helpers + hooks |
 | Phase 2: moved `flightPlanStates` to `hooks/zustand/` | Old paths in CSV may still show until rescan   |
 | Entanglement fixes                                    | Unrelated to duplication (cycles ≠ copy-paste) |
 | Template flight geometry fix                          | Functional fix; no duplication impact          |
@@ -368,16 +363,16 @@ Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain
 
 | Rank | Redundant lines | Description              | Main locations                 |
 | ---- | --------------- | ------------------------ | ------------------------------ |
-| 1    | 104             | 8 lines × 14 occurrences | Plan map highlight — 10 files  |
-| 2    | 81              | 9 lines × 10 occurrences | Plan click/hover — 7 files     |
-| 3    | 77              | 7 lines × 12 occurrences | Plan list row — 8 files        |
-| 4    | 72              | 12 lines × 7             | Backend + frontend validation  |
-| 5    | 64              | 8 lines × 9              | Backend SQL SELECT fragments   |
-| 6    | 56              | 8 lines × 8              | Point hover graphic            |
-| 7    | 54              | 9 lines × 7              | Wizard button blocks           |
-| 8    | 54              | 6 lines × 10             | Backend CRUD validation        |
-| 9    | 51              | 17 lines × 4             | Backend search query blocks    |
-| 10   | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()   |
+| 1    | 72              | 12 lines × 7             | Backend + frontend validation  |
+| 2    | 64              | 8 lines × 9              | Backend SQL SELECT fragments   |
+| 3    | 56              | 8 lines × 8              | Point hover graphic            |
+| 4    | 54              | 9 lines × 7              | Wizard button blocks           |
+| 5    | 54              | 6 lines × 10             | Backend CRUD validation        |
+| 6    | 51              | 17 lines × 4             | Backend search query blocks    |
+| 7    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()   |
+| 8    | 45              | 15 lines × 3             | Point list row click + goTo    |
+| 9    | 44              | 44 lines × 2             | `SingleGeometry` ↔ geometry handlers |
+| 10   | 43              | 43 lines × 2             | `finished_plans` types mirror  |
 
 
 ---
