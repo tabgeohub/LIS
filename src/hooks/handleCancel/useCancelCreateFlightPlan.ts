@@ -1,6 +1,6 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 
 export function useCancelCreateFlightPlan() {
   const { setSelectedTab } = useTabState();

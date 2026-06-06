@@ -13,7 +13,7 @@ import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import Header from "./Header";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import PointsList from "./PointsList";

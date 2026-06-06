@@ -9,7 +9,7 @@ import { saveAs } from "file-saver";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import Graphic from "@arcgis/core/Graphic";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { GoCheckCircleFill } from "react-icons/go";
 import { TbCancel } from "react-icons/tb";
 import dayjs from "dayjs";

@@ -4,7 +4,7 @@ import {
   usePlansFilterStore,
 } from "hooks/filters/usePlansFilterStore";
 import { FlightPlanType } from "Types";
-import { useViewPlanState } from "../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function Filter({ plans }: { plans: FlightPlanType[] }) {
   const {

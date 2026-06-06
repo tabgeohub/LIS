@@ -1,6 +1,6 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useCreateData } from "utils/useCreateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";

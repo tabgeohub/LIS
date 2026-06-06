@@ -1,5 +1,5 @@
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import { useContent } from "hooks/useContent";
 

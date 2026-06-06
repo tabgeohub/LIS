@@ -1,5 +1,5 @@
 import Submit from "./Submit";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import RemovePoint from "./RemovePoint";
 import { useContent } from "hooks/useContent";
 

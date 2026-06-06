@@ -1,5 +1,5 @@
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
 import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";

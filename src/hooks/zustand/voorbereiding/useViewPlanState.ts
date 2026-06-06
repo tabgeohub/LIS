@@ -126,7 +126,8 @@ export const useViewPlanState = create<ViewPlanState>((set) => ({
   setClickedPoint: (clickedPoint: number) => set(() => ({ clickedPoint })),
 
   clickedGeometry: null,
-  setClickedGeometry: (clickedGeometry: number | null) => set(() => ({ clickedGeometry })),
+  setClickedGeometry: (clickedGeometry: number | null) =>
+    set(() => ({ clickedGeometry })),
 
   selectedPlan: null,
   setSelectedPlan: (selectedPlan: FlightPlanType) =>

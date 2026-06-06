@@ -1,7 +1,7 @@
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";

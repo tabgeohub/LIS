@@ -1,5 +1,5 @@
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useViewPlanState } from "../../Voorbereiding/ViewPlan/helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useContent } from "hooks/useContent";

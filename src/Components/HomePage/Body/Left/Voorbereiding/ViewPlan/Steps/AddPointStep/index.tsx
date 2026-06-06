@@ -9,7 +9,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { findSpecificPoint } from "../../../EnrichedAddPoint/helpers/findSpecificPoint";
 import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function AddPointStep() {
   const [addPointStep, setAddPointStep] = useState(1);

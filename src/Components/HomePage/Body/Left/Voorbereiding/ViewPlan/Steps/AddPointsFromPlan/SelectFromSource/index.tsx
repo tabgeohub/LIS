@@ -6,7 +6,7 @@ import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
 import { useFlightPlansList } from "api-hooks/flightPlans";
 import { useTemplateFlights } from "api-hooks/templateFlights";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import PlansList from "./PlansList";
 import PointsList from "./PointsList";
 import { FlightPlanType } from "Types";

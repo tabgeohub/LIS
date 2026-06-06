@@ -1,5 +1,5 @@
 import { useContent } from "hooks/useContent";
-import { useFlightPlanState } from "../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 

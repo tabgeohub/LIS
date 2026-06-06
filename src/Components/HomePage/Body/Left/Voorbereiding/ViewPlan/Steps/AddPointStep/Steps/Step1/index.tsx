@@ -5,7 +5,7 @@ import SearchWidget from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAd
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "../../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function Step1({
   handleCancel,

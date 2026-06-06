@@ -13,7 +13,7 @@ import DuplicateFlightPlan from "./Steps/DuplicateFlightPlan";
 import { useRenderVluchtplans } from "hooks/useRenderVluchtPlans";
 import { filterPlans } from "@helpers/filterPlans";
 import { FlightPlanType } from "Types";
-import { useViewPlanState } from "./helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import AddPointsFromPlan from "./Steps/AddPointsFromPlan";

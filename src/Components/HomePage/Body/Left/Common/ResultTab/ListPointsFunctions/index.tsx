@@ -19,7 +19,7 @@ import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
 import shpwrite from "@mapbox/shp-write";
 import { FeatureCollection, Point as pt, Feature } from "geojson";
-import { useViewPlanState } from "../../../Voorbereiding/ViewPlan/helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 

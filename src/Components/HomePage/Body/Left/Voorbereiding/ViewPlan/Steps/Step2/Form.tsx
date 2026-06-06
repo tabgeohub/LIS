@@ -5,7 +5,7 @@ import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponent
 import useGetPiloot from "hooks/consts/useGetPiloot";
 import useGetWaarnemers from "hooks/consts/useGetWaarnemers";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function Form({
   vluchtnummer,

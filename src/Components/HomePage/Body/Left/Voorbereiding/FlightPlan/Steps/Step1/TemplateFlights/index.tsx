@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFlightPlanState } from "../../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { useTemplateFlights } from "api-hooks/templateFlights";
 import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";

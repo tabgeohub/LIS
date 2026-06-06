@@ -6,7 +6,7 @@ import { createQuadrantGraphic } from "../../helpers/createQuadrantGraphic";
 import SinglePlan from "./SinglePlan";
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function Step1({
   handleCancel,

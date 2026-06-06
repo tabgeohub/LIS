@@ -2,7 +2,7 @@ import { useState } from "react";
 import Buttons from "./Buttons";
 import Form from "./Form";
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
-import { useViewPlanState } from "../../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 
 export default function Step3({
   handleCancel,

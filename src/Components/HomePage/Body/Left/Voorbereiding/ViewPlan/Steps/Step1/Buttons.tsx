@@ -1,6 +1,6 @@
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import toast from "react-hot-toast";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { usePlanDuplicateState } from "../../helpers/usePlanDuplicateState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

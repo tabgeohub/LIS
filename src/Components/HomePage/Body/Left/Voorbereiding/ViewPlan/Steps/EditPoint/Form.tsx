@@ -1,4 +1,4 @@
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";

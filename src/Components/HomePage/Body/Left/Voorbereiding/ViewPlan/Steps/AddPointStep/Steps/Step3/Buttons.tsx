@@ -3,7 +3,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { findSpecificPoint } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/findSpecificPoint";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
-import { useViewPlanState } from "../../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import { useContent } from "hooks/useContent";
 import { EnrichedPointType } from "Types";

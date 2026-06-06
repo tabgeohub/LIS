@@ -1,5 +1,5 @@
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import useLogAction from "hooks/useLogAction";

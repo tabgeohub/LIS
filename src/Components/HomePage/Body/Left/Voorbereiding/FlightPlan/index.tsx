@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useFlightPlanState } from "./helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";

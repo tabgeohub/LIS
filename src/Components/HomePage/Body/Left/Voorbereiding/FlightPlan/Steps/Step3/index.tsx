@@ -4,7 +4,7 @@ import { EnrichedPointType } from "Types";
 
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import Filter from "../../Common/Filter";

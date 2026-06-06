@@ -1,5 +1,5 @@
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";

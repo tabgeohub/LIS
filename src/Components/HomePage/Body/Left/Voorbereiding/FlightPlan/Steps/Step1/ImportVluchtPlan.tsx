@@ -6,7 +6,7 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useCreateData } from "utils/useCreateData";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useContent } from "hooks/useContent";
 

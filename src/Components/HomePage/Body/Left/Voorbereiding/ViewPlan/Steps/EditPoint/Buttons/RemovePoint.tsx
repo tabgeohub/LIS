@@ -5,7 +5,7 @@ import { useUpdateData } from "utils/useUpdateData";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Point from "@arcgis/core/geometry/Point";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useContent } from "hooks/useContent";
 
 export default function RemovePoint() {

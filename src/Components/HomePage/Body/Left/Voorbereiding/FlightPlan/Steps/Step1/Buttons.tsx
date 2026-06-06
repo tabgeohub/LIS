@@ -1,5 +1,5 @@
 import useLogAction from "hooks/useLogAction";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useContent } from "hooks/useContent";

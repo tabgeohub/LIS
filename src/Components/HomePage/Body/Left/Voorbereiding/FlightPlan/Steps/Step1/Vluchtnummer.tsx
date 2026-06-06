@@ -1,5 +1,5 @@
 import { useVluchtnummerExists } from "api-hooks/flightPlans";
-import { useFlightPlanState } from "../../helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useContent } from "hooks/useContent";

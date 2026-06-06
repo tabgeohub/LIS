@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useViewPlanState } from "Components/HomePage/Body/Left/Voorbereiding/ViewPlan/helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useEffect, useRef } from "react";
 import { FlightPlanType } from "Types";
 

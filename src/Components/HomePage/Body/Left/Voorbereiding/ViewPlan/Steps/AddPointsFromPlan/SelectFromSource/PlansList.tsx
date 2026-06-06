@@ -1,5 +1,5 @@
 import { HiChevronRight, HiOutlineMap, HiOutlineShare } from "react-icons/hi";
-import { useViewPlanState } from "../../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useState } from "react";
 import { useContent } from "hooks/useContent";
 

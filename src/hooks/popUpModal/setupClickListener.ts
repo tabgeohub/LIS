@@ -16,29 +16,25 @@ export const setupClickListener = (
 
   let isProcessing = false;
   let lastClickTime = 0;
-  const DEBOUNCE_MS = 150; // Debounce rapid clicks
+  const DEBOUNCE_MS = 150;
 
   const clickHandler = mapView.on("click", async (event) => {
-    // Check if tab is blocked - return early if so
     if (isTabBlocked && isTabBlocked()) {
       return;
     }
 
-    // Debounce rapid clicks
     const now = Date.now();
     if (now - lastClickTime < DEBOUNCE_MS) {
       return;
     }
     lastClickTime = now;
 
-    // Prevent multiple simultaneous clicks
     if (isProcessing) {
       return;
     }
     isProcessing = true;
 
     try {
-      // Optimize hitTest to only check specific layers if provided
       const includeLayers = pointsGraphicsLayer
         ? [pointsGraphicsLayer]
         : undefined;

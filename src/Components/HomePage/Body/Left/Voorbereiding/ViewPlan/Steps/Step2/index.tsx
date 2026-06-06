@@ -7,7 +7,7 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { useEffect } from "react";
 import Point from "@arcgis/core/geometry/Point";
-import { useViewPlanState } from "../../helpers/useViewPlanState";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import PointsAdding from "./PointsAdding";

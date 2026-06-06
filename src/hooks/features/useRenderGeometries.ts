@@ -7,7 +7,7 @@ import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
 import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
 import { useGeometriesStore, Geometry } from "./useGeometriesStore";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useFlightPlanState } from "Components/HomePage/Body/Left/Voorbereiding/FlightPlan/helpers/flightPlanStates";
+import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
