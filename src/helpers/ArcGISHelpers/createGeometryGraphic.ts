@@ -47,6 +47,51 @@ export interface CreateGeometryGraphicOptions {
   transformCoordinates?: (point: GeometryPoint) => [number, number] | null; // Optional coordinate transformation
 }
 
+/** Blue starred geometry on the bottom table map layer */
+export const GEOMETRY_STAR_SYMBOL: GeometrySymbolOptions = {
+  fillColor: [0, 0, 255, 0.3],
+  outlineColor: [0, 0, 255, 1],
+  lineColor: [0, 0, 255, 1],
+  outlineWidth: 2,
+  lineWidth: 3,
+};
+
+/** Yellow hover highlight in the bottom geometries table */
+export const GEOMETRY_TABLE_HOVER_SYMBOL: GeometrySymbolOptions = {
+  fillColor: [255, 255, 0, 0.5],
+  outlineColor: [255, 255, 0, 1],
+  lineColor: [255, 255, 0, 1],
+  outlineWidth: 2,
+  lineWidth: 3,
+};
+
+/** Yellow selection sync for geometries tab / table */
+export const GEOMETRY_TABLE_YELLOW_SYMBOL: GeometrySymbolOptions = {
+  fillColor: [255, 255, 0, 0.3],
+  outlineColor: [255, 255, 0, 1],
+  lineColor: [255, 255, 0, 1],
+  outlineWidth: 2,
+  lineWidth: 3,
+};
+
+/** Yellow selection outline (finished-plan list click, flight-plan multi-select) */
+export const GEOMETRY_SELECTION_SYMBOL: GeometrySymbolOptions = {
+  fillColor: [0, 0, 0, 0],
+  outlineColor: [255, 255, 0, 1],
+  lineColor: [255, 255, 0, 1],
+  outlineWidth: 3,
+  lineWidth: 4,
+};
+
+/** Orange geometry outline for PDF report map rendering */
+export const GEOMETRY_REPORT_SYMBOL: GeometrySymbolOptions = {
+  fillColor: [255, 140, 0, 0.5],
+  outlineColor: [255, 140, 0, 1],
+  lineColor: [255, 140, 0, 1],
+  outlineWidth: 2,
+  lineWidth: 3,
+};
+
 /**
  * Default symbol options (blue)
  */

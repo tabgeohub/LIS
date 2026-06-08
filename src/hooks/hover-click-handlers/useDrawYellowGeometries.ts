@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { Geometry } from "hooks/features/useGeometriesStore";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { ClickableGeometry } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
+import { createSelectionGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 
 interface UseDrawYellowGeometriesOptions {
   selectedGeometryIds: number[];
-  geometries: Geometry[]; // Not used, kept for API compatibility
-  allGeometries: Geometry[];
+  geometries: ClickableGeometry[]; // Not used, kept for API compatibility
+  allGeometries: ClickableGeometry[];
   herhalenFilter?: boolean | null;
 }
 
@@ -27,7 +27,8 @@ export default function useDrawYellowGeometries({
   useEffect(() => {
     if (!validateMapView(mapView, yellowGeometriesGraphicsLayer)) return;
 
-    yellowGeometriesGraphicsLayer.graphics.removeAll();
+    const layer = yellowGeometriesGraphicsLayer!;
+    layer.graphics.removeAll();
 
     if (!selectedGeometryIds || selectedGeometryIds.length === 0) {
       return;
@@ -41,20 +42,10 @@ export default function useDrawYellowGeometries({
       // Selected geometries should always be drawn in yellow, regardless of herhalenFilter
       // The filter only applies to which geometries appear in the list (blue layer)
 
-      // Use the createGeometryGraphic utility with yellow symbol options
-      const graphic = createGeometryGraphic(geometry, {
-        symbolOptions: {
-          fillColor: [0, 0, 0, 0], // Transparent fill
-          outlineColor: [255, 255, 0, 1], // Yellow outline
-          lineColor: [255, 255, 0, 1], // Yellow line
-          outlineWidth: 3,
-          lineWidth: 4,
-        },
-        attributes: geometry,
-      });
+      const graphic = createSelectionGeometryGraphic(geometry, geometry);
 
       if (graphic) {
-        yellowGeometriesGraphicsLayer.add(graphic);
+        layer.add(graphic);
       }
     });
   }, [selectedGeometryIds, allGeometries, mapView, yellowGeometriesGraphicsLayer]);

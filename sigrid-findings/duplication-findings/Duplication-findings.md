@@ -11,10 +11,10 @@
 
 | Metric                      | Value                                      |
 | --------------------------- | ------------------------------------------ |
-| **Duplicate clusters**      | **398** in export · **~293** remaining     |
+| **Duplicate clusters**      | **398** in export · **~272** remaining     |
 | **Severity**                | All **HIGH**                               |
-| **Status**                  | **105 FIXED** · **293 RAW**                |
-| **Total redundant lines**   | **~6,361** · **~4,290** remaining          |
+| **Status**                  | **~126 FIXED** · **~272 RAW**              |
+| **Total redundant lines**   | **~6,361** · **~3,950** remaining          |
 | **File locations affected** | **1,038** in export (pre-rescan)           |
 
 
@@ -77,6 +77,25 @@ Shared helpers under `DrawingTool/helpers/`:
 
 **Test:** `Duplication-test-checklist.md` → *Drawing tool* — all items passed.
 
+### Geometry rendering & handlers *(2026-06-05)* · **Tested ✓**
+
+**12 clusters · ~186 redundant lines · Nabewerking, Voorbereiding, bottom table**
+
+- **Phase A — hover:** deleted `CreateReport/…/useGeometryHandlers.ts`; shared `useGeometryHover` in Create report Step 2 + Vluchten zoeken `SingleGeometry`
+- **Phase B — graphic factory:** symbol presets + `createGeometryMapGraphics.ts`; wired `GeometriesTable`, `useMapGraphics` (geometries tab), `processGeometry`
+- **Phase C — table hook:** `useGeometryListMapActions`; starred graphics restore on tab switch
+- **Phase D — click:** `useGeometryClick` (finished single + DB multi-select); wired `SingleGeometry`, `GeometriesList`; `useDrawYellowGeometries` shares `createSelectionGeometryGraphic`
+
+**Test:** `Duplication-test-checklist.md` → *Geometry rendering & handlers* — all items passed.
+
+### Map legend / layers *(2026-06-05)*
+
+**9 clusters · ~146 redundant lines · KaartLegend**
+
+Shared `LegendSection.tsx` + `useLegendLayers.ts` + `layerTypes.ts`; layer configs stay in section files / `nnederlandLayers.tsx`. Wired: Block1 `Section1–3`, Overig `Section1–4`, `NNederland`.
+
+**Test:** `Duplication-test-checklist.md` → *Map legend / layers*.
+
 ---
 
 ## By application area
@@ -85,11 +104,11 @@ Shared helpers under `DrawingTool/helpers/`:
 | Area                                 | Clusters | Redundant lines | Notes                                        |
 | ------------------------------------ | -------- | --------------- | -------------------------------------------- |
 | **Backend** (`backend/src/routes/…`) | 99       | ~1,626          | SQL fragments, validation, CRUD handlers     |
-| **HomePage — Search & tables**       | 45       | ~750            | Points/plans lists *(plan + point map fixed)* |
-| **HomePage — Voorbereiding**         | 73       | ~990            | Flight plan, view plan *(drawing tool fixed)* |
-| **HomePage — Nabewerking**           | 35       | ~620            | Vluchten zoeken, create report *(foto fixed)* |
-| **hooks**                            | 47       | ~850            | Zustand stores, map handlers *(plan + point hooks fixed)* |
-| **HomePage — Other**                 | 22       | ~281            | Layout, misc                                 |
+| **HomePage — Search & tables**       | 45       | ~750            | Points/plans/geometries tables *(map graphics fixed)* |
+| **HomePage — Voorbereiding**         | 73       | ~990            | Flight plan, view plan *(drawing + geometry click fixed)* |
+| **HomePage — Nabewerking**           | 35       | ~620            | Vluchten zoeken, create report *(foto + geometry fixed)* |
+| **hooks**                            | 47       | ~850            | Zustand stores, map handlers *(plan + point + geometry hooks fixed)* |
+| **HomePage — Other**                 | 22       | ~281            | Layout, misc *(KaartLegend fixed)*          |
 | **helpers**                          | 12       | ~149            | Shared utilities                             |
 | **Other pages**                      | 10       | ~137            | Dashboard, installations                     |
 | **HomePage — Tools**                 | 5        | ~68             | Aandachtspunten verwijderen                  |
@@ -174,23 +193,7 @@ Store `clear()` functions copy the entire initial state block — duplicated ins
 
 ---
 
-### 5. Geometry rendering & handlers
-
-**12 clusters · ~186 redundant lines**
-
-
-| Block size   | Occurrences       | Key files                                                                |
-| ------------ | ----------------- | ------------------------------------------------------------------------ |
-| **44 lines** | 2×                | `SingleGeometry.tsx` ↔ `CreateReport/…/useGeometryHandlers.ts`           |
-| **8 lines**  | **7×** in 5 files | `GeometriesTable`, `processGeometry`, `SingleGeometry`, `useMapGraphics` |
-| 10 lines     | 3×                | Geometry table ↔ map graphics sync                                       |
-
-
-**Suggested fix:** Shared `renderGeometryOnMap()` / merge `SingleGeometry` with handler hook.
-
----
-
-### 6. Edit point form steps
+### 5. Edit point form steps
 
 **~3 clusters · ~17 redundant lines · Tools vs Voorbereiding**
 
@@ -208,24 +211,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 7. Map legend / layers
-
-**9 clusters · ~146 redundant lines**
-
-KaartLegend section components repeat layer-toggle patterns.
-
-
-| Block size | Occurrences | Key files                                                   |
-| ---------- | ----------- | ----------------------------------------------------------- |
-| 7 lines    | **5×**      | `LayersList/Block1/Section1`, `Section2`, `Overig/Section`* |
-| 16 lines   | 2×          | `Block1/Section2` ↔ `Overig/Section2`                       |
-
-
-**Suggested fix:** Generic `LegendSection` component with props for layer config.
-
----
-
-### 8. View plan — add points
+### 6. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -241,7 +227,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 9. Backend — finished plans queries
+### 7. Backend — finished plans queries
 
 **9 clusters · ~127 redundant lines**
 
@@ -257,7 +243,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 10. Layout components
+### 8. Layout components
 
 **3 clusters · ~38 redundant lines**
 
@@ -271,7 +257,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 11. Wizard / step buttons
+### 9. Wizard / step buttons
 
 **22 clusters · ~352 redundant lines**
 
@@ -288,7 +274,7 @@ Cancel / next / log-action / clear-graphics blocks repeated across wizard Button
 
 ---
 
-### 12. Miscellaneous
+### 10. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -318,9 +304,10 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | **A** | Shared `finished_plans` types (#1)                | ~100                         | 1 h    |
 | **B** | Backend queries + validation (#2, #3)             | ~600+                        | 4–6 h  |
 | ~~**C**~~ | ~~Point list map graphics~~ *(done 2026-06-05)* | ~~ ~743 ~~                   | —      |
-| **D** | Zustand clear/initial state (#4)                  | ~200+                        | 2 h    |
-| **E** | Geometry + legend (#5, #7)                        | ~330+                        | 5–7 h  |
-| **F** | Wizard buttons, view plan, layout (#8, #10, #11)  | ~350+                        | 4–6 h  |
+| ~~**D**~~ | ~~Geometry rendering & handlers~~ *(done 2026-06-05)* | ~~ ~186 ~~              | —      |
+| ~~**E**~~ | ~~Map legend / layers~~ *(done 2026-06-05)*     | ~~ ~146 ~~                   | —      |
+| **F** | Zustand clear/initial state (#4)                  | ~200+                        | 2 h    |
+| **G** | Wizard buttons, view plan, layout (#6, #8, #9)  | ~350+                        | 4–6 h  |
 
 
 Phases **A + B** remove ~700+ redundant lines with the highest clarity gain (point + plan map graphics already done).
@@ -344,6 +331,8 @@ Phases **A + B** remove ~700+ redundant lines with the highest clarity gain (poi
 | **Flight plan map & list UI** (2026-06-05)          | 40 clusters (~904 lines) — shared ArcGIS helpers + hooks |
 | **Point list & star/highlight on map** (2026-06-05) | 44 clusters (~743 lines) — `createPointMapGraphics` + `usePointListMapActions` |
 | **Drawing tool map cleanup** (2026-06-05)           | 6 clusters (~121 lines) — `drawingToolMapCleanup` + lifecycle hooks |
+| **Geometry rendering & handlers** (2026-06-05)      | 12 clusters (~186 lines) — Phases A–D; `useGeometryHover`, `useGeometryClick`, `useGeometryListMapActions` |
+| **Map legend / layers** (2026-06-05)                | 9 clusters (~146 lines) — `LegendSection` + `useLegendLayers` |
 | Phase 2: moved `flightPlanStates` to `hooks/zustand/` | Old paths in CSV may still show until rescan   |
 | Entanglement fixes                                    | Unrelated to duplication (cycles ≠ copy-paste) |
 | Template flight geometry fix                          | Functional fix; no duplication impact          |
@@ -364,10 +353,10 @@ Phases **A + B** remove ~700+ redundant lines with the highest clarity gain (poi
 | 4    | 54              | 6 lines × 10             | Backend CRUD validation        |
 | 5    | 51              | 17 lines × 4             | Backend search query blocks    |
 | 6    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()   |
-| 7    | 44              | 44 lines × 2             | `SingleGeometry` ↔ geometry handlers |
-| 8    | 43              | 43 lines × 2             | `finished_plans` types mirror  |
-| 9    | 42              | 14 lines × 3             | Backend SQL SELECT fragments   |
-| 10   | 40              | 10 lines × 4             | Drawing tool reset logic *(fixed)* |
+| 7    | 43              | 43 lines × 2             | `finished_plans` types mirror  |
+| 8    | 42              | 14 lines × 3             | Backend SQL SELECT fragments   |
+| 9    | 40              | 10 lines × 4             | Drawing tool reset logic *(fixed)* |
+| 10   | 44              | 44 lines × 2             | `SingleGeometry` ↔ geometry handlers *(fixed)* |
 
 
 ---

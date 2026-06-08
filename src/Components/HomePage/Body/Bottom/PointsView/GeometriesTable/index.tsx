@@ -1,11 +1,6 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import useGeometryListMapActions from "hooks/hover-click-handlers/useGeometryListMapActions";
 import { MdFilterAlt } from "react-icons/md";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { useState } from "react";
@@ -15,7 +10,6 @@ import { TfiMoreAlt } from "react-icons/tfi";
 import { TbPolygon, TbLine } from "react-icons/tb";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
-import Point from "@arcgis/core/geometry/Point";
 
 const allColumnsGeometries = [
   "omschrijving",
@@ -43,169 +37,15 @@ export default function GeometriesTable({
   const organizations = useGetOrganisaties();
 
   const { geometriesTable } = useOpenTable();
-  const { graphicsLayerHover, graphicsLayer, mapView } = useMapViewState();
 
   const [visibleColumnsGeometries, setVisibleColumnsGeometries] =
     useState(allColumnsGeometries);
 
-  const toggleStarGeometry = (geometry: Geometry) => {
-    const alreadyStarred = starredGeometries.find(
-      (g: Geometry) => g.id === geometry.id
-    );
-
-    if (alreadyStarred) {
-      setStarredGeometries((prev: Geometry[]) =>
-        prev.filter((g) => g.id !== geometry.id)
-      );
-      const toRemove = graphicsLayer?.graphics.find(
-        (g) => g.attributes?.geometryId === geometry.id
-      );
-      if (toRemove) graphicsLayer?.graphics.remove(toRemove);
-    } else {
-      setStarredGeometries((prev: Geometry[]) => [...prev, geometry]);
-
-      // Create graphic for the geometry
-      if (!geometry.points || geometry.points.length === 0) return;
-
-      const coordinates = geometry.points.map((point) => [
-        point.longitude,
-        point.latitude,
-      ]);
-
-      let graphic: Graphic | null = null;
-
-      if (geometry.type === "polygon") {
-        const ring = [...coordinates];
-        const first = ring[0];
-        const last = ring[ring.length - 1];
-        if (first[0] !== last[0] || first[1] !== last[1]) {
-          ring.push([first[0], first[1]]);
-        }
-
-        const polygon = new Polygon({
-          rings: [ring],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const fillSymbol = new SimpleFillSymbol({
-          color: [0, 0, 255, 0.3],
-          outline: {
-            color: [0, 0, 255, 1],
-            width: 2,
-          },
-        });
-
-        graphic = new Graphic({
-          geometry: polygon,
-          symbol: fillSymbol,
-          attributes: { geometryId: geometry.id },
-        });
-      } else if (geometry.type === "line") {
-        const polyline = new Polyline({
-          paths: [coordinates],
-          spatialReference: { wkid: 4326 },
-        });
-
-        const lineSymbol = new SimpleLineSymbol({
-          color: [0, 0, 255, 1],
-          width: 3,
-        });
-
-        graphic = new Graphic({
-          geometry: polyline,
-          symbol: lineSymbol,
-          attributes: { geometryId: geometry.id },
-        });
-      }
-
-      if (graphic) {
-        graphicsLayer?.graphics.add(graphic);
-      }
-    }
-  };
-
-  const hoverGeometryTable = (geometry: Geometry) => {
-    if (!geometry.points || geometry.points.length === 0) return;
-
-    const coordinates = geometry.points.map((point) => [
-      point.longitude,
-      point.latitude,
-    ]);
-
-    let graphic: Graphic | null = null;
-
-    if (geometry.type === "polygon") {
-      const ring = [...coordinates];
-      const first = ring[0];
-      const last = ring[ring.length - 1];
-      if (first[0] !== last[0] || first[1] !== last[1]) {
-        ring.push([first[0], first[1]]);
-      }
-
-      const polygon = new Polygon({
-        rings: [ring],
-        spatialReference: { wkid: 4326 },
-      });
-
-      const fillSymbol = new SimpleFillSymbol({
-        color: [255, 255, 0, 0.5],
-        outline: {
-          color: [255, 255, 0, 1],
-          width: 2,
-        },
-      });
-
-      graphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-      });
-    } else if (geometry.type === "line") {
-      const polyline = new Polyline({
-        paths: [coordinates],
-        spatialReference: { wkid: 4326 },
-      });
-
-      const lineSymbol = new SimpleLineSymbol({
-        color: [255, 255, 0, 1],
-        width: 3,
-      });
-
-      graphic = new Graphic({
-        geometry: polyline,
-        symbol: lineSymbol,
-      });
-    }
-
-    if (graphic) {
-      graphicsLayerHover?.add(graphic);
-    }
-  };
-
-  const goToGeometry = (geometry: Geometry) => {
-    if (!mapView || !geometry.points || geometry.points.length === 0) return;
-
-    // Calculate centroid
-    const sum = geometry.points.reduce(
-      (acc, point) => {
-        acc.lon += point.longitude;
-        acc.lat += point.latitude;
-        return acc;
-      },
-      { lon: 0, lat: 0 }
-    );
-
-    const centerLon = sum.lon / geometry.points.length;
-    const centerLat = sum.lat / geometry.points.length;
-
-    const centerPoint = new Point({
-      longitude: centerLon,
-      latitude: centerLat,
-      spatialReference: { wkid: 4326 },
+  const { hoverGeometry, clearHover, goToGeometry, toggleStarGeometry } =
+    useGeometryListMapActions({
+      starredGeometries,
+      setStarredGeometries,
     });
-
-    mapView.goTo(centerPoint);
-    mapView.zoom = 12;
-  };
 
   return (
     <div
@@ -275,8 +115,8 @@ export default function GeometriesTable({
                     ? "bg-white hover:bg-gray-100"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
-                onMouseEnter={() => hoverGeometryTable(geometry)}
-                onMouseLeave={() => graphicsLayerHover?.removeAll()}
+                onMouseEnter={() => hoverGeometry(geometry)}
+                onMouseLeave={clearHover}
                 onClick={() => goToGeometry(geometry)}
               >
                 <td className="px-2 py-1 align-middle">

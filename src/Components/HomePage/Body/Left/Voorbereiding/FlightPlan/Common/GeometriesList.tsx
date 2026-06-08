@@ -5,24 +5,12 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { TbLine, TbPolygon } from "react-icons/tb";
 import Graphic from "@arcgis/core/Graphic";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import useDrawYellowGeometries from "hooks/hover-click-handlers/useDrawYellowGeometries";
+import useGeometryClick from "hooks/hover-click-handlers/useGeometryClick";
 import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 
-
-// Hook for geometry click (similar to usePointClick)
-function useGeometryClick(selectedGeometryIds: number[], allGeometries: Geometry[], herhalenFilter?: boolean | null) {
-    // Use allGeometries to find selected geometries, not just the filtered list
-    // This ensures selected geometries are found even if they're not in the current filter
-    useDrawYellowGeometries({
-        selectedGeometryIds: selectedGeometryIds, // Pass IDs directly - the effect will handle re-rendering when they change
-        geometries: [], // Not used in the effect, but kept for API compatibility
-        allGeometries: allGeometries, // Use all geometries for lookup
-        herhalenFilter: herhalenFilter, // Filter by herhalen to only show geometries matching current step
-    });
-}
 
 // Geometry Item Checkbox Component
 function GeometryItemCheckBox({
@@ -151,11 +139,11 @@ export default function GeometriesList({
 
     // Pass selected geometry IDs directly to avoid unnecessary object conversions
     // This ensures the effect only runs when the selection actually changes
-    useGeometryClick(
-        safeSelectedGeometries, // Pass IDs directly
-        dbGeometries, // Use all geometries for lookup
-        herhalenFilter // Pass herhalen filter to only draw matching geometries
-    );
+    useGeometryClick({
+        selectedGeometryIds: safeSelectedGeometries,
+        allGeometries: dbGeometries,
+        herhalenFilter,
+    });
     const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryHover();
 
     // Render blue geometries for non-selected ones

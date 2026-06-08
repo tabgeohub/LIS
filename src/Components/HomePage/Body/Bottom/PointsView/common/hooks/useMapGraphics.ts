@@ -1,12 +1,9 @@
 import { useEffect, RefObject } from "react";
+import Graphic from "@arcgis/core/Graphic";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import Graphic from "@arcgis/core/Graphic";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
+import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { addPlanStarGraphic } from "hooks/hover-click-handlers/usePlanStarGraphic";
@@ -58,74 +55,11 @@ export const useMapGraphics = ({
     if (tab === "geometries") {
       if (!mapView || !yellowGraphicsLayer || !geometriesTable) return;
 
-      geometriesTable.forEach((geometry) => {
-        if (!geometry.points || geometry.points.length === 0) return;
-
-        const coordinates = geometry.points.map((point) => [
-          point.longitude,
-          point.latitude,
-        ]);
-
-        if (geometry.type === "polygon") {
-          const ring = [...coordinates];
-          const first = ring[0];
-          const last = ring[ring.length - 1];
-          if (first[0] !== last[0] || first[1] !== last[1]) {
-            ring.push([first[0], first[1]]);
-          }
-
-          const polygon = new Polygon({
-            rings: [ring],
-            spatialReference: { wkid: 4326 },
-          });
-
-          const fillSymbol = new SimpleFillSymbol({
-            color: [255, 255, 0, 0.3],
-            outline: {
-              color: [255, 255, 0, 1],
-              width: 2,
-            },
-          });
-
-          yellowGraphicsLayer.add(
-            new Graphic({
-              geometry: polygon,
-              symbol: fillSymbol,
-              attributes: {
-                geometryId: geometry.id,
-                type: "geometry",
-              },
-            })
-          );
-        } else if (geometry.type === "line") {
-          const polyline = new Polyline({
-            paths: [coordinates],
-            spatialReference: { wkid: 4326 },
-          });
-
-          const lineSymbol = new SimpleLineSymbol({
-            color: [255, 255, 0, 1],
-            width: 3,
-          });
-
-          yellowGraphicsLayer.add(
-            new Graphic({
-              geometry: polyline,
-              symbol: lineSymbol,
-              attributes: {
-                geometryId: geometry.id,
-                type: "geometry",
-              },
-            })
-          );
-        }
-
-        const alreadyStarred = starredGeometries.find(
-          (g) => g.id === geometry.id
-        );
-        if (alreadyStarred) {
-          // Starred geometries are already handled in GeometriesTable
-        }
+      syncGeometriesTableMapGraphics({
+        geometries: geometriesTable,
+        starredGeometries,
+        yellowGraphicsLayer,
+        graphicsLayer,
       });
     }
 

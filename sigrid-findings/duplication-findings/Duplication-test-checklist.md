@@ -197,13 +197,36 @@
 
 ---
 
-### 5. Geometry rendering & handlers
+### 5. Geometry rendering & handlers · **Tested ✓**
 
-**Surfaces:** `SingleGeometry`, Create report geometry handlers, geometries table.
+**Surfaces:** `SingleGeometry`, Create report Step 2, bottom Geometries table, geometries tab yellow sync, PDF report map.
 
-- [ ] Nabewerking: click geometry — renders on map (lines/polygons/points).
-- [ ] Create report: geometry selection + map sync.
-- [ ] Geometries table row click — same map behaviour as waarnemingen list.
+#### Phase A — hover
+
+- [x] Vluchten zoeken → Waarnemingen: hover polygon/line — yellow outline on map (shared `useGeometryHover`).
+- [x] Create report Step 2: hover geometry row — same yellow hover behaviour.
+- [x] Mouse leave — hover graphic clears.
+
+#### Phase B — graphic factory
+
+- [x] Bottom panel → **Geometries** tab: table rows show yellow geometry outlines on map (polygon + line).
+- [x] Star a geometry — blue fill/outline on `graphicsLayer`; unstar removes it.
+- [x] Hover table row — brighter yellow highlight on `graphicsLayerHover`; clears on mouse leave.
+- [x] Click row / go-to — map pans to geometry centroid, zoom ~12.
+- [x] Switch away from geometries tab and back — yellow sync redraws correctly.
+- [x] Create report zip/PDF: geometry map snapshot still shows **orange** outline (polygon + line).
+
+#### Phase C — table hook
+
+- [x] `GeometriesTable` uses `useGeometryListMapActions` — star / hover / goTo behave as Phase B.
+- [x] Star several geometries, switch to Points tab, switch back to Geometries — blue star graphics still on map.
+
+#### Phase D — shared click hook
+
+- [x] Vluchten zoeken → Waarnemingen: click geometry — yellow outline on `yellowGraphicsLayer` (polygon + line); switching selection updates graphic; deselect clears layer.
+- [x] Voorbereiding flight plan → geometry checkbox select — yellow on `yellowGeometriesGraphicsLayer`; multi-select; non-selected stay blue on `geometriesGraphicsLayer`.
+- [x] Template flight Fase3 — template geometries still render yellow (via `useDrawYellowGeometries` → shared `createSelectionGeometryGraphic`).
+- [x] Hover + click together — hover on mapView.graphics, selection on yellow layer; no stale graphics.
 
 ---
 
@@ -217,9 +240,13 @@
 
 ### 8. Map legend / layers
 
-- [ ] KaartLegend sections toggle layers on/off.
-- [ ] Block1 vs Overig sections — no broken toggles after shared component.
-- [ ] Layer visibility persists during session as before.
+**Surfaces:** KaartLegend → Block1, Overig, NNederland; regio-filtered users + admin.
+
+- [ ] **Block1:** Aandachtspunten + Geometries default on; Regios toggles; Waypoints/tracks parent gates children.
+- [ ] **Overig:** parent checkbox gates Section1–4; nested groups (Wegen, Hoogspanningsmasten) expand/toggle.
+- [ ] **NNederland:** section hidden when no layers for user regio; parent + layer toggles; `selectedLayers` restore on load.
+- [ ] **Admin vs regional user:** each sees correct layer subset per `regio`.
+- [ ] Toggle layer on — appears on map; off — removed; disabled parent removes child layers from map.
 
 ---
 
