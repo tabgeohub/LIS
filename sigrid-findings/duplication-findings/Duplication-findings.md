@@ -3,7 +3,6 @@
 **Source:** `Duplication findings.csv` + `Duplicates.csv`  
 **Sigrid pillar:** Maintainability (code duplication)  
 **Date:** 2026-06-05  
-**Last cleanup:** 2026-06-05 — theme #6 (finished plans SQL) implemented; re-export CSV after testing.
 
 ---
 
@@ -12,10 +11,10 @@
 
 | Metric                      | Value                            |
 | --------------------------- | -------------------------------- |
-| **Duplicate clusters**      | **~234** remaining (est. after themes #2 + #6) |
+| **Duplicate clusters**      | **~234** remaining (est.)        |
 | **Severity**                | All **HIGH**                     |
 | **Total redundant lines**   | **~3,250** remaining (est.)      |
-| **File locations affected** | **~670** (est. post-fixes; rescan to confirm) |
+| **File locations affected** | **~670** (est.; rescan to confirm) |
 
 
 Duplication means the **same block of code appears in multiple places**. Sigrid counts how many lines are redundant and how often they repeat. Fixing duplication improves maintainability — one change updates one shared function instead of many copies.
@@ -29,7 +28,7 @@ Duplication means the **same block of code appears in multiple places**. Sigrid 
 
 | Area                                 | Clusters (est.) | Redundant lines (est.) | Notes                            |
 | ------------------------------------ | --------------- | ---------------------- | -------------------------------- |
-| **Backend** (`backend/src/routes/…`) | ~70             | ~1,060                 | Validation, CRUD (SQL theme #2 done) |
+| **Backend** (`backend/src/routes/…`) | ~70             | ~1,060                 | Validation, CRUD                 |
 | **HomePage — Voorbereiding**         | ~60             | ~700                   | View plan, wizard buttons        |
 | **hooks**                            | ~35             | ~600                   | Zustand `clear()` patterns       |
 | **HomePage — Search & tables**       | ~20             | ~200                   | Residual list/table patterns     |
@@ -191,14 +190,14 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 ## Recommended fix priority
 
 
-| Phase | Theme                                    | Est. redundant lines removed | Effort |
-| ----- | ---------------------------------------- | ---------------------------- | ------ |
-| **A** | Shared `finished_plans` types (#1)         | ~100                         | 1 h    |
-| **B** | Backend validation (#2)                  | ~400+                        | 2–3 h  |
-| **C** | Zustand clear/initial state (#3)         | ~200+                        | 2 h    |
-| **D** | Edit point forms (#4)                    | ~17                          | 1 h    |
-| **E** | View plan add points (#5)                | ~194                         | 2–3 h  |
-| **F** | Wizard buttons + layout (#6, #7)         | ~390                         | 4–5 h  |
+| Phase | Theme                            | Est. redundant lines removed | Effort |
+| ----- | -------------------------------- | ---------------------------- | ------ |
+| **A** | Shared `finished_plans` types (#1) | ~100                         | 1 h    |
+| **B** | Backend validation (#2)          | ~400+                        | 2–3 h  |
+| **C** | Zustand clear/initial state (#3) | ~200+                        | 2 h    |
+| **D** | Edit point forms (#4)            | ~17                          | 1 h    |
+| **E** | View plan add points (#5)        | ~194                         | 2–3 h  |
+| **F** | Wizard buttons + layout (#6, #7) | ~390                         | 4–5 h  |
 
 
 Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
@@ -236,4 +235,3 @@ Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
 | `Duplicates.csv`                | 1,038 rows — one row per file location per cluster |
 | `Duplication-findings.md`       | **Open** cluster status & fix priority             |
 | `Duplication-test-checklist.md` | Regression tests after each duplication fix        |
-
