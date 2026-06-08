@@ -1,8 +1,3 @@
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -19,6 +14,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import ClickedPointFunctions from "Components/HomePage/Body/Bottom/ClickedPointFunctions";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 
 export default function PointsListEdit({
   clickedPoint,
@@ -39,7 +35,6 @@ export default function PointsListEdit({
 
   const [starredPoints, setStarredPoints] = useState<EnrichedPointType[]>([]);
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const { graphicsLayerHover, mapView, graphicsLayer } = useMapViewState();
   const { setSelectedBottomTab } = useSelectedBottomTabState();
 
   const { setOpenSideBar } = useOpeSideBarState();
@@ -52,78 +47,29 @@ export default function PointsListEdit({
 
   const { pointsTable, setOpenTable, setView } = useOpenTable();
 
-  const hoverPointTable = (point: EnrichedPointType) => {
-    const graphic = new Graphic({
-      geometry: new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-      }),
-      symbol: new PictureMarkerSymbol({
-        url: "/location-icon.png",
-        width: "24px",
-        height: "24px",
-      }),
+  const { hoverPoint, clearHover, goToPoint, toggleStarPoint } =
+    usePointListMapActions({
+      starredPoints,
+      setStarredPoints,
+      onStar: (point) => {
+        logAction({
+          message: `User starred point '${point.omschrijving}' in the list of starred points`,
+          step: "ResultTab",
+        });
+      },
+      onUnstar: (point) => {
+        logAction({
+          message: `User removed point '${point.omschrijving}' from the list of starred points`,
+          step: "ResultTab",
+        });
+      },
+      onGoTo: (point) => {
+        logAction({
+          message: `User clicked on point '${point.omschrijving}' in the list of starred points`,
+          step: "ResultTab ( goToPoint function )",
+        });
+      },
     });
-    graphicsLayerHover?.add(graphic);
-  };
-
-  const goToPoint = (point: EnrichedPointType) => {
-    if (mapView) {
-      const pt = new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-      });
-      mapView.goTo(pt);
-
-      logAction({
-        message: `User clicked on point '${point.omschrijving}' in the list of starred points`,
-        step: "ResultTab ( goToPoint function )",
-      });
-    }
-  };
-
-  const toggleStarPoint = (point: EnrichedPointType) => {
-    const alreadyStarred = starredPoints.find((p) => p.id === point.id);
-
-    if (alreadyStarred) {
-      setStarredPoints((prev) => prev.filter((p) => p.id !== point.id));
-      const toRemove = graphicsLayer?.graphics.find(
-        (g) => g.attributes?.id === point.id
-      );
-      if (toRemove) graphicsLayer?.graphics.remove(toRemove);
-
-      logAction({
-        message: `User removed point '${point.omschrijving}' from the list of starred points`,
-        step: "ResultTab",
-      });
-    } else {
-      setStarredPoints((prev) => [...prev, point]);
-
-      const graphic = new Graphic({
-        geometry: new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        }),
-        symbol: new SimpleMarkerSymbol({
-          style: "circle",
-          size: 14,
-          color: [255, 255, 255, 0],
-          outline: {
-            color: [0, 0, 255, 1],
-            width: 2,
-          },
-        }),
-        attributes: { id: point.id },
-      });
-
-      graphicsLayer?.graphics.add(graphic);
-
-      logAction({
-        message: `User starred point '${point.omschrijving}' in the list of starred points`,
-        step: "ResultTab",
-      });
-    }
-  };
 
   const tableView = () => {
     setOpenResultTab(false);
@@ -179,8 +125,8 @@ export default function PointsListEdit({
               <div
                 key={point.id}
                 className="px-4 py-1 border-b hover:bg-neutral-100"
-                onMouseEnter={() => hoverPointTable(point)}
-                onMouseLeave={() => graphicsLayerHover?.removeAll()}
+                onMouseEnter={() => hoverPoint(point)}
+                onMouseLeave={clearHover}
                 onClick={() => goToPoint(point)}
               >
                 <div className="flex items-center justify-between">

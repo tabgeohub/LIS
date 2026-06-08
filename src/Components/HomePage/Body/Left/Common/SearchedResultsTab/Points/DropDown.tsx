@@ -1,6 +1,4 @@
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { starAllPointsOnMap } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import {
@@ -61,35 +59,11 @@ export default function DropDown({
 
   const selectAll = () => {
     setOpenListPointDiv(false);
-    if (!graphicsLayer) return;
-
-    const newStars = pointsData.filter(
-      (point) => !starredPoints.some((p) => p.id === point.id)
-    );
-
-    const combined = [...starredPoints, ...newStars];
-    const unique = Array.from(new Map(combined.map((p) => [p.id, p])).values());
-    setStarredPoints(unique);
-
-    newStars.forEach((point) => {
-      const graphic = new Graphic({
-        geometry: new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        }),
-        symbol: new SimpleMarkerSymbol({
-          style: "circle",
-          size: 14,
-          color: [255, 255, 255, 0],
-          outline: {
-            color: [0, 0, 255, 1],
-            width: 2,
-          },
-        }),
-        attributes: { id: point.id },
-      });
-
-      graphicsLayer.graphics.add(graphic);
+    starAllPointsOnMap({
+      points: pointsData,
+      starredPoints,
+      setStarredPoints,
+      graphicsLayer,
     });
   };
 

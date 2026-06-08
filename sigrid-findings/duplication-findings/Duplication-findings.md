@@ -11,10 +11,10 @@
 
 | Metric                      | Value                                      |
 | --------------------------- | ------------------------------------------ |
-| **Duplicate clusters**      | **398** in export · **~343** remaining     |
+| **Duplicate clusters**      | **398** in export · **~293** remaining     |
 | **Severity**                | All **HIGH**                               |
-| **Status**                  | **55 FIXED** · **343 RAW**                 |
-| **Total redundant lines**   | **~6,361** · **~5,154** remaining          |
+| **Status**                  | **105 FIXED** · **293 RAW**                |
+| **Total redundant lines**   | **~6,361** · **~4,290** remaining          |
 | **File locations affected** | **1,038** in export (pre-rescan)           |
 
 
@@ -51,6 +51,32 @@ Shared helpers and hooks under `src/helpers/ArcGISHelpers/` and `src/hooks/hover
 
 **Test:** see `Duplication-test-checklist.md` → *Flight plan map & list UI*.
 
+### Point list & star/highlight on map *(2026-06-05)*
+
+**44 clusters · ~743 redundant lines · Search tab, result tab, bottom table**
+
+Shared helpers and hook:
+
+- `createPointMapGraphics.ts` — star/hover/yellow-marker graphics, `goTo`, `syncPointsTableMapGraphics`, `starAllPointsOnMap`
+- `createSymbols.ts` — `SEARCH_RESULT_POINT_OUTLINE_SYMBOL`, `POINT_HOVER_PIN_SYMBOL` (uses existing `STARRED_POINT_SYMBOL`, `YELLOW_MARKER_SYMBOL`)
+- `usePointListMapActions.ts` — hover, goTo, toggle star, star-all
+- Wired: `SearchedResultsTab/Points/index`, `Points/DropDown`, `ResultTab/PointsList`, `PointsListEdit`, `ListPointsFunctions`, `PointsTable`, `useMapGraphics` (points tab)
+
+**Test:** see `Duplication-test-checklist.md` → *Point list & star/highlight on map*.
+
+### Drawing tool — map cleanup & lifecycle *(2026-06-05)* · **Tested ✓**
+
+**6 clusters · ~121 redundant lines · Voorbereiding**
+
+Shared helpers under `DrawingTool/helpers/`:
+
+- `drawingToolMapCleanup.ts`, `resetSketchSession.ts`, `useOmschrijvingExists.ts`
+- `useDrawingToolLifecycle.ts` — `useDrawingToolRootLifecycle`, `useDrawingToolStep1Lifecycle`, `useDrawingToolStep2Lifecycle`
+- Wired: `DrawingTool/index`, `Step1`, `Step2`, `Step2/Buttons`, `Step1/Options`
+- Form fields: `Common/AandachtspuntDetailsFields.tsx` (+ `GeometryOmschrijvingField` / `EnrichedAddPoint/.../Omschrijving`)
+
+**Test:** `Duplication-test-checklist.md` → *Drawing tool* — all items passed.
+
 ---
 
 ## By application area
@@ -59,10 +85,10 @@ Shared helpers and hooks under `src/helpers/ArcGISHelpers/` and `src/hooks/hover
 | Area                                 | Clusters | Redundant lines | Notes                                        |
 | ------------------------------------ | -------- | --------------- | -------------------------------------------- |
 | **Backend** (`backend/src/routes/…`) | 99       | ~1,626          | SQL fragments, validation, CRUD handlers     |
-| **HomePage — Search & tables**       | 45       | ~750            | Points/plans lists *(plan map fixed)*        |
-| **HomePage — Voorbereiding**         | 73       | ~990            | Flight plan, view plan, drawing tool         |
+| **HomePage — Search & tables**       | 45       | ~750            | Points/plans lists *(plan + point map fixed)* |
+| **HomePage — Voorbereiding**         | 73       | ~990            | Flight plan, view plan *(drawing tool fixed)* |
 | **HomePage — Nabewerking**           | 35       | ~620            | Vluchten zoeken, create report *(foto fixed)* |
-| **hooks**                            | 47       | ~850            | Zustand stores, map handlers *(plan hooks fixed)* |
+| **hooks**                            | 47       | ~850            | Zustand stores, map handlers *(plan + point hooks fixed)* |
 | **HomePage — Other**                 | 22       | ~281            | Layout, misc                                 |
 | **helpers**                          | 12       | ~149            | Shared utilities                             |
 | **Other pages**                      | 10       | ~137            | Dashboard, installations                     |
@@ -92,25 +118,7 @@ Clusters are grouped by **what is duplicated**, not by Sigrid row order.
 
 ---
 
-### 2. Point list & star/highlight on map
-
-**44 clusters · ~743 redundant lines · Search tab, result tab**
-
-Star toggle, yellow markers, and hover graphics duplicated across point list components.
-
-
-| Block size  | Occurrences | Key files                                                                                            |
-| ----------- | ----------- | ---------------------------------------------------------------------------------------------------- |
-| **8 lines** | 7–8×        | `Points/index.tsx`, `PointsList.tsx`, `PointsListEdit.tsx`, `Points/DropDown`, `ListPointsFunctions` |
-| 11 lines    | 4×          | Star / highlight graphic creation                                                                    |
-| 15–16 lines | 3×          | Point row click + map `goTo`                                                                         |
-
-
-**Suggested fix:** Shared `usePointListMapGraphics()` or extract star/highlight helpers used by all point list variants.
-
----
-
-### 3. Backend — flight plan / point SQL queries
+### 2. Backend — flight plan / point SQL queries
 
 **29 clusters · ~567 redundant lines**
 
@@ -128,7 +136,7 @@ Same SELECT / JOIN / filter fragments across route handlers.
 
 ---
 
-### 4. Backend — route validation & CRUD
+### 3. Backend — route validation & CRUD
 
 **45 clusters · ~768 redundant lines**
 
@@ -147,23 +155,7 @@ Repeated request validation and create/update boilerplate.
 
 ---
 
-### 5. Drawing tool
-
-**6 clusters · ~121 redundant lines · Voorbereiding**
-
-
-| Block size   | Occurrences       | Key files                                                                   |
-| ------------ | ----------------- | --------------------------------------------------------------------------- |
-| **10 lines** | **5×** in 4 files | `DrawingTool/index`, `Step1`, `Step2`, `Step2/Buttons` — filter/reset logic |
-| 12 lines     | 4×                | Same reset pattern                                                          |
-| 19 lines     | 2×                | `DrawingTool/index` ↔ `Step2/index`                                         |
-
-
-**Suggested fix:** Single `resetDrawingToolState()` used by all steps.
-
----
-
-### 6. Zustand store — initial state vs `clear()`
+### 4. Zustand store — initial state vs `clear()`
 
 **25 clusters · ~461 redundant lines · hooks**
 
@@ -182,7 +174,7 @@ Store `clear()` functions copy the entire initial state block — duplicated ins
 
 ---
 
-### 7. Geometry rendering & handlers
+### 5. Geometry rendering & handlers
 
 **12 clusters · ~186 redundant lines**
 
@@ -198,11 +190,12 @@ Store `clear()` functions copy the entire initial state block — duplicated ins
 
 ---
 
-### 8. Edit point form steps
+### 6. Edit point form steps
 
-**4 clusters · ~30 redundant lines · Tools vs Voorbereiding**
+**~3 clusters · ~17 redundant lines · Tools vs Voorbereiding**
 
-Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selected point edit”.
+Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selected point edit”.  
+*(DrawingTool ↔ EnrichedAddPoint form fields fixed via `AandachtspuntDetailsFields`.)*
 
 
 | Block size | Key files                                                                    |
@@ -211,11 +204,11 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 | 8 lines    | `AddToPlan/Step1`, `ViewPlans/PlansList`, etc. (Tools ↔ Voorbereiding pairs) |
 
 
-**Suggested fix:** Shared form step components under `Components/Common/EditPoint/`.
+**Suggested fix:** Shared form step components under `Components/Common/EditPoint/` (extend `AandachtspuntDetailsFields` where applicable).
 
 ---
 
-### 9. Map legend / layers
+### 7. Map legend / layers
 
 **9 clusters · ~146 redundant lines**
 
@@ -232,7 +225,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 10. View plan — add points
+### 8. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -248,7 +241,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 11. Backend — finished plans queries
+### 9. Backend — finished plans queries
 
 **9 clusters · ~127 redundant lines**
 
@@ -264,7 +257,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 12. Layout components
+### 10. Layout components
 
 **3 clusters · ~38 redundant lines**
 
@@ -278,7 +271,7 @@ KaartLegend section components repeat layer-toggle patterns.
 
 ---
 
-### 13. Wizard / step buttons
+### 11. Wizard / step buttons
 
 **22 clusters · ~352 redundant lines**
 
@@ -295,7 +288,7 @@ Cancel / next / log-action / clear-graphics blocks repeated across wizard Button
 
 ---
 
-### 14. Miscellaneous
+### 12. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -323,14 +316,14 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | Phase | Theme                                             | Est. redundant lines removed | Effort |
 | ----- | ------------------------------------------------- | ---------------------------- | ------ |
 | **A** | Shared `finished_plans` types (#1)                | ~100                         | 1 h    |
-| **B** | Backend queries + validation (#3, #4)             | ~600+                        | 4–6 h  |
-| **C** | Point list map graphics (#2)                      | ~400+                        | 3–4 h  |
-| **D** | Zustand clear/initial state (#6)                  | ~200+                        | 2 h    |
-| **E** | Geometry, drawing tool, legend (#5, #7, #9)       | ~450+                        | 6–8 h  |
-| **F** | Wizard buttons, view plan, layout (#10, #12, #13) | ~350+                        | 4–6 h  |
+| **B** | Backend queries + validation (#2, #3)             | ~600+                        | 4–6 h  |
+| ~~**C**~~ | ~~Point list map graphics~~ *(done 2026-06-05)* | ~~ ~743 ~~                   | —      |
+| **D** | Zustand clear/initial state (#4)                  | ~200+                        | 2 h    |
+| **E** | Geometry + legend (#5, #7)                        | ~330+                        | 5–7 h  |
+| **F** | Wizard buttons, view plan, layout (#8, #10, #11)  | ~350+                        | 4–6 h  |
 
 
-Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain.
+Phases **A + B** remove ~700+ redundant lines with the highest clarity gain (point + plan map graphics already done).
 
 ---
 
@@ -349,6 +342,8 @@ Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain
 | ----------------------------------------------------- | ---------------------------------------------- |
 | **Foto / attachments refactor** (2026-06-05)        | 15 clusters (~303 lines) — shared `common/Foto/` |
 | **Flight plan map & list UI** (2026-06-05)          | 40 clusters (~904 lines) — shared ArcGIS helpers + hooks |
+| **Point list & star/highlight on map** (2026-06-05) | 44 clusters (~743 lines) — `createPointMapGraphics` + `usePointListMapActions` |
+| **Drawing tool map cleanup** (2026-06-05)           | 6 clusters (~121 lines) — `drawingToolMapCleanup` + lifecycle hooks |
 | Phase 2: moved `flightPlanStates` to `hooks/zustand/` | Old paths in CSV may still show until rescan   |
 | Entanglement fixes                                    | Unrelated to duplication (cycles ≠ copy-paste) |
 | Template flight geometry fix                          | Functional fix; no duplication impact          |
@@ -365,14 +360,14 @@ Phases **A + B + C** remove ~1,100 redundant lines with the highest clarity gain
 | ---- | --------------- | ------------------------ | ------------------------------ |
 | 1    | 72              | 12 lines × 7             | Backend + frontend validation  |
 | 2    | 64              | 8 lines × 9              | Backend SQL SELECT fragments   |
-| 3    | 56              | 8 lines × 8              | Point hover graphic            |
-| 4    | 54              | 9 lines × 7              | Wizard button blocks           |
-| 5    | 54              | 6 lines × 10             | Backend CRUD validation        |
-| 6    | 51              | 17 lines × 4             | Backend search query blocks    |
-| 7    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()   |
-| 8    | 45              | 15 lines × 3             | Point list row click + goTo    |
-| 9    | 44              | 44 lines × 2             | `SingleGeometry` ↔ geometry handlers |
-| 10   | 43              | 43 lines × 2             | `finished_plans` types mirror  |
+| 3    | 54              | 9 lines × 7              | Wizard button blocks           |
+| 4    | 54              | 6 lines × 10             | Backend CRUD validation        |
+| 5    | 51              | 17 lines × 4             | Backend search query blocks    |
+| 6    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()   |
+| 7    | 44              | 44 lines × 2             | `SingleGeometry` ↔ geometry handlers |
+| 8    | 43              | 43 lines × 2             | `finished_plans` types mirror  |
+| 9    | 42              | 14 lines × 3             | Backend SQL SELECT fragments   |
+| 10   | 40              | 10 lines × 4             | Drawing tool reset logic *(fixed)* |
 
 
 ---

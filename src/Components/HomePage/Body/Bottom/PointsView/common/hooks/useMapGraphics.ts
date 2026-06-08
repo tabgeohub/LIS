@@ -1,14 +1,13 @@
 import { useEffect, RefObject } from "react";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
-import { YELLOW_MARKER_SYMBOL, STARRED_POINT_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { addPlanStarGraphic } from "hooks/hover-click-handlers/usePlanStarGraphic";
 
@@ -48,34 +47,11 @@ export const useMapGraphics = ({
     if (tab === "points") {
       if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
-      pointsTable.forEach((point) => {
-        if (!point) return;
-
-        const geometry = new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-          spatialReference: { wkid: 4326 },
-        });
-
-        const graphic = new Graphic({
-          geometry,
-          symbol: YELLOW_MARKER_SYMBOL,
-          attributes: point,
-        });
-        yellowGraphicsLayer.add(graphic);
-
-        const alreadyStarred = starredPoints.find((p) => p.id === point.id);
-        if (alreadyStarred) {
-          const g = new Graphic({
-            geometry: new Point({
-              longitude: point.longitude,
-              latitude: point.latitude,
-            }),
-            symbol: STARRED_POINT_SYMBOL,
-            attributes: { id: point.id },
-          });
-          graphicsLayer?.graphics.add(g);
-        }
+      syncPointsTableMapGraphics({
+        points: pointsTable,
+        starredPoints,
+        yellowGraphicsLayer,
+        graphicsLayer,
       });
     }
 

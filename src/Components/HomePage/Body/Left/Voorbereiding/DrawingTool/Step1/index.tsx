@@ -10,7 +10,9 @@ import { TbPencil } from "react-icons/tb";
 import ConfirmButton from "./ConfirmButton";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useContent } from "hooks/useContent";
-import { useDrawingStore } from "hooks/zustand/useDrawingStore";
+import { cleanupDrawingToolMap } from "../helpers/drawingToolMapCleanup";
+import { resetSketchSession } from "../helpers/resetSketchSession";
+import { useDrawingToolStep1Lifecycle } from "../helpers/useDrawingToolLifecycle";
 
 export default function Step1() {
   const { mapView } = useMapViewState();
@@ -19,11 +21,19 @@ export default function Step1() {
   const [selectedTool, setSelectedTool] = useState<"line" | "polygon" | null>(
     null
   );
-  const [sketchViewModel, setSketchViewModel] = useState<SketchViewModel | null>(null);
+  const [sketchViewModel, setSketchViewModel] =
+    useState<SketchViewModel | null>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(null);
   const [hasGraphics, setHasGraphics] = useState(false);
 
-  // Monitor graphics layer for changes
+  useDrawingToolStep1Lifecycle(
+    mapView,
+    selectedTab,
+    sketchViewModel,
+    setSketchViewModel,
+    setSelectedTool
+  );
+
   useEffect(() => {
     if (!graphicsLayer) {
       setHasGraphics(false);
@@ -34,10 +44,8 @@ export default function Step1() {
       setHasGraphics(graphicsLayer.graphics.length > 0);
     };
 
-    // Initial check
     updateGraphicsCount();
 
-    // Watch for changes using graphics collection events
     const handle = graphicsLayer.graphics.on("change", updateGraphicsCount);
 
     return () => {
@@ -45,103 +53,23 @@ export default function Step1() {
     };
   }, [graphicsLayer]);
 
-  // Cleanup when tab changes away from tekengereedschap
-  useEffect(() => {
-    if (selectedTab !== "tekengereedschap") {
-      // Delete all graphics with "currently-drawing" attribute
-      clearCurrentlyDrawingGraphics();
-
-      // Reset cursor
-      if (mapView?.container) {
-        mapView.container.style.cursor = "";
-      }
-      // Cancel any active sketchViewModel
-      if (sketchViewModel) {
-        try {
-          sketchViewModel.cancel();
-        } catch (e) {
-          // Ignore errors if already cancelled
-        }
-        try {
-          sketchViewModel.destroy();
-        } catch (e) {
-          // Ignore errors if already destroyed
-        }
-        setSketchViewModel(null);
-      }
-      setSelectedTool(null);
-    }
-  }, [selectedTab, mapView, sketchViewModel]);
-
-  // Cleanup on unmount - only reset cursor and cleanup sketchViewModel
-  // Don't delete graphics here - they should persist when moving to Step2
-  // Graphics will be deleted by:
-  // 1. Tab change cleanup (when tab changes away from tekengereedschap)
-  // 2. Explicit cancel/back actions
-  // 3. Step2 cleanup when going back to Step1
-  useEffect(() => {
-    return () => {
-      // Reset cursor
-      if (mapView?.container) {
-        mapView.container.style.cursor = "";
-      }
-      // Cancel any active sketchViewModel
-      if (sketchViewModel) {
-        sketchViewModel.cancel();
-        sketchViewModel.destroy();
-      }
-    };
-  }, [mapView, sketchViewModel]);
-
-  const resetCursor = () => {
-    if (mapView?.container) {
-      mapView.container.style.cursor = "";
-    }
-    // Cancel any active sketchViewModel
-    if (sketchViewModel) {
-      sketchViewModel.cancel();
-      sketchViewModel.destroy();
-      setSketchViewModel(null);
-    }
-    setSelectedTool(null);
-  };
-
-  const clearCurrentlyDrawingGraphics = () => {
-    if (!mapView) return;
-
-    // Search all graphics layers for graphics with "currently-drawing" attribute
-    const layers = mapView.map.layers;
-    for (let i = 0; i < layers.length; i++) {
-      const layer = layers.getItemAt(i);
-      if (layer instanceof GraphicsLayer) {
-        const graphics = layer.graphics.toArray();
-        graphics.forEach((graphic) => {
-          if (graphic.attributes && graphic.attributes["currently-drawing"] === true) {
-            try {
-              layer.remove(graphic);
-            } catch (err) {
-              // Ignore removal errors
-            }
-          }
-        });
-      }
-    }
-  };
-
   const handleClear = () => {
-    clearCurrentlyDrawingGraphics();
-    resetCursor();
+    cleanupDrawingToolMap(mapView);
+    resetSketchSession({
+      sketchViewModel,
+      mapView,
+      setSketchViewModel,
+      setSelectedTool,
+    });
   };
 
   const handleCancel = () => {
-    clearCurrentlyDrawingGraphics();
-    resetCursor();
+    handleClear();
     setSelectedTab("none");
   };
 
   return (
     <div className="p-4">
-      {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
@@ -161,7 +89,6 @@ export default function Step1() {
         </p>
       </motion.div>
 
-      {/* Tool Selection */}
       <Options
         selectedTool={selectedTool}
         setSelectedTool={setSelectedTool}
@@ -173,10 +100,8 @@ export default function Step1() {
         handleClear={handleClear}
       />
 
-      {/* Instructions */}
       <Text selectedTool={selectedTool} />
 
-      {/* Action Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

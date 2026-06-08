@@ -2,17 +2,19 @@ import { useDrawingStore } from "hooks/zustand/useDrawingStore";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
 import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { useMemo } from "react";
+import {
+  cleanupDrawingToolMap,
+  clearCurrentlyDrawingGraphics,
+} from "../helpers/drawingToolMapCleanup";
+import { useOmschrijvingExists } from "../helpers/useOmschrijvingExists";
 
 export default function Buttons() {
   const {
-    setStep,
     clear,
     omschrijving,
     organisatie,
@@ -26,63 +28,12 @@ export default function Buttons() {
   const { user } = useAuth();
   const content = useContent();
   const { create, loading } = useCreateData("/geometries");
-  const { fetchGeometries, dbGeometries } = useGeometriesStore();
+  const { fetchGeometries } = useGeometriesStore();
 
-  // Check if omschrijving already exists (case-insensitive)
-  const omschrijvingExists = useMemo(() => {
-    if (!omschrijving || omschrijving.trim() === "") return false;
-    return dbGeometries.some(
-      (geometry) =>
-        geometry.omschrijving?.toLowerCase().trim() ===
-        omschrijving.toLowerCase().trim()
-    );
-  }, [omschrijving, dbGeometries]);
+  const omschrijvingExists = useOmschrijvingExists(omschrijving);
 
-  const clearCurrentlyDrawingGraphics = () => {
-    if (!mapView) return;
-
-    // Search all graphics layers for graphics with "currently-drawing" attribute
-    const layers = mapView.map.layers;
-    for (let i = 0; i < layers.length; i++) {
-      const layer = layers.getItemAt(i);
-      if (layer instanceof GraphicsLayer) {
-        const graphics = layer.graphics.toArray();
-        graphics.forEach((graphic) => {
-          if (graphic.attributes && graphic.attributes["currently-drawing"] === true) {
-            try {
-              layer.remove(graphic);
-            } catch (err) {
-              // Ignore removal errors
-            }
-          }
-        });
-      }
-    }
-  };
-
-  function handleBack() {
-    // Delete all graphics with "currently-drawing" attribute
-    clearCurrentlyDrawingGraphics();
-
-    // Reset cursor
-    if (mapView?.container) {
-      mapView.container.style.cursor = "";
-    }
-
-    // Clear store state (this will also set step to 1)
-    clear();
-  }
-
-  function handleCancel() {
-    // Delete all graphics with "currently-drawing" attribute
-    clearCurrentlyDrawingGraphics();
-
-    // Reset cursor
-    if (mapView?.container) {
-      mapView.container.style.cursor = "";
-    }
-
-    // Clear store state (this will also set step to 1)
+  function handleLeaveStep2() {
+    cleanupDrawingToolMap(mapView);
     clear();
   }
 
@@ -193,8 +144,7 @@ export default function Buttons() {
         points: pointsArray,
       },
       async () => {
-        // Success callback - clear graphics and reset after successful creation
-        clearCurrentlyDrawingGraphics();
+        clearCurrentlyDrawingGraphics(mapView);
         clear();
 
         // Refetch geometries to update the map immediately
@@ -216,7 +166,7 @@ export default function Buttons() {
     <div className="relative">
       <div className="flex justify-end gap-x-1 text-[12px] mt-6">
         <button
-          onClick={handleBack}
+          onClick={handleLeaveStep2}
           disabled={loading}
           className="gray-button"
         >
@@ -237,7 +187,7 @@ export default function Buttons() {
         </button>
 
         <button
-          onClick={handleCancel}
+          onClick={handleLeaveStep2}
           disabled={loading}
           className="gray-button"
         >

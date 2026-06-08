@@ -1,3 +1,7 @@
+import {
+  getUnstarredPoints,
+  starAllPointsOnMap,
+} from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
@@ -5,11 +9,8 @@ import { FaListAlt, FaSave } from "react-icons/fa";
 import { ImTable2 } from "react-icons/im";
 import { IoMdAdd } from "react-icons/io";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { EnrichedPointType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import Graphic from "@arcgis/core/Graphic";
-import Point from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import { EnrichedPointType } from "Types";
 import { PiSelectionForegroundThin } from "react-icons/pi";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
@@ -76,41 +77,21 @@ export default function ListPointFunctions({
 
   const selectAll = () => {
     setOpenListPointDiv(false);
-    if (!graphicsLayer) return;
 
-    const newStars = pointsTable.filter(
-      (point) => !starredPoints.some((p) => p.id === point.id)
-    );
+    const newStars = getUnstarredPoints(pointsTable, starredPoints);
+    starAllPointsOnMap({
+      points: pointsTable,
+      starredPoints,
+      setStarredPoints,
+      graphicsLayer,
+    });
 
-    const combined = [...starredPoints, ...newStars];
-    const unique = Array.from(new Map(combined.map((p) => [p.id, p])).values());
-    setStarredPoints(unique);
-
-    newStars.forEach((point) => {
-      const graphic = new Graphic({
-        geometry: new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        }),
-        symbol: new SimpleMarkerSymbol({
-          style: "circle",
-          size: 14,
-          color: [255, 255, 255, 0],
-          outline: {
-            color: [0, 0, 255, 1],
-            width: 2,
-          },
-        }),
-        attributes: { id: point.id },
+    if (newStars.length > 0) {
+      logAction({
+        message: `User starred point '${newStars[0].omschrijving}' in the list of starred points`,
+        step: "ResultTab",
       });
-
-      graphicsLayer.graphics.add(graphic);
-    });
-
-    logAction({
-      message: `User starred point '${newStars[0].omschrijving}' in the list of starred points`,
-      step: "ResultTab",
-    });
+    }
   };
 
   const exportCsv = () => {

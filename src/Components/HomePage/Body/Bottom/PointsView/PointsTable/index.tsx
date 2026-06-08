@@ -1,12 +1,7 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { EnrichedPointType } from "Types";
 
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import { MdFilterAlt } from "react-icons/md";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { useState } from "react";
@@ -15,6 +10,7 @@ import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
 import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
+import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 
 const allColumnsPoints = [
   "omschrijving",
@@ -48,68 +44,15 @@ export default function PointsTable({
 
   useOpenAllTable(); // kept if you need elsewhere
   const { pointsTable } = useOpenTable();
-  const { graphicsLayerHover, graphicsLayer, mapView } = useMapViewState();
 
   const [visibleColumnsPoints, setVisibleColumnsPoints] =
     useState(allColumnsPoints);
 
-  const toggleStarPoint = (point: EnrichedPointType) => {
-    const alreadyStarred = starredPoints.find(
-      (p: EnrichedPointType) => p.id === point.id
-    );
-
-    if (alreadyStarred) {
-      setStarredPoints((prev: EnrichedPointType[]) =>
-        prev.filter((p) => p.id !== point.id)
-      );
-      const toRemove = graphicsLayer?.graphics.find(
-        (g) => g.attributes?.id === point.id
-      );
-      if (toRemove) graphicsLayer?.graphics.remove(toRemove);
-    } else {
-      setStarredPoints((prev: EnrichedPointType[]) => [...prev, point]);
-
-      const graphic = new Graphic({
-        geometry: new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        }),
-        symbol: new SimpleMarkerSymbol({
-          style: "circle",
-          size: 14,
-          color: [255, 255, 255, 0],
-          outline: { color: [0, 0, 255, 1], width: 2 },
-        }),
-        attributes: { id: point.id },
-      });
-
-      graphicsLayer?.graphics.add(graphic);
-    }
-  };
-
-  const hoverPointTable = (point: EnrichedPointType) => {
-    const graphic = new Graphic({
-      geometry: new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-      }),
-      symbol: new PictureMarkerSymbol({
-        url: "/location-icon.png",
-        width: "24px",
-        height: "24px",
-      }),
+  const { hoverPoint, clearHover, goToPoint, toggleStarPoint } =
+    usePointListMapActions({
+      starredPoints,
+      setStarredPoints,
     });
-    graphicsLayerHover?.add(graphic);
-  };
-
-  const goToPoint = (point: EnrichedPointType) => {
-    if (!mapView) return;
-    const pt = new Point({
-      longitude: point.longitude,
-      latitude: point.latitude,
-    });
-    mapView.goTo(pt);
-  };
 
   return (
     <div
@@ -170,8 +113,8 @@ export default function PointsTable({
                     ? "bg-white hover:bg-gray-100"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
-                onMouseEnter={() => hoverPointTable(point)}
-                onMouseLeave={() => graphicsLayerHover?.removeAll()}
+                onMouseEnter={() => hoverPoint(point)}
+                onMouseLeave={clearHover}
                 onClick={() => goToPoint(point)}
               >
                 <td className="px-2 py-1 align-middle">

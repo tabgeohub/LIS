@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import MapView from "@arcgis/core/views/MapView";
 import { classNames } from "@helpers/classNames";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { CURRENTLY_DRAWING_ATTRIBUTE } from "../helpers/drawingToolMapCleanup";
+import { destroySketchViewModel } from "../helpers/resetSketchSession";
 
 interface OptionsProps {
   selectedTool: "line" | "polygon" | null;
@@ -33,13 +35,7 @@ export default function Options({
 }: OptionsProps) {
   // Cleanup function
   const cleanup = () => {
-    if (sketchViewModel) {
-      sketchViewModel.destroy();
-      setSketchViewModel(null);
-    }
-    if (mapView?.container) {
-      mapView.container.style.cursor = "";
-    }
+    destroySketchViewModel(sketchViewModel, setSketchViewModel, mapView);
   };
 
   // Cleanup on unmount
@@ -98,7 +94,7 @@ export default function Options({
         // Mark this graphic as "currently-drawing" so we can easily find and delete it later
         event.graphic.attributes = {
           ...event.graphic.attributes,
-          "currently-drawing": true,
+          [CURRENTLY_DRAWING_ATTRIBUTE]: true,
         };
 
         // Apply appropriate symbol based on geometry type

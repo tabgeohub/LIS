@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import {
-  YELLOW_MARKER_SYMBOL,
-  STARRED_POINT_SYMBOL,
-} from "@helpers/ArcGISHelpers/createSymbols";
+  addStarPointGraphics,
+  createSearchResultPointOutlineGraphic,
+  getUnstarredPoints,
+  mergeStarredPoints,
+  syncPointsTableMapGraphics,
+} from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useStarredAll } from "@helpers/ZustandStates/starredAll";
+import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 import { useEffect, useRef, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { IoIosArrowForward } from "react-icons/io";
@@ -45,14 +45,19 @@ export default function Points({
 
   const { starredAll } = useStarredAll();
 
-  const { graphicsLayerHover, mapView, graphicsLayer, yellowGraphicsLayer } =
-    useMapViewState();
+  const { mapView, graphicsLayer, yellowGraphicsLayer } = useMapViewState();
 
   const { setSelectedBottomTab } = useSelectedBottomTabState();
 
   const { setOpenSideBar } = useOpeSideBarState();
 
   const { setClickedPoint } = usePopUpState();
+
+  const { hoverPoint, clearHover, goToPoint, toggleStarPoint } =
+    usePointListMapActions({
+      starredPoints,
+      setStarredPoints,
+    });
 
   const hasRunFilter = useRef(false);
   const hasRunStar = useRef(false);
@@ -62,24 +67,7 @@ export default function Points({
       hasRunFilter.current = true;
 
       pointsData.forEach((point) => {
-        const graphic = new Graphic({
-          geometry: new Point({
-            longitude: point.longitude,
-            latitude: point.latitude,
-          }),
-          symbol: new SimpleMarkerSymbol({
-            style: "circle",
-            size: 14,
-            color: [255, 255, 255, 0],
-            outline: {
-              color: [255, 255, 0, 1],
-              width: 4,
-            },
-          }),
-          attributes: { id: point.id },
-        });
-
-        graphicsLayer?.graphics.add(graphic);
+        graphicsLayer?.graphics.add(createSearchResultPointOutlineGraphic(point));
       });
     }
   }, []);
@@ -90,137 +78,22 @@ export default function Points({
 
       if (!graphicsLayer) return;
 
-      const newStars = pointsData.filter(
-        (point) => !starredPoints.some((p) => p.id === point.id)
-      );
-
-      const combined = [...starredPoints, ...newStars];
-      const unique = Array.from(
-        new Map(combined.map((p) => [p.id, p])).values()
-      );
-      setStarredPoints(unique);
-
-      newStars.forEach((point) => {
-        const graphic = new Graphic({
-          geometry: new Point({
-            longitude: point.longitude,
-            latitude: point.latitude,
-          }),
-          symbol: new SimpleMarkerSymbol({
-            style: "circle",
-            size: 14,
-            color: [255, 255, 255, 0],
-            outline: {
-              color: [0, 0, 255, 1],
-              width: 2,
-            },
-          }),
-          attributes: { id: point.id },
-        });
-
-        graphicsLayer.graphics.add(graphic);
-      });
+      const newStars = getUnstarredPoints(pointsData, starredPoints);
+      setStarredPoints(mergeStarredPoints(starredPoints, newStars));
+      addStarPointGraphics(newStars, graphicsLayer);
     }
   }, [starredAll]);
-
-  const hoverPointTable = (point: EnrichedPointType) => {
-    const graphic = new Graphic({
-      geometry: new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-      }),
-      symbol: new PictureMarkerSymbol({
-        url: "/location-icon.png",
-        width: "24px",
-        height: "24px",
-      }),
-    });
-    graphicsLayerHover?.add(graphic);
-  };
-
-  const goToPoint = (point: EnrichedPointType) => {
-    if (mapView) {
-      const pt = new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-      });
-      mapView.goTo(pt);
-    }
-  };
-
-  const toggleStarPoint = (point: EnrichedPointType) => {
-    if (!graphicsLayer) return;
-    const alreadyStarred = starredPoints.find((p) => p.id === point.id);
-
-    if (alreadyStarred) {
-      setStarredPoints((prev) => prev.filter((p) => p.id !== point.id));
-      const toRemove = graphicsLayer?.graphics.find(
-        (g) => g.attributes?.id === point.id
-      );
-      if (toRemove)
-        graphicsLayer.graphics.removeMany(
-          graphicsLayer.graphics.filter((g) => g.attributes?.id === point.id)
-        );
-    } else {
-      setStarredPoints((prev) => [...prev, point]);
-
-      const graphic = new Graphic({
-        geometry: new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        }),
-        symbol: new SimpleMarkerSymbol({
-          style: "circle",
-          size: 14,
-          color: [255, 255, 255, 0],
-          outline: {
-            color: [0, 0, 255, 1],
-            width: 2,
-          },
-        }),
-        attributes: { id: point.id },
-      });
-
-      graphicsLayer?.graphics.add(graphic);
-    }
-  };
 
   useEffect(() => {
     graphicsLayer?.removeAll();
     yellowGraphicsLayer?.graphics.removeAll();
     if (!validateMapView(mapView, yellowGraphicsLayer)) return;
 
-    pointsData.forEach((point) => {
-      if (!point) return;
-
-      const geometry = new Point({
-        longitude: point.longitude,
-        latitude: point.latitude,
-        spatialReference: { wkid: 4326 },
-      });
-
-      const graphic = new Graphic({
-        geometry,
-        symbol: YELLOW_MARKER_SYMBOL,
-        attributes: point,
-      });
-
-      yellowGraphicsLayer?.add(graphic);
-
-      const alreadyStarred = starredPoints.find((p) => p.id === point.id);
-
-      if (alreadyStarred) {
-        const graphic = new Graphic({
-          geometry: new Point({
-            longitude: point.longitude,
-            latitude: point.latitude,
-          }),
-          symbol: STARRED_POINT_SYMBOL,
-          attributes: { id: point.id },
-        });
-
-        graphicsLayer?.graphics.add(graphic);
-      }
+    syncPointsTableMapGraphics({
+      points: pointsData,
+      starredPoints,
+      yellowGraphicsLayer,
+      graphicsLayer,
     });
   }, []);
 
@@ -243,8 +116,8 @@ export default function Points({
               <div
                 key={point.id}
                 className="px-4 py-1 border-b hover:bg-neutral-100"
-                onMouseEnter={() => hoverPointTable(point)}
-                onMouseLeave={() => graphicsLayerHover?.removeAll()}
+                onMouseEnter={() => hoverPoint(point)}
+                onMouseLeave={clearHover}
                 onClick={() => goToPoint(point)}
               >
                 <div className="flex items-center justify-between">

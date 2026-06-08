@@ -63,6 +63,92 @@
 
 ---
 
+### Flight plan map & list UI
+
+**Fixed:** 2026-06-05  
+**Shared code:** `createPlanBoundingBoxGraphic.ts`, `computeFlightPlanCentroid.ts`, `finishedPlanMapGraphics.ts`, `usePlanClick`, `usePlanHover`, `usePlanStarGraphic`, `useFinishedPlanMapHighlight`  
+**Tested:** ☐ *(fill in when QA complete)*
+
+**Surfaces:** Search tab, bottom panel, `FlightPlansList`, `FlightPlansTable`, `SinglePlan`, plan hover/click hooks.
+
+- [ ] Search: flight plans list loads and filters.
+- [ ] Click plan row — map highlights plan path; selection state correct.
+- [ ] Hover plan row — hover graphic appears/disappears.
+- [ ] Bottom panel / dropdown plan details — same highlight behaviour.
+- [ ] Multiple plan lists (search vs bottom vs voorbereiding if shared) — all still work.
+- [ ] Deselect / click elsewhere — graphics cleared.
+- [ ] Star / select-all on plans — star graphics on map.
+
+---
+
+### Point list & star/highlight on map
+
+**Fixed:** 2026-06-05  
+**Shared code:** `createPointMapGraphics.ts`, `createSymbols.ts` (hover + search outline symbols), `usePointListMapActions.ts`  
+**Wired:** `SearchedResultsTab/Points/index`, `Points/DropDown`, `ResultTab/PointsList`, `PointsListEdit`, `ListPointsFunctions`, `PointsTable`, `useMapGraphics` (points tab)  
+**Tested:** ☐ *(fill in when QA complete)*
+
+#### Search tab — `SearchedResultsTab/Points`
+
+- [ ] Run search → points list loads with yellow outline rings on map (initial load effect).
+- [ ] Yellow marker dots appear on `yellowGraphicsLayer` after list mount.
+- [ ] Hover row — location pin on map; leave row — pin clears.
+- [ ] Click row — map pans to point.
+- [ ] Star / unstar row — blue circle on `graphicsLayer`; icon toggles blue/gray.
+- [ ] Header dropdown → Select all — all points starred + blue circles on map.
+
+#### Result tab — `PointsList` and `PointsListEdit`
+
+- [ ] Points list loads from result tab (read and edit variants).
+- [ ] Hover, click goTo, star/unstar — same map behaviour as search tab.
+- [ ] Dropdown → Select all — stars all + map graphics.
+- [ ] Edit variant — action links (edit/delete/view/add to plan) still open correct sidebar tabs.
+
+#### Bottom panel — `PointsTable`
+
+- [ ] Points table view — hover pin, row click goTo, star toggle work.
+- [ ] Starred row highlighted (blue background) in table.
+
+#### Layer sync
+
+- [ ] Switch bottom tab to points — yellow markers + starred overlays match list state.
+- [ ] No duplicate star graphics when starring from list then opening bottom table.
+
+---
+
+### Drawing tool — map cleanup & lifecycle
+
+**Fixed:** 2026-06-05  
+**Shared code:** `DrawingTool/helpers/` (`drawingToolMapCleanup`, `resetSketchSession`, `useDrawingToolLifecycle`, `useOmschrijvingExists`)  
+**Form merge:** `Common/AandachtspuntDetailsFields.tsx`  
+**Tested:** ✓ 2026-06-05
+
+#### Step 1 — draw
+
+- [x] Open Tekengereedschap tab — Step1 loads.
+- [x] Select line/polygon tool — crosshair cursor; draw on map.
+- [x] Graphics tagged `currently-drawing`; clear button removes them + resets cursor.
+- [x] Confirm with graphics — advances to Step2; graphics persist on map.
+
+#### Step 2 — form & save
+
+- [x] Step2 form fields bind correctly (checkboxes, omschrijving duplicate warning, selects).
+- [x] Duplicate omschrijving blocks save.
+- [x] Back — graphics removed, returns to Step1, store cleared.
+- [x] Cancel — same as back.
+- [x] Save — API succeeds, graphics cleared, geometries refetched on map.
+
+#### Tab / lifecycle
+
+- [x] Switch away from Tekengereedschap mid-draw — no leftover graphics or crosshair.
+- [x] Re-open tab — fresh Step1 state.
+
+#### EnrichedAddPoint form (shared fields)
+
+- [x] EnrichedAddPoint Step3 — same field layout; point omschrijving API warning still works.
+
+---
+
 ## Pending — run when fix is merged
 
 ### 1. Shared types — `finished_plans`
@@ -77,32 +163,7 @@
 
 ---
 
-### 2. Flight plan map & list UI
-
-**Surfaces:** Search tab, bottom panel, `FlightPlansList`, `FlightPlansTable`, `SinglePlan`, plan hover/click hooks.
-
-- [ ] Search: flight plans list loads and filters.
-- [ ] Click plan row — map highlights plan path; selection state correct.
-- [ ] Hover plan row — hover graphic appears/disappears.
-- [ ] Bottom panel / dropdown plan details — same highlight behaviour.
-- [ ] Multiple plan lists (search vs bottom vs voorbereiding if shared) — all still work.
-- [ ] Deselect / click elsewhere — graphics cleared.
-
----
-
-### 3. Point list & star/highlight on map
-
-**Surfaces:** `Points/index`, `PointsList`, `PointsListEdit`, search results, star toggle.
-
-- [ ] Point list loads in search and edit modes.
-- [ ] Click point row — map `goTo` + selection.
-- [ ] Star toggle — yellow/star graphics on map; state persists in list.
-- [ ] Hover point — hover graphic (if applicable).
-- [ ] Bulk / filter changes — graphics stay in sync with visible list.
-
----
-
-### 4. Backend — flight plan / point SQL queries
+### 2. Backend — flight plan / point SQL queries
 
 **Surfaces:** search endpoints, template plans, preprepared plans, regio filters.
 
@@ -114,7 +175,7 @@
 
 ---
 
-### 5. Backend — route validation & CRUD
+### 3. Backend — route validation & CRUD
 
 **Surfaces:** create/edit point, geometry, finished plan, flight plan, email routes + matching frontend forms.
 
@@ -126,16 +187,7 @@
 
 ---
 
-### 6. Drawing tool (Voorbereiding)
-
-- [ ] Open drawing tool wizard — all steps load.
-- [ ] Draw / filter / reset between Step1 and Step2 — state clears correctly.
-- [ ] Cancel / back — no leftover graphics on map.
-- [ ] Complete flow — geometries saved on plan.
-
----
-
-### 7. Zustand store — initial state vs `clear()`
+### 4. Zustand store — initial state vs `clear()`
 
 **Stores:** `useFinishedPlansState`, `useReuseFlightPlan`, `templateFlightStates`, `flightPlanStates`, etc.
 
@@ -145,7 +197,7 @@
 
 ---
 
-### 8. Geometry rendering & handlers
+### 5. Geometry rendering & handlers
 
 **Surfaces:** `SingleGeometry`, Create report geometry handlers, geometries table.
 
@@ -155,7 +207,7 @@
 
 ---
 
-### 9. Edit point form steps (Tools vs Voorbereiding)
+### 6. Edit point form steps (Tools vs Voorbereiding)
 
 - [ ] Aandachtspunten verwijderen — edit point Step2 sub-forms.
 - [ ] Voorbereiding — selected point edit Step2.
@@ -163,7 +215,7 @@
 
 ---
 
-### 10. Map legend / layers
+### 8. Map legend / layers
 
 - [ ] KaartLegend sections toggle layers on/off.
 - [ ] Block1 vs Overig sections — no broken toggles after shared component.
@@ -171,7 +223,7 @@
 
 ---
 
-### 11. View plan — add points
+### 9. View plan — add points
 
 - [ ] View plan: add point to plan — points list selection.
 - [ ] Add points from another plan — source list works.
@@ -180,7 +232,7 @@
 
 ---
 
-### 12. Backend — finished plans queries
+### 10. Backend — finished plans queries
 
 - [ ] Timeslider finished plans endpoint.
 - [ ] Partial finished plans / single finished flight plan.
@@ -188,7 +240,7 @@
 
 ---
 
-### 13. Layout components
+### 11. Layout components
 
 - [ ] Left panel layout — scroll, header, tabs.
 - [ ] Right panel layout — same shared wrapper behaviour.
@@ -196,7 +248,7 @@
 
 ---
 
-### 14. Wizard / step buttons
+### 12. Wizard / step buttons
 
 **Surfaces:** Edit flight, reuse/duplicate flight plan, flight plan Step3, view plan Step2, template flights.
 
@@ -207,7 +259,7 @@
 
 ---
 
-### 15. Miscellaneous
+### 13. Miscellaneous
 
 *Add specific checkboxes when touching a cluster in this bucket — do not block merge on full misc sweep.*
 
