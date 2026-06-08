@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { finishedPlanKeys } from "lib/queryKeys";
 import { FinishedFlightPlanType } from "Types/finished_plans";
+import { appendRegioQuery } from "../flightPlans/regioQuery";
 
 export function usePartialFinishedPlans(
   regioId: string | number | undefined
@@ -10,7 +11,10 @@ export function usePartialFinishedPlans(
     queryKey: finishedPlanKeys.partialList(regioId ?? ""),
     queryFn: () =>
       fetchApi<FinishedFlightPlanType[]>(
-        `/finished_plans/getPartialFinishedFlightPlans?regio_id=${regioId}`
+        appendRegioQuery(
+          "/finished_plans/getPartialFinishedFlightPlans",
+          regioId
+        )
       ),
     enabled: regioId !== undefined && regioId !== "",
   });

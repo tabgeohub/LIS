@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 
 export async function getGeometries(req: Request, res: Response): Promise<void> {
   try {
-    const { regio } = req.query;
+    const regio = resolveRegioFilter(req);
 
     let query = `
       SELECT

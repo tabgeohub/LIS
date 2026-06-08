@@ -5,7 +5,8 @@ export const flightPlanKeys = {
     [...flightPlanKeys.lists(), String(regioId)] as const,
   unPrepared: (regioId: string | number) =>
     [...flightPlanKeys.all, "unPrepared", String(regioId)] as const,
-  preprepared: () => [...flightPlanKeys.all, "preprepared"] as const,
+  preprepared: (regioId: string | number) =>
+    [...flightPlanKeys.all, "preprepared", String(regioId)] as const,
   fullPrepared: (regioId: string | number) =>
     [...flightPlanKeys.all, "fullPrepared", String(regioId)] as const,
   vluchtnummer: (vluchtnummer: string) =>

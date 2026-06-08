@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { appendRegioFilter } from "../../helpers/queries/regioFilter";
+import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 
 export async function getPreparedFlightPlans(
   req: Request,
   res: Response
 ): Promise<void> {
   try {
-    const { regio_id } = req.query;
+    const regio_id = resolveRegioFilter(req);
 
-    const params: any[] = [];
+    const params: unknown[] = [];
     let query = `
       SELECT id, vluchtnummer, omschrijving, datum, created_at, user_id, points
       FROM lis.flightPlans
       WHERE status = 'prepared'
     `;
 
-    if (regio_id && regio_id !== "admin") {
-      params.push(regio_id);
-      query += ` AND regio_id = $${params.length}`;
-    }
-
+    query = appendRegioFilter(query, params, regio_id, "regio_id", {
+      caseInsensitiveAdmin: true,
+    });
     query += ` ORDER BY created_at DESC`;
 
     const result = await pool.query(query, params);

@@ -3,6 +3,7 @@ import { fetchApi } from "api/fetchApi";
 import { flightPlanKeys } from "lib/queryKeys";
 import { FlightPlanType } from "Types";
 import { enabledForRegio } from "./enabled";
+import { appendRegioQuery } from "./regioQuery";
 
 /** Fully prepared plans (nabewerking status change) */
 export function useFullPreparedFlightPlans(
@@ -13,7 +14,7 @@ export function useFullPreparedFlightPlans(
     queryKey: flightPlanKeys.fullPrepared(regioId ?? ""),
     queryFn: () =>
       fetchApi<FlightPlanType[]>(
-        `/flightPlans/fullPreparedFlightPlans?regio_id=${regioId}`
+        appendRegioQuery("/flightPlans/fullPreparedFlightPlans", regioId)
       ),
     enabled: enabledForRegio(regioId, userId),
   });

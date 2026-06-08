@@ -21,6 +21,8 @@
  *                     type: string
  *                   email:
  *                     type: string
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 
 /**
@@ -52,6 +54,8 @@
  *     responses:
  *       201:
  *         description: User created successfully
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 
 /**
@@ -77,4 +81,8 @@
  *     responses:
  *       200:
  *         description: User updated successfully
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
+
+export {};

@@ -5,9 +5,11 @@
  *     tags:
  *       - TemplatePlans
  *     summary: Get all template flight plans
+ *     parameters:
+ *       - $ref: '#/components/parameters/RegioId'
  *     responses:
  *       200:
- *         description: List of template flight plans
+ *         description: List of template flight plans with geometries
  *         content:
  *           application/json:
  *             schema:
@@ -16,20 +18,26 @@
  *                 type: object
  *                 properties:
  *                   id:
- *                     type: string
+ *                     type: integer
  *                   name:
  *                     type: string
- *                   description:
+ *                   regio_id:
  *                     type: string
- */
-
-/**
- * @openapi
- * /templateFlight:
+ *                   points:
+ *                     type: array
+ *                     items:
+ *                       type: integer
+ *                   geometries:
+ *                     type: array
+ *                     items:
+ *                       $ref: '#/components/schemas/GeometryGroup'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *
  *   post:
  *     tags:
  *       - TemplatePlans
- *     summary: Create a new template flight plan
+ *     summary: Create a template flight plan
  *     requestBody:
  *       required: true
  *       content:
@@ -39,21 +47,41 @@
  *             properties:
  *               name:
  *                 type: string
- *               description:
- *                 type: string
  *               points:
  *                 type: array
  *                 items:
- *                   type: object
- *                   properties:
- *                     latitude:
- *                       type: number
- *                     longitude:
- *                       type: number
+ *                   type: integer
+ *               regio_id:
+ *                 type: string
  *             required:
  *               - name
  *               - points
+ *               - regio_id
  *     responses:
  *       201:
- *         description: Template flight plan created successfully
+ *         description: Template created
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *
+ * /templateFlight/templateName:
+ *   post:
+ *     tags:
+ *       - TemplatePlans
+ *     summary: Check or reserve a template name
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Name availability result
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
+
+export {};

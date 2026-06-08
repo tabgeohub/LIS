@@ -163,15 +163,40 @@
 
 ---
 
-### 2. Backend — flight plan / point SQL queries
+### 2. Backend — flight plan / point SQL queries · **Implemented — test pending**
 
-**Surfaces:** search endpoints, template plans, preprepared plans, regio filters.
+**Helpers:** `backend/src/helpers/queries/` (`pointJson`, `flightPlanJoin`, `regioFilter`, `buildFlightPlanQuery`, `buildPointSearchQuery`, `buildFinishedPlanQuery`, `formatPlanGeometries`, `parsePlanIds`).
 
-- [ ] `getAllFlightPlans` / search plans — same result counts as before (spot-check known queries).
-- [ ] `getSearchedPoints` — filters (regio, text) unchanged.
-- [ ] `getPrepreparedFlightPlans` / template plans — no missing rows.
-- [ ] Pagination / limits (if any) still respected.
-- [ ] Error cases: invalid params → same HTTP status/messages.
+**Tier 1 routes (10):** `getAllFlightPlans`, `getPrepreparedFlightPlans`, `getSearchedFlightPlans`, `getFullPreparedFlightPlans`, `getUnPreparedPlans`, `getFlightPlanById`, `getPreparedFlightPlans`, `getSearchedPoints`, `getPrePreparedPlanPoints`, `getTemplateFlightPlans`.
+
+**Tier 4 overlap (5):** `getPartialFinishedPlans`, `getFinishedPlansTimeslider`, `getTimeRange`, `getPointPlanImages`, `getGeometryPlanImages`.
+
+- [ ] `getAllFlightPlans` — `points` + `geometries[]` split unchanged; regio filter (`admin` = all).
+- [ ] `getPrepreparedFlightPlans` / `getFullPreparedFlightPlans` / `getUnPreparedPlans` — status + regio filters.
+- [ ] `getSearchedFlightPlans` — search on vluchtnummer/omschrijving; 400 when `search` missing.
+- [ ] `getFlightPlanById` — single plan with `layers`, geometry fields on points.
+- [ ] `getPreparedFlightPlans` — simple list (no UNNEST join).
+- [ ] `getSearchedPoints` / `GET /points/:id` — point arrays; path param `id` for plan points.
+- [ ] `getTemplateFlightPlans` — template `geometries[]` enrichment from geometries table.
+- [ ] `getPartialFinishedPlans` — finished plans + `points_data` / `geometries[]` shape.
+- [ ] Timeslider: `getFinishedPlansTimeslider` (date range + regio), `getTimeRange` (min/max dates).
+- [ ] Timeslider images: `getPointPlanImages`, `getGeometryPlanImages` (regio `::text` filter).
+- [ ] Voorbereiding + Nabewerking UI smoke — flight plan lists, search, templates load without errors.
+
+---
+
+### 6. Backend — finished plans queries · **Implemented — test pending**
+
+**Helpers:** `buildFinishedFlightPlansListQuery`, `buildSingleFinishedFlightPlanQuery`, `buildAttachmentsAggregationExpr`, `buildFinishedPlanDetailsPointJsonbObject` in `backend/src/helpers/queries/`.
+
+**Routes:** `getFinishedFlightPlans`, `getSingleFinishedFlightPlan` (+ theme #2 overlap: `getPartialFinishedPlans`, timeslider routes).
+
+- [ ] `GET /finished_plans/` — all finished plans with `points_data`, attachments per point, `path`.
+- [ ] `GET /finished_plans/getSingleFinishedFlightPlan/:planId` — single plan with `geometries[]`, `flighttime`, ordered points.
+- [ ] `GET /finished_plans/getPartialFinishedFlightPlans` — partial list + geometry grouping (regio filter).
+- [ ] Nabewerking Vluchten zoeken — open finished plan, points + attachments render.
+- [ ] Timeslider — date range, plan images unchanged after shared regio helpers.
+- [ ] Unknown plan id → `null` response (not 404).
 
 ---
 
@@ -238,15 +263,15 @@
 
 ---
 
-### 8. Map legend / layers
+### 8. Map legend / layers · **Tested ✓**
 
 **Surfaces:** KaartLegend → Block1, Overig, NNederland; regio-filtered users + admin.
 
-- [ ] **Block1:** Aandachtspunten + Geometries default on; Regios toggles; Waypoints/tracks parent gates children.
-- [ ] **Overig:** parent checkbox gates Section1–4; nested groups (Wegen, Hoogspanningsmasten) expand/toggle.
-- [ ] **NNederland:** section hidden when no layers for user regio; parent + layer toggles; `selectedLayers` restore on load.
-- [ ] **Admin vs regional user:** each sees correct layer subset per `regio`.
-- [ ] Toggle layer on — appears on map; off — removed; disabled parent removes child layers from map.
+- [x] **Block1:** Aandachtspunten + Geometries default on; Regios toggles; Waypoints/tracks parent gates children.
+- [x] **Overig:** parent checkbox gates Section1–4; nested groups (Wegen, Hoogspanningsmasten) expand/toggle.
+- [x] **NNederland:** section hidden when no layers for user regio; parent + layer toggles; `selectedLayers` restore on load.
+- [x] **Admin vs regional user:** each sees correct layer subset per `regio`.
+- [x] Toggle layer on — appears on map; off — removed; disabled parent removes child layers from map.
 
 ---
 

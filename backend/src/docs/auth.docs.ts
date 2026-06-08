@@ -4,8 +4,9 @@
  *   post:
  *     tags:
  *       - Auth
- *     summary: Log in a user
- *     description: Authenticate a user with email and password.
+ *     summary: Legacy email/password login
+ *     description: Production auth uses Keycloak via `/auth` routes on the backend root. This endpoint is the legacy session login under `/api/auth`.
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,27 +21,14 @@
  *               password:
  *                 type: string
  *                 format: password
- *                 example: secret123
  *             required:
  *               - email
  *               - password
  *     responses:
  *       200:
  *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     email:
- *                       type: string
  *       401:
  *         description: Invalid credentials
  */
+
+export {};

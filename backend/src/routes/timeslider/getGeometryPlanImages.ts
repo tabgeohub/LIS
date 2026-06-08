@@ -1,19 +1,14 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { buildFinishedPlanRegioWhereClause } from "../../helpers/queries/buildFinishedPlanQuery";
+import { parsePlanIds } from "../../helpers/queries/parsePlanIds";
+import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 
-function parsePlanIds(query: unknown): number[] {
-  if (query == null) return [];
-  if (Array.isArray(query)) {
-    return query
-      .flatMap((v) => String(v).split(","))
-      .map((s) => parseInt(s.trim(), 10))
-      .filter((n) => Number.isFinite(n) && n > 0);
-  }
-  return String(query)
-    .split(",")
-    .map((s) => parseInt(s.trim(), 10))
-    .filter((n) => Number.isFinite(n) && n > 0);
-}
+const TIMESLIDER_REGIO_FILTER = {
+  caseInsensitiveAdmin: true,
+  when: "provided" as const,
+  castAsText: true,
+};
 
 /**
  * GET /api/timeslider/geometryPlanImages
@@ -53,10 +48,14 @@ export async function getGeometryPlanImages(
       return;
     }
 
-    const regioId = req.query.regio_id;
-    const isAdmin =
-      regioId != null && String(regioId).toLowerCase() === "admin";
-    const shouldFilter = regioId != null && !isAdmin;
+    const regioId = resolveRegioFilter(req);
+    const params: unknown[] = [geometryId, planIds];
+    const regioClause = buildFinishedPlanRegioWhereClause(
+      regioId,
+      params,
+      "fl.regio_id",
+      TIMESLIDER_REGIO_FILTER
+    );
 
     const sql = `
       SELECT DISTINCT ON (a.id)
@@ -78,14 +77,9 @@ export async function getGeometryPlanImages(
         ON a.id = ANY(COALESCE(fp.attachments_id, ARRAY[]::integer[]))
         AND a.point_id = fp.point_id
       WHERE fp.plan_id = ANY($2::int[])
-        ${shouldFilter ? `AND fl.regio_id::text = $3::text` : ""}
+        ${regioClause}
       ORDER BY a.id ASC, fp.plan_id ASC;
     `;
-
-    const params: unknown[] = [geometryId, planIds];
-    if (shouldFilter) {
-      params.push(String(regioId));
-    }
 
     const result = await pool.query(sql, params);
 

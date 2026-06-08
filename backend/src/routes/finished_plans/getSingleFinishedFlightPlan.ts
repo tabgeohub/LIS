@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { buildSingleFinishedFlightPlanQuery } from "../../helpers/queries/buildFinishedPlanQuery";
+import { formatFinishedPlansWithGeometries } from "../../helpers/queries/formatPlanGeometries";
 
 export async function getSingleFinishedFlightPlan(
   req: Request,
@@ -8,149 +10,16 @@ export async function getSingleFinishedFlightPlan(
   const { planId } = req.params;
 
   try {
-    const result = await pool.query(
-      `
-      /* Scope finished_plans to the requested plan */
-      WITH ffp_rows AS (
-        SELECT *
-        FROM lis.finished_plans
-        WHERE plan_id = $1
-      ),
-      /* Collapse to exactly one row per (plan_id, point_id) to avoid duplicates */
-      points_per_plan AS (
-        SELECT
-          plan_id,
-          point_id,
-          MAX(point_order)  AS point_order,
-          MAX(pointcomment) AS point_comment
-        FROM ffp_rows
-        GROUP BY plan_id, point_id
-      ),
-      /* Attachments in finished_plans.attachments_id order (same as reports / UI) */
-      fp_point_attachments AS (
-        SELECT DISTINCT ON (point_id)
-          point_id,
-          attachments_id
-        FROM ffp_rows
-        ORDER BY point_id, point_order DESC NULLS LAST
-      ),
-      attachments_per_point AS (
-        SELECT
-          fpa.point_id,
-          COALESCE(
-            (
-              SELECT jsonb_agg(obj ORDER BY ord)
-              FROM (
-                SELECT
-                  u.ord,
-                  jsonb_build_object(
-                    'id', a.id,
-                    'url', a.url,
-                    'point_id', a.point_id,
-                    'attachmentid', a.attachmentid,
-                    'taken_at', a.taken_at,
-                    'location', a.location
-                  ) AS obj
-                FROM unnest(COALESCE(fpa.attachments_id, ARRAY[]::integer[]))
-                  WITH ORDINALITY AS u(att_id, ord)
-                JOIN lis.attachments a ON a.id = u.att_id
-              ) sub
-            ),
-            '[]'::jsonb
-          ) AS attachments
-        FROM fp_point_attachments fpa
-      )
-      SELECT
-        fp.*,
-        fpp.path       AS path,
-        fpp.flighttime AS flighttime,
-        jsonb_agg(
-          jsonb_strip_nulls(
-            jsonb_build_object(
-              'id',                  pt.id,
-              'omschrijving',        pt.omschrijving,
-              'regio_id',            pt.regio_id,
-              'xcoordinaat_rd',      pt.xcoordinaat_rd,
-              'ycoordinaat_rd',      pt.ycoordinaat_rd,
-              'latitude',            pt.latitude,
-              'longitude',           pt.longitude,
-              'vertrouwelijk',       pt.vertrouwelijk,
-              'herhalen',            pt.herhalen,
-              'user_id',             pt.user_id,
-              'activiteit_id',       pt.activiteit_id,
-              'organisatie_id',      pt.organisatie_id,
-              'specifiek_letten_op', pt.specifiek_letten_op,
-              'datum',               pt.created_at,
-              'point_order',         ppp.point_order,
-              'point_comment',       ppp.point_comment,
-              'attachments',         ap.attachments,
-              'geometry_id',         pt.geometry_id,
-              'geometry_type',       g.type,
-              'geometry_omschrijving', g.omschrijving
-            )
-          )
-          ORDER BY ppp.point_order NULLS LAST, pt.id
-        ) AS points_data
-      FROM lis.flightplans fp
-      JOIN points_per_plan ppp
-        ON ppp.plan_id = fp.id
-      JOIN lis.points pt
-        ON pt.id = ppp.point_id
-      LEFT JOIN attachments_per_point ap
-        ON ap.point_id = ppp.point_id
-      LEFT JOIN lis.geometries g
-        ON g.id = pt.geometry_id
-      /* New: join the per-plan path/flighttime (id, path jsonb, planid int, flighttime jsonb) */
-      LEFT JOIN lis.finished_plans_path fpp
-        ON fpp.planid = fp.id
-      WHERE fp.status = 'finished'
-        AND fp.id = $1
-      GROUP BY fp.id, fpp.path, fpp.flighttime;
-      `,
-      [planId]
-    );
+    const result = await pool.query(buildSingleFinishedFlightPlanQuery(), [
+      planId,
+    ]);
 
     if (!result.rows[0]) {
       res.status(200).json(null);
       return;
     }
 
-    const plan = result.rows[0];
-
-    // Format plan: group points with geometry_id into geometries array
-    const points = plan.points_data || [];
-    const pointsWithoutGeometry: any[] = [];
-    const geometriesMap = new Map<number, any>();
-
-    // Separate points with and without geometry_id
-    points.forEach((point: any) => {
-      if (point.geometry_id) {
-        const geometryId = point.geometry_id;
-        
-        if (!geometriesMap.has(geometryId)) {
-          geometriesMap.set(geometryId, {
-            id: geometryId,
-            geometry_type: point.geometry_type || null,
-            geometry_omschrijving: point.geometry_omschrijving || null,
-            points: [],
-          });
-        }
-        
-        // Remove geometry fields from point before adding to geometry
-        const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
-        geometriesMap.get(geometryId)!.points.push(pointWithoutGeometry);
-      } else {
-        // Remove geometry fields from point (they'll be null/undefined anyway)
-        const { geometry_id, geometry_type, geometry_omschrijving, ...pointWithoutGeometry } = point;
-        pointsWithoutGeometry.push(pointWithoutGeometry);
-      }
-    });
-
-    const formattedPlan = {
-      ...plan,
-      points_data: pointsWithoutGeometry,
-      geometries: Array.from(geometriesMap.values()),
-    };
+    const formattedPlan = formatFinishedPlansWithGeometries([result.rows[0]])[0];
 
     res.status(200).json(formattedPlan);
   } catch (error: any) {

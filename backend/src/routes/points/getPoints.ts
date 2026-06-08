@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 
 export async function getPoints(req: Request, res: Response) {
   try {
@@ -10,10 +11,11 @@ export async function getPoints(req: Request, res: Response) {
       van,
       tot,
       herhalen,
-      regio,
       status,
       hasGeometry
     } = req.query;
+
+    const regio = resolveRegioFilter(req);
 
     let query = "SELECT * FROM lis.points";
     const params: any[] = [];

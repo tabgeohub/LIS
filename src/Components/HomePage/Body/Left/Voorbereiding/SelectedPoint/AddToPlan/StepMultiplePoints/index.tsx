@@ -14,6 +14,7 @@ export default function StepMultiplePoints({
   const { user } = useAuth();
 
   const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
+    user.role,
     user.user_id
   );
 
