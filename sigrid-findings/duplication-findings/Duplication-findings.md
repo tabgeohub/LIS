@@ -11,9 +11,9 @@
 
 | Metric                      | Value                            |
 | --------------------------- | -------------------------------- |
-| **Duplicate clusters**      | **~234** remaining (est.)        |
+| **Duplicate clusters**      | **~212** remaining (est.)        |
 | **Severity**                | All **HIGH**                     |
-| **Total redundant lines**   | **~3,250** remaining (est.)      |
+| **Total redundant lines**   | **~2,900** remaining (est.)      |
 | **File locations affected** | **~670** (est.; rescan to confirm) |
 
 
@@ -29,7 +29,7 @@ Duplication means the **same block of code appears in multiple places**. Sigrid 
 | Area                                 | Clusters (est.) | Redundant lines (est.) | Notes                            |
 | ------------------------------------ | --------------- | ---------------------- | -------------------------------- |
 | **Backend** (`backend/src/routes/…`) | ~70             | ~1,060                 | Validation, CRUD                 |
-| **HomePage — Voorbereiding**         | ~60             | ~700                   | View plan, wizard buttons        |
+| **HomePage — Voorbereiding**         | ~38             | ~348                   | View plan add points             |
 | **hooks**                            | ~35             | ~600                   | Zustand `clear()` patterns       |
 | **HomePage — Search & tables**       | ~20             | ~200                   | Residual list/table patterns     |
 | **HomePage — Nabewerking**           | ~15             | ~150                   | Residual nabewerking patterns    |
@@ -148,24 +148,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 7. Wizard / step buttons
-
-**22 clusters · ~352 redundant lines**
-
-Cancel / next / log-action / clear-graphics blocks repeated across wizard Buttons.tsx files.
-
-
-| Block size  | Occurrences       | Key files                                                                                            |
-| ----------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
-| **9 lines** | **7×** in 6 files | `EditFlight/Buttons`, `ReuseFlightPlan`, `DuplicateFlightPlan`, `FlightPlan/Step3`, `ViewPlan/Step2` |
-| 10 lines    | 4×                | `DuplicateFlightPlan`, `ReuseFlightPlan`, `FlightPlan/Step3`, `TemplateFlights`                      |
-
-
-**Suggested fix:** `useWizardButtons({ onNext, onCancel, logStep })` hook.
-
----
-
-### 8. Miscellaneous
+### 7. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -197,7 +180,7 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | **C** | Zustand clear/initial state (#3) | ~200+                        | 2 h    |
 | **D** | Edit point forms (#4)            | ~17                          | 1 h    |
 | **E** | View plan add points (#5)        | ~194                         | 2–3 h  |
-| **F** | Wizard buttons + layout (#6, #7) | ~390                         | 4–5 h  |
+| **F** | Layout (#6)                      | ~38                          | 1 h    |
 
 
 Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
@@ -218,10 +201,9 @@ Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
 | Rank | Redundant lines | Description              | Main locations                |
 | ---- | --------------- | ------------------------ | ----------------------------- |
 | 1    | 72              | 12 lines × 7             | Backend + frontend validation |
-| 2    | 54              | 9 lines × 7              | Wizard button blocks          |
-| 3    | 54              | 6 lines × 10             | Backend CRUD validation       |
-| 4    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()  |
-| 5    | 43              | 43 lines × 2             | `finished_plans` types mirror |
+| 2    | 54              | 6 lines × 10             | Backend CRUD validation       |
+| 3    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()  |
+| 4    | 43              | 43 lines × 2             | `finished_plans` types mirror |
 
 
 ---

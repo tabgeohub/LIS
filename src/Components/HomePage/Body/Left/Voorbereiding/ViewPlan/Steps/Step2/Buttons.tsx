@@ -2,7 +2,6 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
-import useLogAction from "hooks/useLogAction";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import {
@@ -10,6 +9,9 @@ import {
   buildViewPlanUpdatePayload,
   replacePlanInList,
 } from "./helpers/buildUpdatedPlanFromForm";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons({
   vluchtnummer,
@@ -20,9 +22,8 @@ export default function Buttons({
   handleCancel: () => void;
   refetch: () => void;
 }) {
-  const logAction = useLogAction();
+  const { logStep, withLog } = useWizardButtons("View plan - Step 2");
   const { user } = useAuth();
-
   const {
     setStep,
     omschrijving,
@@ -42,14 +43,10 @@ export default function Buttons({
     setInitialPlans,
     initialPlans,
   } = useViewPlanState();
-
   const { update } = useUpdateData(`/flightPlans/vluchtplans`);
-
   const { pointsTable, geometriesTable, setPointsTable, setGeometriesTable, setOpenTable } =
     useOpenTable();
-
   const { resetFeatures } = useResetFeatures();
-
   const { yellowGraphicsLayer } = useMapViewState();
 
   const submitStep2 = () => {
@@ -89,79 +86,48 @@ export default function Buttons({
       setFilteredPlans(replacePlanInList(filteredPlans, updatedPlan));
       setInitialPlans(replacePlanInList(initialPlans, updatedPlan));
       setSelectedPlan(updatedPlan);
-
       await refetch();
-
       setStep(1);
-
-      logAction({
-        message: "User clicked 'Save' button",
-        step: "View plan - Step 2",
-        newData: payload,
-      });
+      logStep("User clicked 'Save' button", payload);
     });
   };
 
+  const resetViewPlanStep = () =>
+    runWizardCleanup([
+      resetFeatures,
+      () => yellowGraphicsLayer?.graphics.removeAll(),
+      // @ts-ignore
+      () => setSelectedPlan(null),
+      () => setStep(1),
+      () => setSelectedIndex(0),
+      () => setPointsTable([]),
+      () => setGeometriesTable([]),
+      () => setOpenTable(false),
+    ]);
+
   return (
-    <>
-      <button
-        onClick={() => {
-          resetFeatures();
-
-          yellowGraphicsLayer?.graphics.removeAll();
-
-          // @ts-ignore
-          setSelectedPlan(null);
-
-          setStep(1);
-          setSelectedIndex(0);
-          setPointsTable([]);
-          setGeometriesTable([]);
-          setOpenTable(false);
-
-          logAction({
-            message: "User clicked 'Back' button",
-            step: "View plan - Step 2",
-          });
-        }}
-        className="gray-button"
-      >
-        Vorige
-      </button>
-
-      <button
-        className="gray-button"
-        onClick={() => {
-          setStep(3);
-
-          logAction({
-            message: "User clicked 'Edit point' button",
-            step: "View plan - Step 2",
-          });
-        }}
-      >
-        Aandachtspunt bewerken
-      </button>
-
-      <button className="gray-button" onClick={submitStep2}>
-        Opslaan
-      </button>
-
-      <button
-        onClick={() => {
-          resetFeatures();
-
-          handleCancel();
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "View plan - Step 2",
-          });
-        }}
-        className="gray-button"
-      >
-        Annuleren
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: "Vorige",
+          onClick: withLog("User clicked 'Back' button", resetViewPlanStep),
+        },
+        {
+          label: "Aandachtspunt bewerken",
+          onClick: withLog("User clicked 'Edit point' button", () => setStep(3)),
+        },
+        {
+          label: "Opslaan",
+          onClick: submitStep2,
+        },
+        {
+          label: "Annuleren",
+          onClick: withLog("User clicked 'Cancel' button", () =>
+            runWizardCleanup([resetFeatures, handleCancel])
+          ),
+        },
+      ]}
+    />
   );
 }

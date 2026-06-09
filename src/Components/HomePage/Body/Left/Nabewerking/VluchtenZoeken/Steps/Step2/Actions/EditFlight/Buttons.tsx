@@ -2,9 +2,9 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import { ActionType } from "../..";
 import { useUpdateData } from "utils/useUpdateData";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 
 export default function Buttons({
   setAction,
@@ -24,12 +24,9 @@ export default function Buttons({
     doelEnHoofdthema,
     aanvullendeInfo,
   } = useFinishedPlansState();
-
   const { user } = useAuth();
-
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans`);
-
-  const logAction = useLogAction();
+  const { logStep, withLog, labels } = useWizardButtons("Second step - Edit flight");
 
   function handleSubmit() {
     if (!selectedPlan) return;
@@ -64,70 +61,42 @@ export default function Buttons({
         hoofdthema: responseData.result.hoofdthema,
         aanvullende: responseData.result.aanvullende,
       });
-
       setAction("none");
     });
 
-    logAction({
-      message: "User clicked 'Save' button to edit flight plan data",
-      step: "Second step - Edit flight",
-      newData: {
-        omschrijving: selectedPlan.omschrijving,
-        waarnemer: selectedPlan.waarnemer,
-        piloot: selectedPlan.piloot,
-        datum: selectedPlan.datum,
-        vliegduur: selectedPlan.vliegduur,
-        luchtvaartuig: selectedPlan.luchtvaartuig,
-        passagiers: selectedPlan.passagiers,
-        hoofdthema: selectedPlan.hoofdthema,
-        aanvullende: selectedPlan.aanvullende,
-      },
+    logStep("User clicked 'Save' button to edit flight plan data", {
+      omschrijving: selectedPlan.omschrijving,
+      waarnemer: selectedPlan.waarnemer,
+      piloot: selectedPlan.piloot,
+      datum: selectedPlan.datum,
+      vliegduur: selectedPlan.vliegduur,
+      luchtvaartuig: selectedPlan.luchtvaartuig,
+      passagiers: selectedPlan.passagiers,
+      hoofdthema: selectedPlan.hoofdthema,
+      aanvullende: selectedPlan.aanvullende,
     });
   }
 
-  const content = useContent();
-
   return (
     <>
-      <div className="flex justify-end gap-x-1 text-[12px] mt-2">
-        <button
-          onClick={() => {
-            setAction("none");
-
-            logAction({
-              message: "User clicked 'Previous' button",
-              step: "Second step - Edit flight",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.vorige}
-        </button>
-
-        <button onClick={handleSubmit} className="gray-button">
-          {content.common.opslaan}
-        </button>
-
-        <button
-          onClick={() => {
-            setAction("none");
-
-            logAction({
-              message: "User clicked 'Cancel' button",
-              step: "Second step - Edit flight",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.annuleren}
-        </button>
-      </div>
-
-      {loading && (
-        <div className="absolute h-full w-full top-10 left-0 bg-gray-100 opacity-50 z-10 flex justify-center items-center">
-          <LoadingBars />
-        </div>
-      )}
+      <WizardButtonBar
+        className="flex justify-end gap-x-1 text-[12px] mt-2"
+        buttons={[
+          {
+            label: labels.vorige,
+            onClick: withLog("User clicked 'Previous' button", () => setAction("none")),
+          },
+          {
+            label: labels.opslaan,
+            onClick: handleSubmit,
+          },
+          {
+            label: labels.annuleren,
+            onClick: withLog("User clicked 'Cancel' button", () => setAction("none")),
+          },
+        ]}
+      />
+      <WizardLoadingOverlay show={loading} variant="offset" />
     </>
   );
 }

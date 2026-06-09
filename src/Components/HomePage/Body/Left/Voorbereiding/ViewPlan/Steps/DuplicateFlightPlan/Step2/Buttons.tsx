@@ -5,7 +5,9 @@ import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useContent } from "hooks/useContent";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons({
   handleCancel,
@@ -16,7 +18,6 @@ export default function Buttons({
 }) {
   const { setStep, setSelectedIndex } = useViewPlanState();
   const { selectedBasemap } = useSelectedBasemapState();
-
   const {
     duplicatedFlightPlan,
     vluchtnummer,
@@ -30,13 +31,11 @@ export default function Buttons({
     doelEnHoofdthema,
     aanvullendeInfo,
   } = usePlanDuplicateState();
-
   const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
   const { create } = useCreateData("/flightPlans");
-
   const { user } = useAuth();
-
   const { selectedLayers } = kaartlagenState();
+  const { labels } = useWizardButtons("View plan - Duplicate Step 2");
 
   const submitStep2 = () => {
     const attributes = {
@@ -60,35 +59,34 @@ export default function Buttons({
 
     create(attributes, () => {
       refetch();
-
       setStep(1);
     });
   };
 
-  const content = useContent();
-
   return (
-    <>
-      <button
-        onClick={() => {
-          setStep(1);
-          setSelectedIndex(0);
-          setPointsTable([]);
-          setGeometriesTable([]);
-          setOpenTable(false);
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}
-      </button>
-
-      <button className="gray-button" onClick={submitStep2}>
-        {content.common.opslaan}
-      </button>
-
-      <button onClick={handleCancel} className="gray-button">
-        {content.common.annuleren}
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: labels.vorige,
+          onClick: () =>
+            runWizardCleanup([
+              () => setStep(1),
+              () => setSelectedIndex(0),
+              () => setPointsTable([]),
+              () => setGeometriesTable([]),
+              () => setOpenTable(false),
+            ]),
+        },
+        {
+          label: labels.opslaan,
+          onClick: submitStep2,
+        },
+        {
+          label: labels.annuleren,
+          onClick: handleCancel,
+        },
+      ]}
+    />
   );
 }
