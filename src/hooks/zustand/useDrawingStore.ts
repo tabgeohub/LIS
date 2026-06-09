@@ -7,7 +7,6 @@ interface DrawingState {
   graphicsDrawn: Array<{ type: string; points: number[][] }> | null;
   setGraphicsDrawn: (value: Array<{ type: string; points: number[][] }> | null) => void;
 
-  // Form states
   omschrijving: string;
   setOmschrijving: (value: string) => void;
   vertrouwelijk: boolean;
@@ -24,36 +23,26 @@ interface DrawingState {
   clear: () => void;
 }
 
-export const useDrawingStore = create<DrawingState>((set) => ({
+const initialState = {
   step: 1,
-  setStep: (value) => set({ step: value }),
-
-  graphicsDrawn: null,
-  setGraphicsDrawn: (value) => set({ graphicsDrawn: value }),
-
-  // Form states
+  graphicsDrawn: null as Array<{ type: string; points: number[][] }> | null,
   omschrijving: "",
-  setOmschrijving: (value) => set({ omschrijving: value }),
   vertrouwelijk: false,
-  setVertrouwelijk: (value) => set({ vertrouwelijk: value }),
   herhalen: false,
-  setHerhalen: (value) => set({ herhalen: value }),
   activiteit: "",
-  setActiviteit: (value) => set({ activiteit: value }),
   organisatie: "",
-  setOrganisatie: (value) => set({ organisatie: value }),
   specifiekLettenOp: "",
-  setSpecifiekLettenOp: (value) => set({ specifiekLettenOp: value }),
+};
 
-  clear: () =>
-    set({
-      step: 1,
-      graphicsDrawn: null,
-      omschrijving: "",
-      vertrouwelijk: false,
-      herhalen: false,
-      activiteit: "",
-      organisatie: "",
-      specifiekLettenOp: "",
-    }),
+export const useDrawingStore = create<DrawingState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setGraphicsDrawn: (value) => set({ graphicsDrawn: value }),
+  setOmschrijving: (value) => set({ omschrijving: value }),
+  setVertrouwelijk: (value) => set({ vertrouwelijk: value }),
+  setHerhalen: (value) => set({ herhalen: value }),
+  setActiviteit: (value) => set({ activiteit: value }),
+  setOrganisatie: (value) => set({ organisatie: value }),
+  setSpecifiekLettenOp: (value) => set({ specifiekLettenOp: value }),
+  clear: () => set(initialState),
 }));

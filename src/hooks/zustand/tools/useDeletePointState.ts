@@ -59,67 +59,57 @@ interface DeletePoint {
   clear: () => void;
 }
 
-export const useDeletePointState = create<DeletePoint>((set) => ({
-  mainStep: "main",
-  setMainStep: (value) => set({ mainStep: value }),
-
-  selectedPoints: [],
-  setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-  selectedPoint: null,
-  setSelectedPoint: (value) => set({ selectedPoint: value }),
-
+const initialState = {
+  mainStep: "main" as AandachtspuntenVerwijderenType,
+  selectedPoints: [] as EnrichedPointType[],
+  selectedPoint: null as EnrichedPointType | null,
   omschrijving: "",
-  setOmschrijving: (value) => set({ omschrijving: value }),
-
   regio_id: "",
-  setRegio_id: (value) => set({ regio_id: value }),
-
   xcoordinaat_rd: 0,
-  setXCoordinaat_rd: (value) => set({ xcoordinaat_rd: value }),
-
   ycoordinaat_rd: 0,
-  setYCoordinaat_rd: (value) => set({ ycoordinaat_rd: value }),
-
   latitude: 0,
-  setLatitude: (value) => set({ latitude: value }),
-
   longitude: 0,
-  setLongitude: (value) => set({ longitude: value }),
-
   herhalen: false,
-  setHerhalen: (value) => set({ herhalen: value }),
-
   vertrouwelijk: 0,
-  setVertrouwelijk: (value) => set({ vertrouwelijk: value }),
-
   user_id: 0,
-  setUser_id: (value) => set({ user_id: value }),
-
   activiteit_id: "",
-  setActiviteit_id: (value) => set({ activiteit_id: value }),
-
   organisatie_id: "",
-  setOrganisatie_id: (value) => set({ organisatie_id: value }),
-
   specifiek_letten_op: "",
-  setSpecifiek_letten_op: (value) => set({ specifiek_letten_op: value }),
+};
 
-  clear: () =>
-    set({
-      selectedPoints: [],
-      selectedPoint: null,
-      omschrijving: "",
-      regio_id: "",
-      xcoordinaat_rd: 0,
-      ycoordinaat_rd: 0,
-      latitude: 0,
-      longitude: 0,
-      herhalen: false,
-      vertrouwelijk: 0,
-      user_id: 0,
-      activiteit_id: "",
-      organisatie_id: "",
-      specifiek_letten_op: "",
-    }),
+/** Resets point form fields; preserves mainStep and selectedPoints list. */
+const clearState = {
+  selectedPoint: initialState.selectedPoint,
+  omschrijving: initialState.omschrijving,
+  regio_id: initialState.regio_id,
+  xcoordinaat_rd: initialState.xcoordinaat_rd,
+  ycoordinaat_rd: initialState.ycoordinaat_rd,
+  latitude: initialState.latitude,
+  longitude: initialState.longitude,
+  herhalen: initialState.herhalen,
+  vertrouwelijk: initialState.vertrouwelijk,
+  user_id: initialState.user_id,
+  activiteit_id: initialState.activiteit_id,
+  organisatie_id: initialState.organisatie_id,
+  specifiek_letten_op: initialState.specifiek_letten_op,
+};
+
+export const useDeletePointState = create<DeletePoint>((set) => ({
+  ...initialState,
+  setMainStep: (value) => set({ mainStep: value }),
+  setSelectedPoints: (value) => set({ selectedPoints: value }),
+  setSelectedPoint: (value) => set({ selectedPoint: value }),
+  setOmschrijving: (value) => set({ omschrijving: value }),
+  setRegio_id: (value) => set({ regio_id: value }),
+  setXCoordinaat_rd: (value) => set({ xcoordinaat_rd: value }),
+  setYCoordinaat_rd: (value) => set({ ycoordinaat_rd: value }),
+  setLatitude: (value) => set({ latitude: value }),
+  setLongitude: (value) => set({ longitude: value }),
+  setHerhalen: (value) => set({ herhalen: value }),
+  setVertrouwelijk: (value) => set({ vertrouwelijk: value }),
+  setUser_id: (value) => set({ user_id: value }),
+  setActiviteit_id: (value) => set({ activiteit_id: value }),
+  setOrganisatie_id: (value) => set({ organisatie_id: value }),
+  setSpecifiek_letten_op: (value) => set({ specifiek_letten_op: value }),
+  clear: () => set(clearState),
 }));

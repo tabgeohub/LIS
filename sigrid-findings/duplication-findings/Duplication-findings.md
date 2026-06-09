@@ -11,9 +11,9 @@
 
 | Metric                      | Value                            |
 | --------------------------- | -------------------------------- |
-| **Duplicate clusters**      | **~212** remaining (est.)        |
+| **Duplicate clusters**      | **~187** remaining (est.)        |
 | **Severity**                | All **HIGH**                     |
-| **Total redundant lines**   | **~2,900** remaining (est.)      |
+| **Total redundant lines**   | **~2,440** remaining (est.)      |
 | **File locations affected** | **~670** (est.; rescan to confirm) |
 
 
@@ -30,7 +30,7 @@ Duplication means the **same block of code appears in multiple places**. Sigrid 
 | ------------------------------------ | --------------- | ---------------------- | -------------------------------- |
 | **Backend** (`backend/src/routes/…`) | ~70             | ~1,060                 | Validation, CRUD                 |
 | **HomePage — Voorbereiding**         | ~38             | ~348                   | View plan add points             |
-| **hooks**                            | ~35             | ~600                   | Zustand `clear()` patterns       |
+| **hooks**                            | ~10             | ~140                   | Residual hook patterns           |
 | **HomePage — Search & tables**       | ~20             | ~200                   | Residual list/table patterns     |
 | **HomePage — Nabewerking**           | ~15             | ~150                   | Residual nabewerking patterns    |
 | **HomePage — Other**                 | ~18             | ~200                   | Layout, misc                     |
@@ -82,26 +82,7 @@ Repeated request validation and create/update boilerplate.
 
 ---
 
-### 3. Zustand store — initial state vs `clear()`
-
-**25 clusters · ~461 redundant lines · hooks**
-
-Store `clear()` functions copy the entire initial state block — duplicated inside the same file or across stores.
-
-
-| Block size   | Occurrences    | Key files                                                                                          |
-| ------------ | -------------- | -------------------------------------------------------------------------------------------------- |
-| **40 lines** | 2× (same file) | `useReuseFlightPlan.ts`                                                                            |
-| **36 lines** | 2× (same file) | `flightPlanStates.ts` *(moved to `hooks/zustand/voorbereiding/` — may clear on rescan)*            |
-| 18–21 lines  | 2–3×           | `useFinishedPlansState`, `useReuseFlightPlan`, `templateFlightStates`                              |
-| 6–9 lines    | 5×             | Shared `clear()` field-reset pattern across Nabewerking stores                                      |
-
-
-**Suggested fix:** Define `initialState` once per store; `clear: () => set(initialState)`.
-
----
-
-### 4. Edit point form steps
+### 3. Edit point form steps
 
 **~3 clusters · ~17 redundant lines · Tools vs Voorbereiding**
 
@@ -118,7 +99,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 5. View plan — add points
+### 4. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -134,7 +115,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 6. Layout components
+### 5. Layout components
 
 **3 clusters · ~38 redundant lines**
 
@@ -148,7 +129,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 7. Miscellaneous
+### 6. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -177,10 +158,9 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | ----- | -------------------------------- | ---------------------------- | ------ |
 | **A** | Shared `finished_plans` types (#1) | ~100                         | 1 h    |
 | **B** | Backend validation (#2)          | ~400+                        | 2–3 h  |
-| **C** | Zustand clear/initial state (#3) | ~200+                        | 2 h    |
-| **D** | Edit point forms (#4)            | ~17                          | 1 h    |
-| **E** | View plan add points (#5)        | ~194                         | 2–3 h  |
-| **F** | Layout (#6)                      | ~38                          | 1 h    |
+| **C** | Edit point forms (#3)            | ~17                          | 1 h    |
+| **D** | View plan add points (#4)        | ~194                         | 2–3 h  |
+| **E** | Layout (#5)                      | ~38                          | 1 h    |
 
 
 Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
@@ -202,8 +182,7 @@ Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
 | ---- | --------------- | ------------------------ | ----------------------------- |
 | 1    | 72              | 12 lines × 7             | Backend + frontend validation |
 | 2    | 54              | 6 lines × 10             | Backend CRUD validation       |
-| 3    | 47              | 40 lines × 2 (same file) | `useReuseFlightPlan` clear()  |
-| 4    | 43              | 43 lines × 2             | `finished_plans` types mirror |
+| 3    | 43              | 43 lines × 2             | `finished_plans` types mirror |
 
 
 ---

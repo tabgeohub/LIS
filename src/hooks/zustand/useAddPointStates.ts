@@ -23,43 +23,22 @@ interface AddPointToFlightPlanState {
   clear: () => void;
 }
 
-export const useAddPointStates = create<AddPointToFlightPlanState>((set) => ({
+const initialState = {
   step: 1,
-  setStep: (value) => set({ step: value }),
-
-  selectedPoints: [],
-  setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-  selectedPoints2: [],
-  setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-
-  selectedPlan: null,
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-
+  selectedPoints: [] as number[],
+  selectedPoints2: [] as number[],
+  selectedPlan: null as FlightPlanType | null,
   openFilter: false,
+  filteredPoints: [] as EnrichedPointType[],
+};
+
+export const useAddPointStates = create<AddPointToFlightPlanState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setSelectedPoints: (value) => set({ selectedPoints: value }),
+  setSelectedPoints2: (value) => set({ selectedPoints2: value }),
+  setSelectedPlan: (value) => set({ selectedPlan: value }),
   setOpenFilter: (value) => set({ openFilter: value }),
-
-  filteredPoints: [],
   setFilteredPoints: (value) => set({ filteredPoints: value }),
-
-  clear: () =>
-    set({
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      selectedPlan: null,
-      setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-      openFilter: false,
-      setOpenFilter: (value) => set({ openFilter: value }),
-
-      filteredPoints: [],
-      setFilteredPoints: (value) => set({ filteredPoints: value }),
-
-      selectedPoints: [],
-      setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-      selectedPoints2: [],
-      setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-    }),
+  clear: () => set(initialState),
 }));

@@ -69,79 +69,58 @@ interface FinishedPlansState {
   clear: () => void;
 }
 
-export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
+const initialState = {
   step: 1,
-  setStep: (value) => set({ step: value }),
-
-  selectedPlan: null,
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-
+  selectedPlan: null as FinishedFlightPlanType | null,
   openFilter: false,
-  setOpenFilter: (value) => set({ openFilter: value }),
-
-  filteredPoints: [],
-  setFilteredPoints: (value) => set({ filteredPoints: value }),
-
-  filteredPlans: [],
-  setFilteredPlans: (value) => set({ filteredPlans: value }),
-
+  filteredPoints: [] as FinishedPointType[],
+  filteredPlans: [] as FinishedFlightPlanType[],
   periode: "Alle",
-  setPeriode: (value) => set({ periode: value }),
-
   dateFrom: "",
-  setDateFrom: (value) => set({ dateFrom: value }),
-
   dateTo: "",
-  setDateTo: (value) => set({ dateTo: value }),
-
-  selectedPoint: null,
-  setSelectedPoint: (value) => set({ selectedPoint: value }),
-
-  selectedGeometry: null,
-  setSelectedGeometry: (value) => set({ selectedGeometry: value }),
-
+  selectedPoint: null as FinishedPointType | null,
+  selectedGeometry: null as FinishedGeometryType | null,
   omschrijving: "",
-  setOmschrijving: (value) => set({ omschrijving: value }),
-
   waarnemer: "",
-  setWaarnemer: (value) => set({ waarnemer: value }),
-
   piloot: "",
-  setPiloot: (value) => set({ piloot: value }),
-
   datum: "",
-  setDatum: (value) => set({ datum: value }),
-
   geplandeVliegduur: "",
-  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-
   typeLuchtvaartuig: "",
-  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-
-  aantalPassagiers: null,
-  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-
+  aantalPassagiers: null as number | null | undefined,
   doelEnHoofdthema: "",
-  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-
   aanvullendeInfo: "",
-  setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-
   filterTerm: "",
+};
+
+/** Subset reset when leaving the search flow (preserves form/filter fields). */
+const clearState = {
+  step: initialState.step,
+  selectedPlan: initialState.selectedPlan,
+  openFilter: initialState.openFilter,
+  filteredPoints: initialState.filteredPoints,
+};
+
+export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setSelectedPlan: (value) => set({ selectedPlan: value }),
+  setOpenFilter: (value) => set({ openFilter: value }),
+  setFilteredPoints: (value) => set({ filteredPoints: value }),
+  setFilteredPlans: (value) => set({ filteredPlans: value }),
+  setPeriode: (value) => set({ periode: value }),
+  setDateFrom: (value) => set({ dateFrom: value }),
+  setDateTo: (value) => set({ dateTo: value }),
+  setSelectedPoint: (value) => set({ selectedPoint: value }),
+  setSelectedGeometry: (value) => set({ selectedGeometry: value }),
+  setOmschrijving: (value) => set({ omschrijving: value }),
+  setWaarnemer: (value) => set({ waarnemer: value }),
+  setPiloot: (value) => set({ piloot: value }),
+  setDatum: (value) => set({ datum: value }),
+  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
+  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
+  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
+  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
+  setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
   setFilterTerm: (value) => set({ filterTerm: value }),
-
-  clear: () =>
-    set({
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      selectedPlan: null,
-      setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-      openFilter: false,
-      setOpenFilter: (value) => set({ openFilter: value }),
-
-      filteredPoints: [],
-      setFilteredPoints: (value) => set({ filteredPoints: value }),
-    }),
+  clear: () => set(clearState),
 }));

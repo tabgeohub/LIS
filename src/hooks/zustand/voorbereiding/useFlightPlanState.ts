@@ -59,115 +59,46 @@ interface FlightPlanState {
   clear: () => void;
 }
 
-export const useFlightPlanState = create<FlightPlanState>((set) => ({
+const initialState = {
   vluchtnummer: "",
-  setVluchtnummer: (value) => set({ vluchtnummer: value }),
-
   omschrijving: "",
-  setOmschrijving: (value) => set({ omschrijving: value }),
-
   waarnemer: "",
-  setWaarnemer: (value) => set({ waarnemer: value }),
-
   piloot: "",
-  setPiloot: (value) => set({ piloot: value }),
-
   datum: "",
-  setDatum: (value) => set({ datum: value }),
-
   geplandeVliegduur: "0:00",
-  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-
   typeLuchtvaartuig: "",
-  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-
-  aantalPassagiers: null,
-  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-
+  aantalPassagiers: null as number | null,
   doelEnHoofdthema: "",
-  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-
   aanvullendeInfo: "",
-  setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-
   step: 1,
+  selectedPoints: [] as number[],
+  selectedPoints2: [] as number[],
+  selectedGeometries: [] as number[],
+  selectedGeometries2: [] as number[],
+  hoveredGraphic: null as __esri.Graphic | null,
+  selectedGraphics: [] as __esri.Graphic[],
+  points: [] as EnrichedPointType[],
+};
+
+export const useFlightPlanState = create<FlightPlanState>((set) => ({
+  ...initialState,
+  setVluchtnummer: (value) => set({ vluchtnummer: value }),
+  setOmschrijving: (value) => set({ omschrijving: value }),
+  setWaarnemer: (value) => set({ waarnemer: value }),
+  setPiloot: (value) => set({ piloot: value }),
+  setDatum: (value) => set({ datum: value }),
+  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
+  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
+  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
+  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
+  setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
   setStep: (value) => set({ step: value }),
-
-  selectedPoints: [],
   setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-  selectedPoints2: [],
   setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-
-  selectedGeometries: [],
   setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-  selectedGeometries2: [],
   setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
-
-  hoveredGraphic: null,
   setHoveredGraphic: (value) => set({ hoveredGraphic: value }),
-
-  selectedGraphics: [],
   setSelectedGraphics: (value) => set({ selectedGraphics: value }),
-
-  points: [],
   setPoints: (value) => set({ points: value }),
-
-  clear: () =>
-    set({
-      vluchtnummer: "",
-      setVluchtnummer: (value) => set({ vluchtnummer: value }),
-
-      omschrijving: "",
-      setOmschrijving: (value) => set({ omschrijving: value }),
-
-      waarnemer: "",
-      setWaarnemer: (value) => set({ waarnemer: value }),
-
-      piloot: "",
-      setPiloot: (value) => set({ piloot: value }),
-
-      datum: "",
-      setDatum: (value) => set({ datum: value }),
-
-      geplandeVliegduur: "0:00",
-      setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-
-      typeLuchtvaartuig: "",
-      setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-
-      aantalPassagiers: null,
-      setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-
-      doelEnHoofdthema: "",
-      setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-
-      aanvullendeInfo: "",
-      setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      selectedPoints: [],
-      setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-      selectedPoints2: [],
-      setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-
-      selectedGeometries: [],
-      setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-      selectedGeometries2: [],
-      setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
-
-      hoveredGraphic: null,
-      setHoveredGraphic: (value) => set({ hoveredGraphic: value }),
-
-      selectedGraphics: [],
-      setSelectedGraphics: (value) => set({ selectedGraphics: value }),
-
-      points: [],
-      setPoints: (value) => set({ points: value }),
-    }),
+  clear: () => set(initialState),
 }));

@@ -42,67 +42,46 @@ interface CreateReportState {
   clear: () => void;
 }
 
-export const useCreateReportState = create<CreateReportState>((set) => ({
+const initialState = {
   step: 1,
-  setStep: (value) => set({ step: value }),
-
-  selectedPlan: null,
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-  selectedPoints: [],
-  setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-  selectedGeometries: [],
-  setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-  filteredPlans: [],
-  setFilteredPlans: (value) => set({ filteredPlans: value }),
-
+  selectedPlan: null as FinishedFlightPlanType | null,
+  selectedPoints: [] as number[],
+  selectedGeometries: [] as number[],
+  filteredPlans: [] as FinishedFlightPlanType[],
   openFilter: false,
-  setOpenFilter: (value) => set({ openFilter: value }),
-
   filterTerm: "",
-  setFilterTerm: (value) => set({ filterTerm: value }),
-
-  zipFile: null,
-  setZipFile: (value) => set({ zipFile: value }),
-
+  zipFile: null as Blob | null,
   zippingStatus: "",
-  setZippingStatus: (value) => set({ zippingStatus: value }),
-
   periode: "alle",
-  setPeriode: (value) => set({ periode: value }),
-
   dateFrom: "",
-  setDateFrom: (value) => set({ dateFrom: value }),
-
   dateTo: "",
+};
+
+/** Subset reset when leaving the wizard (preserves filteredPlans, filterTerm, zip). */
+const clearState = {
+  step: initialState.step,
+  selectedPlan: initialState.selectedPlan,
+  selectedPoints: initialState.selectedPoints,
+  selectedGeometries: initialState.selectedGeometries,
+  openFilter: initialState.openFilter,
+  periode: initialState.periode,
+  dateFrom: initialState.dateFrom,
+  dateTo: initialState.dateTo,
+};
+
+export const useCreateReportState = create<CreateReportState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setSelectedPlan: (value) => set({ selectedPlan: value }),
+  setSelectedPoints: (value) => set({ selectedPoints: value }),
+  setSelectedGeometries: (value) => set({ selectedGeometries: value }),
+  setFilteredPlans: (value) => set({ filteredPlans: value }),
+  setOpenFilter: (value) => set({ openFilter: value }),
+  setFilterTerm: (value) => set({ filterTerm: value }),
+  setZipFile: (value) => set({ zipFile: value }),
+  setZippingStatus: (value) => set({ zippingStatus: value }),
+  setPeriode: (value) => set({ periode: value }),
+  setDateFrom: (value) => set({ dateFrom: value }),
   setDateTo: (value) => set({ dateTo: value }),
-
-  clear: () =>
-    set({
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      selectedPlan: null,
-      setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-      selectedPoints: [],
-      setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-      selectedGeometries: [],
-      setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-      openFilter: false,
-      setOpenFilter: (value) => set({ openFilter: value }),
-
-      periode: "alle",
-      setPeriode: (value) => set({ periode: value }),
-
-      dateFrom: "",
-      setDateFrom: (value) => set({ dateFrom: value }),
-
-      dateTo: "",
-      setDateTo: (value) => set({ dateTo: value }),
-    }),
+  clear: () => set(clearState),
 }));

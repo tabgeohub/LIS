@@ -33,57 +33,39 @@ interface ChangePlanStatusState {
   clear: () => void;
 }
 
-export const useChangePlanStatusState = create<ChangePlanStatusState>(
-  (set) => ({
-    step: 1,
-    setStep: (value) => set({ step: value }),
+const initialState = {
+  step: 1,
+  selectedPlan: null as FlightPlanType | null,
+  selectedPoints: [] as number[],
+  filteredPlans: [] as FlightPlanType[],
+  openFilter: false,
+  filterTerm: "",
+  periode: "alle",
+  dateFrom: "",
+  dateTo: "",
+};
 
-    selectedPlan: null,
-    setSelectedPlan: (value) => set({ selectedPlan: value }),
+/** Subset reset when leaving the wizard (preserves filteredPlans, filterTerm). */
+const clearState = {
+  step: initialState.step,
+  selectedPlan: initialState.selectedPlan,
+  selectedPoints: initialState.selectedPoints,
+  openFilter: initialState.openFilter,
+  periode: initialState.periode,
+  dateFrom: initialState.dateFrom,
+  dateTo: initialState.dateTo,
+};
 
-    selectedPoints: [],
-    setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-    filteredPlans: [],
-    setFilteredPlans: (value) => set({ filteredPlans: value }),
-
-    openFilter: false,
-    setOpenFilter: (value) => set({ openFilter: value }),
-
-    filterTerm: "",
-    setFilterTerm: (value) => set({ filterTerm: value }),
-
-    periode: "alle",
-    setPeriode: (value) => set({ periode: value }),
-
-    dateFrom: "",
-    setDateFrom: (value) => set({ dateFrom: value }),
-
-    dateTo: "",
-    setDateTo: (value) => set({ dateTo: value }),
-
-    clear: () =>
-      set({
-        step: 1,
-        setStep: (value) => set({ step: value }),
-
-        selectedPlan: null,
-        setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-        selectedPoints: [],
-        setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-        openFilter: false,
-        setOpenFilter: (value) => set({ openFilter: value }),
-
-        periode: "alle",
-        setPeriode: (value) => set({ periode: value }),
-
-        dateFrom: "",
-        setDateFrom: (value) => set({ dateFrom: value }),
-
-        dateTo: "",
-        setDateTo: (value) => set({ dateTo: value }),
-      }),
-  })
-);
+export const useChangePlanStatusState = create<ChangePlanStatusState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setSelectedPlan: (value) => set({ selectedPlan: value }),
+  setSelectedPoints: (value) => set({ selectedPoints: value }),
+  setFilteredPlans: (value) => set({ filteredPlans: value }),
+  setOpenFilter: (value) => set({ openFilter: value }),
+  setFilterTerm: (value) => set({ filterTerm: value }),
+  setPeriode: (value) => set({ periode: value }),
+  setDateFrom: (value) => set({ dateFrom: value }),
+  setDateTo: (value) => set({ dateTo: value }),
+  clear: () => set(clearState),
+}));

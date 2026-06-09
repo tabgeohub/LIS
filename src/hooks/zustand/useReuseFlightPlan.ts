@@ -65,127 +65,50 @@ interface ReUseFlightPlanState {
   clear: () => void;
 }
 
-export const useReuseFlightPlan = create<ReUseFlightPlanState>((set) => ({
+const initialState = {
   step: 1,
-  setStep: (value) => set({ step: value }),
-
-  currentPoints: [],
-  setCurrentPoints: (value) => set({ currentPoints: value }),
-
-  currentGeometries: [],
-  setCurrentGeometries: (value) => set({ currentGeometries: value }),
-
-  newPoints: [],
-  setNewPoints: (value) => set({ newPoints: value }),
-
-  newGeometries: [],
-  setNewGeometries: (value) => set({ newGeometries: value }),
-
-  selectedPlan: null,
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-
+  currentPoints: [] as number[],
+  currentGeometries: [] as number[],
+  newPoints: [] as number[],
+  newGeometries: [] as number[],
+  selectedPlan: null as FlightPlanType | null,
   openFilter: false,
-  setOpenFilter: (value) => set({ openFilter: value }),
-
-  filteredPlans: [],
-  setFilteredPlans: (value) => set({ filteredPlans: value }),
-
-  filteredPoints: [],
-  setFilteredPoints: (value) => set({ filteredPoints: value }),
-
+  filteredPlans: [] as FlightPlanType[],
+  filteredPoints: [] as EnrichedPointType[],
   vluchtnummer: "",
-  setVluchtnummer: (value) => set({ vluchtnummer: value }),
-
   filterTerm: "",
-  setFilterTerm: (value) => set({ filterTerm: value }),
-
   omschrijving: "",
-  setOmschrijving: (value) => set({ omschrijving: value }),
-
   waarnemer: "",
-  setWaarnemer: (value) => set({ waarnemer: value }),
-
   piloot: "",
-  setPiloot: (value) => set({ piloot: value }),
-
   datum: "",
-  setDatum: (value) => set({ datum: value }),
-
   geplandeVliegduur: "",
-  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-
   typeLuchtvaartuig: "",
-  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-
-  aantalPassagiers: null,
-  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-
+  aantalPassagiers: null as number | null | undefined,
   doelEnHoofdthema: "",
-  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-
   aanvullendeInfo: "",
+};
+
+export const useReuseFlightPlan = create<ReUseFlightPlanState>((set) => ({
+  ...initialState,
+  setStep: (value) => set({ step: value }),
+  setCurrentPoints: (value) => set({ currentPoints: value }),
+  setCurrentGeometries: (value) => set({ currentGeometries: value }),
+  setNewPoints: (value) => set({ newPoints: value }),
+  setNewGeometries: (value) => set({ newGeometries: value }),
+  setSelectedPlan: (value) => set({ selectedPlan: value }),
+  setOpenFilter: (value) => set({ openFilter: value }),
+  setFilteredPlans: (value) => set({ filteredPlans: value }),
+  setFilteredPoints: (value) => set({ filteredPoints: value }),
+  setVluchtnummer: (value) => set({ vluchtnummer: value }),
+  setFilterTerm: (value) => set({ filterTerm: value }),
+  setOmschrijving: (value) => set({ omschrijving: value }),
+  setWaarnemer: (value) => set({ waarnemer: value }),
+  setPiloot: (value) => set({ piloot: value }),
+  setDatum: (value) => set({ datum: value }),
+  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
+  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
+  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
+  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
   setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-
-  clear: () =>
-    set({
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      currentPoints: [],
-      setCurrentPoints: (value) => set({ currentPoints: value }),
-
-      currentGeometries: [],
-      setCurrentGeometries: (value) => set({ currentGeometries: value }),
-
-      newPoints: [],
-      setNewPoints: (value) => set({ newPoints: value }),
-
-      newGeometries: [],
-      setNewGeometries: (value) => set({ newGeometries: value }),
-
-      selectedPlan: null,
-      setSelectedPlan: (value) => set({ selectedPlan: value }),
-
-      openFilter: false,
-      setOpenFilter: (value) => set({ openFilter: value }),
-
-      filteredPlans: [],
-      setFilteredPlans: (value) => set({ filteredPlans: value }),
-
-      filteredPoints: [],
-      setFilteredPoints: (value) => set({ filteredPoints: value }),
-
-      vluchtnummer: "",
-      setVluchtnummer: (value) => set({ vluchtnummer: value }),
-
-      filterTerm: "",
-      setFilterTerm: (value) => set({ filterTerm: value }),
-
-      omschrijving: "",
-      setOmschrijving: (value) => set({ omschrijving: value }),
-
-      waarnemer: "",
-      setWaarnemer: (value) => set({ waarnemer: value }),
-
-      piloot: "",
-      setPiloot: (value) => set({ piloot: value }),
-
-      datum: "",
-      setDatum: (value) => set({ datum: value }),
-
-      geplandeVliegduur: "",
-      setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-
-      typeLuchtvaartuig: "",
-      setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-
-      aantalPassagiers: null,
-      setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-
-      doelEnHoofdthema: "",
-      setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-
-      aanvullendeInfo: "",
-      setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-    }),
+  clear: () => set(initialState),
 }));

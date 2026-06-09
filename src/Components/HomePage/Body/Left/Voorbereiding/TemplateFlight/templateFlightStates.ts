@@ -29,55 +29,26 @@ interface TemplateFlightState {
   clear: () => void;
 }
 
-export const useTemplateFlightState = create<TemplateFlightState>((set) => ({
+const initialState = {
   step: 1,
+  selectedPoints: [] as number[],
+  selectedPoints2: [] as number[],
+  selectedGeometries: [] as number[],
+  selectedGeometries2: [] as number[],
+  hoveredGraphic: null as __esri.Graphic | null,
+  selectedGraphics: [] as __esri.Graphic[],
+  points: [] as EnrichedPointType[],
+};
+
+export const useTemplateFlightState = create<TemplateFlightState>((set) => ({
+  ...initialState,
   setStep: (value) => set({ step: value }),
-
-  selectedPoints: [],
   setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-  selectedPoints2: [],
   setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-
-  selectedGeometries: [],
   setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-  selectedGeometries2: [],
   setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
-
-  hoveredGraphic: null,
   setHoveredGraphic: (value) => set({ hoveredGraphic: value }),
-
-  selectedGraphics: [],
   setSelectedGraphics: (value) => set({ selectedGraphics: value }),
-
-  points: [],
   setPoints: (value) => set({ points: value }),
-
-  clear: () =>
-    set({
-      step: 1,
-      setStep: (value) => set({ step: value }),
-
-      selectedPoints: [],
-      setSelectedPoints: (value) => set({ selectedPoints: value }),
-
-      selectedPoints2: [],
-      setSelectedPoints2: (value) => set({ selectedPoints2: value }),
-
-      selectedGeometries: [],
-      setSelectedGeometries: (value) => set({ selectedGeometries: value }),
-
-      selectedGeometries2: [],
-      setSelectedGeometries2: (value) => set({ selectedGeometries2: value }),
-
-      hoveredGraphic: null,
-      setHoveredGraphic: (value) => set({ hoveredGraphic: value }),
-
-      selectedGraphics: [],
-      setSelectedGraphics: (value) => set({ selectedGraphics: value }),
-
-      points: [],
-      setPoints: (value) => set({ points: value }),
-    }),
+  clear: () => set(initialState),
 }));
