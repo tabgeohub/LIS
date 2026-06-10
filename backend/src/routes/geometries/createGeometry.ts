@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import {
+  MISSING_FIELDS_MESSAGE_WITH_PERIOD,
+  missingFields,
+  serverError,
+} from "../../helpers/routeResponses";
+import { getMissingFields, requireNonEmptyArray } from "../../helpers/validateBody";
 
 export async function createGeometry(req: Request, res: Response): Promise<void> {
   const {
@@ -11,14 +17,15 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     specifiekLettenOp,
     geometry_type,
     regio_id,
-    points, // Array of points to insert
+    points,
   } = req.body;
 
-  if (!omschrijving || !organisatie || !geometry_type || !points || !Array.isArray(points) || points.length === 0) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken.",
-    });
+  if (
+    getMissingFields(req.body, ["omschrijving", "organisatie", "geometry_type"])
+      .length > 0 ||
+    !requireNonEmptyArray(points)
+  ) {
+    missingFields(res, MISSING_FIELDS_MESSAGE_WITH_PERIOD);
     return;
   }
 
@@ -27,8 +34,6 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
   try {
     await client.query("BEGIN");
 
-    // Insert into geometries table
-    // Note: Column names should match the database schema (likely snake_case or camelCase)
     const geometryResult = await client.query(
       `INSERT INTO lis.geometries (
         omschrijving,
@@ -54,7 +59,6 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
 
     const geometryId = geometryResult.rows[0].id;
 
-    // Insert all points with the geometry_id
     const insertedPoints = [];
     for (const point of points) {
       const pointResult = await client.query(
@@ -110,17 +114,13 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     });
   } catch (err) {
     await client.query("ROLLBACK");
-    console.error(
+    serverError(
+      res,
       "Error creating geometry:",
-      err instanceof Error ? err.message : String(err)
+      `Error : ${err instanceof Error ? err.message : String(err)}`,
+      err
     );
-
-    res.status(500).json({
-      result: null,
-      message: `Error : ${err instanceof Error ? err.message : String(err)}`,
-    });
   } finally {
     client.release();
   }
 }
-

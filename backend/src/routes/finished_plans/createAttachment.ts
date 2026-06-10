@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { created, missingFields, serverError } from "../../helpers/routeResponses";
+import { getMissingFields } from "../../helpers/validateBody";
 
 export async function createAttachment(
   req: Request,
@@ -7,15 +9,14 @@ export async function createAttachment(
 ): Promise<void> {
   const { url, pointId, attachmentId, taken_at, long, lat } = req.body;
 
-  if (!pointId || !attachmentId || !taken_at || !url) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (
+    getMissingFields(req.body, ["pointId", "attachmentId", "taken_at", "url"])
+      .length > 0
+  ) {
+    missingFields(res);
     return;
   }
 
-  // Format location as "lat,long" if both are provided
   let location: string | null = null;
   if (lat !== undefined && lat !== null && long !== undefined && long !== null) {
     location = `${lat},${long}`;
@@ -27,21 +28,15 @@ export async function createAttachment(
       [url, pointId, attachmentId, taken_at, location]
     );
 
-    res.status(201).json({
-      result: result.rows[0],
-      message: "Attachment succesvol aangemaakt",
-    });
+    created(res, result.rows[0], "Attachment succesvol aangemaakt");
   } catch (err) {
-    console.error(
+    serverError(
+      res,
       "Error creating attachment:",
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to create attachment: ${
+      `Failed to create attachment: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

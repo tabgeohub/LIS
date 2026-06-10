@@ -11,9 +11,9 @@
 
 | Metric                      | Value                            |
 | --------------------------- | -------------------------------- |
-| **Duplicate clusters**      | **~187** remaining (est.)        |
+| **Duplicate clusters**      | **~142** remaining (est.)        |
 | **Severity**                | All **HIGH**                     |
-| **Total redundant lines**   | **~2,440** remaining (est.)      |
+| **Total redundant lines**   | **~1,670** remaining (est.)      |
 | **File locations affected** | **~670** (est.; rescan to confirm) |
 
 
@@ -28,7 +28,7 @@ Duplication means the **same block of code appears in multiple places**. Sigrid 
 
 | Area                                 | Clusters (est.) | Redundant lines (est.) | Notes                            |
 | ------------------------------------ | --------------- | ---------------------- | -------------------------------- |
-| **Backend** (`backend/src/routes/…`) | ~70             | ~1,060                 | Validation, CRUD                 |
+| **Backend** (`backend/src/routes/…`) | ~25             | ~290                   | Residual route patterns          |
 | **HomePage — Voorbereiding**         | ~38             | ~348                   | View plan add points             |
 | **hooks**                            | ~10             | ~140                   | Residual hook patterns           |
 | **HomePage — Search & tables**       | ~20             | ~200                   | Residual list/table patterns     |
@@ -63,26 +63,7 @@ Clusters are grouped by **what is duplicated**, not by Sigrid row order.
 
 ---
 
-### 2. Backend — route validation & CRUD
-
-**45 clusters · ~768 redundant lines**
-
-Repeated request validation and create/update boilerplate.
-
-
-| Block size   | Occurrences         | Key files                                                                                         |
-| ------------ | ------------------- | ------------------------------------------------------------------------------------------------- |
-| **12 lines** | **7×** in 5 files   | `createFinishedPlan`, `createGeometry`, `createPoint` (×3), `editPoint`, frontend edit step       |
-| **6 lines**  | **10×** in 10 files | `createEmail`, `createFlightPlan`, `createPoint`, `editPoint`, `updateVluchtPlan`, status updates |
-| **6 lines**  | **10×** in 6 files  | Missing-field checks across routes + frontend buttons                                             |
-| 7 lines      | 7–8×                | `editPointStatus`, `updateFlightPlanStatus`, email delete/update                                  |
-
-
-**Suggested fix:** `validateRequiredFields(req, fields)` middleware or shared validator; standard `handleCreate` pattern.
-
----
-
-### 3. Edit point form steps
+### 2. Edit point form steps
 
 **~3 clusters · ~17 redundant lines · Tools vs Voorbereiding**
 
@@ -99,7 +80,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 4. View plan — add points
+### 3. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -115,7 +96,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 5. Layout components
+### 4. Layout components
 
 **3 clusters · ~38 redundant lines**
 
@@ -129,7 +110,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 6. Miscellaneous
+### 5. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -145,8 +126,7 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | Item                    | Files                                             |
 | ----------------------- | ------------------------------------------------- |
 | `finished_plans` types  | `backend/src/Types/` ↔ `src/Types/`               |
-| Point create validation | `createPoint.ts` ↔ `EditPointDetails/Steps/Step2` |
-| Missing-field checks    | Multiple routes ↔ frontend form buttons           |
+| Point payload shape     | `createPoint.ts` ↔ frontend add-point buttons     |
 
 
 ---
@@ -157,13 +137,12 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | Phase | Theme                            | Est. redundant lines removed | Effort |
 | ----- | -------------------------------- | ---------------------------- | ------ |
 | **A** | Shared `finished_plans` types (#1) | ~100                         | 1 h    |
-| **B** | Backend validation (#2)          | ~400+                        | 2–3 h  |
-| **C** | Edit point forms (#3)            | ~17                          | 1 h    |
-| **D** | View plan add points (#4)        | ~194                         | 2–3 h  |
-| **E** | Layout (#5)                      | ~38                          | 1 h    |
+| **B** | Edit point forms (#2)            | ~17                          | 1 h    |
+| **C** | View plan add points (#3)        | ~194                         | 2–3 h  |
+| **D** | Layout (#4)                      | ~38                          | 1 h    |
 
 
-Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
+Phases **A + C** remove the most user-visible duplication.
 
 ---
 
@@ -180,9 +159,8 @@ Phases **A + B** remove ~800+ redundant lines with the highest clarity gain.
 
 | Rank | Redundant lines | Description              | Main locations                |
 | ---- | --------------- | ------------------------ | ----------------------------- |
-| 1    | 72              | 12 lines × 7             | Backend + frontend validation |
-| 2    | 54              | 6 lines × 10             | Backend CRUD validation       |
-| 3    | 43              | 43 lines × 2             | `finished_plans` types mirror |
+| 1    | 43              | 43 lines × 2             | `finished_plans` types mirror |
+| 2    | 33              | 33 lines × 2             | View plan points lists        |
 
 
 ---

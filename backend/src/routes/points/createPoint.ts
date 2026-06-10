@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import {
+  MISSING_FIELDS_MESSAGE_WITH_PERIOD,
+  missingFields,
+  serverError,
+} from "../../helpers/routeResponses";
+import { getMissingFields } from "../../helpers/validateBody";
 
 export async function createPoint(req: Request, res: Response): Promise<void> {
   const {
@@ -19,11 +25,8 @@ export async function createPoint(req: Request, res: Response): Promise<void> {
 
   const created_at = new Date();
 
-  if (!omschrijving || !user_id) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken.",
-    });
+  if (getMissingFields(req.body, ["omschrijving", "user_id"]).length > 0) {
+    missingFields(res, MISSING_FIELDS_MESSAGE_WITH_PERIOD);
     return;
   }
 
@@ -69,21 +72,19 @@ export async function createPoint(req: Request, res: Response): Promise<void> {
       ]
     );
 
+    const row = result.rows[0];
     res.status(201).json({
-      result: result.rows[0],
-      id: result.rows[0].id,
-      point: result.rows[0],
+      result: row,
+      id: row.id,
+      point: row,
       message: "Punt succesvol aangemaakt",
     });
   } catch (err) {
-    console.error(
+    serverError(
+      res,
       "Error creating point:",
-      err instanceof Error ? err.message : String(err)
+      `Error : ${err instanceof Error ? err.message : String(err)}`,
+      err
     );
-
-    res.status(500).json({
-      result: null,
-      message: `Error : ${err instanceof Error ? err.message : String(err)}`,
-    });
   }
 }

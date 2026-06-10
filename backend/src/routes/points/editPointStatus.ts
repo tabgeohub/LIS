@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { missingFields, notFound, okResult, serverError } from "../../helpers/routeResponses";
+import { requireId } from "../../helpers/validateBody";
 
 export async function editPointStatus(
   req: Request,
@@ -7,11 +9,8 @@ export async function editPointStatus(
 ): Promise<void> {
   const { id, status } = req.body;
 
-  if (!id) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (!requireId(id)) {
+    missingFields(res);
     return;
   }
 
@@ -27,28 +26,19 @@ export async function editPointStatus(
     );
 
     if (result.rows.length === 0) {
-      res.status(404).json({
-        result: null,
-        message: "Aandachtspunt niet gevonden",
-      });
+      notFound(res, "Aandachtspunt niet gevonden");
       return;
     }
 
-    res.status(200).json({
-      result: result.rows[0],
-      message: "Aandachtspunt succesvol bijgewerkt",
-    });
+    okResult(res, result.rows[0], "Aandachtspunt succesvol bijgewerkt");
   } catch (err) {
-    console.error(
-      `Error updating point status:`,
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to update point status: ${
+    serverError(
+      res,
+      "Error updating point status:",
+      `Failed to update point status: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

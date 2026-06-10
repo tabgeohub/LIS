@@ -200,7 +200,11 @@
 
 ---
 
-### 3. Backend — route validation & CRUD
+### 3. Backend — route validation & CRUD · **Implemented — test pending**
+
+**Shared helpers:** `backend/src/helpers/routeResponses.ts`, `validateBody.ts`, `validators/finishedPlan.ts`
+
+**Migrated routes (16):** `createPoint`, `editPoint`, `editPointStatus`, `createFlightPlan`, `updateVluchtPlan`, `updateVluchtPlanPoints`, `updateFlightPlanStatus`, `createGeometry`, `createEmail`, `updateSingleEmail`, `deleteSingleEmail`, `createTemplateFlightPlan`, `createTemplateName`, `createAttachment`, `updateFinishedPointAttachments`, `createFinishedPlan` (validator extracted).
 
 **Surfaces:** create/edit point, geometry, finished plan, flight plan, email routes + matching frontend forms.
 

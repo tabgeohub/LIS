@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { created, missingFields, serverError } from "../../helpers/routeResponses";
+import { getMissingFields } from "../../helpers/validateBody";
 
 export async function createEmail(req: Request, res: Response): Promise<void> {
   const { email, regio } = req.body;
 
-  if (!email) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (getMissingFields(req.body, ["email"]).length > 0) {
+    missingFields(res);
     return;
   }
 
@@ -18,21 +17,15 @@ export async function createEmail(req: Request, res: Response): Promise<void> {
       [email, regio]
     );
 
-    res.status(201).json({
-      result: result.rows[0],
-      message: "E-mail succesvol aangemaakt",
-    });
+    created(res, result.rows[0], "E-mail succesvol aangemaakt");
   } catch (err) {
-    console.error(
+    serverError(
+      res,
       "Error creating email:",
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to create email: ${
+      `Failed to create email: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

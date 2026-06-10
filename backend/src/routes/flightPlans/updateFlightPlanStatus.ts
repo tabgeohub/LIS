@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { missingFields, okResult, serverError } from "../../helpers/routeResponses";
+import { requireId } from "../../helpers/validateBody";
 
 export async function updateFlightPlanStatus(
   req: Request,
@@ -7,11 +9,8 @@ export async function updateFlightPlanStatus(
 ): Promise<void> {
   const { id, status } = req.body;
 
-  if (!id) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (!requireId(id)) {
+    missingFields(res);
     return;
   }
 
@@ -21,21 +20,19 @@ export async function updateFlightPlanStatus(
       [status, id]
     );
 
-    res.status(200).json({
-      result: result.rows[0],
-      message: "Status van het vluchtplan succesvol bijgewerkt",
-    });
-  } catch (err) {
-    console.error(
-      "Fout bij het bijwerken van het vluchtplan:",
-      err instanceof Error ? err.message : String(err)
+    okResult(
+      res,
+      result.rows[0],
+      "Status van het vluchtplan succesvol bijgewerkt"
     );
-
-    res.status(500).json({
-      result: null,
-      message: `Bijwerken van het vluchtplan mislukt: Error: ${
+  } catch (err) {
+    serverError(
+      res,
+      "Fout bij het bijwerken van het vluchtplan:",
+      `Bijwerken van het vluchtplan mislukt: Error: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { missingFields, notFound, okResult, serverError } from "../../helpers/routeResponses";
+import { requireId } from "../../helpers/validateBody";
 
 export async function editSingleEmail(
   req: Request,
@@ -7,11 +9,8 @@ export async function editSingleEmail(
 ): Promise<void> {
   const { id, email } = req.body;
 
-  if (!id) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (!requireId(id)) {
+    missingFields(res);
     return;
   }
 
@@ -22,28 +21,19 @@ export async function editSingleEmail(
     );
 
     if (result.rows.length === 0) {
-      res.status(404).json({
-        result: null,
-        message: "E-mail niet gevonden",
-      });
+      notFound(res, "E-mail niet gevonden");
       return;
     }
 
-    res.status(200).json({
-      result: result.rows[0],
-      message: "E-mail succesvol bijgewerkt",
-    });
+    okResult(res, result.rows[0], "E-mail succesvol bijgewerkt");
   } catch (err) {
-    console.error(
+    serverError(
+      res,
       "Error updating flight plan:",
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to update flight plan: ${
+      `Failed to update flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

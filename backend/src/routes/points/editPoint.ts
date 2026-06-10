@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { missingFields, notFound, okResult, serverError } from "../../helpers/routeResponses";
+import { requireId } from "../../helpers/validateBody";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
   const {
@@ -18,11 +20,8 @@ export async function editPoint(req: Request, res: Response): Promise<void> {
     id,
   } = req.body;
 
-  if (!id) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (!requireId(id)) {
+    missingFields(res);
     return;
   }
 
@@ -63,28 +62,19 @@ export async function editPoint(req: Request, res: Response): Promise<void> {
     );
 
     if (result.rows.length === 0) {
-      res.status(404).json({
-        result: null,
-        message: "Vluchtplan niet gevonden",
-      });
+      notFound(res, "Vluchtplan niet gevonden");
       return;
     }
 
-    res.status(200).json({
-      result: result.rows[0],
-      message: "Vluchtplan succesvol bijgewerkt",
-    });
+    okResult(res, result.rows[0], "Vluchtplan succesvol bijgewerkt");
   } catch (err) {
-    console.error(
-      `Error updating point:`,
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to update point: ${
+    serverError(
+      res,
+      "Error updating point:",
+      `Failed to update point: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

@@ -1,5 +1,13 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import {
+  MISSING_FIELDS_MESSAGE_WITH_PERIOD,
+  missingFields,
+  notFound,
+  okResult,
+  serverError,
+} from "../../helpers/routeResponses";
+import { requireArray } from "../../helpers/validateBody";
 
 export async function updateFinishedPointAttachments(
   req: Request,
@@ -10,12 +18,9 @@ export async function updateFinishedPointAttachments(
   if (
     point_id == null ||
     plan_id == null ||
-    !Array.isArray(attachments_id)
+    !requireArray(attachments_id)
   ) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken.",
-    });
+    missingFields(res, MISSING_FIELDS_MESSAGE_WITH_PERIOD);
     return;
   }
 
@@ -39,10 +44,7 @@ export async function updateFinishedPointAttachments(
 
     if (existing.rows.length === 0) {
       await client.query("ROLLBACK");
-      res.status(404).json({
-        result: null,
-        message: "Geen bestaande attachment gevonden.",
-      });
+      notFound(res, "Geen bestaande attachment gevonden.");
       return;
     }
 
@@ -75,23 +77,17 @@ export async function updateFinishedPointAttachments(
 
     await client.query("COMMIT");
 
-    res.status(200).json({
-      result: result.rows[0],
-      message: "Attachment succesvol bijgewerkt.",
-    });
+    okResult(res, result.rows[0], "Attachment succesvol bijgewerkt.");
   } catch (err) {
     await client.query("ROLLBACK");
-    console.error(
-      `Error updating point:`,
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to update point: ${
+    serverError(
+      res,
+      "Error updating point:",
+      `Failed to update point: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   } finally {
     client.release();
   }

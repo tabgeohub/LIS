@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { created, missingFields, serverError } from "../../helpers/routeResponses";
+import { getMissingFields, requireArray } from "../../helpers/validateBody";
 
 export async function createTemplateFlightPlan(
   req: Request,
@@ -7,11 +9,11 @@ export async function createTemplateFlightPlan(
 ): Promise<void> {
   const { points, name, regio_id } = req.body;
 
-  if (!points || !name || !Array.isArray(points)) {
-    res.status(400).json({
-      result: null,
-      message: "Verplichte velden ontbreken",
-    });
+  if (
+    getMissingFields(req.body, ["name"]).length > 0 ||
+    !requireArray(points)
+  ) {
+    missingFields(res);
     return;
   }
 
@@ -44,21 +46,15 @@ export async function createTemplateFlightPlan(
       [points, name, regio_id]
     );
 
-    res.status(201).json({
-      result: result.rows[0],
-      message: "De vluchttemplate is succesvol opgeslagen",
-    });
+    created(res, result.rows[0], "De vluchttemplate is succesvol opgeslagen");
   } catch (err) {
-    console.error(
+    serverError(
+      res,
       "Error creating template flight plan:",
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to creating template flight plan: ${
+      `Failed to creating template flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-    });
+      err
+    );
   }
 }

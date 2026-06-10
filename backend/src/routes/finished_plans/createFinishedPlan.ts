@@ -1,90 +1,19 @@
 import { Request, Response } from "express";
 import { PoolClient } from "pg";
 import { pool } from "../../db";
-import { EnrichedPointType } from "../../Types";
-
-function ok(res: Response, data: unknown, status = 200) {
-  return res.status(status).json(data);
-}
-function fail(
-  res: Response,
-  status: number,
-  code: string,
-  message: string,
-  details?: unknown
-) {
-  return res.status(status).json({ error: { code, message, details } });
-}
-
-type Attachment = {
-  url: string;
-  objectId?: number | string | null;
-  taken_at?: string | Date | null;
-  long?: number | null;
-  lat?: number | null;
-};
-
-type IncomingPoint = EnrichedPointType & {
-  attachments?: Attachment[] | null;
-  order?: number | null;
-  comment: string | null;
-  spoed?: number | null;
-  sendToEmail?: string | null;
-};
-
-type IncomingPlan = {
-  id: number;
-  user_id: number;
-  points: IncomingPoint[];
-  pathData?: unknown;
-  flightTime?: string | number | null;
-};
-
-function isNonEmptyArray<T>(x: unknown): x is T[] {
-  return Array.isArray(x) && x.length >= 0;
-}
-
-function validatePlan(
-  raw: any
-): { ok: true; plan: IncomingPlan } | { ok: false; reason: string } {
-  if (!raw || typeof raw !== "object")
-    return { ok: false, reason: "Request body must be a JSON object." };
-
-  const { plan } = raw as { plan?: any };
-  if (!plan || typeof plan !== "object")
-    return { ok: false, reason: "`plan` is required and must be an object." };
-
-  if (typeof plan.id !== "number" || !Number.isInteger(plan.id))
-    return { ok: false, reason: "`plan.id` must be an integer." };
-
-  if (!isNonEmptyArray<IncomingPoint>(plan.points))
-    return {
-      ok: false,
-      reason: "`plan.points` must be an array (can be empty if needed).",
-    };
-
-  for (const [i, p] of plan.points.entries()) {
-    if (typeof p !== "object")
-      return { ok: false, reason: `points[${i}] must be an object.` };
-    if (typeof p.id !== "number")
-      return { ok: false, reason: `points[${i}].id must be a number.` };
-    if (typeof p.omschrijving !== "string")
-      return {
-        ok: false,
-        reason: `points[${i}].omschrijving must be a string.`,
-      };
-  }
-
-  return { ok: true, plan };
-}
+import {
+  finishedPlanFail,
+  finishedPlanOk,
+  validateFinishedPlan,
+} from "../../helpers/validators/finishedPlan";
 
 export async function createFinishedPlan(
   req: Request,
   res: Response
 ): Promise<void> {
-  const validated = validatePlan(req.body);
+  const validated = validateFinishedPlan(req.body);
   if (!validated.ok) {
-    fail(res, 400, "ERR_VALIDATION", validated.reason);
+    finishedPlanFail(res, 400, "ERR_VALIDATION", validated.reason);
     return;
   }
   const plan = validated.plan;
@@ -93,7 +22,7 @@ export async function createFinishedPlan(
   try {
     client = await pool.connect();
   } catch (e) {
-    fail(
+    finishedPlanFail(
       res,
       500,
       "ERR_DB_CONNECT",
@@ -108,7 +37,6 @@ export async function createFinishedPlan(
 
     const negativeIdToRealId: Record<number, number> = {};
 
-    // 2) Upsert points
     for (const point of plan.points) {
       const isNew = point.id < 0;
 
@@ -175,7 +103,6 @@ export async function createFinishedPlan(
       }
     }
 
-    // 3) Replace negative IDs with newly created real IDs for the plan
     const realPointIds = plan.points.map((p) =>
       p.id < 0 ? negativeIdToRealId[p.id] : p.id
     );
@@ -189,7 +116,6 @@ export async function createFinishedPlan(
       throw new Error(`Flightplan ${plan.id} not found when updating points.`);
     }
 
-    // 4) Mark plan status as finished
     const statusRes = await client.query(
       `UPDATE lis.flightplans SET status = 'finished' WHERE id = $1`,
       [plan.id]
@@ -198,7 +124,6 @@ export async function createFinishedPlan(
       throw new Error(`Flightplan ${plan.id} not found when updating status.`);
     }
 
-    // 5) Insert path data
     await client.query(
       `INSERT INTO lis.finished_plans_path (path, planid, flighttime) VALUES ($1, $2, $3)`,
       [
@@ -208,7 +133,6 @@ export async function createFinishedPlan(
       ]
     );
 
-    // 6) Insert attachments and map by point
     const attachmentsMap: Record<number, number[]> = {};
     for (const point of plan.points) {
       const realPointId =
@@ -217,7 +141,6 @@ export async function createFinishedPlan(
 
       if (Array.isArray(point.attachments) && point.attachments.length > 0) {
         for (const attachment of point.attachments) {
-          // Format location as "lat,long" if available from attachment, otherwise use point's location
           let location: string | null = null;
           if (attachment.lat !== undefined && attachment.lat !== null && attachment.long !== undefined && attachment.long !== null) {
             location = `${attachment.lat},${attachment.long}`;
@@ -243,7 +166,6 @@ export async function createFinishedPlan(
       }
     }
 
-    // 7) Insert finished_plan rows in sequence (preserve provided order if any)
     const orderRow = await client.query(
       `SELECT MAX(point_order) AS max_order FROM lis.finished_plans WHERE plan_id = $1`,
       [plan.id]
@@ -287,7 +209,7 @@ export async function createFinishedPlan(
 
     await client.query("COMMIT");
 
-    ok(
+    finishedPlanOk(
       res,
       { message: "Vluchtplan succesvol opgeslagen", planId: plan.id },
       200
@@ -297,7 +219,7 @@ export async function createFinishedPlan(
       await client.query("ROLLBACK");
     } catch {}
     const msg = e instanceof Error ? e.message : String(e);
-    fail(res, 500, "ERR_DB_TRANSACTION", "Failed to save finished plan.", msg);
+    finishedPlanFail(res, 500, "ERR_DB_TRANSACTION", "Failed to save finished plan.", msg);
   } finally {
     client.release();
   }
