@@ -15,7 +15,7 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import Buttons from "./Buttons";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import PointsList from "./PointsList";
 import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
@@ -139,7 +139,7 @@ export default function AddPointToPlan() {
         />
       }
     >
-      <Loading loading={loading} />
+      <WizardLoadingOverlay show={loading} variant="stacked" />
 
       <Header
         setSelectedPointIds={setSelectedPointIds}
@@ -161,23 +161,5 @@ export default function AddPointToPlan() {
         setSelectedPointIds={setSelectedPointIds}
       />
     </ScrollButtonsLayout>
-  );
-}
-
-function Loading({ loading }: { loading: boolean }) {
-  return (
-    <>
-      {loading && (
-        <div className="absolute top-0 left-0 w-full h-full ">
-          <div className="relative h-full w-full">
-            <div className="absolute top-0 left-0 h-full w-full bg-gray-500/20 bg-opacity-50 z-10" />
-
-            <div className="absolute top-[30%] left-[50%] translate-x-[-50%] z-20">
-              <LoadingBars />
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 }

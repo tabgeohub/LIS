@@ -6,6 +6,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { FlightPlanType } from "Types";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import {
   buildUniquePointIds,
   drawYellowGeometries,
@@ -121,24 +122,25 @@ export default function Buttons({
   }
 
   return (
-    <div className="flex justify-end gap-x-1 text-[12px]">
-      <button
-        onClick={() => {
-          setStep(2);
+    <WizardButtonBar
+      className="flex justify-end gap-x-1 text-[12px]"
+      buttons={[
+        {
+          label: content.common.vorige,
+          onClick: () => {
+            setStep(2);
 
-          logAction({
-            message: "User clicked 'Next' button",
-            step: "Third step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}
-      </button>
-
-      <button onClick={handleSubmit} className="gray-button">
-        {content.common.opslaan}
-      </button>
-    </div>
+            logAction({
+              message: "User clicked 'Next' button",
+              step: "Third step",
+            });
+          },
+        },
+        {
+          label: content.common.opslaan,
+          onClick: handleSubmit,
+        },
+      ]}
+    />
   );
 }

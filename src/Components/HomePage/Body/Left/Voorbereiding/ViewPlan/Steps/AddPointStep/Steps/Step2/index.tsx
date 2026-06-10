@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { SpatialReference } from "Types";
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
@@ -67,29 +68,19 @@ export default function Step2({
     createNewPoint(redGraphicsLayer, setCurrentPoint, drawLon, drawLat);
   }
 
-  useEffect(() => {
-    if (coordinateSystem === "RD") {
-      const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-        "RD",
-        "WGS84",
-        xCoord,
-        yCoord
-      );
-
-      setLongitude(transformedX);
-      setLatitude(transformedY);
-    } else if (coordinateSystem === "WGS84") {
-      const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
-
-      setXCoord(transformedX);
-      setYCoord(transformedY);
-    }
-  }, [xCoord, yCoord, coordinateSystem, longitude, latitude]);
+  useCoordinateSystemSync({
+    coordinateSystem,
+    rdX: xCoord,
+    rdY: yCoord,
+    latitude,
+    longitude,
+    patchCoords: (patch) => {
+      if (patch.longitude !== undefined) setLongitude(patch.longitude);
+      if (patch.latitude !== undefined) setLatitude(patch.latitude);
+      if (patch.rdX !== undefined) setXCoord(patch.rdX);
+      if (patch.rdY !== undefined) setYCoord(patch.rdY);
+    },
+  });
 
   const content = useContent();
 

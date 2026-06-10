@@ -1,7 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { useEffect } from "react";
 
 export default function useCoordinatesWatcher() {
   const {
@@ -16,27 +14,17 @@ export default function useCoordinatesWatcher() {
     setYCoord,
   } = useEnrichedPointState();
 
-  useEffect(() => {
-    if (coordinateSystem === "RD") {
-      const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-        "RD",
-        "WGS84",
-        xCoord,
-        yCoord
-      );
-
-      setLongitude(transformedX);
-      setLatitude(transformedY);
-    } else if (coordinateSystem === "WGS84") {
-      const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
-
-      setXCoord(transformedX);
-      setYCoord(transformedY);
-    }
-  }, [xCoord, yCoord, coordinateSystem, longitude, latitude]);
+  useCoordinateSystemSync({
+    coordinateSystem,
+    rdX: xCoord,
+    rdY: yCoord,
+    latitude,
+    longitude,
+    patchCoords: (patch) => {
+      if (patch.longitude !== undefined) setLongitude(patch.longitude);
+      if (patch.latitude !== undefined) setLatitude(patch.latitude);
+      if (patch.rdX !== undefined) setXCoord(patch.rdX);
+      if (patch.rdY !== undefined) setYCoord(patch.rdY);
+    },
+  });
 }

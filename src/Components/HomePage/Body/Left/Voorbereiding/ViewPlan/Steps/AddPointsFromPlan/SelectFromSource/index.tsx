@@ -15,7 +15,8 @@ import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useUpdateData } from "utils/useUpdateData";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import Point from "@arcgis/core/geometry/Point";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
@@ -295,7 +296,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
         />
       }
     >
-      <Loading loading={dataLoading || loading} />
+      <WizardLoadingOverlay show={dataLoading || loading} variant="stacked" />
 
       {!dataLoading && !loading && !selectedItem && (
         <PlansList
@@ -326,24 +327,6 @@ export default function SelectFromSource({ source }: { source: Source }) {
         />
       )}
     </ScrollButtonsLayout>
-  );
-}
-
-function Loading({ loading }: { loading: boolean }) {
-  return (
-    <>
-      {loading && (
-        <div className="absolute top-0 left-0 w-full h-full ">
-          <div className="relative h-full w-full">
-            <div className="absolute top-0 left-0 h-full w-full bg-gray-500/20 bg-opacity-50 z-10" />
-
-            <div className="absolute top-[30%] left-[50%] translate-x-[-50%] z-20">
-              <LoadingBars />
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 }
 
@@ -449,24 +432,37 @@ function Buttons({
     );
   }
 
-  return (
-    <>
-      {!loading && !selectedItem && (
-        <button className="gray-button" onClick={() => setStep(2)}>
-          {content.common.vorige}
-        </button>
-      )}
+  if (loading) {
+    return null;
+  }
 
-      {!loading && selectedItem && (
-        <>
-          <button className="gray-button" onClick={() => setSelectedItem(null)}>
-            {content.common.vorige}
-          </button>
-          <button className="gray-button" onClick={handleSubmit}>
-            {content.common.opslaan}
-          </button>
-        </>
-      )}
-    </>
+  if (!selectedItem) {
+    return (
+      <WizardButtonBar
+        className=""
+        buttons={[
+          {
+            label: content.common.vorige,
+            onClick: () => setStep(2),
+          },
+        ]}
+      />
+    );
+  }
+
+  return (
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: content.common.vorige,
+          onClick: () => setSelectedItem(null),
+        },
+        {
+          label: content.common.opslaan,
+          onClick: handleSubmit,
+        },
+      ]}
+    />
   );
 }

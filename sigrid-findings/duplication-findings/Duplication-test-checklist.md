@@ -259,10 +259,13 @@
 
 ---
 
-### 6. Edit point form steps (Tools vs Voorbereiding)
+### 6. Edit point form steps (Tools vs Voorbereiding) · **Implemented — test pending**
+
+**Shared:** `EditPointMapClickStep`, `useCoordinateSystemSync`, `AddToPlanQuestionStep`, `FlightPlanPickerList`, `AandachtspuntDetailsFields` (Tools Step1).
 
 - [ ] Aandachtspunten verwijderen — edit point Step2 sub-forms.
 - [ ] Voorbereiding — selected point edit Step2.
+- [ ] Add to plan + view plans (both flows).
 - [ ] Field bindings, save, validation identical on both paths.
 
 ---
@@ -279,11 +282,16 @@
 
 ---
 
-### 9. View plan — add points
+### 9. View plan — add points · **Implemented — test pending**
 
-- [ ] View plan: add point to plan — points list selection.
-- [ ] Add points from another plan — source list works.
-- [ ] Coordinate watcher / update button on map.
+**Shared:** `PointsSelectionList`, `PointsSelectionHeader`, `useSortedPointSelection`, `useMapPointSelectionClick`, `useCoordinateSystemSync`, `WizardButtonBar`, `WizardLoadingOverlay`
+
+- [ ] View plan: add point to plan — points list selection, filter, select all/deselect all.
+- [ ] View plan: add points from plan/template — plan picker → points list.
+- [ ] Map click toggles point selection on both flows.
+- [ ] Pins / blue graphics sync with checkbox selection.
+- [ ] Opslaan saves points; Vorige navigates back.
+- [ ] Add point step 2 — coordinate sync (RD ↔ WGS84) and update button.
 - [ ] Selected points appear on plan after confirm.
 
 ---
