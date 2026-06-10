@@ -1,10 +1,9 @@
 import { useFormikContext } from "formik";
-import { useEffect } from "react";
 import InputFormik from "../../../Common/InputFormik";
 import SelectFormik from "../../../Common/SelectFormik";
 import { SpatialReference } from "Types";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import useLogAction from "hooks/useLogAction";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 
 export default function Step2Sub2({
   setSubStep,
@@ -34,61 +33,48 @@ export default function Step2Sub2({
     coordinateSystem: SpatialReference;
   }>();
 
-  useEffect(() => {
-    if (values.coordinateSystem === "RD") {
-      setValues({
-        ...values,
-        longitude: getTransformedCoordinates("RD", "WGS84", values.x, values.y)
-          .x,
-        latitude: getTransformedCoordinates("RD", "WGS84", values.x, values.y)
-          .y,
-      });
+  useCoordinateSystemSync({
+    coordinateSystem: values.coordinateSystem,
+    rdX: values.x,
+    rdY: values.y,
+    latitude: values.latitude,
+    longitude: values.longitude,
+    patchCoords: (patch) => {
+      if (values.coordinateSystem === "RD") {
+        setValues({
+          ...values,
+          longitude: patch.longitude ?? values.longitude,
+          latitude: patch.latitude ?? values.latitude,
+        });
 
-      logAction({
-        message: "User changed the coordinate system to RD",
-        newData: {
-          x: values.x,
-          y: values.y,
-          longitude: values.longitude,
-          latitude: values.latitude,
-        },
-      });
-    } else if (values.coordinateSystem === "WGS84") {
-      setValues({
-        ...values,
-        x: getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          values.longitude,
-          values.latitude
-        ).x,
-        y: getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          values.longitude,
-          values.latitude
-        ).y,
-      });
+        logAction({
+          message: "User changed the coordinate system to RD",
+          newData: {
+            x: values.x,
+            y: values.y,
+            longitude: values.longitude,
+            latitude: values.latitude,
+          },
+        });
+      } else if (values.coordinateSystem === "WGS84") {
+        setValues({
+          ...values,
+          x: patch.rdX ?? values.x,
+          y: patch.rdY ?? values.y,
+        });
 
-      logAction({
-        message: "User changed the coordinate system to WGS84",
-        newData: {
-          x: values.x,
-          y: values.y,
-          longitude: values.longitude,
-          latitude: values.latitude,
-        },
-      });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    values.coordinateSystem,
-    values.x,
-    values.y,
-    values.latitude,
-    values.longitude,
-  ]);
+        logAction({
+          message: "User changed the coordinate system to WGS84",
+          newData: {
+            x: values.x,
+            y: values.y,
+            longitude: values.longitude,
+            latitude: values.latitude,
+          },
+        });
+      }
+    },
+  });
 
   return (
     <div>

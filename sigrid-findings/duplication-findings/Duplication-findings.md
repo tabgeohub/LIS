@@ -11,9 +11,9 @@
 
 | Metric                      | Value                            |
 | --------------------------- | -------------------------------- |
-| **Duplicate clusters**      | **~142** remaining (est.)        |
+| **Duplicate clusters**      | **~139** remaining (est.)        |
 | **Severity**                | All **HIGH**                     |
-| **Total redundant lines**   | **~1,670** remaining (est.)      |
+| **Total redundant lines**   | **~1,570** remaining (est.)      |
 | **File locations affected** | **~670** (est.; rescan to confirm) |
 
 
@@ -49,21 +49,7 @@ Clusters are grouped by **what is duplicated**, not by Sigrid row order.
 
 ---
 
-### 1. Shared types — `finished_plans`
-
-**3 clusters · ~101 redundant lines · Backend + frontend**
-
-
-| Block size   | Occurrences | Key files                                                             |
-| ------------ | ----------- | --------------------------------------------------------------------- |
-| **43 lines** | 2×          | `backend/src/Types/finished_plans.ts` ↔ `src/Types/finished_plans.ts` |
-
-
-**Suggested fix:** Single source of truth in `src/Types/`; backend imports from there (or shared package).
-
----
-
-### 2. Edit point form steps
+### 1. Edit point form steps
 
 **~3 clusters · ~17 redundant lines · Tools vs Voorbereiding**
 
@@ -80,7 +66,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 3. View plan — add points
+### 2. View plan — add points
 
 **14 clusters · ~194 redundant lines · Voorbereiding**
 
@@ -96,7 +82,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 4. Miscellaneous
+### 3. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -109,10 +95,9 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 **21 clusters** span both backend and frontend (validation shapes, types, similar field checks). Highest priority:
 
 
-| Item                    | Files                                             |
-| ----------------------- | ------------------------------------------------- |
-| `finished_plans` types  | `backend/src/Types/` ↔ `src/Types/`               |
-| Point payload shape     | `createPoint.ts` ↔ frontend add-point buttons     |
+| Item                | Files                                         |
+| ------------------- | --------------------------------------------- |
+| Point payload shape | `createPoint.ts` ↔ frontend add-point buttons |
 
 
 ---
@@ -120,14 +105,10 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 ## Recommended fix priority
 
 
-| Phase | Theme                            | Est. redundant lines removed | Effort |
-| ----- | -------------------------------- | ---------------------------- | ------ |
-| **A** | Shared `finished_plans` types (#1) | ~100                         | 1 h    |
-| **B** | Edit point forms (#2)            | ~17                          | 1 h    |
-| **C** | View plan add points (#3)        | ~194                         | 2–3 h  |
-
-
-Phases **A + C** remove the most user-visible duplication.
+| Phase | Theme                     | Est. redundant lines removed | Effort |
+| ----- | ------------------------- | ---------------------------- | ------ |
+| **A** | Edit point forms (#1)     | ~17                          | 1 h    |
+| **B** | View plan add points (#2) | ~194                         | 2–3 h  |
 
 ---
 
@@ -142,10 +123,9 @@ Phases **A + C** remove the most user-visible duplication.
 ## Quick reference — top open clusters by redundant lines
 
 
-| Rank | Redundant lines | Description              | Main locations                |
-| ---- | --------------- | ------------------------ | ----------------------------- |
-| 1    | 43              | 43 lines × 2             | `finished_plans` types mirror |
-| 2    | 33              | 33 lines × 2             | View plan points lists        |
+| Rank | Redundant lines | Description      | Main locations         |
+| ---- | --------------- | ---------------- | ---------------------- |
+| 1    | 33              | 33 lines × 2     | View plan points lists |
 
 
 ---

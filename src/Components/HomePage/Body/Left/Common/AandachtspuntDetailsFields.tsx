@@ -19,8 +19,21 @@ export interface AandachtspuntDetailsValues {
   setSpecifiekLettenOp: (value: string) => void;
 }
 
+export interface AandachtspuntDetailsLabels {
+  vertrouwelijk?: string;
+  herhalen?: string;
+  activiteit?: string;
+  organisatie?: string;
+  specifiekLettenOp?: string;
+}
+
 interface AandachtspuntDetailsFieldsProps extends AandachtspuntDetailsValues {
   omschrijvingField: ReactNode;
+  labels?: AandachtspuntDetailsLabels;
+  hideVertrouwelijk?: boolean;
+  fieldsAfterOmschrijving?: ReactNode;
+  trailingFields?: ReactNode;
+  className?: string;
 }
 
 export default function AandachtspuntDetailsFields({
@@ -35,38 +48,49 @@ export default function AandachtspuntDetailsFields({
   specifiekLettenOp,
   setSpecifiekLettenOp,
   omschrijvingField,
+  labels,
+  hideVertrouwelijk = false,
+  fieldsAfterOmschrijving,
+  trailingFields,
+  className = "space-y-5 text-[16px]",
 }: AandachtspuntDetailsFieldsProps) {
   const content = useContent();
   const activities = useGetActiviteiten();
   const organizations = useGetOrganisaties();
 
+  const defaultLabels = content.voorbereiding.aandachtspuntAanmaken.step2;
+
   return (
-    <div className="space-y-5 text-[16px]">
-      <CheckBoxComp
-        checked={vertrouwelijk}
-        value={vertrouwelijk}
-        setValue={setVertrouwelijk}
-        label={content.voorbereiding.aandachtspuntAanmaken.step2.vertrouwelijk}
-      />
+    <div className={className}>
+      {!hideVertrouwelijk && (
+        <CheckBoxComp
+          checked={vertrouwelijk}
+          value={vertrouwelijk}
+          setValue={setVertrouwelijk}
+          label={labels?.vertrouwelijk ?? defaultLabels.vertrouwelijk}
+        />
+      )}
 
       <CheckBoxComp
         checked={herhalen}
         value={herhalen}
         setValue={setHerhalen}
-        label={content.voorbereiding.aandachtspuntAanmaken.step2.herhalen}
+        label={labels?.herhalen ?? defaultLabels.herhalen}
       />
 
       {omschrijvingField}
 
+      {fieldsAfterOmschrijving}
+
       <SelectComp
-        label={content.voorbereiding.aandachtspuntAanmaken.step2.activiteit}
+        label={labels?.activiteit ?? defaultLabels.activiteit}
         value={activiteit}
         setValue={setActiviteit}
         options={activities}
       />
 
       <SelectComp
-        label={content.voorbereiding.aandachtspuntAanmaken.step2.organisatie}
+        label={labels?.organisatie ?? defaultLabels.organisatie}
         value={organisatie}
         setValue={setOrganisatie}
         options={organizations}
@@ -77,11 +101,11 @@ export default function AandachtspuntDetailsFields({
         <TextAreaComp
           value={specifiekLettenOp}
           setValue={setSpecifiekLettenOp}
-          label={
-            content.voorbereiding.aandachtspuntAanmaken.step2.specifiekLettenOp
-          }
+          label={labels?.specifiekLettenOp ?? defaultLabels.specifiekLettenOp}
         />
       </div>
+
+      {trailingFields}
     </div>
   );
 }

@@ -1,12 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Step2Sub2({
   setSubStep,
@@ -16,6 +14,7 @@ export default function Step2Sub2({
   handleSubmit: () => void;
 }) {
   const logAction = useLogAction();
+  const content = useContent();
 
   const [coordinateSystem, setCoordinateSystem] = useState<string>("RD");
 
@@ -30,43 +29,38 @@ export default function Step2Sub2({
     setLongitude,
   } = useDeletePointState();
 
-  useEffect(() => {
-    if (coordinateSystem === "RD") {
-      setLatitude(
-        getTransformedCoordinates("RD", "WGS84", xcoordinaat_rd, ycoordinaat_rd)
-          .y
-      );
-      setLongitude(
-        getTransformedCoordinates("RD", "WGS84", xcoordinaat_rd, ycoordinaat_rd)
-          .x
-      );
-      setXCoordinaat_rd(xcoordinaat_rd);
-      setYCoordinaat_rd(ycoordinaat_rd);
-    } else if (coordinateSystem === "WGS84") {
-      setXCoordinaat_rd(
-        getTransformedCoordinates("WGS84", "RD", longitude, latitude).x
-      );
-      setYCoordinaat_rd(
-        getTransformedCoordinates("WGS84", "RD", longitude, latitude).y
-      );
-      setLatitude(latitude);
-      setLongitude(longitude);
-    }
+  useCoordinateSystemSync({
+    coordinateSystem,
+    rdX: xcoordinaat_rd,
+    rdY: ycoordinaat_rd,
+    latitude,
+    longitude,
+    patchCoords: (patch) => {
+      if (coordinateSystem === "RD") {
+        if (patch.latitude !== undefined) setLatitude(patch.latitude);
+        if (patch.longitude !== undefined) setLongitude(patch.longitude);
+        setXCoordinaat_rd(xcoordinaat_rd);
+        setYCoordinaat_rd(ycoordinaat_rd);
+      } else if (coordinateSystem === "WGS84") {
+        if (patch.rdX !== undefined) setXCoordinaat_rd(patch.rdX);
+        if (patch.rdY !== undefined) setYCoordinaat_rd(patch.rdY);
+        setLatitude(latitude);
+        setLongitude(longitude);
+      }
 
-    logAction({
-      message: "User changed coordinate system",
-      step: "Edit point details - Step 2",
-      newData: {
-        coordinateSystem,
-        xcoordinaat_rd,
-        ycoordinaat_rd,
-        latitude,
-        longitude,
-      },
-    });
-  }, [coordinateSystem, latitude, longitude, xcoordinaat_rd, ycoordinaat_rd]);
-
-  const content = useContent();
+      logAction({
+        message: "User changed coordinate system",
+        step: "Edit point details - Step 2",
+        newData: {
+          coordinateSystem,
+          xcoordinaat_rd,
+          ycoordinaat_rd,
+          latitude,
+          longitude,
+        },
+      });
+    },
+  });
 
   return (
     <div>

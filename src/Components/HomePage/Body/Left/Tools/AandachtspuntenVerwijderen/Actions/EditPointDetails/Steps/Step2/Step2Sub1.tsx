@@ -2,11 +2,11 @@
 import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import EditPointMapClickStep from "Components/HomePage/Body/Common/EditPoint/EditPointMapClickStep";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { useEffect, useState } from "react";
-import { CgSpinner } from "react-icons/cg";
 
 export default function Step2Sub1({
   setStep,
@@ -26,6 +26,7 @@ export default function Step2Sub1({
   setCurrentPoint: (value: { x: number; y: number }) => void;
 }) {
   const logAction = useLogAction();
+  const content = useContent();
 
   const { mapView, redGraphicsLayer } = useMapViewState();
 
@@ -123,77 +124,45 @@ export default function Step2Sub1({
     };
   }, [currentPoint.x, currentPoint.y, mapClickedNotify, mapView, subStep]);
 
-  const content = useContent();
-
   return (
-    <div>
-      <p className="text-gray-800 leading-3 text-[12px]">Klik op de kaart</p>
+    <EditPointMapClickStep
+      instructionText={
+        content.tools.aandachtspuntenVerwijderen.editPoint.step2.text1
+      }
+      saveLabel={content.common.opslaan}
+      enterCoordinatesLabel={
+        content.tools.aandachtspuntenVerwijderen.editPoint.step2
+          .coördinatenInvoeren
+      }
+      cancelLabel={content.common.annuleren}
+      onSave={() => {
+        handleSubmit();
 
-      <p className="text-gray-800 leading-3 text-[12px] mt-2">
-        {content.tools.aandachtspuntenVerwijderen.editPoint.step2.text1}
-      </p>
+        logAction({
+          message: "User clicked 'Save' button",
+          step: "Edit point details - Step 2",
+        });
+      }}
+      onEnterCoordinates={() => {
+        setSubStep(2);
 
-      <div className="bg-gray-100 group cursor-pointer hover:bg-primary border transition-all duration-300 w-[35px] aspect-square border-gray-200 rounded-lg flex items-center justify-center mt-4">
-        <div className="bg-primary group-hover:bg-gray-100 border w-2 h-2 rounded-full transition-all duration-300" />
-      </div>
+        logAction({
+          message: "User clicked 'Edit geometry' button",
+          step: "Edit point details - Step 2",
+        });
+      }}
+      onCancel={() => {
+        setStep(1);
 
-      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-        <button
-          onClick={() => {
-            handleSubmit();
-
-            logAction({
-              message: "User clicked 'Save' button",
-              step: "Edit point details - Step 2",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.opslaan}
-        </button>
-
-        <button
-          onClick={() => {
-            setSubStep(2);
-
-            logAction({
-              message: "User clicked 'Edit geometry' button",
-              step: "Edit point details - Step 2",
-            });
-          }}
-          className="gray-button"
-        >
-          {
-            content.tools.aandachtspuntenVerwijderen.editPoint.step2
-              .coördinatenInvoeren
-          }
-        </button>
-
-        <button
-          className="gray-button"
-          onClick={() => {
-            setStep(1);
-
-            logAction({
-              message: "User clicked 'Back' button",
-              step: "Edit point details - Step 2",
-            });
-          }}
-        >
-          {content.common.annuleren}
-        </button>
-      </div>
-
-      {isLoading && (
-        <div className="absolute h-full w-full top-0 left-0 bg-gray-100 opacity-50 z-10 flex justify-center items-center">
-          <div className="flex flex-col items-center justify-center">
-            <CgSpinner className="animate-spin text-blue-500 text-6xl" />
-            <p className="text-gray-500 text-sm">
-              {content.tools.aandachtspuntenVerwijderen.editPoint.step2.loading}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
+        logAction({
+          message: "User clicked 'Back' button",
+          step: "Edit point details - Step 2",
+        });
+      }}
+      isLoading={isLoading}
+      loadingText={
+        content.tools.aandachtspuntenVerwijderen.editPoint.step2.loading
+      }
+    />
   );
 }

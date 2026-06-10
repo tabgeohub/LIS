@@ -1,5 +1,6 @@
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
 import useLogAction from "hooks/useLogAction";
 
 export default function Step1({
@@ -17,83 +18,46 @@ export default function Step1({
   const { setSelectedBottomTab } = useSelectedBottomTabState();
 
   return (
-    <div className="p-2">
-      <p className="text-[12px]">
-        Wilt u meer dan één punt toevoegen aan een vluchtplan?
-      </p>
+    <AddToPlanQuestionStep
+      question="Wilt u meer dan één punt toevoegen aan een vluchtplan?"
+      yesLabel="Ja"
+      noLabel="Nee"
+      nextLabel="Volgende"
+      cancelLabel="Annuleren"
+      answer={answer}
+      onAnswerChange={(value) => {
+        setAnswer(value);
 
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center gap-x-2 text-sm">
-          <input
-            onClick={() => {
-              setAnswer("radio1");
+        logAction({
+          message:
+            value === "radio1"
+              ? "User clicked 'Yes' button"
+              : "User clicked 'No' button",
+          step: "Add to plan - Step 1",
+        });
+      }}
+      onNext={() => {
+        if (answer === "radio2") {
+          setStep(2);
+        } else {
+          setStep(3);
+        }
 
-              logAction({
-                message: "User clicked 'Yes' button",
-                step: "Add to plan - Step 1",
-              });
-            }}
-            checked={answer === "radio1"}
-            type="radio"
-            id="radio1"
-            name="radio"
-          />
-          <label htmlFor="radio1">Ja</label>
-        </div>
+        logAction({
+          message: "User clicked 'Next' button",
+          step: "Add to plan - Step 1",
+        });
+      }}
+      onCancel={() => {
+        setSelectedTab("none");
+        setSelectedBottomTab("Kaartlagenlijst");
 
-        <div className="flex items-center gap-x-2 text-sm">
-          <input
-            onClick={() => {
-              setAnswer("radio2");
-
-              logAction({
-                message: "User clicked 'No' button",
-                step: "Add to plan - Step 1",
-              });
-            }}
-            checked={answer === "radio2"}
-            type="radio"
-            id="radio2"
-            name="radio"
-          />
-          <label htmlFor="radio2">Nee</label>
-        </div>
-      </div>
-
-      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-        <button
-          onClick={() => {
-            if (answer === "radio2") {
-              setStep(2);
-            } else {
-              setStep(3);
-            }
-
-            logAction({
-              message: "User clicked 'Next' button",
-              step: "Add to plan - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
-          Volgende
-        </button>
-
-        <button
-          onClick={() => {
-            setSelectedTab("none");
-            setSelectedBottomTab("Kaartlagenlijst");
-
-            logAction({
-              message: "User clicked 'Cancel' button",
-              step: "Add to plan - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
-          Annuleren
-        </button>
-      </div>
-    </div>
+        logAction({
+          message: "User clicked 'Cancel' button",
+          step: "Add to plan - Step 1",
+        });
+      }}
+      radioName="voorbereidingAddToPlan"
+    />
   );
 }
