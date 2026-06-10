@@ -96,21 +96,7 @@ Duplicate Step2 sub-forms between “Aandachtspunten verwijderen” and “Selec
 
 ---
 
-### 4. Layout components
-
-**3 clusters · ~38 redundant lines**
-
-
-| Block size   | Key files                                                    |
-| ------------ | ------------------------------------------------------------ |
-| **17 lines** | `Body/Left/Common/Layout/index.tsx` ↔ `Body/Right/index.tsx` |
-
-
-**Suggested fix:** Extract shared layout wrapper.
-
----
-
-### 5. Miscellaneous
+### 4. Miscellaneous
 
 **122 clusters · ~1,350 redundant lines**
 
@@ -139,7 +125,6 @@ Smaller or one-off duplicates across Dashboard, emails, filters, import flows, e
 | **A** | Shared `finished_plans` types (#1) | ~100                         | 1 h    |
 | **B** | Edit point forms (#2)            | ~17                          | 1 h    |
 | **C** | View plan add points (#3)        | ~194                         | 2–3 h  |
-| **D** | Layout (#4)                      | ~38                          | 1 h    |
 
 
 Phases **A + C** remove the most user-visible duplication.
