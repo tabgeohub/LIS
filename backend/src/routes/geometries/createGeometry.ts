@@ -6,6 +6,10 @@ import {
   serverError,
 } from "../../helpers/routeResponses";
 import { getMissingFields, requireNonEmptyArray } from "../../helpers/validateBody";
+import {
+  buildPointInsertParams,
+  buildPointInsertSql,
+} from "../../helpers/queries/pointFields";
 
 export async function createGeometry(req: Request, res: Response): Promise<void> {
   const {
@@ -62,42 +66,18 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     const insertedPoints = [];
     for (const point of points) {
       const pointResult = await client.query(
-        `INSERT INTO lis.points (
-          omschrijving,
-          regio_id,
-          xcoordinaat_rd,
-          ycoordinaat_rd,
-          latitude,
-          longitude,
-          vertrouwelijk,
-          herhalen,
-          user_id,
-          activiteit_id,
-          organisatie_id,
-          specifiek_letten_op,
-          geometry_id,
-          soort,
-          status,
-          created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *`,
-        [
-          point.omschrijving,
-          point.regio_id,
-          point.xcoordinaat_rd,
-          point.ycoordinaat_rd,
-          point.latitude,
-          point.longitude,
-          point.vertrouwelijk,
-          point.herhalen,
-          point.user_id,
-          point.activiteit,
-          point.organisatie,
-          point.specifiekLettenOp,
+        `${buildPointInsertSql([
+          "geometry_id",
+          "soort",
+          "status",
+          "created_at",
+        ])} RETURNING *`,
+        buildPointInsertParams(point, [
           geometryId,
           "permanent",
           "niet bezocht",
           new Date(),
-        ]
+        ])
       );
       insertedPoints.push(pointResult.rows[0]);
     }

@@ -6,6 +6,10 @@ import {
   finishedPlanOk,
   validateFinishedPlan,
 } from "../../helpers/validators/finishedPlan";
+import {
+  buildPointInsertParams,
+  buildPointInsertSql,
+} from "../../helpers/queries/pointFields";
 
 export async function createFinishedPlan(
   req: Request,
@@ -41,45 +45,29 @@ export async function createFinishedPlan(
       const isNew = point.id < 0;
 
       if (isNew) {
-        const insertSql = `
-          INSERT INTO lis.points (
-            omschrijving,
-            regio_id,
-            xcoordinaat_rd,
-            ycoordinaat_rd,
-            latitude,
-            longitude,
-            vertrouwelijk,
-            herhalen,
-            user_id,
-            activiteit_id,
-            organisatie_id,
-            specifiek_letten_op,
-            created_at,
-            status,
-            soort
-          )
-          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, $14, $15)
-          RETURNING id
-        `;
+        const insertSql = `${buildPointInsertSql([
+          "created_at",
+          "status",
+          "soort",
+        ])} RETURNING id`;
 
-        const insertValues = [
-          point.omschrijving,
-          point.regio_id ?? null,
-          point.xcoordinaat_rd ?? null,
-          point.ycoordinaat_rd ?? null,
-          point.latitude ?? null,
-          point.longitude ?? null,
-          point.vertrouwelijk ?? false,
-          point.herhalen ?? false,
-          plan.user_id,
-          point.activiteit_id ?? null,
-          point.organisatie_id ?? null,
-          point.specifiek_letten_op ?? null,
-          new Date(),
-          "bezocht",
-          "adhoc",
-        ];
+        const insertValues = buildPointInsertParams(
+          point,
+          [new Date(), "bezocht", "adhoc"],
+          {
+            regio_id: point.regio_id ?? null,
+            xcoordinaat_rd: point.xcoordinaat_rd ?? null,
+            ycoordinaat_rd: point.ycoordinaat_rd ?? null,
+            latitude: point.latitude ?? null,
+            longitude: point.longitude ?? null,
+            vertrouwelijk: point.vertrouwelijk ?? false,
+            herhalen: point.herhalen ?? false,
+            user_id: plan.user_id,
+            activiteit_id: point.activiteit_id ?? null,
+            organisatie_id: point.organisatie_id ?? null,
+            specifiek_letten_op: point.specifiek_letten_op ?? null,
+          }
+        );
 
         const inserted = await client.query(insertSql, insertValues);
         const newId = inserted.rows?.[0]?.id;

@@ -2,7 +2,10 @@ import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/Aan
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import {
+  pickDeletePointFormFields,
+  useDeletePointState,
+} from "hooks/zustand/tools/useDeletePointState";
 
 export default function Form() {
   const content = useContent();
@@ -15,6 +18,10 @@ export default function Form() {
     setOrganisatie_id,
     setSpecifiek_letten_op,
     setVertrouwelijk,
+    selectedPoint,
+  } = useDeletePointState();
+
+  const {
     omschrijving,
     regio_id,
     herhalen,
@@ -23,12 +30,11 @@ export default function Form() {
     activiteit_id,
     organisatie_id,
     specifiek_letten_op,
-    selectedPoint,
     xcoordinaat_rd,
     ycoordinaat_rd,
     latitude,
     longitude,
-  } = useDeletePointState();
+  } = useDeletePointState(pickDeletePointFormFields);
 
   return (
     <AandachtspuntDetailsFields

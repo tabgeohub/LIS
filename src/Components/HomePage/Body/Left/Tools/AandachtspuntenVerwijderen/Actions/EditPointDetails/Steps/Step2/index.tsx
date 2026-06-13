@@ -1,11 +1,18 @@
 import { useState } from "react";
 import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import {
+  pickDeletePointFormFields,
+  useDeletePointState,
+} from "hooks/zustand/tools/useDeletePointState";
 import { useUpdateData } from "utils/useUpdateData";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import useLogAction from "hooks/useLogAction";
+import {
+  buildPointUpdatePayload,
+  pickPointCoreLogData,
+} from "@helpers/points/buildPointUpdatePayload";
 
 export default function Step2({
   setStep,
@@ -21,21 +28,8 @@ export default function Step2({
     y: 0,
   });
 
-  const {
-    selectedPoint,
-    omschrijving,
-    regio_id,
-    xcoordinaat_rd,
-    ycoordinaat_rd,
-    latitude,
-    longitude,
-    vertrouwelijk,
-    herhalen,
-    user_id,
-    activiteit_id,
-    organisatie_id,
-    specifiek_letten_op,
-  } = useDeletePointState();
+  const formFields = useDeletePointState(pickDeletePointFormFields);
+  const { selectedPoint } = useDeletePointState();
 
   const { mapView, redGraphicsLayer } = useMapViewState();
 
@@ -44,22 +38,11 @@ export default function Step2({
   function handleSubmit() {
     if (!selectedPoint) return;
 
-    const newPoint = {
-      omschrijving,
-      regio_id,
-      xcoordinaat_rd,
-      ycoordinaat_rd,
-      latitude,
-      longitude,
-      vertrouwelijk,
-      herhalen: herhalen ? 1 : 0,
-      user_id,
-      activiteit_id,
-      organisatie_id,
-      specifiek_letten_op,
-      datum: selectedPoint?.created_at,
-      id: selectedPoint?.id,
-    };
+    const newPoint = buildPointUpdatePayload(
+      formFields,
+      selectedPoint.id,
+      selectedPoint.created_at
+    );
 
     update(newPoint, (responseData) => {
       if (!responseData.result) return;
@@ -79,20 +62,7 @@ export default function Step2({
       logAction({
         message: "User clicked 'Save' button",
         step: "Edit point details - Step 2",
-        newData: {
-          omschrijving: selectedPoint.omschrijving,
-          regio_id: selectedPoint.regio_id,
-          xcoordinaat_rd: selectedPoint.xcoordinaat_rd,
-          ycoordinaat_rd: selectedPoint.ycoordinaat_rd,
-          latitude: selectedPoint.latitude,
-          longitude: selectedPoint.longitude,
-          vertrouwelijk: selectedPoint.vertrouwelijk,
-          herhalen: selectedPoint.herhalen,
-          user_id: selectedPoint.user_id,
-          activiteit_id: selectedPoint.activiteit_id,
-          organisatie_id: selectedPoint.organisatie_id,
-          specifiek_letten_op: selectedPoint.specifiek_letten_op,
-        },
+        newData: pickPointCoreLogData(selectedPoint),
       });
     });
   }

@@ -1,24 +1,14 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import {
+  buildPointUpdateParams,
+  buildPointUpdateSql,
+} from "../../helpers/queries/pointFields";
 import { missingFields, notFound, okResult, serverError } from "../../helpers/routeResponses";
 import { requireId } from "../../helpers/validateBody";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
-  const {
-    omschrijving,
-    regio_id,
-    xcoordinaat_rd,
-    ycoordinaat_rd,
-    latitude,
-    longitude,
-    vertrouwelijk,
-    herhalen,
-    user_id,
-    activiteit_id,
-    organisatie_id,
-    specifiek_letten_op,
-    id,
-  } = req.body;
+  const { id } = req.body;
 
   if (!requireId(id)) {
     missingFields(res);
@@ -27,38 +17,8 @@ export async function editPoint(req: Request, res: Response): Promise<void> {
 
   try {
     const result = await pool.query(
-      `
-      UPDATE lis.points SET
-        omschrijving = $1,
-        regio_id = $2,
-        xcoordinaat_rd = $3,
-        ycoordinaat_rd = $4,
-        latitude = $5,
-        longitude = $6,
-        herhalen = $7,
-        vertrouwelijk = $8,
-        user_id = $9,
-        activiteit_id = $10,
-        organisatie_id = $11,
-        specifiek_letten_op = $12
-      WHERE id = $13
-      RETURNING *;
-    `,
-      [
-        omschrijving,
-        regio_id,
-        xcoordinaat_rd,
-        ycoordinaat_rd,
-        latitude,
-        longitude,
-        herhalen,
-        vertrouwelijk,
-        user_id,
-        activiteit_id,
-        organisatie_id,
-        specifiek_letten_op,
-        id,
-      ]
+      buildPointUpdateSql(),
+      buildPointUpdateParams(req.body, id)
     );
 
     if (result.rows.length === 0) {
