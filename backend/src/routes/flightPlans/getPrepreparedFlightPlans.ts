@@ -1,36 +1,17 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
-import { buildFlightPlanQuery } from "../../helpers/queries/buildFlightPlanQuery";
-import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
+import { fetchFlightPlanList } from "../../helpers/queries/fetchFlightPlanList";
 
 export async function getPrepreparedFlightPlans(
   req: Request,
   res: Response
 ): Promise<void> {
-  try {
-    const regio_id = resolveRegioFilter(req);
-
-    const { query, params } = buildFlightPlanQuery({
-      columnPreset: "search",
-      pointPreset: "search",
-      where: "fp.status = 'pre-prepared'",
-      regio_id,
-      regioFilter: { caseInsensitiveAdmin: true },
-    });
-
-    const result = await pool.query(query, params);
-
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error(
-      "❌ Error fetching pre-prepared flight plans:",
-      err instanceof Error ? err.message : String(err)
-    );
-    res.status(500).json({
-      result: null,
-      message: `Failed to fetch pre-prepared flight plans: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-    });
-  }
+  await fetchFlightPlanList(req, res, {
+    columnPreset: "search",
+    pointPreset: "search",
+    where: "fp.status = 'pre-prepared'",
+    regioFilter: { caseInsensitiveAdmin: true },
+    useRegioFilter: true,
+    errorLogLabel: "❌ Error fetching pre-prepared flight plans:",
+    errorMessage: "Failed to fetch pre-prepared flight plans",
+  });
 }

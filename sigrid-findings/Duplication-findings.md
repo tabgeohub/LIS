@@ -2,7 +2,7 @@
 
 **Source:** `Duplication findings.csv` + `Duplicates.csv`  
 **Sigrid pillar:** Maintainability (code duplication)  
-**Scan date:** 2026-06-10 (post-deploy)  
+**Scan date:** 2026-06-10 (post-deploy) · **Last fix:** point payload cross-stack (tested ✓)
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |--------|-------|
-| **Duplicate clusters** | **73** |
+| **Duplicate clusters** | **~69** remaining (est.) |
 | **Severity** | All **HIGH** |
-| **Total redundant lines** | **895** |
-| **File locations affected** | **184** |
+| **Total redundant lines** | **~733** remaining (est.) |
+| **File locations affected** | **~159** remaining (est.) |
 
-**Progress vs original scan (2026-06-04):** 398 clusters → **73** (−82%) · 1,038 file locations → **184** (−82%)
+**Progress vs original scan (2026-06-04):** 398 clusters → **~69** (−83%) · 1,038 file locations → **~159** (−85%)
 
 ---
 
@@ -23,8 +23,8 @@
 
 | Area | File locations | Notes |
 |------|----------------|-------|
-| **backend** | 155 | Routes, query helpers, validation |
-| **HomePage** | 13 | Residual Tools edit-point + small UI hits |
+| **backend** | ~130 | Routes, query helpers |
+| **HomePage** | ~4 | Residual small UI hits |
 | **Types** | 12 | `backend/Types` ↔ `src/Types` mirrors |
 | **DevicesUpdatesPage** | 2 | Types mirror with backend |
 | **helpers** | 1 | Zustand users management types |
@@ -38,55 +38,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 1. Route validation & error responses (cross-stack)
-
-**4 clusters · ~162 redundant lines**
-
-Shared validation/error-response patterns across backend CRUD routes and Tools edit-point UI. Partially introduced by the shared `routeResponses` / `validateBody` refactor — Sigrid still counts the repeated pattern as duplication.
-
-| Block | Occurrences | Redundant | Key files |
-|-------|-------------|-----------|-----------|
-| 12 lines | 6× | 60 | backend/…/routes/finished_plans/createFinishedPlan.ts, backend/…/routes/geometries/createGeometry.ts, backend/…/routes/points/createPoint.ts (+2 more) |
-| 6 lines | 9× | 48 | backend/…/routes/finished_plans/createFinishedPlan.ts, backend/…/routes/geometries/createGeometry.ts, backend/…/routes/points/createPoint.ts (+3 more) |
-| 7 lines | 7× | 42 | backend/…/routes/finished_plans/createFinishedPlan.ts, backend/…/routes/geometries/createGeometry.ts, backend/…/routes/points/createPoint.ts (+3 more) |
-| 6 lines | 3× | 12 | backend/…/routes/points/editPoint.ts, …/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx, …/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Form.tsx |
-
-<details>
-<summary>File locations (4 clusters ≥ 12 redundant lines)</summary>
-
-| File | Lines | Dup % |
-|------|-------|-------|
-| `backend/…/routes/finished_plans/createFinishedPlan.ts` | L46–57 | 7.5% |
-| `backend/…/routes/geometries/createGeometry.ts` | L66–77 | 14.6% |
-| `backend/…/routes/points/createPoint.ts` | L36–47 | 22.2% |
-| `backend/…/routes/points/createPoint.ts` | L57–68 | 22.2% |
-| `backend/…/routes/points/editPoint.ts` | L8–19 | 19.0% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step2/index.tsx` | L26–37 | 17.1% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` | L44–49 | 8.5% |
-| `backend/…/routes/finished_plans/createFinishedPlan.ts` | L46–51 | 3.8% |
-| `backend/…/routes/geometries/createGeometry.ts` | L66–71 | 7.3% |
-| `backend/…/routes/points/createPoint.ts` | L36–41 | 11.1% |
-| `backend/…/routes/points/createPoint.ts` | L57–62 | 11.1% |
-| `backend/…/routes/points/editPoint.ts` | L8–13 | 9.5% |
-| `backend/…/routes/points/editPoint.ts` | L48–53 | 9.5% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step2/index.tsx` | L26–31 | 8.6% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step2/index.tsx` | L48–53 | 8.6% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` | L44–50 | 9.9% |
-| `backend/…/routes/finished_plans/createFinishedPlan.ts` | L46–52 | 4.4% |
-| `backend/…/routes/geometries/createGeometry.ts` | L66–72 | 8.5% |
-| `backend/…/routes/points/createPoint.ts` | L36–42 | 13.0% |
-| `backend/…/routes/points/createPoint.ts` | L57–63 | 13.0% |
-| `backend/…/routes/points/editPoint.ts` | L8–14 | 11.1% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step2/index.tsx` | L48–54 | 10.0% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` | L23–28 | 8.5% |
-| `backend/…/routes/points/editPoint.ts` | L54–59 | 9.5% |
-| `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Form.tsx` | L20–25 | 10.3% |
-
-</details>
-
----
-
-### 2. Flight plan routes
+### 1. Flight plan routes
 
 **13 clusters · ~153 redundant lines**
 
@@ -132,7 +84,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 3. Shared types (backend ↔ frontend)
+### 2. Shared types (backend ↔ frontend)
 
 **10 clusters · ~132 redundant lines**
 
@@ -171,7 +123,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 4. Query helpers (internal duplication)
+### 3. Query helpers (internal duplication)
 
 **11 clusters · ~124 redundant lines**
 
@@ -213,7 +165,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 5. HomePage — other UI
+### 4. HomePage — other UI
 
 **4 clusters · ~51 redundant lines**
 
@@ -242,7 +194,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 6. Template flight routes
+### 5. Template flight routes
 
 **4 clusters · ~49 redundant lines**
 
@@ -268,7 +220,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 7. Keycloak / user management
+### 6. Keycloak / user management
 
 **5 clusters · ~36 redundant lines**
 
@@ -282,7 +234,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 8. Devices updates
+### 7. Devices updates
 
 **4 clusters · ~35 redundant lines**
 
@@ -305,7 +257,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 9. Miscellaneous backend
+### 8. Miscellaneous backend
 
 **5 clusters · ~35 redundant lines**
 
@@ -319,7 +271,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 10. Timeslider routes
+### 9. Timeslider routes
 
 **2 clusters · ~26 redundant lines**
 
@@ -340,7 +292,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 11. Constants routes
+### 10. Constants routes
 
 **2 clusters · ~25 redundant lines**
 
@@ -363,7 +315,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 12. Point & geometry routes
+### 11. Point & geometry routes
 
 **5 clusters · ~34 redundant lines**
 
@@ -387,7 +339,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 13. Finished plans routes
+### 12. Finished plans routes
 
 **3 clusters · ~20 redundant lines**
 
@@ -399,7 +351,7 @@ Shared validation/error-response patterns across backend CRUD routes and Tools e
 
 ---
 
-### 14. Installations
+### 13. Installations
 
 **1 cluster · ~7 redundant lines**
 
@@ -415,9 +367,6 @@ Clusters that span both backend and frontend:
 
 | Redundant lines | Description | Locations |
 |-----------------|-------------|-----------|
-| 60 | 12 lines occurring 6 times in 5 files | `backend/…/routes/finished_plans/createFinishedPlan.ts` L46–57, `backend/…/routes/geometries/createGeometry.ts` L66–77, `backend/…/routes/points/createPoint.ts` L36–47, `backend/…/routes/points/createPoint.ts` L57–68 (+2) |
-| 48 | 6 lines occurring 9 times in 6 files | `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` L44–49, `backend/…/routes/finished_plans/createFinishedPlan.ts` L46–51, `backend/…/routes/geometries/createGeometry.ts` L66–71, `backend/…/routes/points/createPoint.ts` L36–41 (+5) |
-| 42 | 7 lines occurring 7 times in 6 files | `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` L44–50, `backend/…/routes/finished_plans/createFinishedPlan.ts` L46–52, `backend/…/routes/geometries/createGeometry.ts` L66–72, `backend/…/routes/points/createPoint.ts` L36–42 (+3) |
 | 28 | 28 lines occurring 2 times in 2 files | `backend/…/Types/index.ts` L57–88, `src/Types/index.ts` L93–124 |
 | 24 | 6 lines occurring 5 times in 5 files | `src/Types/finished_plans.ts` L31–36, `…/Left/Voorbereiding/FlightPlan/Steps/Step1/ImportVluchtPlan.tsx` L14–19, `backend/…/Types/index.ts` L3–8, `src/Types/index.ts` L5–10 (+1) |
 | 21 | 7 lines occurring 4 times in 4 files | `src/Types/finished_plans.ts` L30–36, `backend/…/Types/index.ts` L2–8, `src/Types/index.ts` L4–10, `backend/…/routes/geometries/updateGeometry.ts` L5–11 |
@@ -425,7 +374,6 @@ Clusters that span both backend and frontend:
 | 14 | 14 lines occurring 2 times in 2 files | `backend/…/Types/index.ts` L101–118, `src/Types/index.ts` L139–156 |
 | 12 | 12 lines occurring 2 times in 2 files | `backend/…/Types/index.ts` L24–35, `src/Types/index.ts` L29–40 |
 | 12 | 6 lines occurring 3 times in 3 files | `backend/…/routes/points/createPointFromImport.ts` L115–120, `…/Bottom/PointsView/PointsTable/index.tsx` L16–21, `…/Left/Voorbereiding/ViewPlan/Steps/Step1/SinglePlan.tsx` L32–37 |
-| 12 | 6 lines occurring 3 times in 3 files | `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx` L23–28, `backend/…/routes/points/editPoint.ts` L54–59, `…/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Form.tsx` L20–25 |
 | 11 | 11 lines occurring 2 times in 2 files | `backend/…/routes/keycloak/management/users/types.ts` L1–11, `src/helpers/ZustandStates/usersManagementState.ts` L3–13 |
 | 11 | 11 lines occurring 2 times in 2 files | `backend/…/Types/index.ts` L36–46, `src/Types/index.ts` L42–52 |
 | 9 | 9 lines occurring 2 times in 2 files | `…/Bottom/PointsView/PointsTable/index.tsx` L18–26, `backend/…/helpers/queries/pointJson.ts` L74–82 |
@@ -437,11 +385,10 @@ Clusters that span both backend and frontend:
 
 | Phase | Theme | Est. redundant lines | Effort |
 |-------|-------|---------------------|--------|
-| **A** | Route validation & error responses (cross-stack) | ~162 | 1–2 h |
-| **B** | Shared types (backend ↔ frontend) | ~132 | 2–3 h |
-| **C** | Query helpers (pointJson, formatPlanGeometries) | ~124 | 2–3 h |
-| **D** | Flight plan routes | ~153 | 2–3 h |
-| **E** | Remaining (timeslider, keycloak, consts, misc) | ~324 | opportunistic |
+| **A** | Shared types (backend ↔ frontend) | ~132 | 2–3 h |
+| **B** | Query helpers (pointJson, formatPlanGeometries) | ~124 | 2–3 h |
+| **C** | Flight plan routes | ~153 | 2–3 h |
+| **D** | Remaining (timeslider, keycloak, consts, misc) | ~324 | opportunistic |
 
 ---
 
@@ -449,21 +396,18 @@ Clusters that span both backend and frontend:
 
 | Rank | Redundant | Block | Main locations |
 |------|-----------|-------|----------------|
-| 1 | 60 | 12 lines occurring 6 times in 5 files | backend/…/routes/finished_plans/createFinishedPlan.ts, backend/…/routes/geometries/createGeometry.ts (+4) |
-| 2 | 48 | 6 lines occurring 9 times in 6 files | …/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx, backend/…/routes/finished_plans/createFinishedPlan.ts (+7) |
-| 3 | 42 | 7 lines occurring 7 times in 6 files | …/Left/Tools/AandachtspuntenVerwijderen/Actions/EditPointDetails/Steps/Step1/Buttons.tsx, backend/…/routes/finished_plans/createFinishedPlan.ts (+5) |
-| 4 | 30 | 10 lines occurring 4 times in 2 files | backend/…/routes/flightPlans/createFlightPlan.ts, backend/…/routes/flightPlans/createFlightPlan.ts (+2) |
-| 5 | 28 | 28 lines occurring 2 times in 2 files | backend/…/Types/index.ts, src/Types/index.ts |
-| 6 | 24 | 6 lines occurring 5 times in 5 files | backend/…/routes/flightPlans/getAllFlightPlans.ts, backend/…/routes/flightPlans/getFullPreparedFlightPlans.ts (+3) |
-| 7 | 24 | 6 lines occurring 5 times | backend/…/helpers/queries/pointJson.ts, backend/…/helpers/queries/pointJson.ts (+3) |
-| 8 | 24 | 6 lines occurring 5 times in 5 files | src/Types/finished_plans.ts, …/Left/Voorbereiding/FlightPlan/Steps/Step1/ImportVluchtPlan.tsx (+3) |
-| 9 | 21 | 7 lines occurring 4 times | backend/…/helpers/queries/pointJson.ts, backend/…/helpers/queries/pointJson.ts (+2) |
-| 10 | 21 | 7 lines occurring 4 times in 4 files | src/Types/finished_plans.ts, backend/…/Types/index.ts (+2) |
-| 11 | 18 | 18 lines occurring 2 times in 2 files | backend/…/routes/timeslider/getGeometryPlanImages.ts, backend/…/routes/timeslider/getPointPlanImages.ts |
-| 12 | 18 | 6 lines occurring 4 times in 4 files | backend/…/routes/consts/getActiviteiten.ts, backend/…/routes/consts/getLuchtvaartuig.ts (+2) |
-| 13 | 16 | 8 lines occurring 3 times in 3 files | backend/…/routes/flightPlans/getFullPreparedFlightPlans.ts, backend/…/routes/flightPlans/getSearchedFlightPlans.ts (+1) |
-| 14 | 14 | 14 lines occurring 2 times | backend/…/routes/flightPlans/createFlightPlan.ts, backend/…/routes/flightPlans/createFlightPlan.ts |
-| 15 | 14 | 14 lines occurring 2 times in 2 files | backend/…/Types/index.ts, src/Types/index.ts |
+| 1 | 30 | 10 lines occurring 4 times in 2 files | backend/…/routes/flightPlans/createFlightPlan.ts, backend/…/routes/flightPlans/updateVluchtPlan.ts |
+| 2 | 28 | 28 lines occurring 2 times in 2 files | backend/…/Types/index.ts, src/Types/index.ts |
+| 3 | 24 | 6 lines occurring 5 times in 5 files | backend/…/routes/flightPlans/getAllFlightPlans.ts, backend/…/routes/flightPlans/getFullPreparedFlightPlans.ts (+3) |
+| 4 | 24 | 6 lines occurring 5 times | backend/…/helpers/queries/pointJson.ts (+4) |
+| 5 | 24 | 6 lines occurring 5 times in 5 files | src/Types/finished_plans.ts, …/Left/Voorbereiding/FlightPlan/Steps/Step1/ImportVluchtPlan.tsx (+3) |
+| 6 | 21 | 7 lines occurring 4 times | backend/…/helpers/queries/pointJson.ts (+3) |
+| 7 | 21 | 7 lines occurring 4 times in 4 files | src/Types/finished_plans.ts, backend/…/Types/index.ts (+2) |
+| 8 | 18 | 18 lines occurring 2 times in 2 files | backend/…/routes/timeslider/getGeometryPlanImages.ts, backend/…/routes/timeslider/getPointPlanImages.ts |
+| 9 | 18 | 6 lines occurring 4 times in 4 files | backend/…/routes/consts/getActiviteiten.ts, backend/…/routes/consts/getLuchtvaartuig.ts (+2) |
+| 10 | 16 | 8 lines occurring 3 times in 3 files | backend/…/routes/flightPlans/getFullPreparedFlightPlans.ts, backend/…/routes/flightPlans/getSearchedFlightPlans.ts (+1) |
+| 11 | 14 | 14 lines occurring 2 times | backend/…/routes/flightPlans/createFlightPlan.ts |
+| 12 | 14 | 14 lines occurring 2 times in 2 files | backend/…/Types/index.ts, src/Types/index.ts |
 
 ---
 
@@ -471,6 +415,6 @@ Clusters that span both backend and frontend:
 
 | File | Contents |
 |------|----------|
-| `Duplication findings.csv` | 73 duplicate clusters — one row per cluster |
-| `Duplicates.csv` | 184 rows — one row per file location per cluster |
+| `Duplication findings.csv` | ~69 duplicate clusters — one row per cluster (rescan to confirm) |
+| `Duplicates.csv` | ~159 rows — one row per file location per cluster (rescan to confirm) |
 | `Duplication-findings.md` | **This document** — grouped cluster status |
