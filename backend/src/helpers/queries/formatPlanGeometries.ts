@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { buildGeometryPointsJsonAgg } from "./geometryJson";
 
 type RawPoint = Record<string, unknown> & {
   geometry_id?: number | null;
@@ -30,37 +31,60 @@ function stripGeometryFields(point: RawPoint) {
   return pointWithoutGeometry;
 }
 
+type SplitPointsOptions<T> = {
+  createGeometryGroup: (point: RawPoint, geometryId: number) => T;
+  addPointToGeometry: (group: T, point: RawPoint) => void;
+};
+
+function splitPointsByGeometry<T>(
+  points: RawPoint[],
+  options: SplitPointsOptions<T>
+): { standalonePoints: Record<string, unknown>[]; geometries: T[] } {
+  const standalonePoints: Record<string, unknown>[] = [];
+  const geometriesMap = new Map<number, T>();
+
+  points.forEach((point) => {
+    if (point.geometry_id) {
+      const geometryId = point.geometry_id;
+
+      if (!geometriesMap.has(geometryId)) {
+        geometriesMap.set(
+          geometryId,
+          options.createGeometryGroup(point, geometryId)
+        );
+      }
+
+      options.addPointToGeometry(geometriesMap.get(geometryId)!, point);
+    } else {
+      standalonePoints.push(stripGeometryFields(point));
+    }
+  });
+
+  return {
+    standalonePoints,
+    geometries: Array.from(geometriesMap.values()),
+  };
+}
+
 export function formatPlansWithGeometries(plans: Record<string, unknown>[]) {
   return plans.map((plan) => {
     const points = (plan.points as RawPoint[] | null) ?? [];
-    const pointsWithoutGeometry: Record<string, unknown>[] = [];
-    const geometriesMap = new Map<number, GeometryGroup>();
-
-    points.forEach((point) => {
-      if (point.geometry_id) {
-        const geometryId = point.geometry_id;
-
-        if (!geometriesMap.has(geometryId)) {
-          geometriesMap.set(geometryId, {
-            id: geometryId,
-            type: point.geometry_type ?? null,
-            omschrijving: point.geometry_omschrijving ?? null,
-            points: [],
-          });
-        }
-
-        geometriesMap
-          .get(geometryId)!
-          .points.push(stripGeometryFields(point));
-      } else {
-        pointsWithoutGeometry.push(stripGeometryFields(point));
-      }
+    const { standalonePoints, geometries } = splitPointsByGeometry(points, {
+      createGeometryGroup: (point, geometryId) => ({
+        id: geometryId,
+        type: point.geometry_type ?? null,
+        omschrijving: point.geometry_omschrijving ?? null,
+        points: [],
+      }),
+      addPointToGeometry: (group, point) => {
+        group.points.push(stripGeometryFields(point));
+      },
     });
 
     return {
       ...plan,
-      points: pointsWithoutGeometry,
-      geometries: Array.from(geometriesMap.values()),
+      points: standalonePoints,
+      geometries,
     };
   });
 }
@@ -90,6 +114,7 @@ export async function fetchGeometryDataMap(
     return geometryDataMap;
   }
 
+  const pointsAgg = buildGeometryPointsJsonAgg("coords", "p");
   const geometryQuery = `
         SELECT
           g.id,
@@ -101,16 +126,7 @@ export async function fetchGeometryDataMap(
           g.specifiek_letten_op,
           g.type,
           g.regio_id,
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'id', p.id,
-              'longitude', p.longitude,
-              'latitude', p.latitude,
-              'xcoordinaat_rd', p.xcoordinaat_rd,
-              'ycoordinaat_rd', p.ycoordinaat_rd
-            )
-            ORDER BY p.id ASC
-          ) AS points
+          ${pointsAgg} AS points
         FROM lis.geometries g
         JOIN lis.points p ON p.geometry_id = g.id
         WHERE g.id = ANY($1)
@@ -138,34 +154,22 @@ export function formatFinishedPlansWithGeometries(
 ) {
   return plans.map((plan) => {
     const points = (plan[pointsField] as RawPoint[] | null) ?? [];
-    const pointsWithoutGeometry: Record<string, unknown>[] = [];
-    const geometriesMap = new Map<number, FinishedGeometryGroup>();
-
-    points.forEach((point) => {
-      if (point.geometry_id) {
-        const geometryId = point.geometry_id;
-
-        if (!geometriesMap.has(geometryId)) {
-          geometriesMap.set(geometryId, {
-            id: geometryId,
-            geometry_type: point.geometry_type ?? null,
-            geometry_omschrijving: point.geometry_omschrijving ?? null,
-            points: [],
-          });
-        }
-
-        geometriesMap
-          .get(geometryId)!
-          .points.push(stripGeometryFields(point));
-      } else {
-        pointsWithoutGeometry.push(stripGeometryFields(point));
-      }
+    const { standalonePoints, geometries } = splitPointsByGeometry(points, {
+      createGeometryGroup: (point, geometryId) => ({
+        id: geometryId,
+        geometry_type: point.geometry_type ?? null,
+        geometry_omschrijving: point.geometry_omschrijving ?? null,
+        points: [],
+      }),
+      addPointToGeometry: (group, point) => {
+        group.points.push(stripGeometryFields(point));
+      },
     });
 
     return {
       ...plan,
-      [pointsField]: pointsWithoutGeometry,
-      geometries: Array.from(geometriesMap.values()),
+      [pointsField]: standalonePoints,
+      geometries,
     };
   });
 }
@@ -176,49 +180,41 @@ export function formatTemplatePlansWithGeometries(
 ) {
   return plans.map((plan) => {
     const points = (plan.points as RawPoint[] | null) ?? [];
-    const pointsWithoutGeometry: Record<string, unknown>[] = [];
-    const geometriesMap = new Map<number, GeometryGroup>();
+    const { standalonePoints, geometries } = splitPointsByGeometry(points, {
+      createGeometryGroup: (point, geometryId) => {
+        const fullGeometryData = geometryDataMap.get(geometryId);
 
-    points.forEach((point) => {
-      if (point.geometry_id) {
-        const geometryId = point.geometry_id;
-
-        if (!geometriesMap.has(geometryId)) {
-          const fullGeometryData = geometryDataMap.get(geometryId);
-
-          if (fullGeometryData) {
-            geometriesMap.set(geometryId, {
-              id: geometryId,
-              type: (fullGeometryData.type as string | null) ?? null,
-              omschrijving:
-                (fullGeometryData.omschrijving as string | null) ?? null,
-              organisatie: fullGeometryData.organisatie,
-              vertrouwelijk: fullGeometryData.vertrouwelijk,
-              herhalen: fullGeometryData.herhalen,
-              activiteit: fullGeometryData.activiteit,
-              specifiek_letten_op: fullGeometryData.specifiek_letten_op,
-              regio_id: fullGeometryData.regio_id,
-              points:
-                (fullGeometryData.points as Record<string, unknown>[]) ?? [],
-            });
-          } else {
-            geometriesMap.set(geometryId, {
-              id: geometryId,
-              type: point.geometry_type ?? null,
-              omschrijving: point.geometry_omschrijving ?? null,
-              points: [],
-            });
-          }
+        if (fullGeometryData) {
+          return {
+            id: geometryId,
+            type: (fullGeometryData.type as string | null) ?? null,
+            omschrijving:
+              (fullGeometryData.omschrijving as string | null) ?? null,
+            organisatie: fullGeometryData.organisatie,
+            vertrouwelijk: fullGeometryData.vertrouwelijk,
+            herhalen: fullGeometryData.herhalen,
+            activiteit: fullGeometryData.activiteit,
+            specifiek_letten_op: fullGeometryData.specifiek_letten_op,
+            regio_id: fullGeometryData.regio_id,
+            points:
+              (fullGeometryData.points as Record<string, unknown>[]) ?? [],
+          };
         }
-      } else {
-        pointsWithoutGeometry.push(stripGeometryFields(point));
-      }
+
+        return {
+          id: geometryId,
+          type: point.geometry_type ?? null,
+          omschrijving: point.geometry_omschrijving ?? null,
+          points: [],
+        };
+      },
+      addPointToGeometry: () => {},
     });
 
     return {
       ...plan,
-      points: pointsWithoutGeometry,
-      geometries: Array.from(geometriesMap.values()),
+      points: standalonePoints,
+      geometries,
     };
   });
 }

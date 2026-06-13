@@ -2,7 +2,7 @@
 
 **Source:** `Duplication findings.csv` + `Duplicates.csv`  
 **Sigrid pillar:** Maintainability (code duplication)  
-**Scan date:** 2026-06-10 (post-deploy) · **Last fixes:** point payload cross-stack ✓ · flight plan routes ✓ · backend shared types trim ✓ (tested)
+**Scan date:** 2026-06-10 (post-deploy) · **Last fixes:** point payload cross-stack ✓ · flight plan routes ✓ · backend shared types trim ✓ · query helpers ✓ (tested)
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |--------|-------|
-| **Duplicate clusters** | **~46** remaining (est.) |
+| **Duplicate clusters** | **~35** remaining (est.) |
 | **Severity** | All **HIGH** |
-| **Total redundant lines** | **~460** remaining (est.) |
-| **File locations affected** | **~108** remaining (est.) |
+| **Total redundant lines** | **~336** remaining (est.) |
+| **File locations affected** | **~92** remaining (est.) |
 
-**Progress vs original scan (2026-06-04):** 398 clusters → **~46** (−88%) · 1,038 file locations → **~108** (−90%)
+**Progress vs original scan (2026-06-04):** 398 clusters → **~35** (−91%) · 1,038 file locations → **~92** (−91%)
 
 ---
 
@@ -23,7 +23,7 @@
 
 | Area | File locations | Notes |
 |------|----------------|-------|
-| **backend** | ~95 | Query helpers, residual routes |
+| **backend** | ~80 | Residual routes, timeslider, keycloak |
 | **HomePage** | ~4 | Residual small UI hits |
 | **Types** | 2 | Residual cross-stack (`KeycloakUser` only) |
 | **DevicesUpdatesPage** | 2 | Types mirror with backend |
@@ -38,49 +38,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 1. Query helpers (internal duplication)
-
-**11 clusters · ~124 redundant lines**
-
-| Block | Occurrences | Redundant | Key files |
-|-------|-------------|-----------|-----------|
-| 6 lines | 5× | 24 | backend/…/helpers/queries/pointJson.ts |
-| 7 lines | 4× | 21 | backend/…/helpers/queries/pointJson.ts |
-| 13 lines | 2× | 13 | backend/…/helpers/queries/formatPlanGeometries.ts, backend/…/routes/geometries/getGeometries.ts |
-| 6 lines | 3× | 12 | backend/…/helpers/queries/flightPlanColumns.ts |
-| 10 lines | 2× | 10 | backend/…/helpers/queries/pointJson.ts |
-| 8 lines | 2× | 8 | backend/…/helpers/queries/formatPlanGeometries.ts |
-| 8 lines | 2× | 8 | backend/…/helpers/queries/formatPlanGeometries.ts |
-| 8 lines | 2× | 8 | backend/…/helpers/queries/formatPlanGeometries.ts |
-| 7 lines | 2× | 7 | backend/…/helpers/queries/pointJson.ts |
-| 7 lines | 2× | 7 | backend/…/helpers/queries/flightPlanColumns.ts |
-| 6 lines | 2× | 6 | backend/…/helpers/queries/formatPlanGeometries.ts |
-
-<details>
-<summary>File locations (4 clusters ≥ 12 redundant lines)</summary>
-
-| File | Lines | Dup % |
-|------|-------|-------|
-| `backend/…/helpers/queries/pointJson.ts` | L31–36 | 3.2% |
-| `backend/…/helpers/queries/pointJson.ts` | L44–49 | 3.2% |
-| `backend/…/helpers/queries/pointJson.ts` | L53–58 | 3.2% |
-| `backend/…/helpers/queries/pointJson.ts` | L72–77 | 3.2% |
-| `backend/…/helpers/queries/pointJson.ts` | L88–93 | 3.2% |
-| `backend/…/helpers/queries/pointJson.ts` | L31–37 | 3.8% |
-| `backend/…/helpers/queries/pointJson.ts` | L44–50 | 3.8% |
-| `backend/…/helpers/queries/pointJson.ts` | L53–59 | 3.8% |
-| `backend/…/helpers/queries/pointJson.ts` | L88–94 | 3.8% |
-| `backend/…/helpers/queries/formatPlanGeometries.ts` | L94–106 | 8.2% |
-| `backend/…/routes/geometries/getGeometries.ts` | L10–22 | 25.5% |
-| `backend/…/helpers/queries/flightPlanColumns.ts` | L27–32 | 10.7% |
-| `backend/…/helpers/queries/flightPlanColumns.ts` | L35–40 | 10.7% |
-| `backend/…/helpers/queries/flightPlanColumns.ts` | L44–49 | 10.7% |
-
-</details>
-
----
-
-### 2. HomePage — other UI
+### 1. HomePage — other UI
 
 **4 clusters · ~51 redundant lines**
 
@@ -107,7 +65,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 3. Template flight routes
+### 2. Template flight routes
 
 **4 clusters · ~49 redundant lines**
 
@@ -133,7 +91,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 4. Keycloak / user management
+### 3. Keycloak / user management
 
 **5 clusters · ~36 redundant lines**
 
@@ -147,7 +105,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 5. Devices updates
+### 4. Devices updates
 
 **4 clusters · ~35 redundant lines**
 
@@ -170,7 +128,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 6. Miscellaneous backend
+### 5. Miscellaneous backend
 
 **5 clusters · ~35 redundant lines**
 
@@ -184,7 +142,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 7. Timeslider routes
+### 6. Timeslider routes
 
 **2 clusters · ~26 redundant lines**
 
@@ -205,7 +163,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 8. Constants routes
+### 7. Constants routes
 
 **2 clusters · ~25 redundant lines**
 
@@ -228,7 +186,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 9. Point & geometry routes
+### 8. Point & geometry routes
 
 **5 clusters · ~34 redundant lines**
 
@@ -252,7 +210,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 10. Finished plans routes
+### 9. Finished plans routes
 
 **3 clusters · ~20 redundant lines**
 
@@ -264,7 +222,7 @@ Clusters grouped by **what is duplicated**. **Redundant lines** = total copy-pas
 
 ---
 
-### 11. Installations
+### 10. Installations
 
 **1 cluster · ~7 redundant lines**
 
@@ -289,14 +247,16 @@ Clusters that span both backend and frontend:
 
 **Resolved (2026-06-10, tested ✓):** Removed `backend/src/Types/index.ts` — backend now uses API-only types colocated with validators (`finishedPlan.ts`) and `pointFields.ts` for point payloads. Frontend `src/Types/*` unchanged. `KeycloakUser` mirror (~11 lines) left intentional.
 
+**Resolved (query helpers, tested ✓):** Composed `pointJson.ts` presets from field groups; added `geometryJson.ts` for shared geometry point `JSON_AGG`; extracted `splitPointsByGeometry()` in `formatPlanGeometries.ts`; deduped `flightPlanColumns.ts` standard presets.
+
 ---
 
 ## Recommended fix priority
 
 | Phase | Theme | Est. redundant lines | Effort |
 |-------|-------|---------------------|--------|
-| **A** | Query helpers (pointJson, formatPlanGeometries) | ~124 | 2–3 h |
-| **B** | Remaining (timeslider, keycloak, consts, misc) | ~336 | opportunistic |
+| **A** | HomePage UI + template flight routes | ~100 | 2–3 h |
+| **B** | Remaining (timeslider, keycloak, consts, misc) | ~236 | opportunistic |
 
 ---
 
@@ -304,14 +264,13 @@ Clusters that span both backend and frontend:
 
 | Rank | Redundant | Block | Main locations |
 |------|-----------|-------|----------------|
-| 1 | 24 | 6 lines occurring 5 times | `backend/…/helpers/queries/pointJson.ts` (+4) |
-| 2 | 18 | 6 lines occurring 4 times in 4 files | `src/Types/finished_plans.ts`, `…/ImportVluchtPlan.tsx` (+2) |
-| 3 | 21 | 7 lines occurring 4 times | `backend/…/helpers/queries/pointJson.ts` (+3) |
-| 4 | 18 | 18 lines occurring 2 times in 2 files | `backend/…/routes/timeslider/getGeometryPlanImages.ts`, `backend/…/routes/timeslider/getPointPlanImages.ts` |
-| 5 | 18 | 6 lines occurring 4 times in 4 files | `backend/…/routes/consts/getActiviteiten.ts`, `backend/…/routes/consts/getLuchtvaartuig.ts` (+2) |
-| 6 | 13 | 13 lines occurring 2 times in 2 files | `backend/…/helpers/queries/formatPlanGeometries.ts`, `backend/…/routes/geometries/getGeometries.ts` |
-| 7 | 12 | 6 lines occurring 3 times in 3 files | `createPointFromImport.ts`, `PointsTable/index.tsx`, `SinglePlan.tsx` |
-| 8 | 11 | 11 lines occurring 2 times in 2 files | `keycloak/…/users/types.ts`, `usersManagementState.ts` |
+| 1 | 24 | 6 lines occurring 5 times in 5 files | `src/Types/finished_plans.ts`, `…/ImportVluchtPlan.tsx` (+3) |
+| 2 | 24 | 6 lines occurring 5 times | `getAllFlightPlans.ts`, `getFullPreparedFlightPlans.ts` (+3) |
+| 3 | 18 | 18 lines occurring 2 times in 2 files | `getGeometryPlanImages.ts`, `getPointPlanImages.ts` |
+| 4 | 18 | 6 lines occurring 4 times in 4 files | `getActiviteiten.ts`, `getLuchtvaartuig.ts` (+2) |
+| 5 | 12 | 6 lines occurring 3 times in 3 files | `createPointFromImport.ts`, `PointsTable/index.tsx`, `SinglePlan.tsx` |
+| 6 | 11 | 11 lines occurring 2 times in 2 files | `keycloak/…/users/types.ts`, `usersManagementState.ts` |
+| 7 | 9 | 9 lines occurring 2 times in 2 files | `PointsTable/index.tsx`, `pointJson.ts` (cross-stack field list) |
 
 ---
 
@@ -319,6 +278,6 @@ Clusters that span both backend and frontend:
 
 | File | Contents |
 |------|----------|
-| `Duplication findings.csv` | ~46 duplicate clusters — one row per cluster (rescan to confirm) |
-| `Duplicates.csv` | ~108 rows — one row per file location per cluster (rescan to confirm) |
+| `Duplication findings.csv` | ~35 duplicate clusters — one row per cluster (rescan to confirm) |
+| `Duplicates.csv` | ~92 rows — one row per file location per cluster (rescan to confirm) |
 | `Duplication-findings.md` | **This document** — grouped cluster status |
