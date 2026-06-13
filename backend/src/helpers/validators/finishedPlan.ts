@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { EnrichedPointType } from "../../Types";
 
 export function finishedPlanOk(res: Response, data: unknown, status = 200) {
   return res.status(status).json(data);
@@ -15,7 +14,7 @@ export function finishedPlanFail(
   return res.status(status).json({ error: { code, message, details } });
 }
 
-type Attachment = {
+type FinishedPlanAttachment = {
   url: string;
   objectId?: number | string | null;
   taken_at?: string | Date | null;
@@ -23,8 +22,21 @@ type Attachment = {
   lat?: number | null;
 };
 
-type IncomingPoint = EnrichedPointType & {
-  attachments?: Attachment[] | null;
+type IncomingPoint = {
+  id: number;
+  omschrijving: string;
+  regio_id?: string;
+  xcoordinaat_rd?: number;
+  ycoordinaat_rd?: number;
+  latitude?: number;
+  longitude?: number;
+  vertrouwelijk?: number;
+  herhalen?: number;
+  user_id?: number;
+  activiteit_id?: string;
+  organisatie_id?: string;
+  specifiek_letten_op?: string;
+  attachments?: FinishedPlanAttachment[] | null;
   order?: number | null;
   comment: string | null;
   spoed?: number | null;

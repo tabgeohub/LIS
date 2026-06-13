@@ -1,21 +1,8 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import type { PointCorePayload } from "../../helpers/queries/pointFields";
 
-type PointPayload = {
-  id?: number;
-  omschrijving?: string;
-  regio_id?: string;
-  xcoordinaat_rd?: number;
-  ycoordinaat_rd?: number;
-  latitude?: number;
-  longitude?: number;
-  vertrouwelijk?: number;
-  herhalen?: number;
-  user_id?: number;
-  activiteit_id?: string;
-  organisatie_id?: string;
-  specifiek_letten_op?: string;
-};
+type PointPayload = PointCorePayload & { id?: number };
 
 /**
  * PATCH /api/geometries/:id

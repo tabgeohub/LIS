@@ -15,6 +15,8 @@ export const POINT_CORE_COLUMNS = [
 
 export type PointCoreColumn = (typeof POINT_CORE_COLUMNS)[number];
 
+export type PointCorePayload = Partial<Record<PointCoreColumn, unknown>>;
+
 export type PointCoreSource = Record<string, unknown>;
 
 export function normalizePointCoreFields(
