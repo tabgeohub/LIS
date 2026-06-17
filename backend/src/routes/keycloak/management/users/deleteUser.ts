@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToken";
-import { getAdminBase } from "./helpers";
-import { fetch } from "undici";
+import {
+  handleKeycloakRouteError,
+  keycloakAdminFetch,
+} from "./keycloakAdminClient";
 
 export async function handleDeleteUser(req: Request, res: Response) {
   try {
@@ -11,15 +12,8 @@ export async function handleDeleteUser(req: Request, res: Response) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const adminToken = await getKeycloakAdminToken(req);
-    const adminBase = getAdminBase(req);
-
-    const response = await fetch(`${adminBase}/users/${id}`, {
+    const response = await keycloakAdminFetch(req, `/users/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-        "Content-Type": "application/json",
-      },
     });
 
     if (!response.ok) {
@@ -40,9 +34,7 @@ export async function handleDeleteUser(req: Request, res: Response) {
     }
 
     res.json({ success: true });
-  } catch (error: any) {
-    const message = error?.message || "Failed to delete user";
-    return res.status(500).json({ error: message });
+  } catch (error: unknown) {
+    handleKeycloakRouteError(res, error, "Failed to delete user");
   }
 }
-

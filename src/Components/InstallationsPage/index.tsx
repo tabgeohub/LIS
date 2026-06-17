@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-
-type InstallerMeta = {
-  originalName: string;
-  savedAs: string;
-  size: number;
-  mimetype: string;
-  uploadedAt: string;
-  version: string | null;
-};
+import type { InstallerMeta } from "Types/installer";
 
 function formatSize(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";

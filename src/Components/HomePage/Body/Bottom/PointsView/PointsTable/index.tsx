@@ -12,20 +12,9 @@ import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 
-const allColumnsPoints = [
-  "omschrijving",
-  "regio_id",
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
-  "herhalen",
-  "vertrouwelijk",
-  "activiteit_id",
-  "organisatie_id",
-  "specifiek_letten_op",
-  "datum",
-];
+import { POINT_CORE_DISPLAY_COLUMNS } from "@helpers/points/pointColumnKeys";
+
+const allColumnsPoints = [...POINT_CORE_DISPLAY_COLUMNS];
 
 export default function PointsTable({
   starredPoints,

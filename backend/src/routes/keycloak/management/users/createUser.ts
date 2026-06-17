@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToken";
-import { getAdminBase } from "./helpers";
 import { updateUserRoles } from "./updateUserRoles";
-import { fetch } from "undici";
+import {
+  handleKeycloakRouteError,
+  keycloakAdminFetch,
+} from "./keycloakAdminClient";
 
 export async function createUser(
   userData: {
@@ -13,15 +14,8 @@ export async function createUser(
   },
   req: Request
 ): Promise<string> {
-  const adminToken = await getKeycloakAdminToken(req);
-  const adminBase = getAdminBase(req);
-
-  const response = await fetch(`${adminBase}/users`, {
+  const response = await keycloakAdminFetch(req, "/users", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${adminToken}`,
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       username: userData.username,
       email: userData.email,
@@ -44,7 +38,6 @@ export async function createUser(
     throw new Error(`Failed to create user (${response.status}): ${text}`);
   }
 
-  // Get the user ID from the Location header
   const location = response.headers.get("Location");
   if (!location) {
     throw new Error("Failed to get user ID from response");
@@ -55,15 +48,11 @@ export async function createUser(
     throw new Error("Failed to extract user ID from location");
   }
 
-  // Set the password
-  const passwordResponse = await fetch(
-    `${adminBase}/users/${userId}/reset-password`,
+  const passwordResponse = await keycloakAdminFetch(
+    req,
+    `/users/${userId}/reset-password`,
     {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         type: "password",
         value: userData.password,
@@ -73,15 +62,9 @@ export async function createUser(
   );
 
   if (!passwordResponse.ok) {
-    // Try to delete the user if password setting fails
     try {
-      await fetch(`${adminBase}/users/${userId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-    } catch (deleteError) {
+      await keycloakAdminFetch(req, `/users/${userId}`, { method: "DELETE" });
+    } catch {
       // Ignore delete errors
     }
 
@@ -99,29 +82,19 @@ export async function createUser(
     );
   }
 
-  // Fetch the user to get current state
-  const getUserResponse = await fetch(`${adminBase}/users/${userId}`, {
+  const getUserResponse = await keycloakAdminFetch(req, `/users/${userId}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${adminToken}`,
-      "Content-Type": "application/json",
-    },
   });
 
   if (getUserResponse.ok) {
-    const userData = (await getUserResponse.json()) as any;
+    const existingUser = (await getUserResponse.json()) as Record<string, unknown>;
 
-    // Update user to ensure it's fully set up for login
-    const updateResponse = await fetch(`${adminBase}/users/${userId}`, {
+    const updateResponse = await keycloakAdminFetch(req, `/users/${userId}`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
-        ...userData,
+        ...existingUser,
         enabled: true,
-        emailVerified: userData.email ? true : userData.emailVerified,
+        emailVerified: existingUser.email ? true : existingUser.emailVerified,
         requiredActions: [],
       }),
     });
@@ -149,7 +122,6 @@ export async function handleCreateUser(req: Request, res: Response) {
       return res.status(400).json({ error: "Password is required" });
     }
 
-    // Create the user
     const userId = await createUser(
       {
         username,
@@ -160,15 +132,12 @@ export async function handleCreateUser(req: Request, res: Response) {
       req
     );
 
-    // Assign role if provided (single role, not array)
     if (role) {
       await updateUserRoles(userId, [role], req);
     }
 
     res.json({ success: true, userId });
-  } catch (error: any) {
-    const message = error?.message || "Failed to create user";
-    return res.status(500).json({ error: message });
+  } catch (error: unknown) {
+    handleKeycloakRouteError(res, error, "Failed to create user");
   }
 }
-

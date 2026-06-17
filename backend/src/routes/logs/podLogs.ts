@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { logsFailureMessage } from "../../helpers/queries/logFields";
 
 export async function podLogs(req: Request, res: Response): Promise<void> {
   try {
@@ -13,9 +14,7 @@ export async function podLogs(req: Request, res: Response): Promise<void> {
   } catch (err) {
     res.status(500).json({
       result: null,
-      message: `Failed to create logs: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
+      message: logsFailureMessage(err),
     });
   }
 }

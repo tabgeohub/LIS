@@ -10,6 +10,10 @@ import {
   renderWrongPasswordPage,
   sendHtml,
 } from "../helpers/renderDownloadPage";
+import {
+  buildDownloadActionPath,
+  resolveDownloadFilename,
+} from "../helpers/fileDownloadHelpers";
 
 dotenv.config();
 
@@ -17,39 +21,16 @@ const router = express.Router();
 
 const uploadDir = path.join(__dirname, "..", "uploads");
 
-// strict filename: "<timestamp>-<uuid>.zip"
-const FILE_RE = /^\d{10,13}-[0-9a-fA-F-]{36}\.zip$/;
-
-function isExpiredFromName(name: string): boolean {
-  const ts = Number(name.split("-")[0]);
-  if (!Number.isFinite(ts)) return true;
-  const now = Date.now();
-  const sevenDays = 7 * 24 * 60 * 60 * 1000;
-  return now - ts > sevenDays;
-}
-
-function parseValidFilename(raw: string): string | null {
-  const filename = String(raw || "");
-  return FILE_RE.test(filename) ? filename : null;
-}
-
-function buildDownloadActionPath(filename: string): string {
-  return `/api/file-download/${encodeURIComponent(filename)}`;
-}
-
 const setPasswordHandler: RequestHandler<
   { filename: string },
   any,
   { password: string }
 > = (req, res) => {
-  const filename = parseValidFilename(req.params.filename || "");
+  const filename = resolveDownloadFilename(req, res, () => {
+    res.status(410).send("❌ Link verlopen");
+  });
 
   if (!filename) {
-    res.status(400).send("❌ Ongeldige bestandsnaam");
-    return;
-  }
-  if (isExpiredFromName(filename)) {
-    res.status(410).send("❌ Link verlopen");
     return;
   }
 
@@ -77,15 +58,11 @@ router.post(
 );
 
 router.get("/:filename", (req, res) => {
-  const filename = parseValidFilename(req.params.filename || "");
+  const filename = resolveDownloadFilename(req, res, (response) => {
+    sendHtml(response, renderExpiredDownloadPage());
+  });
 
   if (!filename) {
-    res.status(400).send("❌ Ongeldige bestandsnaam");
-    return;
-  }
-
-  if (isExpiredFromName(filename)) {
-    sendHtml(res, renderExpiredDownloadPage());
     return;
   }
 
@@ -103,16 +80,12 @@ const downloadWithPasswordHandler: RequestHandler<
   any,
   { password: string }
 > = (req, res) => {
-  const filename = parseValidFilename(req.params.filename || "");
   const password = String(req.body?.password || "");
+  const filename = resolveDownloadFilename(req, res, (response) => {
+    sendHtml(response, renderExpiredDownloadPage());
+  });
 
   if (!filename) {
-    res.status(400).send("❌ Ongeldige bestandsnaam");
-    return;
-  }
-
-  if (isExpiredFromName(filename)) {
-    sendHtml(res, renderExpiredDownloadPage());
     return;
   }
 

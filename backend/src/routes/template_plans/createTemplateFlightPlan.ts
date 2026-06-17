@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import { pool } from "../../db";
 import { created, missingFields, serverError } from "../../helpers/routeResponses";
 import { getMissingFields, requireArray } from "../../helpers/validateBody";
+import {
+  findTemplatePlanByName,
+  respondTemplateNameTaken,
+} from "../../helpers/queries/templatePlanHelpers";
 
 export async function createTemplateFlightPlan(
   req: Request,
@@ -18,16 +22,10 @@ export async function createTemplateFlightPlan(
   }
 
   try {
-    const existingTemplate = await pool.query(
-      `SELECT * FROM lis.template_plans WHERE name = $1`,
-      [name]
-    );
+    const existingTemplate = await findTemplatePlanByName(name);
 
     if (existingTemplate.rows.length > 0) {
-      res.status(400).json({
-        result: null,
-        message: "Er bestaat al een sjabloon met deze naam.",
-      });
+      respondTemplateNameTaken(res);
       return;
     }
 

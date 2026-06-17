@@ -13,6 +13,7 @@ import useLogAction from "hooks/useLogAction";
 import { classNames } from "@helpers/classNames";
 import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
 import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
+import { POINT_EXPORT_COLUMNS } from "@helpers/points/pointColumnKeys";
 
 export default function SinglePlan({
   plan,
@@ -27,22 +28,7 @@ export default function SinglePlan({
   const { setSelectedPlan, selectedPlan } = useViewPlanState();
 
   const exportExcel = (plan: FlightPlanType) => {
-    const columns = [
-      "geometry",
-      "omschrijving",
-      "regio_id",
-      "xcoordinaat_rd",
-      "ycoordinaat_rd",
-      "latitude",
-      "longitude",
-      "herhalen",
-      "vertrouwelijk",
-      "indiener_id",
-      "activiteit_id",
-      "organisatie_id",
-      "specifiek_letten_op",
-      "datum",
-    ] as const;
+    const columns = [...POINT_EXPORT_COLUMNS] as const;
 
     const toJaNee = (v: number): string => {
       if (typeof v === "boolean") return v ? "ja" : "nee";

@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { getAdminBase } from "./helpers";
-import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToken";
-import { fetch } from "undici";
+import {
+  handleKeycloakRouteError,
+  keycloakAdminFetch,
+} from "./keycloakAdminClient";
 
 export async function handleResetPassword(req: Request, res: Response) {
   try {
@@ -16,19 +17,12 @@ export async function handleResetPassword(req: Request, res: Response) {
       return res.status(400).json({ error: "Password is required" });
     }
 
-    const adminToken = await getKeycloakAdminToken(req);
-    const adminBase = getAdminBase(req);
-
-    const response = await fetch(`${adminBase}/users/${id}/reset-password`, {
+    const response = await keycloakAdminFetch(req, `/users/${id}/reset-password`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         type: "password",
         value: password,
-        temporary: temporary,
+        temporary,
       }),
     });
 
@@ -50,9 +44,7 @@ export async function handleResetPassword(req: Request, res: Response) {
     }
 
     res.json({ success: true });
-  } catch (error: any) {
-    const message = error?.message || "Failed to reset password";
-    return res.status(500).json({ error: message });
+  } catch (error: unknown) {
+    handleKeycloakRouteError(res, error, "Failed to reset password");
   }
 }
-

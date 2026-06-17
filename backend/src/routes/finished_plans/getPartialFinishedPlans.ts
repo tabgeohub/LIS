@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { pool } from "../../db";
 import { buildFinishedPlansWithPointsQuery } from "../../helpers/queries/buildFinishedPlanQuery";
 import { formatFinishedPlansWithGeometries } from "../../helpers/queries/formatPlanGeometries";
+import { sendFinishedPlanFetchError } from "../../helpers/finishedPlanRouteHelpers";
 import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 
 export async function getPartialFinishedFlightPlans(
@@ -17,18 +18,7 @@ export async function getPartialFinishedFlightPlans(
     const formattedPlans = formatFinishedPlansWithGeometries(result.rows);
 
     res.status(200).json(formattedPlans);
-  } catch (error: any) {
-    console.error("❌ Error fetching finished flightplans:", error);
-    res.status(500).json({
-      message: "Failed to fetch finished flightplans",
-      error: {
-        name: error?.name,
-        code: error?.code,
-        hint: error?.hint,
-        position: error?.position,
-        detail: error?.detail,
-        stack: error?.stack,
-      },
-    });
+  } catch (error: unknown) {
+    sendFinishedPlanFetchError(res, error);
   }
 }

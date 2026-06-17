@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import type { PointCorePayload } from "../../helpers/queries/pointFields";
+import {
+  buildGeometryMetadataValues,
+  GEOMETRY_METADATA_UPDATE_SQL,
+} from "../../helpers/queries/geometryRouteHelpers";
 
 type PointPayload = PointCorePayload & { id?: number };
 
-/**
- * PATCH /api/geometries/:id
- * Updates geometry metadata and optionally all associated points (same transaction pattern as createGeometry).
- */
 export async function updateGeometry(req: Request, res: Response): Promise<void> {
   const { id } = req.params;
   const geometryId = parseInt(id, 10);
@@ -20,21 +20,7 @@ export async function updateGeometry(req: Request, res: Response): Promise<void>
     return;
   }
 
-  const {
-    omschrijving,
-    organisatie,
-    vertrouwelijk,
-    herhalen,
-    activiteit,
-    specifiek_letten_op,
-    specifiekLettenOp,
-    points,
-  } = req.body;
-
-  const specLetOp =
-    specifiek_letten_op !== undefined
-      ? specifiek_letten_op
-      : specifiekLettenOp;
+  const { points, ...metadata } = req.body;
 
   const client = await pool.connect();
 
@@ -56,24 +42,8 @@ export async function updateGeometry(req: Request, res: Response): Promise<void>
     }
 
     const geometryUpdate = await client.query(
-      `UPDATE lis.geometries SET
-        omschrijving = COALESCE($1, omschrijving),
-        organisatie = COALESCE($2, organisatie),
-        vertrouwelijk = COALESCE($3, vertrouwelijk),
-        herhalen = COALESCE($4, herhalen),
-        activiteit = COALESCE($5, activiteit),
-        specifiek_letten_op = COALESCE($6, specifiek_letten_op)
-      WHERE id = $7
-      RETURNING *`,
-      [
-        omschrijving ?? null,
-        organisatie ?? null,
-        vertrouwelijk !== undefined ? (vertrouwelijk ? 1 : 0) : null,
-        herhalen !== undefined ? (herhalen ? 1 : 0) : null,
-        activiteit ?? null,
-        specLetOp ?? null,
-        geometryId,
-      ]
+      GEOMETRY_METADATA_UPDATE_SQL,
+      buildGeometryMetadataValues(metadata, geometryId)
     );
 
     const geometryRow = geometryUpdate.rows[0];

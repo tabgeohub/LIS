@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { POINT_CORE_COLUMNS } from "../../helpers/queries/pointFields";
 
 type ReturnMode = "all" | "existing" | "created";
 
@@ -111,21 +112,7 @@ export async function createPointFromImport(
 
     let insertedMap = new Map<string, number>();
     if (toInsert.length > 0) {
-      const cols = [
-        "omschrijving",
-        "regio_id",
-        "xcoordinaat_rd",
-        "ycoordinaat_rd",
-        "latitude",
-        "longitude",
-        "vertrouwelijk",
-        "herhalen",
-        "user_id",
-        "activiteit_id",
-        "organisatie_id",
-        "specifiek_letten_op",
-        "created_at",
-      ];
+      const cols = [...POINT_CORE_COLUMNS, "created_at"];
       const now = new Date();
       const valuesSql: string[] = [];
       const params: any[] = [];

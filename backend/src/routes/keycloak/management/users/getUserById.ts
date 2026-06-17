@@ -1,22 +1,18 @@
 import { Request, Response } from "express";
-import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToken";
-import { getAdminBase, getUserRoles } from "./helpers";
 import { KeycloakUser } from "./types";
-import { fetch } from "undici";
+import { getUserRoles } from "./helpers";
+import {
+  getKeycloakAdminContext,
+  handleKeycloakRouteError,
+  keycloakAdminFetch,
+} from "./keycloakAdminClient";
 
 async function getUserById(
   userId: string,
   req: Request
 ): Promise<KeycloakUser> {
-  const adminToken = await getKeycloakAdminToken(req);
-  const adminBase = getAdminBase(req);
-
-  const response = await fetch(`${adminBase}/users/${userId}`, {
+  const response = await keycloakAdminFetch(req, `/users/${userId}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${adminToken}`,
-      "Content-Type": "application/json",
-    },
   });
 
   if (!response.ok) {
@@ -25,6 +21,7 @@ async function getUserById(
   }
 
   const user = (await response.json()) as KeycloakUser;
+  const { adminToken, adminBase } = await getKeycloakAdminContext(req);
   const roles = await getUserRoles(userId, adminToken, adminBase);
 
   return {
@@ -39,9 +36,7 @@ export async function handleGetUserById(req: Request, res: Response) {
     const { id } = req.params;
     const user = await getUserById(id, req);
     res.json(user);
-  } catch (error: any) {
-    const message = error?.message || "Failed to fetch user";
-    return res.status(500).json({ error: message });
+  } catch (error: unknown) {
+    handleKeycloakRouteError(res, error, "Failed to fetch user");
   }
 }
-

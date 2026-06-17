@@ -1,20 +1,14 @@
 import { Request, Response } from "express";
-import { getAdminBase, getUserRoles } from "./helpers";
 import { KeycloakUser } from "./types";
-import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToken";
-import { fetch } from "undici";
+import { getUserRoles } from "./helpers";
+import {
+  getKeycloakAdminContext,
+  handleKeycloakRouteError,
+  keycloakAdminFetch,
+} from "./keycloakAdminClient";
 
 async function getAllUsers(req: Request): Promise<KeycloakUser[]> {
-  const adminToken = await getKeycloakAdminToken(req);
-  const adminBase = getAdminBase(req);
-
-  const response = await fetch(`${adminBase}/users`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${adminToken}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await keycloakAdminFetch(req, "/users", { method: "GET" });
 
   if (!response.ok) {
     const text = await response.text();
@@ -31,8 +25,8 @@ async function getAllUsers(req: Request): Promise<KeycloakUser[]> {
   }
 
   const users = (await response.json()) as KeycloakUser[];
+  const { adminToken, adminBase } = await getKeycloakAdminContext(req);
 
-  // Fetch roles for all users in parallel
   const usersWithRoles = await Promise.all(
     users.map(async (user) => {
       const roles = await getUserRoles(user.id, adminToken, adminBase);
@@ -51,9 +45,7 @@ export async function handleGetAllUsers(req: Request, res: Response) {
   try {
     const users = await getAllUsers(req);
     res.json(users);
-  } catch (error: any) {
-    const message = error?.message || "Failed to fetch users";
-    return res.status(500).json({ error: message });
+  } catch (error: unknown) {
+    handleKeycloakRouteError(res, error, "Failed to fetch users");
   }
 }
-

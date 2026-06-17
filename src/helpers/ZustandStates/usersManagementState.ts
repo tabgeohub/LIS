@@ -1,17 +1,7 @@
 import { create } from "zustand";
+import type { KeycloakUser } from "Types/keycloakUser";
 
-export type KeycloakUser = {
-  id: string;
-  username?: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  enabled: boolean;
-  emailVerified: boolean;
-  createdTimestamp?: number;
-  realmRoles?: string[];
-  clientRoles?: Record<string, string[]>;
-};
+export type { KeycloakUser };
 
 type UsersTabType = "all" | "create" | "edit" | "reset" | "roles";
 
