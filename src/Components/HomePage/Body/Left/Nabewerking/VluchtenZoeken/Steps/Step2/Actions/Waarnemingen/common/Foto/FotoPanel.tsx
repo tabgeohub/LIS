@@ -66,10 +66,6 @@ export default function FotoPanel({
     navigateToLocation(location, mapView, redGraphicsLayer);
   };
 
-  if (!attachmentPoint || validAttachments.length === 0) {
-    return <FotoEmptyState setAction={setAction} />;
-  }
-
   async function deleteImage(attachmentId: number) {
     const removed = validAttachments.find((a) => a.id === attachmentId);
     if (!removed?.url || !attachmentPoint || !selectedPlan) return;
@@ -116,42 +112,57 @@ export default function FotoPanel({
     );
   }
 
+  if (!attachmentPoint) {
+    return (
+      <div className="h-full">
+        <FotoEmptyState />
+        <div className="flex bg-white absolute left-0 bottom-0 items-center border-t border-gray-300 justify-end w-full gap-x-2 py-1 pr-3">
+          <button onClick={() => setAction("form")} className="gray-button">
+            {content.common.vorige}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full">
       <div className="overflow-y-scroll pb-20 thin-scrollbar flex-grow">
-        <div className="grid grid-cols-2 gap-2 p-2">
-          {validAttachments
-            .sort((a, b) => a.taken_at - b.taken_at)
-            .map((attachment, index) => (
-              <div key={attachment.id} className="relative group">
-                <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-20 shadow-lg">
-                  {index + 1}
-                </div>
-                <img
-                  src={attachmentDisplayUrl(attachment.url)}
-                  alt={String(attachment.id)}
-                  onClick={() => {
-                    setActiveIndex(index);
-                    setIsOpen(true);
-                  }}
-                  className="object-cover aspect-square cursor-pointer hover:scale-105 transition-all rounded shadow-md w-full"
-                />
-                {attachment.location && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleNavigateToLocation(attachment.location);
+        {validAttachments.length === 0 ? (
+          <FotoEmptyState />
+        ) : (
+          <div className="grid grid-cols-2 gap-2 p-2">
+            {validAttachments
+              .sort((a, b) => a.taken_at - b.taken_at)
+              .map((attachment, index) => (
+                <div key={attachment.id} className="relative group">
+                  <div className="absolute top-2 left-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-20 shadow-lg">
+                    {index + 1}
+                  </div>
+                  <img
+                    src={attachmentDisplayUrl(attachment.url)}
+                    alt={String(attachment.id)}
+                    onClick={() => {
+                      setActiveIndex(index);
+                      setIsOpen(true);
                     }}
-                    className="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 z-10"
-                    title="Show location on map"
-                  >
-                    <MdLocationOn className="size-4" />
-                  </button>
-                )}
-              </div>
-            ))}
+                    className="object-cover aspect-square cursor-pointer hover:scale-105 transition-all rounded shadow-md w-full"
+                  />
+                  {attachment.location && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToLocation(attachment.location);
+                      }}
+                      className="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 z-10"
+                      title="Show location on map"
+                    >
+                      <MdLocationOn className="size-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
 
-          {validAttachments.length > 0 && (
             <ImageGallery
               isOpen={isOpen}
               setIsOpen={setIsOpen}
@@ -161,8 +172,8 @@ export default function FotoPanel({
               onDelete={deleteImage}
               onShowLocation={handleNavigateToLocation}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="flex bg-white absolute left-0 bottom-0 items-center border-t border-gray-300 justify-end w-full gap-x-2 py-1 pr-3">

@@ -1,10 +1,6 @@
 import { useContent } from "hooks/useContent";
 
-export default function FotoEmptyState({
-  setAction,
-}: {
-  setAction: (value: string) => void;
-}) {
+export default function FotoEmptyState() {
   const content = useContent();
 
   return (
@@ -15,12 +11,6 @@ export default function FotoEmptyState({
             .editPointDetails.noImages
         }
       </p>
-
-      <div className="flex justify-end">
-        <button onClick={() => setAction("form")} className="gray-button">
-          {content.common.vorige}
-        </button>
-      </div>
     </div>
   );
 }
