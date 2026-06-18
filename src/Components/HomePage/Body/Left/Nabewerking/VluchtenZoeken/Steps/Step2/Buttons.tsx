@@ -29,11 +29,11 @@ export default function Buttons({
   async function handlePrevious() {
     if (!mapView) return;
 
-    const layers = mapView.map.layers.filter((l) => l.title === "PathPoints");
+    const layers = mapView.map?.layers.filter((l) => l.title === "PathPoints");
 
-    if (layers.length > 0) {
+    if (layers && layers.length > 0) {
       layers.forEach((layer) => {
-        mapView.map.remove(layer);
+        mapView.map?.remove(layer);
       });
     }
 

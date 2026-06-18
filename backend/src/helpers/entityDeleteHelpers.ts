@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { PoolClient } from "pg";
-import { pool } from "../../db";
+import { pool } from "../db";
 
 export function parseRouteEntityId(
   rawId: string | undefined,

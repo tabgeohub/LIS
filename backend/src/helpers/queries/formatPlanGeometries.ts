@@ -69,8 +69,8 @@ function splitPointsByGeometry<T>(
 export function formatPlansWithGeometries(plans: Record<string, unknown>[]) {
   return plans.map((plan) => {
     const points = (plan.points as RawPoint[] | null) ?? [];
-    const { standalonePoints, geometries } = splitPointsByGeometry(points, {
-      createGeometryGroup: (point, geometryId) => ({
+    const { standalonePoints, geometries } = splitPointsByGeometry<GeometryGroup>(points, {
+      createGeometryGroup: (point, geometryId): GeometryGroup => ({
         id: geometryId,
         type: point.geometry_type ?? null,
         omschrijving: point.geometry_omschrijving ?? null,
@@ -154,8 +154,9 @@ export function formatFinishedPlansWithGeometries(
 ) {
   return plans.map((plan) => {
     const points = (plan[pointsField] as RawPoint[] | null) ?? [];
-    const { standalonePoints, geometries } = splitPointsByGeometry(points, {
-      createGeometryGroup: (point, geometryId) => ({
+    const { standalonePoints, geometries } =
+      splitPointsByGeometry<FinishedGeometryGroup>(points, {
+      createGeometryGroup: (point, geometryId): FinishedGeometryGroup => ({
         id: geometryId,
         geometry_type: point.geometry_type ?? null,
         geometry_omschrijving: point.geometry_omschrijving ?? null,

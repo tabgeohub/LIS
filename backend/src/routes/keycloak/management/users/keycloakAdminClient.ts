@@ -3,7 +3,7 @@ import { fetch } from "undici";
 import {
   getKeycloakAdminBase,
   getKeycloakAdminToken,
-} from "../../../services/getKeycloakAdminToken";
+} from "../../../../services/getKeycloakAdminToken";
 
 export function getAdminBase(req: Request): string {
   return getKeycloakAdminBase(req);
@@ -19,8 +19,8 @@ export async function getKeycloakAdminContext(req: Request) {
 export async function keycloakAdminFetch(
   req: Request,
   path: string,
-  init: RequestInit = {}
-): Promise<Response> {
+  init: Parameters<typeof fetch>[1] = {}
+): Promise<Awaited<ReturnType<typeof fetch>>> {
   const { adminToken, adminBase } = await getKeycloakAdminContext(req);
 
   return fetch(`${adminBase}${path}`, {

@@ -15,6 +15,7 @@ export async function getAllFlightPlans(
     useRegioFilter: true,
     errorLogLabel: "❌ Error fetching flight plans:",
     errorMessage: "Failed to fetch flight plans",
-    transform: formatPlansWithGeometries,
+    transform: (rows) =>
+      formatPlansWithGeometries(rows as Record<string, unknown>[]),
   });
 }

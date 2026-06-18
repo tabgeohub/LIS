@@ -7,6 +7,7 @@ import {
 } from "../../helpers/routeResponses";
 import { getMissingFields, requireNonEmptyArray } from "../../helpers/validateBody";
 import { insertGeometryPoints } from "../../helpers/queries/geometryRouteHelpers";
+import type { PointCoreSource } from "../../helpers/queries/pointFields";
 
 export async function createGeometry(req: Request, res: Response): Promise<void> {
   const {
@@ -59,7 +60,11 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     );
 
     const geometryId = geometryResult.rows[0].id;
-    const insertedPoints = await insertGeometryPoints(client, geometryId, points);
+    const insertedPoints = await insertGeometryPoints(
+      client,
+      geometryId,
+      points as PointCoreSource[]
+    );
 
     await client.query("COMMIT");
 
