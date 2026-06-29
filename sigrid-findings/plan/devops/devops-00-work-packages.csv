@@ -1,0 +1,5 @@
+WorkPackageID,Phase,Name,Scope,Approach,RisksIfDoneWrong,DependsOn,Verification,SigridRemarkStrategy
+DO-00,0 - Prep,DevOps baseline,"K8s, Docker, nginx, ingress — separate from application code plan.",Changing K8s and app code in same PR,,Infra findings tracked independently,,
+DO-01,1 - Docker,Docker non-root USER,"dockerfile (nginx frontend), backend/dockerfile","Add USER (nginx for frontend image, node for backend); verify container startup.",Permission errors on ports/volumes,DO-00,Clears Missing User Instruction (2 HIGH RAW),
+DO-02,2 - Kubernetes,K8s manifests verify FIXED,"k8s/lis-backend-dep.yaml, k8s/lis-frontend-dep.yaml, k8s/Lis_ingressFront.yaml",Verify repo matches FIXED status; no rework unless regression.,Re-introducing missing limits/security context,DO-00,Sigrid remains FIXED; kubectl dry-run,34+ findings already FIXED — verify only
+DO-03,3 - Defer,Dockerfile unit size,backend/dockerfile maintainability (59 LOC),Defer unless editing Dockerfiles for DO-01.,None,DO-01,Address with DO-01 if touching dockerfile,

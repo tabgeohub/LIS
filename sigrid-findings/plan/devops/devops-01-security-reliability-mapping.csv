@@ -1,0 +1,38 @@
+WorkPackageID,Category,Status,Severity,Type,Weakness,File,Line,Origin,FirstSeen,IssueAge
+DO-02,Security,FIXED,HIGH,Seccomp Profile Is Not Configured,CWE-15,k8s/lis-frontend-dep.yaml,39,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Pod or Container Without ResourceQuota,CWE-15,k8s/lis-backend-dep.yaml,22,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Pod or Container Without LimitRange,CWE-15,k8s/lis-frontend-dep.yaml,22,KICS,2026-06-04,25
+DO-01,Security,RAW,HIGH,Missing User Instruction,CWE-266,dockerfile,22,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,NET_RAW Capabilities Not Being Dropped,CWE-15,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Container Running As Root,CWE-266,k8s/lis-frontend-dep.yaml,41,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Container Running As Root,CWE-266,k8s/lis-backend-dep.yaml,46,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,NET_RAW Capabilities Not Being Dropped,CWE-15,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Pod or Container Without ResourceQuota,CWE-15,k8s/lis-frontend-dep.yaml,22,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Seccomp Profile Is Not Configured,CWE-15,k8s/lis-backend-dep.yaml,44,KICS,2026-06-04,25
+DO-01,Security,RAW,HIGH,Missing User Instruction,CWE-266,backend/dockerfile,4,KICS,2026-06-04,25
+DO-02,Security,FIXED,HIGH,"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege esc",CWE-250,k8s/lis-frontend-dep.yaml,32,Semgrep,2026-06-04,25
+DO-02,Security,FIXED,HIGH,"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege esc",CWE-250,k8s/lis-backend-dep.yaml,32,Semgrep,2026-06-04,25
+DO-02,Security,FIXED,HIGH,Pod or Container Without LimitRange,CWE-15,k8s/lis-backend-dep.yaml,22,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Container Running With Low UID,CWE-842,k8s/lis-frontend-dep.yaml,41,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Service Account Token Automount Not Disabled,CWE-276,k8s/lis-frontend-dep.yaml,32,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Container lis-online-frontend is running with a writable root filesystem,CWE-732,k8s/lis-frontend-dep.yaml,34,Semgrep,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Memory Requests Not Defined,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Memory Requests Not Defined,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Memory Limits Not Defined,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,CPU Limits Not Set,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Ensure Administrative Boundaries Between Resources,CWE-284,k8s/Lis_ingressFront.yaml,5,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,CPU Limits Not Set,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Memory Limits Not Defined,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,CPU Requests Not Set,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Container lis-online-backend is running with a writable root filesystem,CWE-732,k8s/lis-backend-dep.yaml,34,Semgrep,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Service Account Token Automount Not Disabled,CWE-276,k8s/lis-backend-dep.yaml,32,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,CPU Requests Not Set,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Security,FIXED,MEDIUM,Container Running With Low UID,CWE-842,k8s/lis-backend-dep.yaml,46,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,Memory Requests Not Defined,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,Memory Requests Not Defined,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,Memory Limits Not Defined,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,CPU Limits Not Set,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,CPU Limits Not Set,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,Memory Limits Not Defined,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,CPU Requests Not Set,CWE-770,k8s/lis-frontend-dep.yaml,34,KICS,2026-06-04,25
+DO-02,Reliability,FIXED,MEDIUM,CPU Requests Not Set,CWE-770,k8s/lis-backend-dep.yaml,34,KICS,2026-06-04,25

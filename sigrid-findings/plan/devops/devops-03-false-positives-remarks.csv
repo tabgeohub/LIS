@@ -1,0 +1,2 @@
+WorkPackageID,File,Finding,Reason,Action
+DO-02,k8s/*.yaml,KICS findings FIXED,Already remediated in repo,Verify only — no rework unless regression

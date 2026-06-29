@@ -1,0 +1,5 @@
+WorkPackageID,File,Finding,Reason,Action
+WP-07,callbackHandler.ts,Open redirect CWE-601,"safeReturnPath() rejects //, ://, absolute URLs",Add tests + Sigrid remark
+WP-06,sendEmail.ts,Puppeteer SSRF CWE-918,blockExternalPuppeteerRequests before setContent,Keep interceptor; remark if still flagged after refactor
+WP-06,sendEmail.ts,HTML injection CWE-79,User fields use escapeHtml(),Use explicit HTML builder; remark if template literal still flagged
+WP-05,verify-regio-apis.js,SQL injection CRITICAL,Dev-only script,Fix or exclude — lower priority than production
