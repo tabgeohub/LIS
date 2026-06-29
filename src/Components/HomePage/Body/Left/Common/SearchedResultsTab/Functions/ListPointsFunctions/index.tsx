@@ -3,7 +3,7 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";

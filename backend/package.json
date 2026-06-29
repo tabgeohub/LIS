@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "verify:regio-apis": "npx ts-node --transpile-only scripts/verify-regio-apis.ts",
-    "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts"
+    "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts",
+    "test:post-login-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/resolvePostLoginRedirect.test.ts"
   },
   "keywords": [],
   "author": "",

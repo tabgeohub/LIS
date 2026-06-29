@@ -7,9 +7,8 @@ import useGetLuchtvaartuig from "hooks/consts/useGetLuchtvaartuig";
 import useGetPiloot from "hooks/consts/useGetPiloot";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
-import { populateFormFromPlan } from "hooks/flightPlan/populateFormFromPlan";
+import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useEffect } from "react";
 
 export default function FormElements() {
   const pilootOptions = useGetPiloot();
@@ -37,20 +36,17 @@ export default function FormElements() {
     setAanvullendeInfo,
   } = useFinishedPlansState();
 
-  useEffect(() => {
-    if (!selectedPlan) return;
-    populateFormFromPlan(selectedPlan, {
-      setOmschrijving,
-      setWaarnemer,
-      setPiloot,
-      setDatum,
-      setGeplandeVliegduur,
-      setTypeLuchtvaartuig,
-      setAantalPassagiers,
-      setDoelEnHoofdthema,
-      setAanvullendeInfo,
-    });
-  }, [selectedPlan]);
+  usePopulateFlightPlanFormEffect(selectedPlan, {
+    setOmschrijving,
+    setWaarnemer,
+    setPiloot,
+    setDatum,
+    setGeplandeVliegduur,
+    setTypeLuchtvaartuig,
+    setAantalPassagiers,
+    setDoelEnHoofdthema,
+    setAanvullendeInfo,
+  });
 
   const { beginTime, endTime, durationSeconds } =
     useGetFlightTimesDistance(selectedPlan);

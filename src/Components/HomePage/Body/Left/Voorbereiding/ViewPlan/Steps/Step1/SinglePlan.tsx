@@ -3,7 +3,7 @@ import { EnrichedPointType, FlightPlanType } from "Types";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaLock } from "react-icons/fa6";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { saveAs } from "file-saver";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { GoCheckCircleFill } from "react-icons/go";

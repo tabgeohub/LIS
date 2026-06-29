@@ -1,0 +1,10 @@
+Description,Severity,Status,First Seen,Issue age,Type,Length,Source component,Target component
+High communication density on src/Components/HomePage,MEDIUM,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+High communication density on src/hooks,MEDIUM,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/helpers,LOW,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/utils,LOW,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/api-hooks,LOW,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+Moderate communication density on src/Components/TimesliderItemDetailPage,LOW,RAW,2026-06-04,25,COMMUNICATION_DENSITY,-,-,-
+Transitive dependency between src/hooks and src/utils,LOW,RAW,2026-06-06,23,LAYER_BYPASSING_DEPENDENCY,-,src/hooks,src/utils
+Transitive dependency between src/Components/TimesliderItemDetailPage and src/hooks,LOW,RAW,2026-06-04,25,LAYER_BYPASSING_DEPENDENCY,-,src/Components/TimesliderItemDetailPage,src/hooks
+Transitive dependency between src/Components/TimesliderItemDetailPage and src/helpers,LOW,RAW,2026-06-04,25,LAYER_BYPASSING_DEPENDENCY,-,src/Components/TimesliderItemDetailPage,src/helpers

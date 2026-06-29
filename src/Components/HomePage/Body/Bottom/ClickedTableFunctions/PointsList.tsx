@@ -4,7 +4,7 @@ import { MdOutlineZoomOutMap, MdTableChart } from "react-icons/md";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";

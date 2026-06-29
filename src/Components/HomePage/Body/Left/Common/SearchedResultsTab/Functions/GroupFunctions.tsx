@@ -1,7 +1,7 @@
 import { useStarredAll } from "@helpers/ZustandStates/starredAll";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import shpwrite from "@mapbox/shp-write";
 import {
   FeatureCollection,

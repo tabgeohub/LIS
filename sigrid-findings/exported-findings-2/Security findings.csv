@@ -1,0 +1,133 @@
+Description,Severity,Status,First Seen,Issue age,Type,Weakness,File,Technology,Origin,Remark,Locations
+NPM dependency jspdf contains 12 vulnerabilities (CWE-79),CRITICAL,FIXED,2026-06-04,25,NPM dependency jspdf contains 12 vulnerabilities,CWE-79,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-31938 (9.6) 
+CVE-2025-68428 (9.2) 
+CVE-2025-57810 (8.7) 
+CVE-2025-29907 (8.7) 
+CVE-2026-24133 (8.7) 
+CVE-2026-25535 (8.7) 
+CVE-2026-24737 (8.1) 
+CVE-2026-25940 (8.1) 
+CVE-2026-25755 (8.1) 
+CVE-2026-31898 (8.1) 
+CVE-2026-24043 (6.9) 
+CVE-2026-24040 (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+Untrusted input concatinated with raw SQL query can result in SQL Injection (CWE-89),CRITICAL,FIXED,2026-06-10,19,Untrusted input concatinated with raw SQL query can result in SQL Injection,CWE-89,backend/scripts/verify-regio-apis.js#L269,-,NodeJS Scan,-,backend/scripts/verify-regio-apis.js#L269
+Untrusted input concatinated with raw SQL query can result in SQL Injection (CWE-89),CRITICAL,FIXED,2026-06-10,19,Untrusted input concatinated with raw SQL query can result in SQL Injection,CWE-89,backend/scripts/verify-regio-apis.js#L272,-,NodeJS Scan,-,backend/scripts/verify-regio-apis.js#L272
+The package-lock.json file contains at least 1 library whose integrity is not checked (CWE-494),CRITICAL,FIXED,2026-06-04,25,The package-lock.json file contains at least 1 library whose integrity is not checked,CWE-494,package-lock.json#L6,-,SIG Code Patterns,-,package-lock.json#L6
+Seccomp Profile Is Not Configured (CWE-15),HIGH,FIXED,2026-06-04,25,Seccomp Profile Is Not Configured,CWE-15,k8s/lis-frontend-dep.yaml#L39,-,KICS,-,k8s/lis-frontend-dep.yaml#L39
+Pod or Container Without ResourceQuota (CWE-15),HIGH,FIXED,2026-06-04,25,Pod or Container Without ResourceQuota,CWE-15,k8s/lis-backend-dep.yaml#L22,-,KICS,-,k8s/lis-backend-dep.yaml#L22
+NPM dependency xlsx contains 2 vulnerabilities (CWE-1321),HIGH,RAW,2026-06-05,24,NPM dependency xlsx contains 2 vulnerabilities,CWE-1321,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2023-30533 (7.8) 
+CVE-2024-22363 (7.5) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+NPM dependency multer contains 2 vulnerabilities (CWE-400),HIGH,FIXED,2026-06-29,0,NPM dependency multer contains 2 vulnerabilities,CWE-400,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-5079 (7.5) 
+CVE-2026-5038 (5.3) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+Pod or Container Without LimitRange (CWE-15),HIGH,FIXED,2026-06-04,25,Pod or Container Without LimitRange,CWE-15,k8s/lis-frontend-dep.yaml#L22,-,KICS,-,k8s/lis-frontend-dep.yaml#L22
+Missing User Instruction (CWE-266),HIGH,RAW,2026-06-04,25,Missing User Instruction,CWE-266,dockerfile#L22,Docker,KICS,-,dockerfile#L22
+NET_RAW Capabilities Not Being Dropped (CWE-15),HIGH,FIXED,2026-06-04,25,NET_RAW Capabilities Not Being Dropped,CWE-15,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+If unverified user data can reach the `puppeteer` methods it can result in Server-Side Request Forgery vulnerabilities (CWE-918),HIGH,FIXED,2026-06-04,25,If unverified user data can reach the `puppeteer` methods it can result in Server-Side Request Forgery vulnerabilities,CWE-918,backend/src/routes/emails/sendEmail.ts#L149,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L149
+NPM dependency axios contains 22 vulnerabilities (CWE-441),HIGH,FIXED,2026-06-04,25,NPM dependency axios contains 22 vulnerabilities,CWE-441,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-44494 (8.7) 
+CVE-2026-44492 (8.6) 
+CVE-2025-58754 (7.5) 
+CVE-2026-25639 (7.5) 
+CVE-2026-42035 (7.4) 
+CVE-2026-42033 (7.4) 
+CVE-2026-42264 (7.4) 
+CVE-2026-42043 (7.2) 
+CVE-2026-44495 (7.0) 
+CVE-2026-42039 (6.9) 
+CVE-2026-42038 (6.8) 
+CVE-2026-42044 (6.5) 
+CVE-2025-62718 (6.3) 
+CVE-2026-39865 (5.9) 
+CVE-2026-42042 (5.4) 
+CVE-2026-42036 (5.3) 
+CVE-2026-42034 (5.3) 
+CVE-2026-42037 (5.3) 
+CVE-2026-40175 (4.8) 
+CVE-2026-44490 (4.8) 
+CVE-2026-42041 (4.8) 
+CVE-2026-42040 (3.7) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+NPM dependency xlsx contains 2 vulnerabilities (CWE-1321),HIGH,FIXED,2026-06-04,25,NPM dependency xlsx contains 2 vulnerabilities,CWE-1321,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2023-30533 (7.8) 
+CVE-2024-22363 (7.5) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+Container Running As Root (CWE-266),HIGH,FIXED,2026-06-04,25,Container Running As Root,CWE-266,k8s/lis-frontend-dep.yaml#L41,-,KICS,-,k8s/lis-frontend-dep.yaml#L41
+Container Running As Root (CWE-266),HIGH,FIXED,2026-06-04,25,Container Running As Root,CWE-266,k8s/lis-backend-dep.yaml#L46,-,KICS,-,k8s/lis-backend-dep.yaml#L46
+NPM dependency nodemailer contains 1 vulnerability (CWE-73),HIGH,FIXED,2026-06-29,0,NPM dependency nodemailer contains 1 vulnerability,CWE-73,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+null (7.1) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+NET_RAW Capabilities Not Being Dropped (CWE-15),HIGH,FIXED,2026-06-04,25,NET_RAW Capabilities Not Being Dropped,CWE-15,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+Pod or Container Without ResourceQuota (CWE-15),HIGH,FIXED,2026-06-04,25,Pod or Container Without ResourceQuota,CWE-15,k8s/lis-frontend-dep.yaml#L22,-,KICS,-,k8s/lis-frontend-dep.yaml#L22
+Seccomp Profile Is Not Configured (CWE-15),HIGH,FIXED,2026-06-04,25,Seccomp Profile Is Not Configured,CWE-15,k8s/lis-backend-dep.yaml#L44,-,KICS,-,k8s/lis-backend-dep.yaml#L44
+Missing User Instruction (CWE-266),HIGH,RAW,2026-06-04,25,Missing User Instruction,CWE-266,backend/dockerfile#L4,Docker,KICS,-,backend/dockerfile#L4
+NPM dependency undici contains 7 vulnerabilities (CWE-400),HIGH,FIXED,2026-06-29,0,NPM dependency undici contains 7 vulnerabilities,CWE-400,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-12151 (7.5) 
+CVE-2026-6734 (7.5) 
+CVE-2026-9697 (7.4) 
+CVE-2026-9678 (5.9) 
+CVE-2026-9679 (5.9) 
+CVE-2026-6733 (3.7) 
+CVE-2026-11525 (3.7) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege escalation attacks (CWE-250)",HIGH,FIXED,2026-06-04,25,"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege escalation attacks",CWE-250,k8s/lis-frontend-dep.yaml#L32,-,Semgrep,-,k8s/lis-frontend-dep.yaml#L32
+"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege escalation attacks (CWE-250)",HIGH,FIXED,2026-06-04,25,"When running containers in Kubernetes, it's important to ensure that they  are properly secured to prevent privilege escalation attacks",CWE-250,k8s/lis-backend-dep.yaml#L32,-,Semgrep,-,k8s/lis-backend-dep.yaml#L32
+Pod or Container Without LimitRange (CWE-15),HIGH,FIXED,2026-06-04,25,Pod or Container Without LimitRange,CWE-15,k8s/lis-backend-dep.yaml#L22,-,KICS,-,k8s/lis-backend-dep.yaml#L22
+If unverified user data can reach the `puppeteer` methods it can result in Server-Side Request Forgery vulnerabilities (CWE-918),HIGH,FIXED,2026-06-05,24,If unverified user data can reach the `puppeteer` methods it can result in Server-Side Request Forgery vulnerabilities,CWE-918,backend/src/routes/emails/sendEmail.ts#L205,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L205
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L99,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L99
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/fileDownload.ts#L146,TypeScript,Semgrep,-,backend/src/routes/fileDownload.ts#L146
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-05,24,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L164,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L164
+"The application was found executing string comparisons using one of `===`, `!==`, `==` or `!=` against security sensitive values (CWE-208)",MEDIUM,FIXED,2026-06-04,25,"The application was found executing string comparisons using one of `===`, `!==`, `==` or `!=` against security sensitive values",CWE-208,backend/src/routes/auth/loginUser.ts#L29,TypeScript,ESLint,-,backend/src/routes/auth/loginUser.ts#L29
+"String comparisons using '===', '!==', '!=' and '==' is vulnerable to timing attacks (CWE-208)",MEDIUM,FIXED,2026-06-04,25,"String comparisons using '===', '!==', '!=' and '==' is vulnerable to timing attacks",CWE-208,src/Components/HomePage/Body/Left/Nabewerking/CreateReport/Steps/Step3/hooks/useCopyLink.ts#L23,TypeScript,NodeJS Scan,-,src/Components/HomePage/Body/Left/Nabewerking/CreateReport/Steps/Step3/hooks/useCopyLink.ts#L23
+This template literal looks like HTML and has interpolated variables (CWE-116),MEDIUM,FIXED,2026-06-04,25,This template literal looks like HTML and has interpolated variables,CWE-116,backend/src/routes/emails/sendEmail.ts#L122,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L122
+Container Running With Low UID (CWE-842),MEDIUM,FIXED,2026-06-04,25,Container Running With Low UID,CWE-842,k8s/lis-frontend-dep.yaml#L41,-,KICS,-,k8s/lis-frontend-dep.yaml#L41
+Error messages with stack traces may expose sensitive information about the application (CWE-209),MEDIUM,FIXED,2026-06-04,25,Error messages with stack traces may expose sensitive information about the application,CWE-209,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step1/Buttons.tsx#L16,TypeScript,NodeJS Scan,-,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step1/Buttons.tsx#L16
+Untrusted user input in redirect() can result in Open Redirect vulnerability (CWE-601),MEDIUM,FIXED,2026-06-05,24,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L35,TypeScript,NodeJS Scan,-,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L35
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L107,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L107
+Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability (CWE-79),MEDIUM,FIXED,2026-06-04,25,Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability,CWE-79,backend/src/routes/fileDownload.ts#L119,TypeScript,NodeJS Scan,-,backend/src/routes/fileDownload.ts#L119
+Service Account Token Automount Not Disabled (CWE-276),MEDIUM,FIXED,2026-06-04,25,Service Account Token Automount Not Disabled,CWE-276,k8s/lis-frontend-dep.yaml#L32,-,KICS,-,k8s/lis-frontend-dep.yaml#L32
+Untrusted user input in redirect() can result in Open Redirect vulnerability (CWE-601),MEDIUM,RAW,2026-06-29,0,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L34,TypeScript,NodeJS Scan,-,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L34
+Container lis-online-frontend is running with a writable root filesystem (CWE-732),MEDIUM,FIXED,2026-06-04,25,Container lis-online-frontend is running with a writable root filesystem,CWE-732,k8s/lis-frontend-dep.yaml#L34,-,Semgrep,-,k8s/lis-frontend-dep.yaml#L34
+This template literal looks like HTML and has interpolated variables (CWE-116),MEDIUM,FIXED,2026-06-04,25,This template literal looks like HTML and has interpolated variables,CWE-116,backend/src/routes/emails/sendEmail.ts#L114,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L114
+This template literal looks like HTML and has interpolated variables (CWE-116),MEDIUM,FIXED,2026-06-05,24,This template literal looks like HTML and has interpolated variables,CWE-116,backend/src/helpers/renderDownloadPage.ts#L26,TypeScript,Semgrep,-,backend/src/helpers/renderDownloadPage.ts#L26
+This template literal looks like HTML and has interpolated variables (CWE-116),MEDIUM,FIXED,2026-06-05,24,This template literal looks like HTML and has interpolated variables,CWE-116,backend/src/routes/emails/sendEmail.ts#L47,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L47
+Untrusted user input in redirect() can result in Open Redirect vulnerability (CWE-601),MEDIUM,RAW,2026-06-04,25,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L9,TypeScript,NodeJS Scan,-,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L9
+Memory Requests Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,25,Memory Requests Not Defined,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+Memory Requests Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,25,Memory Requests Not Defined,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L100,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L100
+"The application was found executing string comparisons using one of `===`, `!==`, `==` or `!=` against security sensitive values (CWE-208)",MEDIUM,FIXED,2026-06-04,25,"The application was found executing string comparisons using one of `===`, `!==`, `==` or `!=` against security sensitive values",CWE-208,src/Components/HomePage/Body/Left/Nabewerking/CreateReport/Steps/Step3/hooks/useCopyLink.ts#L23,TypeScript,ESLint,-,src/Components/HomePage/Body/Left/Nabewerking/CreateReport/Steps/Step3/hooks/useCopyLink.ts#L23
+Memory Limits Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,25,Memory Limits Not Defined,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+CPU Limits Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,25,CPU Limits Not Set,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability (CWE-79),MEDIUM,FIXED,2026-06-04,25,Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability,CWE-79,backend/src/routes/fileDownload.ts#L119,TypeScript,NodeJS Scan,-,backend/src/routes/fileDownload.ts#L119
+Ensure Administrative Boundaries Between Resources (CWE-284),MEDIUM,FIXED,2026-06-04,25,Ensure Administrative Boundaries Between Resources,CWE-284,k8s/Lis_ingressFront.yaml#L5,-,KICS,-,k8s/Lis_ingressFront.yaml#L5
+Untrusted user input in redirect() can result in Open Redirect vulnerability (CWE-601),MEDIUM,FIXED,2026-06-04,25,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L34,TypeScript,NodeJS Scan,-,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L34
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-05,24,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L165,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L165
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/fileDownload.ts#L105,TypeScript,Semgrep,-,backend/src/routes/fileDownload.ts#L105
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L103,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L103
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L101,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L101
+NPM dependency uuid contains 1 vulnerability (CWE-1285),MEDIUM,FIXED,2026-06-04,25,NPM dependency uuid contains 1 vulnerability,CWE-1285,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-41907 (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-05,24,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L167,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L167
+CPU Limits Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,25,CPU Limits Not Set,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+NPM dependency nodemailer contains 2 vulnerabilities (CWE-93),MEDIUM,FIXED,2026-06-04,25,NPM dependency nodemailer contains 2 vulnerabilities,CWE-93,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+null (4.9) 
+null (2.3) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-05,24,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L163,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L163
+Memory Limits Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,25,Memory Limits Not Defined,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-05,24,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/emails/sendEmail.ts#L169,TypeScript,Semgrep,-,backend/src/routes/emails/sendEmail.ts#L169
+User data flows into the host portion of this manually-constructed HTML (CWE-79),MEDIUM,FIXED,2026-06-04,25,User data flows into the host portion of this manually-constructed HTML,CWE-79,backend/src/routes/fileDownload.ts#L162,TypeScript,Semgrep,-,backend/src/routes/fileDownload.ts#L162
+CPU Requests Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,25,CPU Requests Not Set,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+Container lis-online-backend is running with a writable root filesystem (CWE-732),MEDIUM,FIXED,2026-06-04,25,Container lis-online-backend is running with a writable root filesystem,CWE-732,k8s/lis-backend-dep.yaml#L34,-,Semgrep,-,k8s/lis-backend-dep.yaml#L34
+Service Account Token Automount Not Disabled (CWE-276),MEDIUM,FIXED,2026-06-04,25,Service Account Token Automount Not Disabled,CWE-276,k8s/lis-backend-dep.yaml#L32,-,KICS,-,k8s/lis-backend-dep.yaml#L32
+CPU Requests Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,25,CPU Requests Not Set,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability (CWE-79),MEDIUM,FIXED,2026-06-04,25,Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability,CWE-79,backend/src/routes/fileDownload.ts#L78,TypeScript,NodeJS Scan,-,backend/src/routes/fileDownload.ts#L78
+Container Running With Low UID (CWE-842),MEDIUM,FIXED,2026-06-04,25,Container Running With Low UID,CWE-842,k8s/lis-backend-dep.yaml#L46,-,KICS,-,k8s/lis-backend-dep.yaml#L46
+"String comparisons using '===', '!==', '!=' and '==' is vulnerable to timing attacks (CWE-208)",MEDIUM,FIXED,2026-06-04,25,"String comparisons using '===', '!==', '!=' and '==' is vulnerable to timing attacks",CWE-208,backend/src/routes/auth/loginUser.ts#L29,TypeScript,NodeJS Scan,-,backend/src/routes/auth/loginUser.ts#L29

@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from "./Components/HomePage";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
 
 import "@arcgis/core/assets/esri/themes/light/main.css";
 import Dashboard from "Components/DashboardPage";
@@ -12,9 +11,11 @@ import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";
 import InstallationsPage from "Components/InstallationsPage";
 import DevicesUpdatesPage from "Components/DevicesUpdatesPage";
+import PostLoginRedirect from "Components/Common/PostLoginRedirect";
 
 export default function App() {
   const { setUser } = useAuth();
+  const [pendingClientPath, setPendingClientPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${getBackEndUrl()}/auth/me`, {
@@ -23,11 +24,15 @@ export default function App() {
     })
       .then((res) => res.json())
       .then((data) => {
+        if (data?.pendingClientPath) {
+          setPendingClientPath(data.pendingClientPath);
+        }
+
         if (!data || !data.user || !data.user.sub) return;
 
         setUser({
           role: data.roles.realm.find(
-            (item) =>
+            (item: string) =>
               item.includes("RWS ") ||
               item.includes("EXT ") ||
               item.includes("admin")
@@ -37,10 +42,11 @@ export default function App() {
           email: data.user.email,
         });
       });
-  }, []);
+  }, [setUser]);
 
   return (
     <Router>
+      <PostLoginRedirect pendingClientPath={pendingClientPath} />
       <ArcGISAuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />

@@ -1,5 +1,6 @@
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { ActionType } from "../..";
+import { buildFlightPlanPayloadFields } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useUpdateData } from "utils/useUpdateData";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
@@ -33,15 +34,17 @@ export default function Buttons({
 
     const attributes = {
       vluchtnummer: selectedPlan.vluchtnummer,
-      omschrijving,
-      waarnemer,
-      piloot,
-      datum,
-      vliegduur: geplandeVliegduur,
-      luchtvaartuig: typeLuchtvaartuig,
-      passagiers: aantalPassagiers,
-      hoofdthema: doelEnHoofdthema,
-      aanvullende: aanvullendeInfo,
+      ...buildFlightPlanPayloadFields({
+        omschrijving,
+        waarnemer,
+        piloot,
+        datum,
+        geplandeVliegduur,
+        typeLuchtvaartuig,
+        aantalPassagiers,
+        doelEnHoofdthema,
+        aanvullendeInfo,
+      }),
       points: selectedPlan.points_data.flatMap((point) => point.id),
       user_id: user.user_id,
       status: selectedPlan.status,

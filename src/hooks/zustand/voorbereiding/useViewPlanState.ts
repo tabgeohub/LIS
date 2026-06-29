@@ -1,7 +1,15 @@
 import { FlightPlanType } from "Types";
 import { create } from "zustand";
+import {
+  createFlightPlanFormFieldSetters,
+  emptyFlightPlanFormFields,
+  FlightPlanFormFieldSetters,
+  FlightPlanFormFieldValues,
+} from "hooks/zustand/shared/flightPlanFormFields";
 
-interface ViewPlanState {
+interface ViewPlanState
+  extends FlightPlanFormFieldValues,
+    FlightPlanFormFieldSetters {
   initialPlans: FlightPlanType[];
   setInitialPlans: (initialPlans: FlightPlanType[]) => void;
 
@@ -29,39 +37,18 @@ interface ViewPlanState {
   selectedIndex: number;
   setSelectedIndex: (selectedIndex: number) => void;
 
-  omschrijving: string;
-  setOmschrijving: (omschrijving: string) => void;
-
-  waarnemer: string;
-  setWaarnemer: (waarnemer: string) => void;
-
-  piloot: string;
-  setPiloot: (piloot: string) => void;
-
-  datum: string;
-  setDatum: (datum: string) => void;
-
-  geplandeVliegduur: string;
-  setGeplandeVliegduur: (geplandeVliegduur: string) => void;
-
-  typeLuchtvaartuig: string;
-  setTypeLuchtvaartuig: (typeLuchtvaartuig: string) => void;
-
-  aantalPassagiers: number;
-  setAantalPassagiers: (aantalPassagiers: number) => void;
-
-  doelEnHoofdthema: string;
-  setDoelEnHoofdthema: (doelEnHoofdthema: string) => void;
-
-  aanvullendeInfo: string;
-  setAanvullendeInfo: (aanvullendeInfo: string) => void;
-
   clickedPoint: number;
   setClickedPoint: (clickedPoint: number) => void;
 
   clickedGeometry: number | null;
   setClickedGeometry: (clickedGeometry: number | null) => void;
 }
+
+const viewPlanFormDefaults = {
+  ...emptyFlightPlanFormFields,
+  geplandeVliegduur: "0:00",
+  aantalPassagiers: 0 as number,
+};
 
 export const useViewPlanState = create<ViewPlanState>((set) => ({
   initialPlans: [],
@@ -90,37 +77,17 @@ export const useViewPlanState = create<ViewPlanState>((set) => ({
   selectedIndex: 0,
   setSelectedIndex: (selectedIndex: number) => set(() => ({ selectedIndex })),
 
-  omschrijving: "",
-  setOmschrijving: (omschrijving: string) => set(() => ({ omschrijving })),
-
-  waarnemer: "",
-  setWaarnemer: (waarnemer: string) => set(() => ({ waarnemer })),
-
-  piloot: "",
-  setPiloot: (piloot: string) => set(() => ({ piloot })),
-
-  datum: "",
-  setDatum: (datum: string) => set(() => ({ datum })),
-
-  geplandeVliegduur: "0:00",
-  setGeplandeVliegduur: (geplandeVliegduur: string) =>
-    set(() => ({ geplandeVliegduur })),
-
-  typeLuchtvaartuig: "",
-  setTypeLuchtvaartuig: (typeLuchtvaartuig: string) =>
-    set(() => ({ typeLuchtvaartuig })),
-
-  aantalPassagiers: 0,
-  setAantalPassagiers: (aantalPassagiers: number) =>
-    set(() => ({ aantalPassagiers })),
-
-  doelEnHoofdthema: "",
-  setDoelEnHoofdthema: (doelEnHoofdthema: string) =>
-    set(() => ({ doelEnHoofdthema })),
-
-  aanvullendeInfo: "",
-  setAanvullendeInfo: (aanvullendeInfo: string) =>
-    set(() => ({ aanvullendeInfo })),
+  ...viewPlanFormDefaults,
+  ...createFlightPlanFormFieldSetters((partial) =>
+    set((state) => ({
+      ...state,
+      ...partial,
+      aantalPassagiers:
+        partial.aantalPassagiers !== undefined
+          ? (partial.aantalPassagiers ?? 0)
+          : state.aantalPassagiers,
+    }))
+  ),
 
   clickedPoint: 0,
   setClickedPoint: (clickedPoint: number) => set(() => ({ clickedPoint })),

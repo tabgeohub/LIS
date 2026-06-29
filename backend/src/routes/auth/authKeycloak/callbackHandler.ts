@@ -1,6 +1,9 @@
 import { RequestHandler } from "express";
 import { getOidcClientFor } from "../oidc";
-import { resolvePostLoginRedirectUrl } from "./resolvePostLoginRedirect";
+import {
+  getFixedPostLoginRedirectUrl,
+  storePendingClientRedirect,
+} from "./resolvePostLoginRedirect";
 
 // @ts-ignore
 export const callbackHandler: RequestHandler = async (req, res) => {
@@ -29,12 +32,15 @@ export const callbackHandler: RequestHandler = async (req, res) => {
     // @ts-ignore
     delete req.session.loginMode;
 
-    if (mode === "desktop") return res.redirect("/auth/desktop-ok");
+    if (mode === "desktop") {
+      return res.redirect("/auth/desktop-ok");
+    }
 
     const rawAfterLogin = req.session.afterLoginRedirect;
     delete req.session.afterLoginRedirect;
+    storePendingClientRedirect(req.session, rawAfterLogin);
 
-    return res.redirect(resolvePostLoginRedirectUrl(profileKey, rawAfterLogin));
+    return res.redirect(getFixedPostLoginRedirectUrl(profileKey));
   } catch (err) {
     console.error("OIDC callback error >>>", err);
     return res.status(400).send("OIDC callback failed");

@@ -25,7 +25,7 @@ import JSZip from "jszip";
 
 import shpwrite from "@mapbox/shp-write";
 import { FeatureCollection, Polygon as pl } from "geojson";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 
 import { useContent } from "hooks/useContent";
 import { addPlanStarGraphics } from "hooks/hover-click-handlers/usePlanStarGraphic";

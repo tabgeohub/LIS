@@ -14,10 +14,10 @@ Application code, dependencies, and maintainability. **DevOps findings (K8s, Doc
 
 | Area | Count | Open (RAW) |
 |------|------:|-----------:|
-| Security + Reliability (code) | 48 | 18 |
-| Security + Reliability FIXED | 30 | — |
-| Maintainability (code) | 1064 | all RAW |
-| Duplication findings | 221 | all RAW |
+| Security + Reliability (code) | 49 | 3 |
+| Security + Reliability FIXED | 46 | — |
+| Maintainability (code) | 1062 | all RAW |
+| Duplication findings | 211 | all RAW |
 
 > DevOps: 37 security/reliability findings (2 RAW) — see `devops/DEVOPS-PLAN.md`
 
@@ -42,12 +42,12 @@ Phase 5: Deferred maintainability (WP-10, WP-11, WP-12)
 | ID | Phase | Name | Depends on | Open findings cleared |
 |----|-------|------|------------|----------------------|
 | WP-00 | 0 - Prep | Baseline and process | — | — |
-| WP-01 | 1 - Dependencies | Backend npm dependency upgrades | WP-00 | 5 |
+| WP-01 | 1 - Dependencies | Backend npm dependency upgrades | WP-00 | — |
 | WP-02 | 1 - Dependencies | Frontend xlsx dependency | WP-00 | 1 |
-| WP-05 | 2 - Dev tooling | verify-regio-apis SQL injection | WP-00 | 2 |
-| WP-06 | 3 - sendEmail cluster | sendEmail.ts single refactor | WP-01 | 7 |
+| WP-05 | 2 - Dev tooling | verify-regio-apis SQL injection | WP-00 | — |
+| WP-06 | 3 - sendEmail cluster | sendEmail.ts single refactor | WP-01 | — |
 | WP-07 | 3 - Auth/HTML | Keycloak callback open redirect | WP-00 | 2 |
-| WP-08 | 3 - Auth/HTML | renderDownloadPage HTML template | WP-06 | 1 |
+| WP-08 | 3 - Auth/HTML | renderDownloadPage HTML template | WP-06 | — |
 | WP-09 | 3 - Auth/HTML | fileDownload.ts verify FIXED | WP-08 | — |
 | DUP-01 | 4 - Duplication | Flight plan Buttons pattern | Independent unless same file as WP-06 | — |
 | DUP-02 | 4 - Duplication | Flight plan FormElements | Independent unless same file as WP-06 | — |
@@ -61,28 +61,13 @@ Phase 5: Deferred maintainability (WP-10, WP-11, WP-12)
 | WP-11 | 5 - Defer | Large map/ArcGIS units | Duplication phase stable | — |
 | WP-12 | 5 - Defer | Architecture coupling | WP-10 | — |
 
-## Open security/reliability items (18 RAW)
+## Open security/reliability items (3 RAW)
 
 | WP | Severity | File | Issue |
 |----|----------|------|-------|
-| WP-05 | CRITICAL | `backend/scripts/verify-regio-apis.js` | Untrusted input concatinated with raw SQL query can result in SQL Injection |
-| WP-05 | CRITICAL | `backend/scripts/verify-regio-apis.js` | Untrusted input concatinated with raw SQL query can result in SQL Injection |
-| WP-01 | HIGH | `backend/package-lock.json` | NPM dependency multer contains 2 vulnerabilities |
-| WP-01 | HIGH | `backend/package-lock.json` | NPM dependency nodemailer contains 1 vulnerability |
-| WP-01 | HIGH | `backend/package-lock.json` | NPM dependency undici contains 7 vulnerabilities |
-| WP-01 | HIGH | `backend/package-lock.json` | NPM dependency multer contains 2 vulnerabilities |
-| WP-01 | HIGH | `backend/package-lock.json` | NPM dependency undici contains 7 vulnerabilities |
-| WP-06 | HIGH | `backend/src/routes/emails/sendEmail.ts` | If unverified user data can reach the `puppeteer` methods it can result in Serve |
 | WP-02 | HIGH | `package-lock.json` | NPM dependency xlsx contains 2 vulnerabilities |
-| WP-08 | MEDIUM | `backend/src/helpers/renderDownloadPage.ts` | This template literal looks like HTML and has interpolated variables |
 | WP-07 | MEDIUM | `backend/src/routes/auth/authKeycloak/callbackHandler.ts` | Untrusted user input in redirect() can result in Open Redirect vulnerability |
 | WP-07 | MEDIUM | `backend/src/routes/auth/authKeycloak/callbackHandler.ts` | Untrusted user input in redirect() can result in Open Redirect vulnerability |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | User data flows into the host portion of this manually-constructed HTML |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | This template literal looks like HTML and has interpolated variables |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | User data flows into the host portion of this manually-constructed HTML |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | User data flows into the host portion of this manually-constructed HTML |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | User data flows into the host portion of this manually-constructed HTML |
-| WP-06 | MEDIUM | `backend/src/routes/emails/sendEmail.ts` | User data flows into the host portion of this manually-constructed HTML |
 
 ## File collision map
 

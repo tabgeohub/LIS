@@ -1,5 +1,6 @@
 import { type RequestHandler } from "express";
 import { decodeJwtPayload } from "../jwt";
+import { consumePendingClientRedirect } from "./resolvePostLoginRedirect";
 
 // @ts-ignore
 export const meHandler: RequestHandler = (req, res) => {
@@ -28,6 +29,8 @@ export const meHandler: RequestHandler = (req, res) => {
   const resourceRoles =
     accessClaims?.resource_access ?? idClaims?.resource_access ?? {};
 
+  const pendingClientPath = consumePendingClientRedirect(req.session);
+
   res.json({
     user: {
       username,
@@ -39,6 +42,7 @@ export const meHandler: RequestHandler = (req, res) => {
       realm: realmRoles,
       resource: resourceRoles,
     },
+    ...(pendingClientPath ? { pendingClientPath } : {}),
     raw: {
       idToken: idClaims,
     },

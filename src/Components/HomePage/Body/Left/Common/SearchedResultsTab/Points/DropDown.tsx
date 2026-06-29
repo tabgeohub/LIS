@@ -14,7 +14,7 @@ import {
 } from "react-icons/md";
 import { saveAs } from "file-saver";
 import { EnrichedPointType } from "Types";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";

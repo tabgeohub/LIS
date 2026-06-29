@@ -6,6 +6,7 @@ import { useEffect, useMemo, useCallback } from "react";
 import useLogAction from "hooks/useLogAction";
 import useNearestPointClick from "hooks/hover-click-handlers/useNearestPointClick";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
+import { sortPointsWithSelectionOrder } from "hooks/points/sortPointsWithSelectionOrder";
 
 export default function PointsList({
   selectedPoints,
@@ -49,32 +50,10 @@ export default function PointsList({
     enabled: true,
   });
 
-  const sortedPoints = useMemo(() => {
-    const indexMap = new Map<number, number>();
-    points.forEach((p, i) => indexMap.set(p.id, i));
-
-    // Create reverse index map for selected points (last clicked = 0, first clicked = highest)
-    const selectedReverseIndexMap = new Map<number, number>();
-    selectedPoints.forEach((id, i) => {
-      selectedReverseIndexMap.set(id, selectedPoints.length - 1 - i);
-    });
-
-    const isSelected = (id: number) => (selectedPoints.includes(id) ? 0 : 1);
-    return [...points].sort((a, b) => {
-      const selOrder = isSelected(a.id) - isSelected(b.id);
-      if (selOrder !== 0) return selOrder;
-
-      // For selected points, sort by reverse index (last clicked first)
-      if (selectedPoints.includes(a.id) && selectedPoints.includes(b.id)) {
-        const aReverseIndex = selectedReverseIndexMap.get(a.id) ?? 0;
-        const bReverseIndex = selectedReverseIndexMap.get(b.id) ?? 0;
-        return aReverseIndex - bReverseIndex;
-      }
-
-      // For non-selected points, maintain original order
-      return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
-    });
-  }, [points, selectedPoints]);
+  const sortedPoints = useMemo(
+    () => sortPointsWithSelectionOrder(points, selectedPoints),
+    [points, selectedPoints]
+  );
 
   return (
     <>

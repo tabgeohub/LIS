@@ -13,7 +13,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType } from "Types";
 import { PiSelectionForegroundThin } from "react-icons/pi";
 import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { FaFolderOpen } from "react-icons/fa6";
 import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";

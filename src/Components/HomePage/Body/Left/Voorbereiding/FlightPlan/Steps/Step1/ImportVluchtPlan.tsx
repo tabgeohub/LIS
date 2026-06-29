@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import * as XLSX from "xlsx";
+import * as XLSX from "@e965/xlsx";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import toast from "react-hot-toast";

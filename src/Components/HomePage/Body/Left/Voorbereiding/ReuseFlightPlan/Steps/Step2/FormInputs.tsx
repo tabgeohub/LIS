@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { populateFormFromPlan } from "hooks/flightPlan/populateFormFromPlan";
+import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Vluchtnummer from "./Vluchtnummer";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import { useEffect } from "react";
 import useGetPiloot from "hooks/consts/useGetPiloot";
 import useGetWaarnemers from "hooks/consts/useGetWaarnemers";
 import useGetLuchtvaartuig from "hooks/consts/useGetLuchtvaartuig";
@@ -37,20 +36,17 @@ export default function FormInputs() {
     setAanvullendeInfo,
   } = useReuseFlightPlan();
 
-  useEffect(() => {
-    if (!selectedPlan) return;
-    populateFormFromPlan(selectedPlan, {
-      setOmschrijving,
-      setWaarnemer,
-      setPiloot,
-      setDatum,
-      setGeplandeVliegduur,
-      setTypeLuchtvaartuig,
-      setAantalPassagiers,
-      setDoelEnHoofdthema,
-      setAanvullendeInfo,
-    });
-  }, [selectedPlan]);
+  usePopulateFlightPlanFormEffect(selectedPlan, {
+    setOmschrijving,
+    setWaarnemer,
+    setPiloot,
+    setDatum,
+    setGeplandeVliegduur,
+    setTypeLuchtvaartuig,
+    setAantalPassagiers,
+    setDoelEnHoofdthema,
+    setAanvullendeInfo,
+  });
 
   return (
     <div className="py-4 px-2 space-y-3">
