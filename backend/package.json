@@ -7,7 +7,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "verify:regio-apis": "npx ts-node --transpile-only scripts/verify-regio-apis.ts"
+    "verify:regio-apis": "npx ts-node --transpile-only scripts/verify-regio-apis.ts",
+    "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,14 +21,14 @@
     "dotenv": "^16.5.0",
     "express": "^4.18.2",
     "express-session": "^1.18.2",
-    "multer": "^2.0.1",
-    "nodemailer": "^8.0.10",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1",
     "openid-client": "^5.7.1",
     "pg": "^8.16.0",
     "puppeteer": "^24.16.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "undici": "^7.18.2",
+    "undici": "^7.28.0",
     "uuid": "^14.0.0"
   },
   "devDependencies": {

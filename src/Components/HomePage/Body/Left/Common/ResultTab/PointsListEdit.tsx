@@ -14,7 +14,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import ClickedPointFunctions from "Components/HomePage/Body/Bottom/ClickedPointFunctions";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
+import { useResultTabStarredPointActions } from "hooks/resultTab/useResultTabStarredPointActions";
 
 export default function PointsListEdit({
   clickedPoint,
@@ -33,43 +33,21 @@ export default function PointsListEdit({
   }>();
   const [openListPointDiv, setOpenListPointDiv] = useState(false);
 
-  const [starredPoints, setStarredPoints] = useState<EnrichedPointType[]>([]);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const { setSelectedBottomTab } = useSelectedBottomTabState();
-
   const { setOpenSideBar } = useOpeSideBarState();
-
   const { setClickedPoint } = usePopUpState();
-
   const { setOpenResultTab } = useOpenResultTab();
-
   const { setSelectedTab } = useTabState();
-
   const { pointsTable, setOpenTable, setView } = useOpenTable();
-
-  const { hoverPoint, clearHover, goToPoint, toggleStarPoint } =
-    usePointListMapActions({
-      starredPoints,
-      setStarredPoints,
-      onStar: (point) => {
-        logAction({
-          message: `User starred point '${point.omschrijving}' in the list of starred points`,
-          step: "ResultTab",
-        });
-      },
-      onUnstar: (point) => {
-        logAction({
-          message: `User removed point '${point.omschrijving}' from the list of starred points`,
-          step: "ResultTab",
-        });
-      },
-      onGoTo: (point) => {
-        logAction({
-          message: `User clicked on point '${point.omschrijving}' in the list of starred points`,
-          step: "ResultTab ( goToPoint function )",
-        });
-      },
-    });
+  const {
+    starredPoints,
+    setStarredPoints,
+    hoverPoint,
+    clearHover,
+    goToPoint,
+    toggleStarPoint,
+  } = useResultTabStarredPointActions();
 
   const tableView = () => {
     setOpenResultTab(false);

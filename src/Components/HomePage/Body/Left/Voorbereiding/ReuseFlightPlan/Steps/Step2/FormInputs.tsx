@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { populateFormFromPlan } from "hooks/flightPlan/populateFormFromPlan";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Vluchtnummer from "./Vluchtnummer";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
@@ -38,16 +39,17 @@ export default function FormInputs() {
 
   useEffect(() => {
     if (!selectedPlan) return;
-
-    setOmschrijving(selectedPlan?.omschrijving);
-    setWaarnemer(selectedPlan?.waarnemer);
-    setPiloot(selectedPlan?.piloot);
-    setDatum(selectedPlan?.datum);
-    setGeplandeVliegduur(selectedPlan?.vliegduur);
-    setTypeLuchtvaartuig(selectedPlan?.luchtvaartuig);
-    setAantalPassagiers(selectedPlan?.passagiers);
-    setDoelEnHoofdthema(selectedPlan?.hoofdthema);
-    setAanvullendeInfo(selectedPlan?.aanvullende);
+    populateFormFromPlan(selectedPlan, {
+      setOmschrijving,
+      setWaarnemer,
+      setPiloot,
+      setDatum,
+      setGeplandeVliegduur,
+      setTypeLuchtvaartuig,
+      setAantalPassagiers,
+      setDoelEnHoofdthema,
+      setAanvullendeInfo,
+    });
   }, [selectedPlan]);
 
   return (

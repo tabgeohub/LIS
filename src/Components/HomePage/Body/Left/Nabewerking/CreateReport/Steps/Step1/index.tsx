@@ -4,7 +4,7 @@ import PeriodFilter from "../PeriodFilter";
 import SinglePlan from "./SinglePlan";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useEffect } from "react";
-import { useFilterPlans } from "../../../VluchtenZoeken/hooks/useFilterPlans";
+import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import { useContent } from "hooks/useContent";
 
 export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {

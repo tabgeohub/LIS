@@ -1,19 +1,21 @@
 import { Response } from "express";
-import { escapeHtml } from "./escapeHtml";
+import {
+  htmlDocument,
+  htmlEscaped,
+  htmlFormPost,
+  htmlParagraph,
+} from "./html/buildHtml";
 
 export function sendHtml(res: Response, html: string): void {
   res.type("html").send(html);
 }
 
 export function renderExpiredDownloadPage(): string {
-  return `<!DOCTYPE html>
-<html lang="nl">
-  <head><meta charset="utf-8" /><title>Beveiligde download</title></head>
-  <body style="font-family: sans-serif; padding: 20px;">
-    <h2>Beveiligde download</h2>
-    <p style="color: red;">❌ Deze downloadlink is verlopen (ouder dan 7 dagen)</p>
-  </body>
-</html>`;
+  return htmlDocument(
+    "<h2>Beveiligde download</h2>" +
+      '<p style="color: red;">❌ Deze downloadlink is verlopen (ouder dan 7 dagen)</p>',
+    '<title>Beveiligde download</title>'
+  );
 }
 
 export function renderDownloadPage(options: {
@@ -21,42 +23,33 @@ export function renderDownloadPage(options: {
   message?: string;
   showNoPasswordNote?: boolean;
 }): string {
-  const action = escapeHtml(options.actionPath);
   const message = options.message
-    ? `<p style="color: red;">${escapeHtml(options.message)}</p>`
+    ? htmlParagraph('<span style="color: red;">' + htmlEscaped(options.message) + "</span>")
     : "";
   const note = options.showNoPasswordNote
-    ? `<p style="color:#666">⚠️ Er is nog geen wachtwoord ingesteld voor dit bestand.</p>`
+    ? htmlParagraph('<span style="color:#666">⚠️ Er is nog geen wachtwoord ingesteld voor dit bestand.</span>')
     : "";
+  const formBody =
+    '<input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />' +
+    '<button type="submit">Download</button>';
 
-  return `<!DOCTYPE html>
-<html lang="nl">
-  <head><meta charset="utf-8" /><title>Beveiligde download</title></head>
-  <body style="font-family: sans-serif; padding: 20px;">
-    <h2>Beveiligde download</h2>
-    ${note}
-    ${message}
-    <form method="POST" action="${action}">
-      <input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />
-      <button type="submit">Download</button>
-    </form>
-  </body>
-</html>`;
+  const body =
+    "<h2>Beveiligde download</h2>" +
+    note +
+    message +
+    htmlFormPost(options.actionPath, formBody);
+
+  return htmlDocument(body, '<title>Beveiligde download</title>');
 }
 
 export function renderWrongPasswordPage(actionPath: string): string {
-  const action = escapeHtml(actionPath);
+  const formBody =
+    '<input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />' +
+    '<button type="submit">Download</button>';
+  const body =
+    "<h2>Beveiligde download</h2>" +
+    htmlFormPost(actionPath, formBody) +
+    '<p style="color: red; margin-top: 10px;">❌ Ongeldig wachtwoord, probeer opnieuw</p>';
 
-  return `<!DOCTYPE html>
-<html lang="nl">
-  <head><meta charset="utf-8" /><title>Beveiligde download</title></head>
-  <body style="font-family: sans-serif; padding: 20px;">
-    <h2>Beveiligde download</h2>
-    <form method="POST" action="${action}">
-      <input type="password" name="password" placeholder="Voer wachtwoord in" autofocus />
-      <button type="submit">Download</button>
-    </form>
-    <p style="color: red; margin-top: 10px;">❌ Ongeldig wachtwoord, probeer opnieuw</p>
-  </body>
-</html>`;
+  return htmlDocument(body, '<title>Beveiligde download</title>');
 }

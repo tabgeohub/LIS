@@ -130,12 +130,17 @@ function assertPlanRegios(
   return true;
 }
 
+const PLAN_TABLE_BY_KEY = {
+  "lis.flightplans": "lis.flightplans",
+  "lis.template_plans": "lis.template_plans",
+} as const;
+
 async function assertPlanRegiosWithDb(
   pool: Pool,
   endpoint: string,
   rows: Array<{ id?: number; regio_id?: string }>,
   expectedRegio: string,
-  table: "lis.flightplans" | "lis.template_plans" = "lis.flightplans"
+  table: keyof typeof PLAN_TABLE_BY_KEY = "lis.flightplans"
 ): Promise<boolean> {
   if (rows.length === 0) {
     pass(endpoint, "0 plan(s)");
@@ -148,8 +153,9 @@ async function assertPlanRegiosWithDb(
     return false;
   }
 
+  const tableName = PLAN_TABLE_BY_KEY[table];
   const r = await pool.query(
-    `SELECT id, regio_id FROM ${table} WHERE id = ANY($1::int[])`,
+    "SELECT id, regio_id FROM " + tableName + " WHERE id = ANY($1::int[])",
     [ids]
   );
   return assertPlanRegios(endpoint, r.rows, expectedRegio);

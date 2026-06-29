@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import { getOidcClientFor } from "../oidc";
-import { OIDC_PROFILES } from "../oidcProfiles";
-import { safeReturnPath } from "./safeReturnPath";
+import { resolvePostLoginRedirectUrl } from "./resolvePostLoginRedirect";
 
 // @ts-ignore
 export const callbackHandler: RequestHandler = async (req, res) => {
@@ -32,15 +31,10 @@ export const callbackHandler: RequestHandler = async (req, res) => {
 
     if (mode === "desktop") return res.redirect("/auth/desktop-ok");
 
-    const afterPath = safeReturnPath(req.session.afterLoginRedirect);
+    const rawAfterLogin = req.session.afterLoginRedirect;
     delete req.session.afterLoginRedirect;
 
-    const base = OIDC_PROFILES[profileKey].frontendUrl.replace(/\/$/, "");
-    if (afterPath) {
-      return res.redirect(`${base}${afterPath}`);
-    }
-
-    return res.redirect(OIDC_PROFILES[profileKey].frontendUrl);
+    return res.redirect(resolvePostLoginRedirectUrl(profileKey, rawAfterLogin));
   } catch (err) {
     console.error("OIDC callback error >>>", err);
     return res.status(400).send("OIDC callback failed");

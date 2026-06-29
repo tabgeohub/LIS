@@ -12,6 +12,7 @@ export function safeReturnPath(raw: unknown): string | null {
   }
   if (decoded.length > 2048) return null;
   if (!decoded.startsWith("/") || decoded.startsWith("//")) return null;
+  if (decoded.includes("\\")) return null;
   if (/\s/.test(decoded)) return null;
   if (decoded.includes("://")) return null;
   return decoded;

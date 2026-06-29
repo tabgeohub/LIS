@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useFilterPlans } from "./useFilterPlans";
+import { useFilterPlans } from "hooks/filters/useFilterPlans";
 
 /**
  * Hook to filter and sort plans based on filter criteria

@@ -4,16 +4,21 @@ import {
   FinishedGeometryType,
 } from "Types/finished_plans";
 import { create } from "zustand";
+import {
+  createFlightPlanFormFieldSetters,
+  createPlanListFilterSetters,
+  emptyFlightPlanFormFields,
+  emptyPlanListFilter,
+  FlightPlanFormFieldValues,
+  PlanListFilterValues,
+} from "hooks/zustand/shared/flightPlanFormFields";
 
-interface FinishedPlansState {
+interface FinishedPlansState extends FlightPlanFormFieldValues, PlanListFilterValues {
   step: number;
   setStep: (value: number) => void;
 
   selectedPlan: FinishedFlightPlanType | null;
   setSelectedPlan: (value: FinishedFlightPlanType | null) => void;
-
-  openFilter: boolean;
-  setOpenFilter: (value: boolean) => void;
 
   filteredPoints: FinishedPointType[];
   setFilteredPoints: (value: FinishedPointType[]) => void;
@@ -36,34 +41,16 @@ interface FinishedPlansState {
   selectedGeometry: FinishedGeometryType | null;
   setSelectedGeometry: (value: FinishedGeometryType | null) => void;
 
-  omschrijving: string;
   setOmschrijving: (value: string) => void;
-
-  waarnemer: string;
   setWaarnemer: (value: string) => void;
-
-  piloot: string;
   setPiloot: (value: string) => void;
-
-  datum: string;
   setDatum: (value: string) => void;
-
-  geplandeVliegduur: string;
   setGeplandeVliegduur: (value: string) => void;
-
-  typeLuchtvaartuig: string;
   setTypeLuchtvaartuig: (value: string) => void;
-
-  aantalPassagiers: number | null | undefined;
   setAantalPassagiers: (value: number | null | undefined) => void;
-
-  doelEnHoofdthema: string;
   setDoelEnHoofdthema: (value: string) => void;
-
-  aanvullendeInfo: string;
   setAanvullendeInfo: (value: string) => void;
-
-  filterTerm: string;
+  setOpenFilter: (value: boolean) => void;
   setFilterTerm: (value: string) => void;
 
   clear: () => void;
@@ -72,7 +59,6 @@ interface FinishedPlansState {
 const initialState = {
   step: 1,
   selectedPlan: null as FinishedFlightPlanType | null,
-  openFilter: false,
   filteredPoints: [] as FinishedPointType[],
   filteredPlans: [] as FinishedFlightPlanType[],
   periode: "Alle",
@@ -80,16 +66,8 @@ const initialState = {
   dateTo: "",
   selectedPoint: null as FinishedPointType | null,
   selectedGeometry: null as FinishedGeometryType | null,
-  omschrijving: "",
-  waarnemer: "",
-  piloot: "",
-  datum: "",
-  geplandeVliegduur: "",
-  typeLuchtvaartuig: "",
-  aantalPassagiers: null as number | null | undefined,
-  doelEnHoofdthema: "",
-  aanvullendeInfo: "",
-  filterTerm: "",
+  ...emptyPlanListFilter,
+  ...emptyFlightPlanFormFields,
 };
 
 /** Subset reset when leaving the search flow (preserves form/filter fields). */
@@ -104,7 +82,6 @@ export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
   ...initialState,
   setStep: (value) => set({ step: value }),
   setSelectedPlan: (value) => set({ selectedPlan: value }),
-  setOpenFilter: (value) => set({ openFilter: value }),
   setFilteredPoints: (value) => set({ filteredPoints: value }),
   setFilteredPlans: (value) => set({ filteredPlans: value }),
   setPeriode: (value) => set({ periode: value }),
@@ -112,15 +89,7 @@ export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
   setDateTo: (value) => set({ dateTo: value }),
   setSelectedPoint: (value) => set({ selectedPoint: value }),
   setSelectedGeometry: (value) => set({ selectedGeometry: value }),
-  setOmschrijving: (value) => set({ omschrijving: value }),
-  setWaarnemer: (value) => set({ waarnemer: value }),
-  setPiloot: (value) => set({ piloot: value }),
-  setDatum: (value) => set({ datum: value }),
-  setGeplandeVliegduur: (value) => set({ geplandeVliegduur: value }),
-  setTypeLuchtvaartuig: (value) => set({ typeLuchtvaartuig: value }),
-  setAantalPassagiers: (value) => set({ aantalPassagiers: value }),
-  setDoelEnHoofdthema: (value) => set({ doelEnHoofdthema: value }),
-  setAanvullendeInfo: (value) => set({ aanvullendeInfo: value }),
-  setFilterTerm: (value) => set({ filterTerm: value }),
+  ...createFlightPlanFormFieldSetters(set),
+  ...createPlanListFilterSetters(set),
   clear: () => set(clearState),
 }));

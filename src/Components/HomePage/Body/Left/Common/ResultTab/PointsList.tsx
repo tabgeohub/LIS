@@ -1,4 +1,3 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useEffect, useRef, useState } from "react";
 import { BsTextParagraph } from "react-icons/bs";
@@ -12,7 +11,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import ClickedPointFunctions from "Components/HomePage/Body/Bottom/ClickedPointFunctions";
 import useLogAction from "hooks/useLogAction";
-import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
+import { useResultTabStarredPointActions } from "hooks/resultTab/useResultTabStarredPointActions";
 
 export default function PointsList({
   clickedPoint,
@@ -27,13 +26,18 @@ export default function PointsList({
 
   const [openListPointDiv, setOpenListPointDiv] = useState(false);
   const { setOpenResultTab } = useOpenResultTab();
-
   const { setSelectedTab } = useTabState();
-
   const { setSelectedBottomTab } = useSelectedBottomTabState();
-
   const { pointsTable, setOpenTable, setView } = useOpenTable();
-  const [starredPoints, setStarredPoints] = useState<EnrichedPointType[]>([]);
+  const {
+    starredPoints,
+    setStarredPoints,
+    hoverPoint,
+    clearHover,
+    goToPoint,
+    toggleStarPoint,
+  } = useResultTabStarredPointActions();
+
   const [clickedPointPosition, setClickedPointPosition] = useState<{
     top: number;
     left: number;
@@ -68,30 +72,6 @@ export default function PointsList({
       window.removeEventListener("resize", handleScrollOrResize);
     };
   }, []);
-
-  const { hoverPoint, clearHover, goToPoint, toggleStarPoint } =
-    usePointListMapActions({
-      starredPoints,
-      setStarredPoints,
-      onStar: (point) => {
-        logAction({
-          message: `User starred point '${point.omschrijving}' in the list of starred points`,
-          step: "ResultTab",
-        });
-      },
-      onUnstar: (point) => {
-        logAction({
-          message: `User removed point '${point.omschrijving}' from the list of starred points`,
-          step: "ResultTab",
-        });
-      },
-      onGoTo: (point) => {
-        logAction({
-          message: `User clicked on point '${point.omschrijving}' in the list of starred points`,
-          step: "ResultTab ( goToPoint function )",
-        });
-      },
-    });
 
   const tableView = () => {
     setOpenResultTab(false);

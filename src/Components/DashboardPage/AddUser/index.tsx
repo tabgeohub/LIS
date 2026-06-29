@@ -1,17 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
-
-type AvailableRole = {
-  id: string;
-  name: string;
-};
-
-type AvailableRoles = {
-  realmRoles: AvailableRole[];
-  clientRoles: Record<string, AvailableRole[]>;
-};
+import RoleSelect from "../shared/RoleSelect";
+import { useKeycloakRoles } from "../shared/useKeycloakRoles";
 
 type FormData = {
   username: string;
@@ -20,20 +12,6 @@ type FormData = {
   confirmPassword: string;
   role: string;
 };
-
-const unwantedRoles = [
-  "default-roles-",
-  "offline_access",
-  "uma_authorization",
-  "manage-account",
-  "manage-account-links",
-  "view-profile",
-  "manage-realm",
-];
-
-function isUnwantedRole(role: string): boolean {
-  return unwantedRoles.some((unwanted) => role.includes(unwanted));
-}
 
 export default function AddUser() {
   const handleCreateSuccess = useUsersManagementState(
@@ -46,40 +24,8 @@ export default function AddUser() {
     confirmPassword: "",
     role: "",
   });
-  const [availableRoles, setAvailableRoles] = useState<AvailableRoles>({
-    realmRoles: [],
-    clientRoles: {},
-  });
+  const { loadingRoles, filteredRealmRoles } = useKeycloakRoles();
   const [loading, setLoading] = useState(false);
-  const [loadingRoles, setLoadingRoles] = useState(false);
-
-  useEffect(() => {
-    const loadRoles = async () => {
-      setLoadingRoles(true);
-      try {
-        const response = await fetch(
-          `${getBackEndUrl()}/api/keycloak/management/roles`,
-          {
-            credentials: "include",
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch roles");
-        }
-
-        setAvailableRoles(data);
-      } catch (err: any) {
-        toast.error(err?.message || "Failed to load roles");
-      } finally {
-        setLoadingRoles(false);
-      }
-    };
-
-    loadRoles();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,10 +88,6 @@ export default function AddUser() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  const filteredRealmRoles = availableRoles.realmRoles.filter(
-    (role) => !isUnwantedRole(role.name)
-  );
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -222,24 +164,14 @@ export default function AddUser() {
           <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
             Role
           </label>
-          {loadingRoles ? (
-            <div className="text-sm text-gray-500 py-2">Loading roles...</div>
-          ) : (
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select a role</option>
-              {filteredRealmRoles.map((role) => (
-                <option key={role.id} value={role.name}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-          )}
+          <RoleSelect
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            roles={filteredRealmRoles}
+            loading={loadingRoles}
+          />
         </div>
 
         <div className="flex gap-3">
