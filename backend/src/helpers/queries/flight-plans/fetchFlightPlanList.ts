@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
+import { pool } from "../../../db";
 import {
   buildFlightPlanQuery,
   BuildFlightPlanQueryOptions,
 } from "./buildFlightPlanQuery";
-import { resolveRegioFilter } from "../resolveRegioFilter";
+import { resolveRegioFilter } from "../../resolveRegioFilter";
 
 type FetchFlightPlanListOptions = Omit<
   BuildFlightPlanQueryOptions,

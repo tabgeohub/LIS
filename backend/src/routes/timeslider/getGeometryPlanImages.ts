@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchTimesliderPlanImages } from "../../helpers/queries/timesliderPlanImages";
+import { fetchTimesliderPlanImages } from "../../helpers/queries/timeslider/timesliderPlanImages";
 
 export async function getGeometryPlanImages(
   req: Request,

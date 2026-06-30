@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { buildFinishedPlansWithPointsQuery } from "../../helpers/queries/buildFinishedPlanQuery";
-import { formatFinishedPlansWithGeometries } from "../../helpers/queries/formatPlanGeometries";
+import { buildFinishedPlansWithPointsQuery } from "../../helpers/queries/finished-plans/buildFinishedPlanQuery";
+import { formatFinishedPlansWithGeometries } from "../../helpers/queries/geometries/formatPlanGeometries";
 import { sendFinishedPlanFetchError } from "../../helpers/finishedPlanRouteHelpers";
 import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
 

@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ProxyAgent, setGlobalDispatcher, fetch, Response } from "undici";
+import { fetch, Response } from "undici";
+import {
+  assertArcgisTokenCredentials,
+  ensureArcgisHttpProxy,
+  resolveArcgisTokenConfig,
+  type ResolvedArcgisTokenConfig,
+} from "./arcgisTokenConfig";
 
 type TokenJson = {
   access_token: string;
@@ -33,74 +39,14 @@ export type ArcgisTokenConfig = {
 
 type Cached = { access_token: string; expires_at: number } | null;
 
-let cfg: Required<ArcgisTokenConfig> | null = null;
+let cfg: ResolvedArcgisTokenConfig | null = null;
 let cache: Cached = null;
-let proxyInitialized = false;
 
 export function initArcgisToken(config?: ArcgisTokenConfig): void {
-  const env = process.env;
-
-  const tokenEndpoint =
-    config?.tokenEndpoint ||
-    env.ARCGIS_TOKEN_ENDPOINT ||
-    "https://www.arcgis.com/sharing/rest/oauth2/token";
-
-  const clientId = config?.clientId || env.ARCGIS_CLIENT_ID;
-  const clientSecret = config?.clientSecret || env.ARCGIS_CLIENT_SECRET;
-  const portalUrl =
-    config?.portalUrl ||
-    env.ARCGIS_PORTAL_URL ||
-    env.ARCGIS_SERVER_URL ||
-    env.REACT_APP_ARCGIS_PORTAL_URL ||
-    "";
-  const adminUser =
-    config?.adminUser ||
-    env.ARCGIS_ADMIN_USER ||
-    env.REACT_APP_ARCGIS_ADMIN_USER ||
-    "";
-  const adminPass =
-    config?.adminPass ||
-    env.ARCGIS_ADMIN_PASS ||
-    env.REACT_APP_ARCGIS_ADMIN_PASS ||
-    "";
-  const referer =
-    config?.referer ||
-    env.ARCGIS_TOKEN_REFERER ||
-    env.REACT_APP_ARCGIS_REFERER_ORIGINS?.split(",")[0] ||
-    env.PUBLIC_FRONTEND_URL ||
-    "http://localhost:3000";
-
-  const hasAdminCreds = !!portalUrl && !!adminUser && !!adminPass;
-  if (!hasAdminCreds) {
-    if (!clientId)
-      throw new Error("Missing ArcGIS clientId (set ARCGIS_CLIENT_ID)");
-    if (!clientSecret) {
-      throw new Error("Missing ArcGIS clientSecret (set ARCGIS_CLIENT_SECRET)");
-    }
-  }
-
-  if (!proxyInitialized) {
-    const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
-    if (proxy) {
-      setGlobalDispatcher(new ProxyAgent(proxy));
-    }
-    proxyInitialized = true;
-  }
-
-  cfg = {
-    tokenEndpoint,
-    clientId: clientId || "",
-    clientSecret: clientSecret || "",
-    portalUrl: portalUrl as any,
-    adminUser: adminUser as any,
-    adminPass: adminPass as any,
-    referer: referer as any,
-    requestTimeoutMs: config?.requestTimeoutMs ?? 15000,
-    retryCount: config?.retryCount ?? 2,
-    retryBaseDelayMs: config?.retryBaseDelayMs ?? 400,
-    skewBufferMs: config?.skewBufferMs ?? 60000,
-    minTtlMs: config?.minTtlMs ?? 0,
-  } as Required<ArcgisTokenConfig>;
+  const resolved = resolveArcgisTokenConfig(config);
+  assertArcgisTokenCredentials(resolved);
+  ensureArcgisHttpProxy();
+  cfg = resolved;
 }
 
 export async function getValidToken(): Promise<{

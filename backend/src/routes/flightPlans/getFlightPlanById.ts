@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { buildFlightPlanQuery } from "../../helpers/queries/buildFlightPlanQuery";
+import { buildFlightPlanQuery } from "../../helpers/queries/flight-plans/buildFlightPlanQuery";
 
 export async function getFlightPlanById(
   req: Request,

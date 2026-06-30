@@ -4,13 +4,13 @@
  */
 import "dotenv/config";
 import { Pool } from "pg";
-import { buildFlightPlanQuery } from "../src/helpers/queries/buildFlightPlanQuery";
+import { buildFlightPlanQuery } from "../src/helpers/queries/flight-plans/buildFlightPlanQuery";
 import {
   buildFinishedFlightPlansListQuery,
   buildFinishedPlansTimeRangeQuery,
   buildFinishedPlansWithPointsQuery,
-} from "../src/helpers/queries/buildFinishedPlanQuery";
-import { appendRegioFilter } from "../src/helpers/queries/regioFilter";
+} from "../src/helpers/queries/finished-plans/buildFinishedPlanQuery";
+import { appendRegioFilter } from "../src/helpers/queries/shared/regioFilter";
 import { resolveRegioFilter } from "../src/helpers/resolveRegioFilter";
 
 const REGIO = "RWS NN";

@@ -1,15 +1,15 @@
-import { FINISHED_PLANS_POINTS_CTE } from "./flightPlanJoin";
+import { FINISHED_PLANS_POINTS_CTE } from "../flight-plans/flightPlanJoin";
 import {
   buildAttachmentsAggregationExpr,
   buildAttachmentsLateralJoin,
   buildFinishedPlanDetailsPointJsonbObject,
   buildFinishedPlanPointJsonbObject,
-} from "./pointJson";
+} from "../points/pointJson";
 import {
   appendRegioFilter,
   buildRegioWhereClause,
   RegioFilterOptions,
-} from "./regioFilter";
+} from "../shared/regioFilter";
 
 export type BuildFinishedPlansQueryOptions = {
   params?: unknown[];

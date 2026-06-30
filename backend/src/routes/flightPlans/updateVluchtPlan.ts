@@ -3,7 +3,7 @@ import { pool } from "../../db";
 import {
   buildFlightPlanUpdateParams,
   buildFlightPlanUpdateSql,
-} from "../../helpers/queries/flightPlanFields";
+} from "../../helpers/queries/flight-plans/flightPlanFields";
 import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
 
 export async function updateVluchtPlan(

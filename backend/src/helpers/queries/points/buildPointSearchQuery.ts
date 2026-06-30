@@ -1,4 +1,4 @@
-import { buildPointsUnnestJoin } from "./flightPlanJoin";
+import { buildPointsUnnestJoin } from "../flight-plans/flightPlanJoin";
 import { buildPointJsonObject } from "./pointJson";
 
 export type PointSearchFilter = "omschrijving" | "planId";

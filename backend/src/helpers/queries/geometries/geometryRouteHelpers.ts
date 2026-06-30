@@ -3,7 +3,7 @@ import {
   buildPointInsertParams,
   buildPointInsertSql,
   PointCoreSource,
-} from "./pointFields";
+} from "../points/pointFields";
 
 export type GeometryMetadataInput = {
   omschrijving?: unknown;

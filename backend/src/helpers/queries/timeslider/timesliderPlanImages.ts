@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
-import { buildFinishedPlanRegioWhereClause } from "./buildFinishedPlanQuery";
-import { parsePlanIds } from "./parsePlanIds";
-import { resolveRegioFilter } from "../resolveRegioFilter";
+import { pool } from "../../../db";
+import { buildFinishedPlanRegioWhereClause } from "../finished-plans/buildFinishedPlanQuery";
+import { parsePlanIds } from "../shared/parsePlanIds";
+import { resolveRegioFilter } from "../../resolveRegioFilter";
 
 export const TIMESLIDER_REGIO_FILTER = {
   caseInsensitiveAdmin: true,

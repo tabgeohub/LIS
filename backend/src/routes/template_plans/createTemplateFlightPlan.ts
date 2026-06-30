@@ -5,7 +5,7 @@ import { getMissingFields, requireArray } from "../../helpers/validateBody";
 import {
   findTemplatePlanByName,
   respondTemplateNameTaken,
-} from "../../helpers/queries/templatePlanHelpers";
+} from "../../helpers/queries/templates/templatePlanHelpers";
 
 export async function createTemplateFlightPlan(
   req: Request,

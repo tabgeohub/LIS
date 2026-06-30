@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { logsFailureMessage } from "../../helpers/queries/logFields";
+import { logsFailureMessage } from "../../helpers/queries/logs/logFields";
 
 export async function podLogs(req: Request, res: Response): Promise<void> {
   try {

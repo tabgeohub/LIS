@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { fetchFlightPlanList } from "../../helpers/queries/fetchFlightPlanList";
-import { formatPlansWithGeometries } from "../../helpers/queries/formatPlanGeometries";
+import { fetchFlightPlanList } from "../../helpers/queries/flight-plans/fetchFlightPlanList";
+import { formatPlansWithGeometries } from "../../helpers/queries/geometries/formatPlanGeometries";
 
 export async function getAllFlightPlans(
   req: Request,

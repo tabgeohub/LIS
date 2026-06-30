@@ -4,7 +4,7 @@ import {
   buildLogInsertQuery,
   buildLogInsertValues,
   logsFailureMessage,
-} from "../../helpers/queries/logFields";
+} from "../../helpers/queries/logs/logFields";
 
 export async function createLogs(req: Request, res: Response): Promise<void> {
   try {

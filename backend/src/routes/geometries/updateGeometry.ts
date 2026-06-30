@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import type { PointCorePayload } from "../../helpers/queries/pointFields";
+import type { PointCorePayload } from "../../helpers/queries/points/pointFields";
 import {
   buildGeometryMetadataValues,
   GEOMETRY_METADATA_UPDATE_SQL,
-} from "../../helpers/queries/geometryRouteHelpers";
+} from "../../helpers/queries/geometries/geometryRouteHelpers";
 
 type PointPayload = PointCorePayload & { id?: number };
 

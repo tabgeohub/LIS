@@ -2,7 +2,7 @@ import { PoolClient } from "pg";
 import {
   buildPointInsertParams,
   buildPointInsertSql,
-} from "./queries/pointFields";
+} from "./queries/points/pointFields";
 import type { IncomingPlan } from "./validators/finishedPlan";
 
 type FinishedPlanPoint = IncomingPlan["points"][number];

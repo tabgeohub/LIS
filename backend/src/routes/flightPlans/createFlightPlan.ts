@@ -3,7 +3,7 @@ import { pool } from "../../db";
 import {
   buildFlightPlanInsertParams,
   buildFlightPlanInsertSql,
-} from "../../helpers/queries/flightPlanFields";
+} from "../../helpers/queries/flight-plans/flightPlanFields";
 import { created, missingFields, serverError } from "../../helpers/routeResponses";
 import { getMissingFields, requireArray } from "../../helpers/validateBody";
 

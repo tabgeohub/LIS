@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchFlightPlanList } from "../../helpers/queries/fetchFlightPlanList";
+import { fetchFlightPlanList } from "../../helpers/queries/flight-plans/fetchFlightPlanList";
 
 export async function getUnPreparedPlans(
   req: Request,

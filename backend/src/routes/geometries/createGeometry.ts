@@ -6,8 +6,8 @@ import {
   serverError,
 } from "../../helpers/routeResponses";
 import { getMissingFields, requireNonEmptyArray } from "../../helpers/validateBody";
-import { insertGeometryPoints } from "../../helpers/queries/geometryRouteHelpers";
-import type { PointCoreSource } from "../../helpers/queries/pointFields";
+import { insertGeometryPoints } from "../../helpers/queries/geometries/geometryRouteHelpers";
+import type { PointCoreSource } from "../../helpers/queries/points/pointFields";
 
 export async function createGeometry(req: Request, res: Response): Promise<void> {
   const {

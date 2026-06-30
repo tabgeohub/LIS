@@ -3,7 +3,7 @@ import { pool } from "../../db";
 import {
   buildPointInsertParams,
   buildPointInsertSql,
-} from "../../helpers/queries/pointFields";
+} from "../../helpers/queries/points/pointFields";
 import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,

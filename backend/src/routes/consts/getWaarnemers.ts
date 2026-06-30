@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchConstLookup } from "../../helpers/queries/fetchConstLookup";
+import { fetchConstLookup } from "../../helpers/queries/consts/fetchConstLookup";
 
 export async function getWaarnemers(
   req: Request,

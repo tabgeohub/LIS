@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
-import { buildFlightPlanQuery } from "./buildFlightPlanQuery";
+import { pool } from "../../../db";
+import { buildFlightPlanQuery } from "../flight-plans/buildFlightPlanQuery";
 import {
   collectGeometryIds,
   fetchGeometryDataMap,
   formatTemplatePlansWithGeometries,
-} from "./formatPlanGeometries";
-import { resolveRegioFilter } from "../resolveRegioFilter";
+} from "../geometries/formatPlanGeometries";
+import { resolveRegioFilter } from "../../resolveRegioFilter";
 
 export async function findTemplatePlanByName(name: string) {
   return pool.query(`SELECT * FROM lis.template_plans WHERE name = $1`, [name]);

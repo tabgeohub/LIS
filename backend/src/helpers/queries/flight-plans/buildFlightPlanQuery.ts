@@ -4,8 +4,8 @@ import {
   appendRegioFilter,
   RegioFilterOptions,
   shouldFilterByRegio,
-} from "./regioFilter";
-import { buildPointJsonObject, PointJsonPreset } from "./pointJson";
+} from "../shared/regioFilter";
+import { buildPointJsonObject, PointJsonPreset } from "../points/pointJson";
 import type { FlightPlanColumnPreset } from "./flightPlanColumns";
 
 export type BuildFlightPlanQueryOptions = {

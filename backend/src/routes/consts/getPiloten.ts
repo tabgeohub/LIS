@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchConstLookup } from "../../helpers/queries/fetchConstLookup";
+import { fetchConstLookup } from "../../helpers/queries/consts/fetchConstLookup";
 
 export async function getPiloten(_req: Request, res: Response): Promise<void> {
   await fetchConstLookup(_req, res, {

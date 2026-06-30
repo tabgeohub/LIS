@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { buildPointSearchQuery } from "../../helpers/queries/buildPointSearchQuery";
+import { buildPointSearchQuery } from "../../helpers/queries/points/buildPointSearchQuery";
 
 export async function getPrepreparedFlightPlanPoints(
   req: Request,

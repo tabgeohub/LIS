@@ -3,7 +3,7 @@ import { pool } from "../../db";
 import {
   buildPointUpdateParams,
   buildPointUpdateSql,
-} from "../../helpers/queries/pointFields";
+} from "../../helpers/queries/points/pointFields";
 import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
