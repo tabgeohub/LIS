@@ -69,11 +69,13 @@ Interface module with 93 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcG
 Interface module with 88 lines of code,MEDIUM,RAW,2026-06-29,0,src/helpers/ArcGISHelpers/bufferGraphics.ts,TypeScript,88
 Interface module with 74 lines of code,MEDIUM,RAW,2026-06-04,25,src/Components/HomePage/Body/Right/SelectedPlansPointsList/Common/usePointPlanImages.ts,TypeScript,74
 Interface module with 69 lines of code,MEDIUM,RAW,2026-06-10,19,src/hooks/layout/useResizableSidebar.ts,TypeScript,69
+Interface module with 68 lines of code,MEDIUM,RAW,2026-06-29,0,src/hooks/zustand/shared/flightPlanFormFields.ts,TypeScript,68
 Interface module with 66 lines of code,MEDIUM,RAW,2026-06-04,25,src/Components/HomePage/Body/Right/SelectedPlansPointsList/Common/useGeometryPlanImages.ts,TypeScript,66
 Interface module with 60 lines of code,MEDIUM,RAW,2026-06-04,25,src/hooks/filters/useFilterPoints.ts,TypeScript,60
 Interface module with 56 lines of code,MEDIUM,RAW,2026-06-06,23,src/helpers/ArcGISHelpers/finishedPlanMapGraphics.ts,TypeScript,56
 Interface module with 54 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcGISHelpers/createPin.ts,TypeScript,54
 Interface module with 53 lines of code,MEDIUM,RAW,2026-06-29,0,src/helpers/points/buildPointUpdatePayload.ts,TypeScript,53
+Interface module with 46 lines of code,MEDIUM,RAW,2026-06-29,0,src/hooks/flightPlan/usePopulateFlightPlanFormEffect.ts,TypeScript,46
 Interface module with 45 lines of code,MEDIUM,RAW,2026-06-04,25,src/hooks/filters/useFilterGeometries.ts,TypeScript,45
 Interface module with 39 lines of code,MEDIUM,RAW,2026-06-29,0,src/hooks/resultTab/useResultTabStarredPointActions.ts,TypeScript,39
 Interface module with 39 lines of code,MEDIUM,RAW,2026-06-04,25,src/hooks/useTimeRange.ts,TypeScript,39
@@ -83,9 +85,9 @@ Interface module with 34 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcG
 Interface module with 31 lines of code,MEDIUM,RAW,2026-06-06,23,src/helpers/ArcGISHelpers/computeFlightPlanCentroid.ts,TypeScript,31
 Interface module with 28 lines of code,MEDIUM,RAW,2026-06-04,25,src/hooks/popUpModal/useHandleClosePopUp.ts,TypeScript,28
 Interface module with 26 lines of code,MEDIUM,RAW,2026-06-10,19,src/hooks/viewPlan/useSortedPointSelection.ts,TypeScript,26
-Interface module with 26 lines of code,MEDIUM,RAW,2026-06-29,0,src/hooks/flightPlan/populateFormFromPlan.ts,TypeScript,26
 Interface module with 25 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcGISHelpers/getTransformedCoordinates.ts,TypeScript,25
 Interface module with 25 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcGISHelpers/createYellowBorder.ts,TypeScript,25
+Interface module with 25 lines of code,MEDIUM,RAW,2026-06-29,0,src/hooks/points/sortPointsWithSelectionOrder.ts,TypeScript,25
 Interface module with 22 lines of code,MEDIUM,RAW,2026-06-04,25,src/Components/HomePage/Body/Right/SelectedPlansPointsList/Common/pointPlanImagesToAttachments.ts,TypeScript,22
 Interface module with 20 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/filterPlans.ts,TypeScript,20
 Interface module with 20 lines of code,MEDIUM,RAW,2026-06-04,25,src/hooks/handleCancel/useCancelCreateFlightPlan.ts,TypeScript,20

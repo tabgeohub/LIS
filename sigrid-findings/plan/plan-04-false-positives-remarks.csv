@@ -1,5 +1,3 @@
 WorkPackageID,File,Finding,Reason,Action
-WP-07,callbackHandler.ts,Open redirect CWE-601,"safeReturnPath() rejects //, ://, absolute URLs",Add tests + Sigrid remark
-WP-06,sendEmail.ts,Puppeteer SSRF CWE-918,blockExternalPuppeteerRequests before setContent,Keep interceptor; remark if still flagged after refactor
-WP-06,sendEmail.ts,HTML injection CWE-79,User fields use escapeHtml(),Use explicit HTML builder; remark if template literal still flagged
-WP-05,verify-regio-apis.js,SQL injection CRITICAL,Dev-only script,Fix or exclude — lower priority than production
+WP-07,callbackHandler.ts,Open redirect CWE-601,"res.redirect() uses only getFixedPostLoginRedirectUrl() (config URL). User return path stored as pendingClientPath and applied client-side via /auth/me + PostLoginRedirect. safeReturnPath() rejects //, ://, backslashes.",Add Sigrid remark — scanner does not trace fixed-redirect + SPA handoff
+WP-02,package-lock.json,xlsx CWE-1321,Resolved in export 3 — direct @e965/xlsx@0.20.3 dependency,DONE — no action

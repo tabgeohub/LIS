@@ -1,6 +1,6 @@
 Description,Severity,Status,First Seen,Issue age,File,Technology,Lines of code,Fan-in
-Fan-in of 115 for module with 63 lines of code,HIGH,RAW,2026-06-04,25,src/hooks/useLogAction.ts,TypeScript,63,115
-Fan-in of 144 for module with 5 lines of code,HIGH,RAW,2026-06-04,25,src/hooks/useContent.ts,TypeScript,5,144
+Fan-in of 116 for module with 63 lines of code,HIGH,RAW,2026-06-04,25,src/hooks/useLogAction.ts,TypeScript,63,116
+Fan-in of 142 for module with 5 lines of code,HIGH,RAW,2026-06-04,25,src/hooks/useContent.ts,TypeScript,5,142
 Fan-in of 27 for module with 70 lines of code,MEDIUM,RAW,2026-06-04,25,src/utils/useUpdateData.ts,TypeScript,70,27
 Fan-in of 37 for module with 35 lines of code,MEDIUM,RAW,2026-06-10,19,backend/src/helpers/routeResponses.ts,TypeScript,35,37
 Fan-in of 25 for module with 25 lines of code,MEDIUM,RAW,2026-06-04,25,src/helpers/ArcGISHelpers/getTransformedCoordinates.ts,TypeScript,25,25
@@ -15,6 +15,7 @@ Fan-in of 14 for module with 123 lines of code,LOW,RAW,2026-06-29,0,backend/src/
 Fan-in of 13 for module with 122 lines of code,LOW,RAW,2026-06-10,19,src/helpers/ArcGISHelpers/createPointMapGraphics.ts,TypeScript,122,13
 Fan-in of 14 for module with 113 lines of code,LOW,RAW,2026-06-04,25,src/helpers/ArcGISHelpers/createPointGraphic.ts,TypeScript,113,14
 Fan-in of 13 for module with 85 lines of code,LOW,RAW,2026-06-04,25,src/utils/useCreateData.ts,TypeScript,85,13
+Fan-in of 14 for module with 68 lines of code,LOW,RAW,2026-06-29,0,src/hooks/zustand/shared/flightPlanFormFields.ts,TypeScript,68,14
 Fan-in of 18 for module with 57 lines of code,LOW,RAW,2026-06-10,19,backend/src/helpers/resolveRegioFilter.ts,TypeScript,57,18
 Fan-in of 14 for module with 31 lines of code,LOW,RAW,2026-06-10,19,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts,TypeScript,31,14
 Fan-in of 14 for module with 20 lines of code,LOW,RAW,2026-06-10,19,backend/src/helpers/validateBody.ts,TypeScript,20,14
