@@ -3,11 +3,11 @@ import { pool } from "../../db";
 import {
   importPointsInTransaction,
   rollbackImportPointsTransaction,
-} from "../../helpers/createPointFromImportDb";
+} from "../../helpers/points/createPointFromImportDb";
 import {
   normalizeImportRows,
   parseReturnMode,
-} from "../../helpers/importPointRowNormalization";
+} from "../../helpers/points/importPointRowNormalization";
 
 export async function createPointFromImport(
   req: Request,

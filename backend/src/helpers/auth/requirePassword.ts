@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 
 export const DOWNLOAD_PASSWORD = process.env.DOWNLOAD_PASSWORD || "password";
-export const uploadsDir = path.join(__dirname, "uploads");
+export const uploadsDir = path.join(__dirname, "..", "uploads");
 
 function parseBasicAuth(header?: string) {
   if (!header) return null;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { missingFields, serverError } from "../../helpers/routeResponses";
-import { getMissingFields } from "../../helpers/validateBody";
+import { missingFields, serverError } from "../../helpers/http/routeResponses";
+import { getMissingFields } from "../../helpers/http/validateBody";
 import {
   findTemplatePlanByName,
   respondTemplateNameTaken,

@@ -5,7 +5,7 @@ import {
   removePointIdsFromFlightPlans,
   runInTransaction,
   sendDeleteError,
-} from "../../helpers/entityDeleteHelpers";
+} from "../../helpers/entities/entityDeleteHelpers";
 
 export async function deleteGeometry(req: Request, res: Response): Promise<void> {
   const geometryId = parseRouteEntityId(req.params.id, "geometry");

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import { buildFinishedPlansTimeRangeQuery } from "../../helpers/queries/finished-plans/buildFinishedPlanQuery";
-import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
+import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 
 export async function getTimeRange(req: Request, res: Response): Promise<void> {
   try {

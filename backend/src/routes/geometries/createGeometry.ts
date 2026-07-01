@@ -4,8 +4,8 @@ import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,
   serverError,
-} from "../../helpers/routeResponses";
-import { getMissingFields, requireNonEmptyArray } from "../../helpers/validateBody";
+} from "../../helpers/http/routeResponses";
+import { getMissingFields, requireNonEmptyArray } from "../../helpers/http/validateBody";
 import { insertGeometryPoints } from "../../helpers/queries/geometries/geometryRouteHelpers";
 import type { PointCoreSource } from "../../helpers/queries/points/pointFields";
 

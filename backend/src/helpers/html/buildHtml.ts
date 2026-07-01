@@ -1,4 +1,4 @@
-import { escapeHtml } from "../escapeHtml";
+import { escapeHtml } from "./escapeHtml";
 
 export function htmlEscaped(value: unknown): string {
   return escapeHtml(value);

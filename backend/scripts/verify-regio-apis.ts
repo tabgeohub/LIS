@@ -11,7 +11,7 @@ import {
   buildFinishedPlansWithPointsQuery,
 } from "../src/helpers/queries/finished-plans/buildFinishedPlanQuery";
 import { appendRegioFilter } from "../src/helpers/queries/shared/regioFilter";
-import { resolveRegioFilter } from "../src/helpers/resolveRegioFilter";
+import { resolveRegioFilter } from "../src/helpers/queries/shared/resolveRegioFilter";
 
 const REGIO = "RWS NN";
 const ADMIN = "admin";

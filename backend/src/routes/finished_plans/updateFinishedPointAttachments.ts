@@ -6,8 +6,8 @@ import {
   notFound,
   okResult,
   serverError,
-} from "../../helpers/routeResponses";
-import { requireArray } from "../../helpers/validateBody";
+} from "../../helpers/http/routeResponses";
+import { requireArray } from "../../helpers/http/validateBody";
 
 export async function updateFinishedPointAttachments(
   req: Request,

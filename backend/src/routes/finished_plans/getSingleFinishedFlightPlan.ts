@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { pool } from "../../db";
 import { buildSingleFinishedFlightPlanQuery } from "../../helpers/queries/finished-plans/buildFinishedPlanQuery";
 import { formatFinishedPlansWithGeometries } from "../../helpers/queries/geometries/formatPlanGeometries";
-import { sendSingleFinishedPlanFetchError } from "../../helpers/finishedPlanRouteHelpers";
+import { sendSingleFinishedPlanFetchError } from "../../helpers/finished-plans/finishedPlanRouteHelpers";
 
 export async function getSingleFinishedFlightPlan(
   req: Request,

@@ -4,8 +4,8 @@ import {
   buildFlightPlanInsertParams,
   buildFlightPlanInsertSql,
 } from "../../helpers/queries/flight-plans/flightPlanFields";
-import { created, missingFields, serverError } from "../../helpers/routeResponses";
-import { getMissingFields, requireArray } from "../../helpers/validateBody";
+import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
+import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
 
 export async function createFlightPlan(
   req: Request,

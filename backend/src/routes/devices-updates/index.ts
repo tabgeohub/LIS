@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireSessionAuth } from "../../helpers/requireSessionAuth";
+import { requireSessionAuth } from "../../helpers/auth/requireSessionAuth";
 import agentRouter from "./agent";
 import { requireAdmin } from "./middleware";
 import { getDevices } from "./getDevices";

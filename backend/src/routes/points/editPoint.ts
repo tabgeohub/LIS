@@ -4,7 +4,7 @@ import {
   buildPointUpdateParams,
   buildPointUpdateSql,
 } from "../../helpers/queries/points/pointFields";
-import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
+import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
   const { id } = req.body;

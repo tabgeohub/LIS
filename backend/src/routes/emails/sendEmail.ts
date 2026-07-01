@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { randomUUID } from "crypto";
 import dayjs from "dayjs";
 import "dayjs/locale/nl";
-import { buildErrorPayload } from "../../helpers/buildErrorPayload";
+import { buildErrorPayload } from "../../helpers/http/buildErrorPayload";
 import {
   buildImageTagsFromFiles,
   buildSpoedEmailHtml,

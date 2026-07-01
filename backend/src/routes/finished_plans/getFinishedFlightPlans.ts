@@ -4,7 +4,7 @@ import { pool } from "../../db";
 
 import { buildFinishedFlightPlansListQuery } from "../../helpers/queries/finished-plans/buildFinishedPlanQuery";
 
-import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
+import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 
 
 

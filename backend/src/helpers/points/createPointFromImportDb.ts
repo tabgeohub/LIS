@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import { POINT_CORE_COLUMNS } from "./queries/points/pointFields";
+import { POINT_CORE_COLUMNS } from "../queries/points/pointFields";
 import {
   NormalizedImportRow,
   ReturnMode,

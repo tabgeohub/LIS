@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
+import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function updateVluchtPlanPoints(
   req: Request,

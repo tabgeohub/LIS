@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { created, missingFields, serverError } from "../../helpers/routeResponses";
-import { getMissingFields } from "../../helpers/validateBody";
+import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
+import { getMissingFields } from "../../helpers/http/validateBody";
 
 export async function createEmail(req: Request, res: Response): Promise<void> {
   const { email, regio } = req.body;

@@ -4,7 +4,7 @@ import {
   buildFlightPlanUpdateParams,
   buildFlightPlanUpdateSql,
 } from "../../helpers/queries/flight-plans/flightPlanFields";
-import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
+import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function updateVluchtPlan(
   req: Request,

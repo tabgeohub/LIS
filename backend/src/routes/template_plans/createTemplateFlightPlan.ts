@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { created, missingFields, serverError } from "../../helpers/routeResponses";
-import { getMissingFields, requireArray } from "../../helpers/validateBody";
+import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
+import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
 import {
   findTemplatePlanByName,
   respondTemplateNameTaken,

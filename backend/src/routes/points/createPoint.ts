@@ -8,8 +8,8 @@ import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,
   serverError,
-} from "../../helpers/routeResponses";
-import { getMissingFields } from "../../helpers/validateBody";
+} from "../../helpers/http/routeResponses";
+import { getMissingFields } from "../../helpers/http/validateBody";
 
 export async function createPoint(req: Request, res: Response): Promise<void> {
   if (getMissingFields(req.body, ["omschrijving", "user_id"]).length > 0) {

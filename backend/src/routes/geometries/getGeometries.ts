@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import { buildGeometryPointsJsonAgg } from "../../helpers/queries/geometries/geometryJson";
-import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
+import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 
 export async function getGeometries(req: Request, res: Response): Promise<void> {
   try {

@@ -4,7 +4,7 @@ import {
   htmlEscaped,
   htmlFormPost,
   htmlParagraph,
-} from "./html/buildHtml";
+} from "./buildHtml";
 
 export function sendHtml(res: Response, html: string): void {
   res.type("html").send(html);

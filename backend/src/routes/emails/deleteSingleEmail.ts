@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { missingFields, notFound, okResult, serverError } from "../../helpers/routeResponses";
-import { requireId } from "../../helpers/validateBody";
+import { missingFields, notFound, okResult, serverError } from "../../helpers/http/routeResponses";
+import { requireId } from "../../helpers/http/validateBody";
 
 export async function deleteSingleEmail(
   req: Request,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { runStatusUpdate } from "../../helpers/runReturningUpdate";
+import { runStatusUpdate } from "../../helpers/http/runReturningUpdate";
 
 export async function editPointStatus(
   req: Request,

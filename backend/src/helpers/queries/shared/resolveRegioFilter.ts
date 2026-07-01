@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { decodeJwtPayload } from "../routes/auth/jwt";
+import { decodeJwtPayload } from "../../../routes/auth/jwt";
 
 function firstQueryValue(value: unknown): string | undefined {
   if (value == null || value === "") {

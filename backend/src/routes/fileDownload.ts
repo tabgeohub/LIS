@@ -3,17 +3,17 @@ import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
 import { setPassword, hasPassword, verifyPassword } from "./passwordStore";
-import { requireSessionAuth } from "../helpers/requireSessionAuth";
+import { requireSessionAuth } from "../helpers/auth/requireSessionAuth";
 import {
   renderDownloadPage,
   renderExpiredDownloadPage,
   renderWrongPasswordPage,
   sendHtml,
-} from "../helpers/renderDownloadPage";
+} from "../helpers/html/renderDownloadPage";
 import {
   buildDownloadActionPath,
   resolveDownloadFilename,
-} from "../helpers/fileDownloadHelpers";
+} from "../helpers/downloads/fileDownloadHelpers";
 
 dotenv.config();
 

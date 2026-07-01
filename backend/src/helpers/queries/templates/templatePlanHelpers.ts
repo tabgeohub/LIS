@@ -6,7 +6,7 @@ import {
   fetchGeometryDataMap,
   formatTemplatePlansWithGeometries,
 } from "../geometries/formatPlanGeometries";
-import { resolveRegioFilter } from "../../resolveRegioFilter";
+import { resolveRegioFilter } from "../shared/resolveRegioFilter";
 
 export async function findTemplatePlanByName(name: string) {
   return pool.query(`SELECT * FROM lis.template_plans WHERE name = $1`, [name]);

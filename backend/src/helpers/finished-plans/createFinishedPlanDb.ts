@@ -3,8 +3,8 @@ import {
   buildPointInsertParams,
   buildPointInsertSql,
   type PointCoreColumn,
-} from "./queries/points/pointFields";
-import type { IncomingPlan } from "./validators/finishedPlan";
+} from "../queries/points/pointFields";
+import type { IncomingPlan } from "../validators/finishedPlan";
 
 type FinishedPlanPoint = IncomingPlan["points"][number];
 type FinishedPlanAttachment = NonNullable<

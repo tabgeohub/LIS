@@ -1,4 +1,4 @@
-import { escapeHtml } from "../../helpers/escapeHtml";
+import { escapeHtml } from "../../helpers/html/escapeHtml";
 import {
   htmlDiv,
   htmlDocument,

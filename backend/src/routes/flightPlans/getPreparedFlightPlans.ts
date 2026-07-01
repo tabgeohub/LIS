@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import { appendRegioFilter } from "../../helpers/queries/shared/regioFilter";
-import { resolveRegioFilter } from "../../helpers/resolveRegioFilter";
+import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 
 export async function getPreparedFlightPlans(
   req: Request,

@@ -4,7 +4,7 @@ import { pool } from "../../db";
 import {
   rollbackFinishedPlanTransaction,
   saveFinishedPlanInTransaction,
-} from "../../helpers/createFinishedPlanDb";
+} from "../../helpers/finished-plans/createFinishedPlanDb";
 import {
   finishedPlanFail,
   finishedPlanOk,

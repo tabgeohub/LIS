@@ -4,7 +4,7 @@ import {
   buildFlightPlanQuery,
   BuildFlightPlanQueryOptions,
 } from "./buildFlightPlanQuery";
-import { resolveRegioFilter } from "../../resolveRegioFilter";
+import { resolveRegioFilter } from "../shared/resolveRegioFilter";
 
 type FetchFlightPlanListOptions = Omit<
   BuildFlightPlanQueryOptions,

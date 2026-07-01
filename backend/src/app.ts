@@ -23,8 +23,8 @@ import geometriesRouter from "./routes/geometries";
 import timesliderRouter from "./routes/timeslider";
 import arcgisRouter from "./routes/arcgis";
 import arcgisPostProxyHandler from "./routes/arcgis/postProxyHandler";
-import { requirePassword, uploadsDir } from "./helpers/requirePassword";
-import { requireSessionAuth } from "./helpers/requireSessionAuth";
+import { requirePassword, uploadsDir } from "./helpers/auth/requirePassword";
+import { requireSessionAuth } from "./helpers/auth/requireSessionAuth";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 
