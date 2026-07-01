@@ -5,7 +5,8 @@ export async function getWaarnemers(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchConstLookup(req, res, {
+  await fetchConstLookup({
+    res,
     select: "id, naam, regio_id",
     from: "lis.waarnemers",
     errorLabel: "piloten",

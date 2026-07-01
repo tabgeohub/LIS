@@ -18,12 +18,17 @@ type FetchFlightPlanListOptions = Omit<
   transform?: (rows: unknown[]) => unknown;
 };
 
+export type FetchFlightPlanListInput = {
+  req: Request;
+  res: Response;
+} & FetchFlightPlanListOptions;
+
 export async function fetchFlightPlanList(
-  req: Request,
-  res: Response,
-  options: FetchFlightPlanListOptions
+  input: FetchFlightPlanListInput
 ): Promise<void> {
   const {
+    req,
+    res,
     useRegioFilter = false,
     errorLogLabel = "Error fetching flight plans:",
     errorMessage,
@@ -31,7 +36,7 @@ export async function fetchFlightPlanList(
     includeErrorField = false,
     transform,
     ...queryOptions
-  } = options;
+  } = input;
 
   try {
     const regio_id = useRegioFilter ? resolveRegioFilter(req) : undefined;

@@ -25,15 +25,19 @@ export async function deleteSingleEmail(
       return;
     }
 
-    okResult(res, result.rows[0], "E-mail succesvol verwijderd");
-  } catch (err) {
-    serverError(
+    okResult({
       res,
-      "Error deleting email:",
-      `Failed to delete email: ${
+      result: result.rows[0],
+      message: "E-mail succesvol verwijderd",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error deleting email:",
+      message: `Failed to delete email: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

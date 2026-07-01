@@ -4,16 +4,19 @@ import { getAdminBase, getUserRoles } from "./helpers";
 import { getAvailableRoles } from "./getAvailableRoles";
 import { fetch } from "undici";
 
-export async function updateUserRoles(
-  userId: string,
-  roles: string[],
-  req: Request
-): Promise<void> {
+export type UpdateUserRolesInput = {
+  userId: string;
+  roles: string[];
+  req: Request;
+};
+
+export async function updateUserRoles(input: UpdateUserRolesInput): Promise<void> {
+  const { userId, roles, req } = input;
   const adminToken = await getKeycloakAdminToken(req);
   const adminBase = getAdminBase(req);
 
   // Get current roles
-  const currentRoles = await getUserRoles(userId, adminToken, adminBase);
+  const currentRoles = await getUserRoles({ userId, adminToken, adminBase });
 
   // Get all available roles to find role IDs
   const availableRoles = await getAvailableRoles(req);
@@ -88,7 +91,7 @@ export async function handleUpdateUserRoles(req: Request, res: Response) {
       return res.status(400).json({ error: "Roles must be an array" });
     }
 
-    await updateUserRoles(id, roles, req);
+    await updateUserRoles({ userId: id, roles, req });
     res.json({ success: true });
   } catch (error: any) {
     const message = error?.message || "Failed to update user roles";

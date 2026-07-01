@@ -44,15 +44,19 @@ export async function createTemplateFlightPlan(
       [points, name, regio_id]
     );
 
-    created(res, result.rows[0], "De vluchttemplate is succesvol opgeslagen");
-  } catch (err) {
-    serverError(
+    created({
       res,
-      "Error creating template flight plan:",
-      `Failed to creating template flight plan: ${
+      result: result.rows[0],
+      message: "De vluchttemplate is succesvol opgeslagen",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error creating template flight plan:",
+      message: `Failed to creating template flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

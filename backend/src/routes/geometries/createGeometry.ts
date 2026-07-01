@@ -60,11 +60,11 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     );
 
     const geometryId = geometryResult.rows[0].id;
-    const insertedPoints = await insertGeometryPoints(
+    const insertedPoints = await insertGeometryPoints({
       client,
       geometryId,
-      points as PointCoreSource[]
-    );
+      points: points as PointCoreSource[],
+    });
 
     await client.query("COMMIT");
 
@@ -78,12 +78,12 @@ export async function createGeometry(req: Request, res: Response): Promise<void>
     });
   } catch (err) {
     await client.query("ROLLBACK");
-    serverError(
+    serverError({
       res,
-      "Error creating geometry:",
-      `Error : ${err instanceof Error ? err.message : String(err)}`,
-      err
-    );
+      logLabel: "Error creating geometry:",
+      message: `Error : ${err instanceof Error ? err.message : String(err)}`,
+      err,
+    });
   } finally {
     client.release();
   }

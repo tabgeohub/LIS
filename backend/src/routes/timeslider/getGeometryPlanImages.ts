@@ -5,7 +5,9 @@ export async function getGeometryPlanImages(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchTimesliderPlanImages(req, res, {
+  await fetchTimesliderPlanImages({
+    req,
+    res,
     filter: "geometry",
     paramName: "geometry_id",
     responseIdKey: "geometry_id",

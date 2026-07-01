@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { pool } from "../../../db";
 
-type FetchConstLookupOptions = {
+export type FetchConstLookupInput = {
+  res: Response;
   select: string;
   from: string;
   where?: string;
@@ -11,12 +12,10 @@ type FetchConstLookupOptions = {
 };
 
 export async function fetchConstLookup(
-  _req: Request,
-  res: Response,
-  options: FetchConstLookupOptions
+  input: FetchConstLookupInput
 ): Promise<void> {
-  const { select, from, where, orderBy, errorLabel, useErrorField = false } =
-    options;
+  const { res, select, from, where, orderBy, errorLabel, useErrorField = false } =
+    input;
 
   try {
     const whereClause = where ? ` WHERE ${where}` : "";

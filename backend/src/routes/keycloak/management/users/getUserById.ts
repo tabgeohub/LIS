@@ -22,7 +22,7 @@ async function getUserById(
 
   const user = (await response.json()) as KeycloakUser;
   const { adminToken, adminBase } = await getKeycloakAdminContext(req);
-  const roles = await getUserRoles(userId, adminToken, adminBase);
+  const roles = await getUserRoles({ userId, adminToken, adminBase });
 
   return {
     ...user,
@@ -37,6 +37,6 @@ export async function handleGetUserById(req: Request, res: Response) {
     const user = await getUserById(id, req);
     res.json(user);
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to fetch user");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to fetch user" });
   }
 }

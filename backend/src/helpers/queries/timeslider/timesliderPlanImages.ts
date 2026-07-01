@@ -84,11 +84,16 @@ type FetchTimesliderPlanImagesOptions = {
   failureMessage: string;
 };
 
+export type FetchTimesliderPlanImagesInput = {
+  req: Request;
+  res: Response;
+} & FetchTimesliderPlanImagesOptions;
+
 export async function fetchTimesliderPlanImages(
-  req: Request,
-  res: Response,
-  options: FetchTimesliderPlanImagesOptions
+  input: FetchTimesliderPlanImagesInput
 ): Promise<void> {
+  const { req, res, ...options } = input;
+
   try {
     const entityId = parsePositiveIntQueryParam(
       req.query[options.paramName],

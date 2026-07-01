@@ -52,11 +52,16 @@ export async function fetchKeycloakClients(
   return (await clientsResponse.json()) as Array<{ id: string; clientId: string }>;
 }
 
+export type FetchClientRoleNamesForUserInput = {
+  userId: string;
+  adminToken: string;
+  adminBase: string;
+};
+
 export async function fetchClientRoleNamesForUser(
-  userId: string,
-  adminToken: string,
-  adminBase: string
+  input: FetchClientRoleNamesForUserInput
 ): Promise<Record<string, string[]>> {
+  const { userId, adminToken, adminBase } = input;
   const clientRoles: Record<string, string[]> = {};
   const clients = await fetchKeycloakClients(adminToken, adminBase);
 
@@ -129,11 +134,14 @@ export async function fetchClientRoleDefinitions(
   return clientRoles;
 }
 
-export function handleKeycloakRouteError(
-  res: import("express").Response,
-  error: unknown,
-  fallbackMessage: string
-) {
+export type HandleKeycloakRouteErrorInput = {
+  res: import("express").Response;
+  error: unknown;
+  fallbackMessage: string;
+};
+
+export function handleKeycloakRouteError(input: HandleKeycloakRouteErrorInput) {
+  const { res, error, fallbackMessage } = input;
   const message =
     error instanceof Error ? error.message : fallbackMessage;
   return res.status(500).json({ error: message });

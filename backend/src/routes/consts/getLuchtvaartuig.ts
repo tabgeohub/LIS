@@ -5,7 +5,8 @@ export async function getLuchtvaartuig(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchConstLookup(req, res, {
+  await fetchConstLookup({
+    res,
     select: "id, naam",
     from: "lis.luchtvaartuig",
     errorLabel: "piloten",

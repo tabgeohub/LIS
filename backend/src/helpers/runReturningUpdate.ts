@@ -18,12 +18,18 @@ export function requireRouteId(res: Response, id: unknown): id is number | strin
   return true;
 }
 
+export type RunReturningUpdateByIdInput = {
+  res: Response;
+  id: unknown;
+  runQuery: () => Promise<QueryResult>;
+  config: ReturningUpdateConfig;
+};
+
 export async function runReturningUpdateById(
-  res: Response,
-  id: unknown,
-  runQuery: () => Promise<QueryResult>,
-  config: ReturningUpdateConfig
+  input: RunReturningUpdateByIdInput
 ): Promise<void> {
+  const { res, id, runQuery, config } = input;
+
   if (!requireRouteId(res, id)) {
     return;
   }
@@ -36,16 +42,20 @@ export async function runReturningUpdateById(
       return;
     }
 
-    okResult(res, result.rows[0], config.successMessage);
+    okResult({
+      res,
+      result: result.rows[0],
+      message: config.successMessage,
+    });
   } catch (err) {
     const errText = err instanceof Error ? err.message : String(err);
     const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
-    serverError(
+    serverError({
       res,
-      config.logLabel,
-      `${config.errorMessage}${separator}${errText}`,
-      err
-    );
+      logLabel: config.logLabel,
+      message: `${config.errorMessage}${separator}${errText}`,
+      err,
+    });
   }
 }
 
@@ -56,12 +66,16 @@ type StatusUpdateConfig = {
   notFoundMessage?: string;
 };
 
-export async function runStatusUpdate(
-  res: Response,
-  id: unknown,
-  runQuery: () => Promise<QueryResult>,
-  config: StatusUpdateConfig
-): Promise<void> {
+export type RunStatusUpdateInput = {
+  res: Response;
+  id: unknown;
+  runQuery: () => Promise<QueryResult>;
+  config: StatusUpdateConfig;
+};
+
+export async function runStatusUpdate(input: RunStatusUpdateInput): Promise<void> {
+  const { res, id, runQuery, config } = input;
+
   if (!requireRouteId(res, id)) {
     return;
   }
@@ -74,15 +88,19 @@ export async function runStatusUpdate(
       return;
     }
 
-    okResult(res, result.rows[0], config.successMessage);
+    okResult({
+      res,
+      result: result.rows[0],
+      message: config.successMessage,
+    });
   } catch (err) {
     const errText = err instanceof Error ? err.message : String(err);
     const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
-    serverError(
+    serverError({
       res,
-      config.logLabel,
-      `${config.errorMessage}${separator}${errText}`,
-      err
-    );
+      logLabel: config.logLabel,
+      message: `${config.errorMessage}${separator}${errText}`,
+      err,
+    });
   }
 }

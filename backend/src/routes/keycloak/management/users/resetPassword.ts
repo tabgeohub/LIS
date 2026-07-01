@@ -45,6 +45,6 @@ export async function handleResetPassword(req: Request, res: Response) {
 
     res.json({ success: true });
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to reset password");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to reset password" });
   }
 }

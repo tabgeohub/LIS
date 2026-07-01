@@ -30,15 +30,19 @@ export async function createFlightPlan(
       buildFlightPlanInsertParams(req.body)
     );
 
-    created(res, result.rows[0], "Vluchtplan succesvol opgeslagen");
-  } catch (err) {
-    serverError(
+    created({
       res,
-      "Error creating flight plan:",
-      `Failed to create flight plan: ${
+      result: result.rows[0],
+      message: "Vluchtplan succesvol opgeslagen",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error creating flight plan:",
+      message: `Failed to create flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

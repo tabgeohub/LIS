@@ -35,6 +35,6 @@ export async function handleDeleteUser(req: Request, res: Response) {
 
     res.json({ success: true });
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to delete user");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to delete user" });
   }
 }

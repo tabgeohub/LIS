@@ -12,16 +12,16 @@ export async function updateVluchtPlan(
 ): Promise<void> {
   const { id } = req.body;
 
-  await runReturningUpdateById(
+  await runReturningUpdateById({
     res,
     id,
-    () =>
+    runQuery: () =>
       pool.query(buildFlightPlanUpdateSql(), buildFlightPlanUpdateParams(req.body, id)),
-    {
+    config: {
       notFoundMessage: "Vluchtplan niet gevonden",
       successMessage: "Vluchtplan succesvol bijgewerkt",
       logLabel: "Error:",
       errorMessage: "Bijwerken van het vluchtplan mislukt. Error:",
-    }
-  );
+    },
+  });
 }

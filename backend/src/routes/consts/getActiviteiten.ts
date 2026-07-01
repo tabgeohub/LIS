@@ -5,7 +5,8 @@ export async function getActiviteiten(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchConstLookup(req, res, {
+  await fetchConstLookup({
+    res,
     select: "id, activiteit",
     from: "lis.activiteiten",
     orderBy: "activiteit ASC",

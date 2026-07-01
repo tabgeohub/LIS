@@ -9,15 +9,15 @@ import { runReturningUpdateById } from "../../helpers/runReturningUpdate";
 export async function editPoint(req: Request, res: Response): Promise<void> {
   const { id } = req.body;
 
-  await runReturningUpdateById(
+  await runReturningUpdateById({
     res,
     id,
-    () => pool.query(buildPointUpdateSql(), buildPointUpdateParams(req.body, id)),
-    {
+    runQuery: () => pool.query(buildPointUpdateSql(), buildPointUpdateParams(req.body, id)),
+    config: {
       notFoundMessage: "Vluchtplan niet gevonden",
       successMessage: "Vluchtplan succesvol bijgewerkt",
       logLabel: "Error updating point:",
       errorMessage: "Failed to update point:",
-    }
-  );
+    },
+  });
 }

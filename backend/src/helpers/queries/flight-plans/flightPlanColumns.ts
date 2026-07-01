@@ -23,11 +23,16 @@ function flightPlanExtraColumns(
   return columns.map((column) => `${planAlias}.${column}`).join(",\n        ");
 }
 
+export type BuildFlightPlanSelectColumnsInput = {
+  preset: FlightPlanColumnPreset;
+  planAlias: string;
+  extraSelect?: string;
+};
+
 export function buildFlightPlanSelectColumns(
-  preset: FlightPlanColumnPreset,
-  planAlias: string,
-  extraSelect?: string
+  input: BuildFlightPlanSelectColumnsInput
 ): string {
+  const { preset, planAlias, extraSelect } = input;
   const base = `${planAlias}.id AS id, ${planAlias}.vluchtnummer, ${planAlias}.omschrijving, ${planAlias}.datum, ${planAlias}.user_id, ${planAlias}.status, ${planAlias}.basemap, ${planAlias}.created_at`;
   const standardExtra = `${base},\n        ${flightPlanExtraColumns(planAlias, FLIGHT_PLAN_STANDARD_EXTRA)},`;
   const allExtra = `${base},\n        ${flightPlanExtraColumns(planAlias, [

@@ -29,7 +29,7 @@ async function getAllUsers(req: Request): Promise<KeycloakUser[]> {
 
   const usersWithRoles = await Promise.all(
     users.map(async (user) => {
-      const roles = await getUserRoles(user.id, adminToken, adminBase);
+      const roles = await getUserRoles({ userId: user.id, adminToken, adminBase });
       return {
         ...user,
         realmRoles: roles.realmRoles,
@@ -46,6 +46,6 @@ export async function handleGetAllUsers(req: Request, res: Response) {
     const users = await getAllUsers(req);
     res.json(users);
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to fetch users");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to fetch users" });
   }
 }

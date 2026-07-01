@@ -3,14 +3,17 @@ import { getKeycloakAdminToken } from "../../../../services/getKeycloakAdminToke
 import { getAdminBase } from "./helpers";
 import { fetch } from "undici";
 
-async function updateUser(
-  userId: string,
+type UpdateUserInput = {
+  userId: string;
   updates: {
     username?: string;
     email?: string;
-  },
-  req: Request
-): Promise<void> {
+  };
+  req: Request;
+};
+
+async function updateUser(input: UpdateUserInput): Promise<void> {
+  const { userId, updates, req } = input;
   const adminToken = await getKeycloakAdminToken(req);
   const adminBase = getAdminBase(req);
 
@@ -34,7 +37,7 @@ export async function handleUpdateUser(req: Request, res: Response) {
     const { id } = req.params;
     const { username, email } = req.body;
 
-    await updateUser(id, { username, email }, req);
+    await updateUser({ userId: id, updates: { username, email }, req });
     res.json({ success: true });
   } catch (error: any) {
     const message = error?.message || "Failed to update user";

@@ -44,11 +44,15 @@ export async function runInTransaction<T>(
   }
 }
 
-export function sendDeleteError(
-  res: Response,
-  entityLabel: string,
-  err: unknown
-): void {
+export type SendDeleteErrorInput = {
+  res: Response;
+  entityLabel: string;
+  err: unknown;
+};
+
+export function sendDeleteError(input: SendDeleteErrorInput): void {
+  const { res, entityLabel, err } = input;
+
   console.error(
     `Error deleting ${entityLabel}:`,
     err instanceof Error ? err.message : String(err)

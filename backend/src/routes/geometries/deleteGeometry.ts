@@ -66,6 +66,6 @@ export async function deleteGeometry(req: Request, res: Response): Promise<void>
       ...result,
     });
   } catch (err) {
-    sendDeleteError(res, "geometry", err);
+    sendDeleteError({ res, entityLabel: "geometry", err });
   }
 }

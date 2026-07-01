@@ -14,28 +14,37 @@ export function notFound(res: Response, message: string): void {
   res.status(404).json({ result: null, message });
 }
 
-export function okResult(
-  res: Response,
-  result: unknown,
-  message: string,
-  status = 200
-): void {
+export type OkResultInput = {
+  res: Response;
+  result: unknown;
+  message: string;
+  status?: number;
+};
+
+export function okResult(input: OkResultInput): void {
+  const { res, result, message, status = 200 } = input;
   res.status(status).json({ result, message });
 }
 
-export function created(res: Response, result: unknown, message: string): void {
-  okResult(res, result, message, 201);
+export type CreatedInput = {
+  res: Response;
+  result: unknown;
+  message: string;
+};
+
+export function created(input: CreatedInput): void {
+  okResult({ ...input, status: 201 });
 }
 
-export function serverError(
-  res: Response,
-  logLabel: string,
-  message: string,
-  err: unknown
-): void {
-  console.error(
-    logLabel,
-    err instanceof Error ? err.message : String(err)
-  );
+export type ServerErrorInput = {
+  res: Response;
+  logLabel: string;
+  message: string;
+  err: unknown;
+};
+
+export function serverError(input: ServerErrorInput): void {
+  const { res, logLabel, message, err } = input;
+  console.error(logLabel, err instanceof Error ? err.message : String(err));
   res.status(500).json({ result: null, message });
 }

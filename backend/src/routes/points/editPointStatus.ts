@@ -8,10 +8,10 @@ export async function editPointStatus(
 ): Promise<void> {
   const { id, status } = req.body;
 
-  await runStatusUpdate(
+  await runStatusUpdate({
     res,
     id,
-    () =>
+    runQuery: () =>
       pool.query(
         `
       UPDATE lis.points SET
@@ -21,11 +21,11 @@ export async function editPointStatus(
     `,
         [status, id]
       ),
-    {
+    config: {
       notFoundMessage: "Aandachtspunt niet gevonden",
       successMessage: "Aandachtspunt succesvol bijgewerkt",
       logLabel: "Error updating point status:",
       errorMessage: "Failed to update point status:",
-    }
-  );
+    },
+  });
 }

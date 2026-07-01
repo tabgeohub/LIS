@@ -28,15 +28,19 @@ export async function createAttachment(
       [url, pointId, attachmentId, taken_at, location]
     );
 
-    created(res, result.rows[0], "Attachment succesvol aangemaakt");
-  } catch (err) {
-    serverError(
+    created({
       res,
-      "Error creating attachment:",
-      `Failed to create attachment: ${
+      result: result.rows[0],
+      message: "Attachment succesvol aangemaakt",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error creating attachment:",
+      message: `Failed to create attachment: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

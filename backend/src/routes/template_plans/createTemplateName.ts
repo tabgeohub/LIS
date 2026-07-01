@@ -29,13 +29,13 @@ export async function createTemplateName(
       message: "De vluchttemplate is succesvol opgeslagen",
     });
   } catch (err) {
-    serverError(
+    serverError({
       res,
-      "Error creating template flight plan:",
-      `Failed to creating template flight plan: ${
+      logLabel: "Error creating template flight plan:",
+      message: `Failed to creating template flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

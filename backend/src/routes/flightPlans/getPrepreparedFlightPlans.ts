@@ -5,7 +5,9 @@ export async function getPrepreparedFlightPlans(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchFlightPlanList(req, res, {
+  await fetchFlightPlanList({
+    req,
+    res,
     columnPreset: "search",
     pointPreset: "search",
     where: "fp.status = 'pre-prepared'",

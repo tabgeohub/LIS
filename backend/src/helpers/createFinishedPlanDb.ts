@@ -92,11 +92,11 @@ class FinishedPlanWriter {
 
   private async insertNewPoint(point: FinishedPlanPoint): Promise<number> {
     const sql = `${buildPointInsertSql(["created_at", "status", "soort"])} RETURNING id`;
-    const values = buildPointInsertParams(
-      point,
-      [new Date(), "bezocht", "adhoc"],
-      buildNewPointOverrides(point, this.plan.user_id)
-    );
+    const values = buildPointInsertParams({
+      source: point,
+      extraValues: [new Date(), "bezocht", "adhoc"],
+      overrides: buildNewPointOverrides(point, this.plan.user_id),
+    });
 
     const inserted = await this.client.query(sql, values);
     const newId = inserted.rows?.[0]?.id;

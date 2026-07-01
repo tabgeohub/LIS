@@ -15,13 +15,13 @@ async function connectDbClient(res: Response): Promise<PoolClient | null> {
   try {
     return await pool.connect();
   } catch (e) {
-    finishedPlanFail(
+    finishedPlanFail({
       res,
-      500,
-      "ERR_DB_CONNECT",
-      "Failed to acquire DB connection.",
-      String(e)
-    );
+      status: 500,
+      code: "ERR_DB_CONNECT",
+      message: "Failed to acquire DB connection.",
+      details: String(e),
+    });
     return null;
   }
 }
@@ -32,7 +32,12 @@ export async function createFinishedPlan(
 ): Promise<void> {
   const validated = validateFinishedPlan(req.body);
   if (!validated.ok) {
-    finishedPlanFail(res, 400, "ERR_VALIDATION", validated.reason);
+    finishedPlanFail({
+      res,
+      status: 400,
+      code: "ERR_VALIDATION",
+      message: validated.reason,
+    });
     return;
   }
 
@@ -45,21 +50,23 @@ export async function createFinishedPlan(
     await client.query("BEGIN");
     await saveFinishedPlanInTransaction(client, validated.plan);
     await client.query("COMMIT");
-    finishedPlanOk(
+    finishedPlanOk({
       res,
-      { message: "Vluchtplan succesvol opgeslagen", planId: validated.plan.id },
-      200
-    );
+      data: {
+        message: "Vluchtplan succesvol opgeslagen",
+        planId: validated.plan.id,
+      },
+    });
   } catch (e) {
     await rollbackFinishedPlanTransaction(client);
     const msg = e instanceof Error ? e.message : String(e);
-    finishedPlanFail(
+    finishedPlanFail({
       res,
-      500,
-      "ERR_DB_TRANSACTION",
-      "Failed to save finished plan.",
-      msg
-    );
+      status: 500,
+      code: "ERR_DB_TRANSACTION",
+      message: "Failed to save finished plan.",
+      details: msg,
+    });
   } finally {
     client.release();
   }

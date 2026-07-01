@@ -7,11 +7,16 @@ import {
 
 export { getAdminBase };
 
+export type GetUserRolesInput = {
+  userId: string;
+  adminToken: string;
+  adminBase: string;
+};
+
 export async function getUserRoles(
-  userId: string,
-  adminToken: string,
-  adminBase: string
+  input: GetUserRolesInput
 ): Promise<{ realmRoles: string[]; clientRoles: Record<string, string[]> }> {
+  const { userId, adminToken, adminBase } = input;
   const realmRoles: string[] = [];
 
   try {
@@ -36,16 +41,16 @@ export async function getUserRoles(
     console.warn(`Failed to fetch realm roles for user ${userId}:`, error);
   }
 
-  const clientRoles = await fetchClientRoleNamesForUser(
+  const clientRoles = await fetchClientRoleNamesForUser({
     userId,
     adminToken,
-    adminBase
-  );
+    adminBase,
+  });
 
   return { realmRoles, clientRoles };
 }
 
 export async function getUserRolesForRequest(userId: string, req: import("express").Request) {
   const { adminToken, adminBase } = await getKeycloakAdminContext(req);
-  return getUserRoles(userId, adminToken, adminBase);
+  return getUserRoles({ userId, adminToken, adminBase });
 }

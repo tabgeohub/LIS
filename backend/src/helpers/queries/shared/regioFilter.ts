@@ -54,11 +54,14 @@ export function shouldFilterByRegio(
   );
 }
 
-function buildRegioMatchClause(
-  column: string,
-  paramIndex: number,
-  options: RegioFilterOptions
-): string {
+type BuildRegioMatchClauseInput = {
+  column: string;
+  paramIndex: number;
+  options: RegioFilterOptions;
+};
+
+function buildRegioMatchClause(input: BuildRegioMatchClauseInput): string {
+  const { column, paramIndex, options } = input;
   const { castAsText = false, compareLowercase = true } = options;
 
   if (compareLowercase || castAsText) {
@@ -86,7 +89,7 @@ export function appendRegioFilter(input: AppendRegioFilterInput): string {
 
   params.push(value);
 
-  return `${sql} AND ${buildRegioMatchClause(column, params.length, options)}`;
+  return `${sql} AND ${buildRegioMatchClause({ column, paramIndex: params.length, options })}`;
 }
 
 export function buildRegioWhereClause(input: BuildRegioWhereClauseInput): string {
@@ -107,5 +110,5 @@ export function buildRegioWhereClause(input: BuildRegioWhereClauseInput): string
 
   params.push(value);
 
-  return `${prefix} ${buildRegioMatchClause(column, params.length, options)}`;
+  return `${prefix} ${buildRegioMatchClause({ column, paramIndex: params.length, options })}`;
 }

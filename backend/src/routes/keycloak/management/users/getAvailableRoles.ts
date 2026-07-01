@@ -39,6 +39,6 @@ export async function handleGetAvailableRoles(req: Request, res: Response) {
     const roles = await getAvailableRoles(req);
     res.json(roles);
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to fetch roles");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to fetch roles" });
   }
 }

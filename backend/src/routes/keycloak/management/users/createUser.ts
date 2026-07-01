@@ -133,11 +133,11 @@ export async function handleCreateUser(req: Request, res: Response) {
     );
 
     if (role) {
-      await updateUserRoles(userId, [role], req);
+      await updateUserRoles({ userId, roles: [role], req });
     }
 
     res.json({ success: true, userId });
   } catch (error: unknown) {
-    handleKeycloakRouteError(res, error, "Failed to create user");
+    handleKeycloakRouteError({ res, error, fallbackMessage: "Failed to create user" });
   }
 }

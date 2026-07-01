@@ -17,15 +17,19 @@ export async function createEmail(req: Request, res: Response): Promise<void> {
       [email, regio]
     );
 
-    created(res, result.rows[0], "E-mail succesvol aangemaakt");
-  } catch (err) {
-    serverError(
+    created({
       res,
-      "Error creating email:",
-      `Failed to create email: ${
+      result: result.rows[0],
+      message: "E-mail succesvol aangemaakt",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error creating email:",
+      message: `Failed to create email: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

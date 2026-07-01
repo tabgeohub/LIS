@@ -1,16 +1,26 @@
 import { Response } from "express";
 
-export function finishedPlanOk(res: Response, data: unknown, status = 200) {
+export type FinishedPlanOkInput = {
+  res: Response;
+  data: unknown;
+  status?: number;
+};
+
+export function finishedPlanOk(input: FinishedPlanOkInput) {
+  const { res, data, status = 200 } = input;
   return res.status(status).json(data);
 }
 
-export function finishedPlanFail(
-  res: Response,
-  status: number,
-  code: string,
-  message: string,
-  details?: unknown
-) {
+export type FinishedPlanFailInput = {
+  res: Response;
+  status: number;
+  code: string;
+  message: string;
+  details?: unknown;
+};
+
+export function finishedPlanFail(input: FinishedPlanFailInput) {
+  const { res, status, code, message, details } = input;
   return res.status(status).json({ error: { code, message, details } });
 }
 

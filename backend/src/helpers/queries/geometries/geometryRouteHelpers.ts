@@ -51,11 +51,16 @@ export const GEOMETRY_METADATA_UPDATE_SQL = `
       WHERE id = $7
       RETURNING *`;
 
+export type InsertGeometryPointsInput = {
+  client: PoolClient;
+  geometryId: number;
+  points: PointCoreSource[];
+};
+
 export async function insertGeometryPoints(
-  client: PoolClient,
-  geometryId: number,
-  points: PointCoreSource[]
+  input: InsertGeometryPointsInput
 ): Promise<Record<string, unknown>[]> {
+  const { client, geometryId, points } = input;
   const insertedPoints: Record<string, unknown>[] = [];
 
   for (const point of points) {
@@ -66,12 +71,15 @@ export async function insertGeometryPoints(
         "status",
         "created_at",
       ])} RETURNING *`,
-      buildPointInsertParams(point, [
-        geometryId,
-        "permanent",
-        "niet bezocht",
-        new Date(),
-      ])
+      buildPointInsertParams({
+        source: point,
+        extraValues: [
+          geometryId,
+          "permanent",
+          "niet bezocht",
+          new Date(),
+        ],
+      })
     );
     insertedPoints.push(pointResult.rows[0]);
   }

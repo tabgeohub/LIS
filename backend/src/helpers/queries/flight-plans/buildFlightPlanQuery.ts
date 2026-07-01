@@ -47,7 +47,7 @@ export function buildFlightPlanQuery(
         : `${planAlias}.created_at DESC`,
   } = options;
 
-  const planColumns = buildFlightPlanSelectColumns(columnPreset, planAlias);
+  const planColumns = buildFlightPlanSelectColumns({ preset: columnPreset, planAlias });
   const pointJson = buildPointJsonObject(pointPreset);
   const joins = buildPointsUnnestJoin(planAlias, includeGeometryJoin);
 

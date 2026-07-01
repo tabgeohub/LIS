@@ -12,7 +12,9 @@ export async function getSearchedFlightPlans(
     return;
   }
 
-  await fetchFlightPlanList(req, res, {
+  await fetchFlightPlanList({
+    req,
+    res,
     columnPreset: "search",
     pointPreset: "search",
     where:

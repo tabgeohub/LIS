@@ -77,17 +77,21 @@ export async function updateFinishedPointAttachments(
 
     await client.query("COMMIT");
 
-    okResult(res, result.rows[0], "Attachment succesvol bijgewerkt.");
+    okResult({
+      res,
+      result: result.rows[0],
+      message: "Attachment succesvol bijgewerkt.",
+    });
   } catch (err) {
     await client.query("ROLLBACK");
-    serverError(
+    serverError({
       res,
-      "Error updating point:",
-      `Failed to update point: ${
+      logLabel: "Error updating point:",
+      message: `Failed to update point: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   } finally {
     client.release();
   }

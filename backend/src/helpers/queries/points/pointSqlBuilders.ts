@@ -13,11 +13,14 @@ export function buildPointInsertSql(extraColumns: string[]): string {
       ) VALUES (${placeholders})`;
 }
 
-export function buildPointInsertParams(
-  source: PointCoreSource,
-  extraValues: unknown[],
-  overrides: Partial<Record<PointCoreColumn, unknown>> = {}
-): unknown[] {
+export type BuildPointInsertParamsInput = {
+  source: PointCoreSource;
+  extraValues: unknown[];
+  overrides?: Partial<Record<PointCoreColumn, unknown>>;
+};
+
+export function buildPointInsertParams(input: BuildPointInsertParamsInput): unknown[] {
+  const { source, extraValues, overrides = {} } = input;
   return [...pointCoreValues(source, overrides), ...extraValues];
 }
 

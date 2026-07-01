@@ -54,6 +54,6 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
       ...result,
     });
   } catch (err) {
-    sendDeleteError(res, "point", err);
+    sendDeleteError({ res, entityLabel: "point", err });
   }
 }

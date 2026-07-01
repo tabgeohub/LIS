@@ -25,15 +25,19 @@ export async function editSingleEmail(
       return;
     }
 
-    okResult(res, result.rows[0], "E-mail succesvol bijgewerkt");
-  } catch (err) {
-    serverError(
+    okResult({
       res,
-      "Error updating flight plan:",
-      `Failed to update flight plan: ${
+      result: result.rows[0],
+      message: "E-mail succesvol bijgewerkt",
+    });
+  } catch (err) {
+    serverError({
+      res,
+      logLabel: "Error updating flight plan:",
+      message: `Failed to update flight plan: ${
         err instanceof Error ? err.message : String(err)
       }`,
-      err
-    );
+      err,
+    });
   }
 }

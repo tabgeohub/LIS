@@ -6,7 +6,9 @@ export async function getAllFlightPlans(
   req: Request,
   res: Response
 ): Promise<void> {
-  await fetchFlightPlanList(req, res, {
+  await fetchFlightPlanList({
+    req,
+    res,
     columnPreset: "all",
     pointPreset: "full",
     includeGeometryJoin: true,

@@ -22,7 +22,10 @@ export async function createPoint(req: Request, res: Response): Promise<void> {
   try {
     const result = await pool.query(
       `${buildPointInsertSql(["soort", "status", "created_at"])} RETURNING *`,
-      buildPointInsertParams(req.body, ["permanent", "niet bezocht", created_at])
+      buildPointInsertParams({
+        source: req.body,
+        extraValues: ["permanent", "niet bezocht", created_at],
+      })
     );
 
     const row = result.rows[0];
@@ -33,11 +36,11 @@ export async function createPoint(req: Request, res: Response): Promise<void> {
       message: "Punt succesvol aangemaakt",
     });
   } catch (err) {
-    serverError(
+    serverError({
       res,
-      "Error creating point:",
-      `Error : ${err instanceof Error ? err.message : String(err)}`,
-      err
-    );
+      logLabel: "Error creating point:",
+      message: `Error : ${err instanceof Error ? err.message : String(err)}`,
+      err,
+    });
   }
 }
