@@ -38,10 +38,18 @@ const upload = multer({
   },
 });
 
-function sendError(res: any, status: any, message: any, extra: any = {}) {
-  const body = { error: message, ...extra };
+type SendErrorInput = {
+  res: express.Response;
+  status: number;
+  message: string;
+  extra?: Record<string, unknown>;
+};
+
+function sendError(input: SendErrorInput) {
+  const { res, status, message, extra = {} } = input;
+  const body: Record<string, unknown> = { error: message, ...extra };
   if (process.env.NODE_ENV !== "production" && extra.stack) {
-    body.stack = extra.stack.split("\n").slice(0, 6).join("\n");
+    body.stack = String(extra.stack).split("\n").slice(0, 6).join("\n");
   }
   return res.status(status).json(body);
 }
@@ -72,14 +80,16 @@ router.post("/", (req, res, next) => {
   upload.single("report")(req, res, (err) => {
     if (err) {
       const message = mapMulterError(err);
-      return sendError(res, 400, message, {
-        code: err.code,
-        stack: err.stack || "",
+      return sendError({
+        res,
+        status: 400,
+        message,
+        extra: { code: err.code, stack: err.stack || "" },
       });
     }
 
     if (!req.file) {
-      return sendError(res, 400, "No file uploaded");
+      return sendError({ res, status: 400, message: "No file uploaded" });
     }
 
     try {
@@ -111,13 +121,18 @@ router.post("/", (req, res, next) => {
 export function uploadErrorHandler(err: any, _req: any, res: any, _next: any) {
   if (err instanceof multer.MulterError) {
     const message = mapMulterError(err);
-    return sendError(res, 400, message, {
-      code: err.code,
-      stack: err.stack || "",
+    return sendError({
+      res,
+      status: 400,
+      message,
+      extra: { code: err.code, stack: err.stack || "" },
     });
   }
-  return sendError(res, 500, "Failed to upload report", {
-    stack: err.stack || "",
+  return sendError({
+    res,
+    status: 500,
+    message: "Failed to upload report",
+    extra: { stack: err.stack || "" },
   });
 }
 

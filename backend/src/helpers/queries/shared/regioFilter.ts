@@ -7,6 +7,22 @@ export type RegioFilterOptions = {
   compareLowercase?: boolean;
 };
 
+export type AppendRegioFilterInput = {
+  sql: string;
+  params: unknown[];
+  regio_id: unknown;
+  column?: string;
+  options?: RegioFilterOptions;
+};
+
+export type BuildRegioWhereClauseInput = {
+  regio_id: unknown;
+  params: unknown[];
+  column: string;
+  options?: RegioFilterOptions;
+  prefix?: "AND" | "WHERE";
+};
+
 function isAdminRegio(
   regio_id: unknown,
   caseInsensitiveAdmin: boolean
@@ -52,13 +68,15 @@ function buildRegioMatchClause(
   return `${column} = $${paramIndex}`;
 }
 
-export function appendRegioFilter(
-  sql: string,
-  params: unknown[],
-  regio_id: unknown,
-  column = "fp.regio_id",
-  options: RegioFilterOptions = {}
-): string {
+export function appendRegioFilter(input: AppendRegioFilterInput): string {
+  const {
+    sql,
+    params,
+    regio_id,
+    column = "fp.regio_id",
+    options = {},
+  } = input;
+
   if (!shouldFilterByRegio(regio_id, options)) {
     return sql;
   }
@@ -71,13 +89,15 @@ export function appendRegioFilter(
   return `${sql} AND ${buildRegioMatchClause(column, params.length, options)}`;
 }
 
-export function buildRegioWhereClause(
-  regio_id: unknown,
-  params: unknown[],
-  column: string,
-  options: RegioFilterOptions = {},
-  prefix: "AND" | "WHERE" = "AND"
-): string {
+export function buildRegioWhereClause(input: BuildRegioWhereClauseInput): string {
+  const {
+    regio_id,
+    params,
+    column,
+    options = {},
+    prefix = "AND",
+  } = input;
+
   if (!shouldFilterByRegio(regio_id, options)) {
     return "";
   }

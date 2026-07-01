@@ -45,7 +45,11 @@ export const reportAgentStatus: RequestHandler = async (req, res) => {
   };
 
   try {
-    const updated = await applyAgentReport(device.id, report, completedCommand);
+    const updated = await applyAgentReport({
+      deviceId: device.id,
+      report,
+      completedCommand,
+    });
     if (!updated) {
       res.status(404).json({ error: "Device not found" });
       return;

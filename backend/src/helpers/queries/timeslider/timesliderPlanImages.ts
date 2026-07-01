@@ -111,12 +111,12 @@ export async function fetchTimesliderPlanImages(
 
     const regioId = resolveRegioFilter(req);
     const params: unknown[] = [entityId, planIds];
-    const regioClause = buildFinishedPlanRegioWhereClause(
-      regioId,
+    const regioClause = buildFinishedPlanRegioWhereClause({
+      regio_id: regioId,
       params,
-      "fl.regio_id",
-      TIMESLIDER_REGIO_FILTER
-    );
+      column: "fl.regio_id",
+      regioFilter: TIMESLIDER_REGIO_FILTER,
+    });
 
     const sql = buildTimesliderPlanImagesQuery({
       filter: options.filter,

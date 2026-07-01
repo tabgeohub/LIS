@@ -289,11 +289,16 @@ export async function touchDeviceSeen(deviceId: string): Promise<void> {
   );
 }
 
+export type ApplyAgentReportInput = {
+  deviceId: string;
+  report: AgentReportBody;
+  completedCommand: DeviceCommand | null;
+};
+
 export async function applyAgentReport(
-  deviceId: string,
-  report: AgentReportBody,
-  completedCommand: DeviceCommand | null
+  input: ApplyAgentReportInput
 ): Promise<GetacDevice | null> {
+  const { deviceId, report, completedCommand } = input;
   await ensureDevicesUpdatesSchema();
 
   const status: DeviceStatus = report.reboot_required

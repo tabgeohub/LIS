@@ -6,15 +6,21 @@ import {
   releaseStaleCommands,
 } from "./db";
 
+export type QueueDeviceCommandInput = {
+  deviceId: string;
+  command: DeviceCommand;
+  res: Response;
+  errorLogLabel: string;
+  errorMessage: string;
+};
+
 export async function queueDeviceCommandWhenIdle(
-  id: string,
-  command: DeviceCommand,
-  res: Response,
-  errorLogLabel: string,
-  errorMessage: string
+  input: QueueDeviceCommandInput
 ): Promise<void> {
-  await releaseStaleCommands(1, id);
-  const device = await getDeviceById(id);
+  const { deviceId, command, res, errorLogLabel, errorMessage } = input;
+
+  await releaseStaleCommands(1, deviceId);
+  const device = await getDeviceById(deviceId);
 
   if (!device) {
     res.status(404).json({ error: "Device not found" });
@@ -33,7 +39,7 @@ export async function queueDeviceCommandWhenIdle(
   }
 
   try {
-    const updated = await queueDeviceCommand(id, command);
+    const updated = await queueDeviceCommand(deviceId, command);
     res.json({ device: updated });
   } catch (err) {
     console.error(errorLogLabel, err);

@@ -352,8 +352,12 @@ async function testDatabaseQueries() {
       const regional = resolveRegioFilter(mockReq(["RWS NN"]))!;
       const params: unknown[] = [];
       let query = `SELECT id, regio_id FROM lis.flightPlans WHERE status = 'prepared'`;
-      query = appendRegioFilter(query, params, regional, "regio_id", {
-        caseInsensitiveAdmin: true,
+      query = appendRegioFilter({
+        sql: query,
+        params,
+        regio_id: regional,
+        column: "regio_id",
+        options: { caseInsensitiveAdmin: true },
       });
       const r = await pool.query(query, params);
       await assertPlanRegiosWithDb(

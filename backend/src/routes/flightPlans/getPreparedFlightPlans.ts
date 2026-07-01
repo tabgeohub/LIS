@@ -17,8 +17,12 @@ export async function getPreparedFlightPlans(
       WHERE status = 'prepared'
     `;
 
-    query = appendRegioFilter(query, params, regio_id, "regio_id", {
-      caseInsensitiveAdmin: true,
+    query = appendRegioFilter({
+      sql: query,
+      params,
+      regio_id,
+      column: "regio_id",
+      options: { caseInsensitiveAdmin: true },
     });
     query += ` ORDER BY created_at DESC`;
 

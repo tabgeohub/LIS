@@ -64,13 +64,13 @@ export function buildFlightPlanQuery(
     query += `
       WHERE ${where}`;
     if (regio_id !== undefined) {
-      query = appendRegioFilter(
-        query,
+      query = appendRegioFilter({
+        sql: query,
         params,
         regio_id,
-        regioColumn ?? `${planAlias}.regio_id`,
-        regioFilter
-      );
+        column: regioColumn ?? `${planAlias}.regio_id`,
+        options: regioFilter,
+      });
     }
   } else if (
     regio_id !== undefined &&

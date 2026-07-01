@@ -4,13 +4,13 @@ import { queueDeviceCommandWhenIdle } from "./commandGuard";
 
 export const checkDeviceStatus: RequestHandler = async (req, res) => {
   const id = String(req.params.id || "");
-  await queueDeviceCommandWhenIdle(
-    id,
-    "CHECK_STATUS",
+  await queueDeviceCommandWhenIdle({
+    deviceId: id,
+    command: "CHECK_STATUS",
     res,
-    "Failed to queue check status:",
-    "Failed to queue status check"
-  );
+    errorLogLabel: "Failed to queue check status:",
+    errorMessage: "Failed to queue status check",
+  });
 };
 
 export const resetDeviceStatus: RequestHandler = async (req, res) => {

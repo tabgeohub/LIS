@@ -63,7 +63,13 @@ export function buildFinishedPlansWithPointsQuery(
       ${whereClause}`;
 
   if (regio_id !== undefined) {
-    query = appendRegioFilter(query, params, regio_id, "fp.regio_id", regioFilter);
+    query = appendRegioFilter({
+      sql: query,
+      params,
+      regio_id,
+      column: "fp.regio_id",
+      options: regioFilter,
+    });
   }
 
   query += `
@@ -96,22 +102,45 @@ export function buildFinishedPlansTimeRangeQuery(
       WHERE fp.status = 'finished'
         AND fp.datum IS NOT NULL`;
 
-  query = appendRegioFilter(query, params, regio_id, "fp.regio_id", regioFilter);
+  query = appendRegioFilter({
+    sql: query,
+    params,
+    regio_id,
+    column: "fp.regio_id",
+    options: regioFilter,
+  });
 
   return { query, params };
 }
 
+export type FinishedPlanRegioWhereInput = {
+  regio_id: unknown;
+  params: unknown[];
+  column: string;
+  regioFilter?: RegioFilterOptions;
+};
+
 export function buildFinishedPlanRegioWhereClause(
-  regio_id: unknown,
-  params: unknown[],
-  column: string,
-  regioFilter: RegioFilterOptions = {
-    caseInsensitiveAdmin: true,
-    when: "provided",
-    castAsText: true,
-  }
+  input: FinishedPlanRegioWhereInput
 ): string {
-  return buildRegioWhereClause(regio_id, params, column, regioFilter, "AND");
+  const {
+    regio_id,
+    params,
+    column,
+    regioFilter = {
+      caseInsensitiveAdmin: true,
+      when: "provided",
+      castAsText: true,
+    },
+  } = input;
+
+  return buildRegioWhereClause({
+    regio_id,
+    params,
+    column,
+    options: regioFilter,
+    prefix: "AND",
+  });
 }
 
 export function buildFinishedFlightPlansListQuery(
@@ -140,13 +169,13 @@ export function buildFinishedFlightPlansListQuery(
       LEFT JOIN lis.finished_plans_path fpp ON fpp.planid = fp.id
       WHERE fp.status = 'finished'`;
 
-  query = appendRegioFilter(
-    query,
+  query = appendRegioFilter({
+    sql: query,
     params,
     regio_id,
-    "fp.regio_id",
-    DEFAULT_FINISHED_REGIO_FILTER
-  );
+    column: "fp.regio_id",
+    options: DEFAULT_FINISHED_REGIO_FILTER,
+  });
 
   query += `
       GROUP BY fp.id, fpp.path;`;
