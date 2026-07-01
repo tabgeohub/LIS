@@ -21,8 +21,15 @@ export function parseReturnMode(returnMode: unknown): ReturnMode {
     : "all";
 }
 
+const TRUTHY_FLAGS = new Set(["1", "ja", "true", "yes"]);
+const FALSY_FLAGS = new Set(["0", "nee", "false", "no"]);
+
+function isEmpty(value: unknown): boolean {
+  return value === null || value === undefined || value === "";
+}
+
 function toNum(value: unknown): number | null {
-  if (value === null || value === undefined || value === "") {
+  if (isEmpty(value)) {
     return null;
   }
   const n =
@@ -33,17 +40,17 @@ function toNum(value: unknown): number | null {
 }
 
 function to01(value: unknown): number | null {
-  if (value === null || value === undefined || value === "") {
+  if (isEmpty(value)) {
     return null;
   }
   if (typeof value === "boolean") {
     return value ? 1 : 0;
   }
   const s = String(value).trim().toLowerCase();
-  if (s === "1" || s === "ja" || s === "true" || s === "yes") {
+  if (TRUTHY_FLAGS.has(s)) {
     return 1;
   }
-  if (s === "0" || s === "nee" || s === "false" || s === "no") {
+  if (FALSY_FLAGS.has(s)) {
     return 0;
   }
   return null;

@@ -1,19 +1,20 @@
 # Sigrid Remediation Plan — Code only
 
-**Source:** `exported-findings-3` · **Generated:** 2026-06-30
+**Source:** `exported-findings-4` · **Generated:** 2026-06-30
 
 Application code, dependencies, and maintainability. **DevOps (Docker) is in [`devops/`](./devops/) — out of scope for code sprints.**
 
-## Current state (export 3)
+## Current state (`exported-findings-4`)
 
 | Metric | Value |
 |--------|------:|
-| Security + Reliability (code) RAW | **2** |
-| Security + Reliability FIXED (code) | 47 |
-| Maintainability RAW | 1066 |
-| Duplication RAW | 206 |
+| Security + Reliability (code) RAW | **1** |
+| Security + Reliability FIXED (code) | 48 |
+| Maintainability RAW | 1090 |
+| Duplication RAW | 209 |
 
-**Dashboard (export 3):** Security 3.8 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9
+**Dashboard (export 4):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9 · Architecture 2.2
+_(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchanged — see analysis below.)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -48,11 +49,10 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 6. **[Maintainability-Architecture/](./Maintainability-Architecture/)** — MAINT-01…08 + ARCH-01…04 (after duplication)
 ```
 
-## Open security/reliability (2 RAW)
+## Open security/reliability (1 RAW)
 
 | WP | Severity | File | Issue |
 |----|----------|------|-------|
-| WP-07 | MEDIUM | `backend/src/routes/auth/authKeycloak/callbackHandler.ts` | Untrusted user input in redirect() can result in Open Redirect vulnerability |
 | WP-07 | MEDIUM | `backend/src/routes/auth/authKeycloak/callbackHandler.ts` | Untrusted user input in redirect() can result in Open Redirect vulnerability |
 
 ## Work packages (status)
@@ -64,11 +64,11 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | WP-02 | DONE | 1 - Dependencies | Frontend xlsx dependency | — | — |
 | WP-05 | DONE | 2 - Dev tooling | verify-regio-apis SQL injection | — | — |
 | WP-06 | DONE | 3 - sendEmail cluster | sendEmail.ts single refactor | — | — |
-| WP-07 | OPEN | 3 - Auth/HTML | Keycloak callback open redirect | 2 | — |
+| WP-07 | OPEN | 3 - Auth/HTML | Keycloak callback open redirect | 1 | — |
 | WP-08 | DONE | 3 - Auth/HTML | renderDownloadPage HTML template | — | — |
 | WP-09 | DONE | 3 - Auth/HTML | fileDownload.ts verify FIXED | — | — |
-| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 159 |
-| DUP-02 | PARTIAL | 4 - Duplication | Flight plan FormElements | — | 6 |
+| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 161 |
+| DUP-02 | PARTIAL | 4 - Duplication | Flight plan FormElements | — | 7 |
 | DUP-03 | DONE | 4 - Duplication | useFilterPlans duplicate | — | — |
 | DUP-04 | PARTIAL | 4 - Duplication | PointsBuffer internal dup | — | 1 |
 | DUP-05 | PARTIAL | 4 - Duplication | PeriodFilter components | — | 1 |
@@ -80,8 +80,8 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 
 | ID | Open RAW | Notes |
 |----|----------:|-------|
-| DUP-01 | 159 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
-| DUP-02 | 6 | FormElements / FormInputs / Step1 shared form blocks (PARTIAL) |
+| DUP-01 | 161 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
+| DUP-02 | 7 | FormElements / FormInputs / Step1 shared form blocks (PARTIAL) |
 | DUP-03 | 0 | src/hooks/filters/useFilterPlans.ts + Nabewerking copy  (DONE) |
 | DUP-04 | 1 | PointsBuffer.tsx internal duplication (PARTIAL) |
 | DUP-05 | 1 | Three PeriodFilter copies (PARTIAL) |

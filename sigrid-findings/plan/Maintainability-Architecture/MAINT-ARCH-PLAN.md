@@ -1,8 +1,10 @@
 # Maintainability & Architecture Plan
 
-**Source:** `exported-findings-3` · **Generated:** 2026-06-30
+**Source:** `exported-findings-4` · **Generated:** 2026-06-30
 
-Split from the former single **DEFER** bucket (1061 RAW maintainability + architecture findings in export 3).
+Split from the former single **DEFER** bucket (1085 RAW maintainability + architecture findings in `exported-findings-4`).
+
+> **Before picking work, read [STRATEGY.md](./STRATEGY.md) and [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md).** Naive extract-to-helper refactors *increased* findings in export 4 — follow the Sigrid thresholds.
 
 **Related:** duplication work (DUP-01…) clears overlapping units in Voorbereiding/Nabewerking — do duplication first where noted.
 
@@ -10,13 +12,13 @@ Split from the former single **DEFER** bucket (1061 RAW maintainability + archit
 
 | Category | RAW |
 |----------|----:|
-| Unit size | 557 |
-| Unit complexity | 235 |
-| Unit interfacing | 123 |
+| Unit size | 566 |
+| Unit complexity | 240 |
+| Unit interfacing | 133 |
 | Module coupling | 24 |
 | Component independence | 113 |
 | Component entanglement | 9 |
-| **Total in this plan** | **1061** |
+| **Total in this plan** | **1085** |
 
 ## Recommended order
 
@@ -36,7 +38,7 @@ Split from the former single **DEFER** bucket (1061 RAW maintainability + archit
 
 | ID | Phase | Name | Open RAW | Categories (RAW) |
 |----|-------|------|----------:|------------------|
-| MAINT-01 | 5 - Maintainability | Backend routes and services | 245 | Unit complexity 62, Unit interfacing 48, Unit size 135 |
+| MAINT-01 | 5 - Maintainability | Backend routes and services | 269 | Unit complexity 67, Unit interfacing 58, Unit size 144 |
 | MAINT-02 | 5 - Maintainability | Nabewerking flows | 107 | Unit complexity 24, Unit interfacing 17, Unit size 66 |
 | MAINT-03 | 5 - Maintainability | Voorbereiding wizards | 175 | Unit complexity 36, Unit interfacing 16, Unit size 123 |
 | MAINT-04 | 5 - Maintainability | Map shell UI | 4 | Unit complexity 1, Unit size 3 |
@@ -62,8 +64,6 @@ Split from the former single **DEFER** bucket (1061 RAW maintainability + archit
 
 | WP | Severity | LOC | Cplx | File | Unit |
 |----|----------|----:|-----:|------|------|
-| MAINT-01 | HIGH | 174 | 72 | `backend/src/routes/finished_plans/createFinishedPlan.ts` | createFinishedPlan.ts.createFinishedPlan(Request,R |
-| MAINT-01 | HIGH | 174 | 72 | `backend/src/routes/finished_plans/createFinishedPlan.ts` | createFinishedPlan.ts.createFinishedPlan(Request,R |
 | MAINT-03 | HIGH | 200 | 54 | `src/Components/HomePage/Body/Left/Voorbereiding/ViewPlan/Steps/AddPointsFromPlan/SelectFromSource/index.tsx` | index.tsx.SelectFromSource(any) |
 | MAINT-03 | HIGH | 200 | 54 | `src/Components/HomePage/Body/Left/Voorbereiding/ViewPlan/Steps/AddPointsFromPlan/SelectFromSource/index.tsx` | index.tsx.SelectFromSource(any) |
 | MAINT-02 | HIGH | 225 | 46 | `src/Components/HomePage/Body/Left/Nabewerking/VluchtenZoeken/Steps/Step2/Actions/Waarnemingen/EditPointDetails/Actions/EditPointCoordinates/index.tsx` | index.tsx.EditPointCoordinates(any) |
@@ -74,19 +74,21 @@ Split from the former single **DEFER** bucket (1061 RAW maintainability + archit
 | MAINT-07 | HIGH | 73 | 45 | `src/Components/TimesliderItemDetailPage/index.tsx` | index.tsx.TimesliderItemDetailPage() |
 | MAINT-03 | HIGH | 140 | 39 | `src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step1/ImportVluchtPlan.tsx` | onload(any) |
 | MAINT-03 | HIGH | 140 | 39 | `src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step1/ImportVluchtPlan.tsx` | onload(any) |
-| MAINT-01 | HIGH | 60 | 39 | `backend/src/services/arcgis.ts` | arcgis.ts.initArcgisToken(ArcgisTokenConfig) |
-| MAINT-01 | HIGH | 166 | 37 | `backend/src/routes/points/createPointFromImport.ts` | createPointFromImport.ts.createPointFromImport(Req |
-| MAINT-01 | HIGH | 166 | 37 | `backend/src/routes/points/createPointFromImport.ts` | createPointFromImport.ts.createPointFromImport(Req |
 | MAINT-04 | HIGH | 153 | 37 | `src/Components/HomePage/Body/MapViewComp/MapComp.tsx` | MapComp.tsx.MapComp(any) |
 | MAINT-04 | HIGH | 153 | 37 | `src/Components/HomePage/Body/MapViewComp/MapComp.tsx` | MapComp.tsx.MapComp(any) |
-| MAINT-01 | HIGH | 37 | 33 | `backend/src/routes/auth/authKeycloak/meHandler.ts` | meHandler.ts.meHandler(any,any) |
-| MAINT-01 | HIGH | 21 | 31 | `backend/src/helpers/queries/pointFields.ts` | PointCorePayload.normalizePointCoreFields(PointCor |
 | MAINT-03 | HIGH | 94 | 29 | `src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Common/GeometriesList.tsx` | GeometriesList.tsx.GeometriesList(any) |
 | MAINT-03 | HIGH | 94 | 29 | `src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Common/GeometriesList.tsx` | GeometriesList.tsx.GeometriesList(any) |
 | MAINT-02 | HIGH | 205 | 26 | `src/Components/HomePage/Body/Left/Nabewerking/CreateReport/helpers/generatePdfReport.ts` | generatePdfReport.ts.generatePdfReport(PDFPointDat |
 | MAINT-02 | HIGH | 205 | 26 | `src/Components/HomePage/Body/Left/Nabewerking/CreateReport/helpers/generatePdfReport.ts` | generatePdfReport.ts.generatePdfReport(PDFPointDat |
 | MAINT-08 | HIGH | 71 | 25 | `src/hooks/hover-click-handlers/usePathPointHandlerClick.ts` | usePathPointHandlerClick.ts.usePathPointHandlerCli |
 | MAINT-08 | HIGH | 66 | 25 | `src/hooks/hover-click-handlers/useDrawPath.ts` | useDrawPath.ts.useDrawPath(boolean) |
+| MAINT-08 | HIGH | 75 | 23 | `src/hooks/hover-click-handlers/useFeatureLayerLabels.ts` | updateLabels() |
+| MAINT-01 | HIGH | 74 | 22 | `backend/src/routes/arcgis/postProxyHandler.ts` | postProxyHandler.ts.arcgisPostProxyHandler(Request |
+| MAINT-08 | HIGH | 74 | 22 | `src/hooks/hover-click-handlers/useFeatureLayerPopup.ts` | useFeatureLayerPopup.ts.useFeatureLayerPopup() |
+| MAINT-01 | HIGH | 81 | 21 | `backend/src/routes/points/getPoints.ts` | getPoints.ts.getPoints(Request,Response) |
+| MAINT-05 | HIGH | 72 | 20 | `src/helpers/ArcGISHelpers/createGeometryGraphic.ts` | createGeometryGraphic.ts.createGeometryGraphic(Bas |
+| MAINT-08 | HIGH | 83 | 17 | `src/hooks/features/useRenderGeometries.ts` | useRenderGeometries.ts.useRenderGeometries() |
+| MAINT-02 | HIGH | 110 | 16 | `src/Components/HomePage/Body/Left/Nabewerking/CreateReport/helpers/useHandleStep2/processGeometry.ts` | processGeometry.ts.processGeometry(ProcessGeometry |
 
 ## Principles
 

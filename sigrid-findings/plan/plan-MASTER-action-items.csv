@@ -1,3 +1,2 @@
 WorkPackageID,Category,Status,Severity,Type,Weakness,File,Line,Origin,FirstSeen,IssueAge,WorkPackageName,Phase,DependsOn
-WP-07,Security,RAW,MEDIUM,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts,34,NodeJS Scan,2026-06-29,0,Keycloak callback open redirect,3 - Auth/HTML,WP-00
-WP-07,Security,RAW,MEDIUM,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts,9,NodeJS Scan,2026-06-04,25,Keycloak callback open redirect,3 - Auth/HTML,WP-00
+WP-07,Security,RAW,MEDIUM,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts,12,NodeJS Scan,2026-06-04,26,Keycloak callback open redirect,3 - Auth/HTML,WP-00

@@ -22,66 +22,73 @@ export function unauthenticatedMeBody() {
   return { user: null, roles: { realm: [], resource: {} } };
 }
 
-function resolveUsername(
-  auth: AuthSession,
-  idClaims: TokenClaims,
-  accessClaims: TokenClaims | null
-): string | null {
-  return (
-    idClaims.preferred_username ??
-    accessClaims?.preferred_username ??
-    auth.userInfo?.preferred_username ??
-    auth.userInfo?.email ??
-    null
-  );
-}
+/**
+ * Assembles the /auth/me payload. Claim sources are held as fields so the
+ * extraction methods take no parameters (keeps Sigrid unit-interfacing low).
+ */
+class MeResponseBuilder {
+  private readonly auth: AuthSession;
+  private readonly idClaims: TokenClaims;
+  private readonly accessClaims: TokenClaims | null;
 
-function resolveRealmRoles(
-  idClaims: TokenClaims,
-  accessClaims: TokenClaims | null
-): string[] {
-  return accessClaims?.realm_access?.roles ?? idClaims?.realm_access?.roles ?? [];
-}
+  constructor(auth: AuthSession) {
+    this.auth = auth;
+    this.idClaims = auth.tokenSet?.claims?.() ?? {};
+    this.accessClaims = decodeJwtPayload<TokenClaims>(
+      auth.tokenSet?.access_token ?? ""
+    );
+  }
 
-function resolveResourceRoles(
-  idClaims: TokenClaims,
-  accessClaims: TokenClaims | null
-): Record<string, unknown> {
-  return accessClaims?.resource_access ?? idClaims?.resource_access ?? {};
-}
+  private username(): string | null {
+    return (
+      this.idClaims.preferred_username ??
+      this.accessClaims?.preferred_username ??
+      this.auth.userInfo?.preferred_username ??
+      this.auth.userInfo?.email ??
+      null
+    );
+  }
 
-function buildMeUser(
-  auth: AuthSession,
-  idClaims: TokenClaims,
-  accessClaims: TokenClaims | null
-) {
-  return {
-    username: resolveUsername(auth, idClaims, accessClaims),
-    name: auth.userInfo?.name ?? idClaims.name ?? null,
-    email: auth.userInfo?.email ?? idClaims.email ?? null,
-    sub: idClaims.sub ?? accessClaims?.sub ?? null,
-  };
+  private realmRoles(): string[] {
+    return (
+      this.accessClaims?.realm_access?.roles ??
+      this.idClaims?.realm_access?.roles ??
+      []
+    );
+  }
+
+  private resourceRoles(): Record<string, unknown> {
+    return this.accessClaims?.resource_access ?? this.idClaims?.resource_access ?? {};
+  }
+
+  private user() {
+    return {
+      username: this.username(),
+      name: this.auth.userInfo?.name ?? this.idClaims.name ?? null,
+      email: this.auth.userInfo?.email ?? this.idClaims.email ?? null,
+      sub: this.idClaims.sub ?? this.accessClaims?.sub ?? null,
+    };
+  }
+
+  build(pendingClientPath?: string) {
+    return {
+      user: this.user(),
+      roles: {
+        realm: this.realmRoles(),
+        resource: this.resourceRoles(),
+      },
+      ...(pendingClientPath ? { pendingClientPath } : {}),
+      raw: {
+        idToken: this.idClaims,
+      },
+    };
+  }
 }
 
 export function buildAuthenticatedMeBody(
   session: SessionWithPending,
   auth: AuthSession
 ) {
-  const idClaims = auth.tokenSet?.claims?.() ?? {};
-  const accessClaims = decodeJwtPayload<TokenClaims>(
-    auth.tokenSet?.access_token ?? ""
-  );
   const pendingClientPath = consumePendingClientRedirect(session);
-
-  return {
-    user: buildMeUser(auth, idClaims, accessClaims),
-    roles: {
-      realm: resolveRealmRoles(idClaims, accessClaims),
-      resource: resolveResourceRoles(idClaims, accessClaims),
-    },
-    ...(pendingClientPath ? { pendingClientPath } : {}),
-    raw: {
-      idToken: idClaims,
-    },
-  };
+  return new MeResponseBuilder(auth).build(pendingClientPath);
 }

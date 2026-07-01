@@ -8,7 +8,7 @@ FINDINGS = os.path.join(ROOT, "sigrid-findings")
 # Latest Sigrid export folder (override with SIGRID_EXPORT_DIR env var)
 EXPORT_DIR = os.environ.get(
     "SIGRID_EXPORT_DIR",
-    os.path.join(FINDINGS, "exported-findings-3"),
+    os.path.join(FINDINGS, "exported-findings-4"),
 )
 PLAN = os.path.join(FINDINGS, "plan")
 DEVOPS = os.path.join(PLAN, "devops")
@@ -814,7 +814,9 @@ def build_maint_arch_markdown(
 
 **Source:** `{export_label}` · **Generated:** {today}
 
-Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability + architecture findings in export 3).
+Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability + architecture findings in `{export_label}`).
+
+> **Before picking work, read [STRATEGY.md](./STRATEGY.md) and [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md).** Naive extract-to-helper refactors *increased* findings in export 4 — follow the Sigrid thresholds.
 
 **Related:** duplication work (DUP-01…) clears overlapping units in Voorbereiding/Nabewerking — do duplication first where noted.
 
@@ -949,7 +951,7 @@ code_md = f"""# Sigrid Remediation Plan — Code only
 
 Application code, dependencies, and maintainability. **DevOps (Docker) is in [`devops/`](./devops/) — out of scope for code sprints.**
 
-## Current state (export 3)
+## Current state (`{export_label}`)
 
 | Metric | Value |
 |--------|------:|
@@ -958,7 +960,8 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | Maintainability RAW | {maint_raw} |
 | Duplication RAW | {dup_raw_total} |
 
-**Dashboard (export 3):** Security 3.8 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9
+**Dashboard (export 4):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9 · Architecture 2.2
+_(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchanged — see analysis below.)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -1127,11 +1130,17 @@ maint_arch_readme = f"""# Maintainability & Architecture
 
 **{maint_arch_raw} RAW** findings split into **MAINT-01…08** (refactor) and **ARCH-01…04** (structure).
 
-## Start here
+## Read these first
+1. **[ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)** — why export 3→4 showed no movement (and how to avoid repeating it)
+2. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + pattern-based plan to actually move both stars
 
-1. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — order, package table, MAINT-08 sub-slices
-2. **`maint-arch-MASTER-action-items.csv`** — HIGH severity shortlist for sprints
-3. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
+## Work breakdown
+3. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — order, package table, MAINT-08 sub-slices
+4. **`maint-arch-MASTER-action-items.csv`** — HIGH severity shortlist for sprints
+5. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
+
+> Note: `ANALYSIS-*.md` and `STRATEGY.md` are hand-maintained; the generator does not overwrite them.
+> `MAINT-ARCH-PLAN.md`, `README.md`, and the CSVs are regenerated.
 
 ## Regenerate
 
@@ -1148,7 +1157,7 @@ with open(os.path.join(DEVOPS, "DEVOPS-PLAN.md"), "w", encoding="utf-8") as f:
 
 plan_readme = f"""# Sigrid remediation plan — Code focus
 
-**Source:** `exported-findings-3` · Open code security RAW: **2** (WP-07 remark only)
+**Source:** `{export_label}` · Open code security RAW: **{code_raw}** (WP-07 remark only)
 
 ## Start here
 
@@ -1177,7 +1186,7 @@ plan_readme = f"""# Sigrid remediation plan — Code focus
 python sigrid-findings/plan/generate-plan.py
 ```
 
-Uses `sigrid-findings/exported-findings-3/` by default. Override: `SIGRID_EXPORT_DIR=path/to/export`.
+Uses `sigrid-findings/{export_label}/` by default. Override: `SIGRID_EXPORT_DIR=path/to/export`.
 """
 
 devops_readme = """# DevOps findings (deferred)
@@ -1194,19 +1203,19 @@ with open(os.path.join(PLAN, "README.md"), "w", encoding="utf-8") as f:
 with open(os.path.join(DEVOPS, "README.md"), "w", encoding="utf-8") as f:
     f.write(devops_readme)
 
-parent_readme = """# Sigrid findings — Otg-lis
+parent_readme = f"""# Sigrid findings — Otg-lis
 
 ## Layout
 
 | Location | Contents |
 |----------|----------|
-| **`exported-findings-3/`** | **Raw Sigrid CSV exports** (current scan) |
+| **`{export_label}/`** | **Raw Sigrid CSV exports** (current scan) |
 | **`plan/`** | **Remediation plan** — [start here](./plan/README.md) |
 | `plan/Maintainability-Architecture/` | MAINT + ARCH split plan |
 | `plan/devops/` | Docker/K8s (deferred) |
 
-Raw findings live **only** inside export folders (e.g. `exported-findings-3/`).  
-After a new Sigrid export, add a folder `exported-findings-4/` and run the generator.
+Raw findings live **only** inside export folders (e.g. `{export_label}/`).  
+After a new Sigrid export, add a folder `exported-findings-5/` and run the generator.
 
 ## Quick start
 
@@ -1216,7 +1225,7 @@ Open **[plan/REMEDIATION-PLAN.md](./plan/REMEDIATION-PLAN.md)** or **`plan/plan-
 python sigrid-findings/plan/generate-plan.py
 ```
 
-Default source: `exported-findings-3/`. Override: `SIGRID_EXPORT_DIR=path/to/folder`.
+Default source: `{export_label}/`. Override: `SIGRID_EXPORT_DIR=path/to/folder`.
 """
 
 with open(os.path.join(FINDINGS, "README.md"), "w", encoding="utf-8") as f:

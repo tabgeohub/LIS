@@ -3,49 +3,76 @@ import type { ArcgisTokenConfig } from "./arcgis";
 
 export type ResolvedArcgisTokenConfig = Required<ArcgisTokenConfig>;
 
-function readEnvString(...values: Array<string | undefined>): string {
-  for (const value of values) {
+function firstNonEmpty(
+  candidates: Array<string | undefined>,
+  fallback = ""
+): string {
+  for (const value of candidates) {
     if (value) {
       return value;
     }
   }
-  return "";
+  return fallback;
 }
 
 export function resolveArcgisTokenConfig(
   config?: ArcgisTokenConfig
 ): ResolvedArcgisTokenConfig {
   const env = process.env;
+  const refererFromOrigins = env.REACT_APP_ARCGIS_REFERER_ORIGINS?.split(",")[0];
+
+  const strings: Record<string, { candidates: Array<string | undefined>; fallback?: string }> = {
+    tokenEndpoint: {
+      candidates: [config?.tokenEndpoint, env.ARCGIS_TOKEN_ENDPOINT],
+      fallback: "https://www.arcgis.com/sharing/rest/oauth2/token",
+    },
+    clientId: { candidates: [config?.clientId, env.ARCGIS_CLIENT_ID] },
+    clientSecret: {
+      candidates: [config?.clientSecret, env.ARCGIS_CLIENT_SECRET],
+    },
+    portalUrl: {
+      candidates: [
+        config?.portalUrl,
+        env.ARCGIS_PORTAL_URL,
+        env.ARCGIS_SERVER_URL,
+        env.REACT_APP_ARCGIS_PORTAL_URL,
+      ],
+    },
+    adminUser: {
+      candidates: [
+        config?.adminUser,
+        env.ARCGIS_ADMIN_USER,
+        env.REACT_APP_ARCGIS_ADMIN_USER,
+      ],
+    },
+    adminPass: {
+      candidates: [
+        config?.adminPass,
+        env.ARCGIS_ADMIN_PASS,
+        env.REACT_APP_ARCGIS_ADMIN_PASS,
+      ],
+    },
+    referer: {
+      candidates: [
+        config?.referer,
+        env.ARCGIS_TOKEN_REFERER,
+        refererFromOrigins,
+        env.PUBLIC_FRONTEND_URL,
+      ],
+      fallback: "http://localhost:3000",
+    },
+  };
+
+  const resolvedStrings = {} as Record<keyof typeof strings, string>;
+  for (const [key, spec] of Object.entries(strings)) {
+    resolvedStrings[key] = firstNonEmpty(spec.candidates, spec.fallback);
+  }
 
   return {
-    tokenEndpoint:
-      config?.tokenEndpoint ||
-      env.ARCGIS_TOKEN_ENDPOINT ||
-      "https://www.arcgis.com/sharing/rest/oauth2/token",
-    clientId: config?.clientId || env.ARCGIS_CLIENT_ID || "",
-    clientSecret: config?.clientSecret || env.ARCGIS_CLIENT_SECRET || "",
-    portalUrl: readEnvString(
-      config?.portalUrl,
-      env.ARCGIS_PORTAL_URL,
-      env.ARCGIS_SERVER_URL,
-      env.REACT_APP_ARCGIS_PORTAL_URL
-    ),
-    adminUser: readEnvString(
-      config?.adminUser,
-      env.ARCGIS_ADMIN_USER,
-      env.REACT_APP_ARCGIS_ADMIN_USER
-    ),
-    adminPass: readEnvString(
-      config?.adminPass,
-      env.ARCGIS_ADMIN_PASS,
-      env.REACT_APP_ARCGIS_ADMIN_PASS
-    ),
-    referer:
-      config?.referer ||
-      env.ARCGIS_TOKEN_REFERER ||
-      env.REACT_APP_ARCGIS_REFERER_ORIGINS?.split(",")[0] ||
-      env.PUBLIC_FRONTEND_URL ||
-      "http://localhost:3000",
+    ...(resolvedStrings as Record<
+      "tokenEndpoint" | "clientId" | "clientSecret" | "portalUrl" | "adminUser" | "adminPass" | "referer",
+      string
+    >),
     requestTimeoutMs: config?.requestTimeoutMs ?? 15000,
     retryCount: config?.retryCount ?? 2,
     retryBaseDelayMs: config?.retryBaseDelayMs ?? 400,

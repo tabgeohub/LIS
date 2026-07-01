@@ -1,0 +1,64 @@
+Description,Severity,Status,First Seen,Issue age,Type,Weakness,File,Technology,Origin,Remark,Locations
+NPM dependency jspdf contains 12 vulnerabilities (CWE-79),CRITICAL,FIXED,2026-06-04,26,NPM dependency jspdf contains 12 vulnerabilities,CWE-79,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-31938 (9.6) 
+CVE-2025-68428 (9.2) 
+CVE-2025-57810 (8.7) 
+CVE-2025-29907 (8.7) 
+CVE-2026-24133 (8.7) 
+CVE-2026-25535 (8.7) 
+CVE-2026-24737 (8.1) 
+CVE-2026-25940 (8.1) 
+CVE-2026-25755 (8.1) 
+CVE-2026-31898 (8.1) 
+CVE-2026-24043 (6.9) 
+CVE-2026-24040 (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+NPM dependency multer contains 2 vulnerabilities (CWE-400),HIGH,FIXED,2026-06-29,1,NPM dependency multer contains 2 vulnerabilities,CWE-400,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-5079 (7.5) 
+CVE-2026-5038 (5.3) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+NPM dependency axios contains 22 vulnerabilities (CWE-441),HIGH,FIXED,2026-06-04,26,NPM dependency axios contains 22 vulnerabilities,CWE-441,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-44494 (8.7) 
+CVE-2026-44492 (8.6) 
+CVE-2025-58754 (7.5) 
+CVE-2026-25639 (7.5) 
+CVE-2026-42035 (7.4) 
+CVE-2026-42033 (7.4) 
+CVE-2026-42264 (7.4) 
+CVE-2026-42043 (7.2) 
+CVE-2026-44495 (7.0) 
+CVE-2026-42039 (6.9) 
+CVE-2026-42038 (6.8) 
+CVE-2026-42044 (6.5) 
+CVE-2025-62718 (6.3) 
+CVE-2026-39865 (5.9) 
+CVE-2026-42042 (5.4) 
+CVE-2026-42036 (5.3) 
+CVE-2026-42034 (5.3) 
+CVE-2026-42037 (5.3) 
+CVE-2026-40175 (4.8) 
+CVE-2026-44490 (4.8) 
+CVE-2026-42041 (4.8) 
+CVE-2026-42040 (3.7) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+NPM dependency undici contains 7 vulnerabilities (CWE-400),HIGH,FIXED,2026-06-29,1,NPM dependency undici contains 7 vulnerabilities,CWE-400,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-12151 (7.5) 
+CVE-2026-6734 (7.5) 
+CVE-2026-9697 (7.4) 
+CVE-2026-9678 (5.9) 
+CVE-2026-9679 (5.9) 
+CVE-2026-6733 (3.7) 
+CVE-2026-11525 (3.7) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+Error messages with stack traces may expose sensitive information about the application (CWE-209),MEDIUM,FIXED,2026-06-04,26,Error messages with stack traces may expose sensitive information about the application,CWE-209,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step1/Buttons.tsx#L16,TypeScript,NodeJS Scan,-,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step1/Buttons.tsx#L16
+Memory Requests Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,26,Memory Requests Not Defined,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+Memory Requests Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,26,Memory Requests Not Defined,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+Memory Limits Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,26,Memory Limits Not Defined,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+CPU Limits Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,26,CPU Limits Not Set,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+NPM dependency uuid contains 1 vulnerability (CWE-1285),MEDIUM,FIXED,2026-06-04,26,NPM dependency uuid contains 1 vulnerability,CWE-1285,backend/package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-41907 (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",backend/package-lock.json#L1
+CPU Limits Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,26,CPU Limits Not Set,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+Memory Limits Not Defined (CWE-770),MEDIUM,FIXED,2026-06-04,26,Memory Limits Not Defined,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34
+CPU Requests Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,26,CPU Requests Not Set,CWE-770,k8s/lis-frontend-dep.yaml#L34,-,KICS,-,k8s/lis-frontend-dep.yaml#L34
+CPU Requests Not Set (CWE-770),MEDIUM,FIXED,2026-06-04,26,CPU Requests Not Set,CWE-770,k8s/lis-backend-dep.yaml#L34,-,KICS,-,k8s/lis-backend-dep.yaml#L34

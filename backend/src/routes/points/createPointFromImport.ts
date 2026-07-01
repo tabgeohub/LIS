@@ -39,12 +39,11 @@ export async function createPointFromImport(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const result = await importPointsInTransaction(
-      client,
+    const result = await importPointsInTransaction(client, {
       normalized,
-      rows,
-      mode
-    );
+      rawRows: rows,
+      mode,
+    });
     await client.query("COMMIT");
 
     res.status(201).json({
