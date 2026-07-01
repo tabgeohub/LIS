@@ -67,20 +67,20 @@ export default function Buttons({
       aanvullendeInfo,
     };
 
-    const payload = buildViewPlanUpdatePayload(
+    const payload = buildViewPlanUpdatePayload({
       selectedPlan,
       form,
       pointsTable,
       geometriesTable,
-      user.user_id
-    );
+      userId: user.user_id,
+    });
 
-    const updatedPlan = buildUpdatedPlanFromForm(
+    const updatedPlan = buildUpdatedPlanFromForm({
       selectedPlan,
       form,
       pointsTable,
-      geometriesTable
-    );
+      geometriesTable,
+    });
 
     update(payload, async () => {
       setFilteredPlans(replacePlanInList(filteredPlans, updatedPlan));

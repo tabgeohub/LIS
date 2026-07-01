@@ -26,8 +26,12 @@ const setPasswordHandler: RequestHandler<
   any,
   { password: string }
 > = (req, res) => {
-  const filename = resolveDownloadFilename(req, res, () => {
-    res.status(410).send("❌ Link verlopen");
+  const filename = resolveDownloadFilename({
+    req,
+    res,
+    onExpired: () => {
+      res.status(410).send("❌ Link verlopen");
+    },
   });
 
   if (!filename) {
@@ -58,8 +62,12 @@ router.post(
 );
 
 router.get("/:filename", (req, res) => {
-  const filename = resolveDownloadFilename(req, res, (response) => {
-    sendHtml(response, renderExpiredDownloadPage());
+  const filename = resolveDownloadFilename({
+    req,
+    res,
+    onExpired: (response) => {
+      sendHtml(response, renderExpiredDownloadPage());
+    },
   });
 
   if (!filename) {
@@ -81,8 +89,12 @@ const downloadWithPasswordHandler: RequestHandler<
   { password: string }
 > = (req, res) => {
   const password = String(req.body?.password || "");
-  const filename = resolveDownloadFilename(req, res, (response) => {
-    sendHtml(response, renderExpiredDownloadPage());
+  const filename = resolveDownloadFilename({
+    req,
+    res,
+    onExpired: (response) => {
+      sendHtml(response, renderExpiredDownloadPage());
+    },
   });
 
   if (!filename) {

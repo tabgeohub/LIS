@@ -15,12 +15,15 @@ function assert(name: string, v?: string) {
   if (!v) throw new Error(`Missing env: ${name}`);
 }
 
-async function buildClient(
-  issuerUrl: string,
-  clientId: string,
-  clientSecret: string,
-  appBaseUrl: string
-) {
+type BuildOidcClientInput = {
+  issuerUrl: string;
+  clientId: string;
+  clientSecret: string;
+  appBaseUrl: string;
+};
+
+async function buildClient(input: BuildOidcClientInput) {
+  const { issuerUrl, clientId, clientSecret, appBaseUrl } = input;
   assert("issuerUrl", issuerUrl);
   assert("clientId", clientId);
   assert("clientSecret", clientSecret);
@@ -58,12 +61,12 @@ export async function getOidcClientFor(req: any): Promise<{
 
   if (profile === "intranet") {
     if (!intranetClient) {
-      intranetClient = await buildClient(
-        process.env.KC_INTRANET_ISSUER_URL!,
-        process.env.KC_INTRANET_CLIENT_ID!,
-        process.env.KC_INTRANET_CLIENT_SECRET!,
-        process.env.INTRANET_APP_BASE_URL!
-      );
+      intranetClient = await buildClient({
+        issuerUrl: process.env.KC_INTRANET_ISSUER_URL!,
+        clientId: process.env.KC_INTRANET_CLIENT_ID!,
+        clientSecret: process.env.KC_INTRANET_CLIENT_SECRET!,
+        appBaseUrl: process.env.INTRANET_APP_BASE_URL!,
+      });
     }
     return {
       client: intranetClient,
@@ -73,12 +76,12 @@ export async function getOidcClientFor(req: any): Promise<{
   }
 
   if (!publicClient) {
-    publicClient = await buildClient(
-      process.env.KC_PUBLIC_ISSUER_URL!,
-      process.env.KC_PUBLIC_CLIENT_ID!,
-      process.env.KC_PUBLIC_CLIENT_SECRET!,
-      process.env.PUBLIC_APP_BASE_URL!
-    );
+    publicClient = await buildClient({
+      issuerUrl: process.env.KC_PUBLIC_ISSUER_URL!,
+      clientId: process.env.KC_PUBLIC_CLIENT_ID!,
+      clientSecret: process.env.KC_PUBLIC_CLIENT_SECRET!,
+      appBaseUrl: process.env.PUBLIC_APP_BASE_URL!,
+    });
   }
   return {
     client: publicClient,

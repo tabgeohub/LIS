@@ -27,12 +27,18 @@ function collectPointIdsFromTables(
   return Array.from(new Set([...fromPoints, ...fromGeometries]));
 }
 
+export type BuildUpdatedPlanFromFormInput = {
+  selectedPlan: FlightPlanType;
+  form: ViewPlanFormFields;
+  pointsTable: EnrichedPointType[];
+  geometriesTable: Geometry[];
+};
+
 export function buildUpdatedPlanFromForm(
-  selectedPlan: FlightPlanType,
-  form: ViewPlanFormFields,
-  pointsTable: EnrichedPointType[],
-  geometriesTable: Geometry[]
+  input: BuildUpdatedPlanFromFormInput
 ): FlightPlanType {
+  const { selectedPlan, form, pointsTable, geometriesTable } = input;
+
   return {
     ...selectedPlan,
     vluchtnummer: form.vluchtnummer,
@@ -53,13 +59,13 @@ export function buildUpdatedPlanFromForm(
   };
 }
 
-export function buildViewPlanUpdatePayload(
-  selectedPlan: FlightPlanType,
-  form: ViewPlanFormFields,
-  pointsTable: EnrichedPointType[],
-  geometriesTable: Geometry[],
-  userId: number
-) {
+export type BuildViewPlanUpdatePayloadInput = BuildUpdatedPlanFromFormInput & {
+  userId: number;
+};
+
+export function buildViewPlanUpdatePayload(input: BuildViewPlanUpdatePayloadInput) {
+  const { selectedPlan, form, pointsTable, geometriesTable, userId } = input;
+
   return {
     vluchtnummer: form.vluchtnummer,
     omschrijving: form.omschrijving,

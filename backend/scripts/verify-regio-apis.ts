@@ -37,7 +37,13 @@ function makeFakeAccessToken(roles: string[]): string {
   return `e30.${payload}.e30`;
 }
 
-function mockReq(roles: string[], query: Record<string, string> = {}) {
+type MockReqInput = {
+  roles: string[];
+  query?: Record<string, string>;
+};
+
+function mockReq(input: MockReqInput) {
+  const { roles, query = {} } = input;
   return {
     query,
     session: {
@@ -99,7 +105,7 @@ function testResolveRegioFilter() {
   ];
 
   for (const c of cases) {
-    const got = resolveRegioFilter(mockReq(c.roles, c.query ?? {}));
+    const got = resolveRegioFilter(mockReq({ roles: c.roles, query: c.query ?? {} }));
     if (got === c.expected) {
       pass(c.name, `→ "${got ?? "(none)"}"`);
     } else {
@@ -108,11 +114,14 @@ function testResolveRegioFilter() {
   }
 }
 
-function assertPlanRegios(
-  endpoint: string,
-  rows: Array<{ id?: number; regio_id?: string }>,
-  expectedRegio: string
-): boolean {
+type AssertPlanRegiosInput = {
+  endpoint: string;
+  rows: Array<{ id?: number; regio_id?: string }>;
+  expectedRegio: string;
+};
+
+function assertPlanRegios(input: AssertPlanRegiosInput): boolean {
+  const { endpoint, rows, expectedRegio } = input;
   const bad = rows.filter(
     (r) => (r.regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
   );
@@ -135,13 +144,24 @@ const PLAN_TABLE_BY_KEY = {
   "lis.template_plans": "lis.template_plans",
 } as const;
 
+type AssertPlanRegiosWithDbInput = {
+  pool: Pool;
+  endpoint: string;
+  rows: Array<{ id?: number; regio_id?: string }>;
+  expectedRegio: string;
+  table?: keyof typeof PLAN_TABLE_BY_KEY;
+};
+
 async function assertPlanRegiosWithDb(
-  pool: Pool,
-  endpoint: string,
-  rows: Array<{ id?: number; regio_id?: string }>,
-  expectedRegio: string,
-  table: keyof typeof PLAN_TABLE_BY_KEY = "lis.flightplans"
+  input: AssertPlanRegiosWithDbInput
 ): Promise<boolean> {
+  const {
+    pool,
+    endpoint,
+    rows,
+    expectedRegio,
+    table = "lis.flightplans",
+  } = input;
   if (rows.length === 0) {
     pass(endpoint, "0 plan(s)");
     return true;
@@ -158,7 +178,7 @@ async function assertPlanRegiosWithDb(
     "SELECT id, regio_id FROM " + tableName + " WHERE id = ANY($1::int[])",
     [ids]
   );
-  return assertPlanRegios(endpoint, r.rows, expectedRegio);
+  return assertPlanRegios({ endpoint, rows: r.rows, expectedRegio });
 }
 
 async function runPointsQuery(regio: string | undefined): Promise<unknown[]> {
@@ -202,11 +222,14 @@ async function runGeometriesQuery(regio: string | undefined): Promise<unknown[]>
   }
 }
 
-async function runQuery(
-  label: string,
-  sql: string,
-  params: unknown[]
-): Promise<unknown[]> {
+type RunQueryInput = {
+  label: string;
+  sql: string;
+  params: unknown[];
+};
+
+async function runQuery(input: RunQueryInput): Promise<unknown[]> {
+  const { label, sql, params } = input;
   const pool = new Pool();
   try {
     const r = await pool.query(sql, params);
@@ -303,8 +326,8 @@ async function testDatabaseQueries() {
 
   try {
     for (const c of flightPlanCases) {
-      const regional = resolveRegioFilter(mockReq(["RWS NN"]));
-      const admin = resolveRegioFilter(mockReq(["admin"]));
+      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }));
+      const admin = resolveRegioFilter(mockReq({ roles: ["admin"] }));
 
       const { query: qRegio, params: pRegio } = c.build(regional);
       const { query: qAdmin, params: pAdmin } = c.build(admin);
@@ -324,13 +347,13 @@ async function testDatabaseQueries() {
         ? "lis.template_plans"
         : "lis.flightplans";
 
-      await assertPlanRegiosWithDb(
+      await assertPlanRegiosWithDb({
         pool,
-        `${c.name} [RWS NN]`,
-        rowsRegio.rows as Array<{ id?: number; regio_id?: string }>,
-        REGIO,
-        table
-      );
+        endpoint: `${c.name} [RWS NN]`,
+        rows: rowsRegio.rows as Array<{ id?: number; regio_id?: string }>,
+        expectedRegio: REGIO,
+        table,
+      });
 
       const adminCount = rowsAdmin.rows.length;
       const regioCount = rowsRegio.rows.length;
@@ -349,7 +372,7 @@ async function testDatabaseQueries() {
 
     // preparedFlighPlans — raw SQL route
     {
-      const regional = resolveRegioFilter(mockReq(["RWS NN"]))!;
+      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
       const params: unknown[] = [];
       let query = `SELECT id, regio_id FROM lis.flightPlans WHERE status = 'prepared'`;
       query = appendRegioFilter({
@@ -360,17 +383,17 @@ async function testDatabaseQueries() {
         options: { caseInsensitiveAdmin: true },
       });
       const r = await pool.query(query, params);
-      await assertPlanRegiosWithDb(
+      await assertPlanRegiosWithDb({
         pool,
-        "GET /flightPlans/preparedFlighPlans [RWS NN]",
-        r.rows,
-        REGIO
-      );
+        endpoint: "GET /flightPlans/preparedFlighPlans [RWS NN]",
+        rows: r.rows,
+        expectedRegio: REGIO,
+      });
     }
 
     // Points
     {
-      const regional = resolveRegioFilter(mockReq(["RWS NN"]))!;
+      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
       const rows = (await runPointsQuery(regional)) as Array<{
         regio_id?: string;
       }>;
@@ -396,7 +419,7 @@ async function testDatabaseQueries() {
 
     // Geometries (filtered via point regio)
     {
-      const regional = resolveRegioFilter(mockReq(["RWS NN"]))!;
+      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
       const rows = (await runGeometriesQuery(regional)) as Array<{
         point_regio_id?: string;
       }>;
@@ -415,19 +438,19 @@ async function testDatabaseQueries() {
 
     // Session → query wiring (simulates Swagger without query param)
     {
-      const resolved = resolveRegioFilter(mockReq(["RWS NN"], {}));
+      const resolved = resolveRegioFilter(mockReq({ roles: ["RWS NN"], query: {} }));
       const { query, params } = buildFinishedPlansWithPointsQuery({
         regio_id: resolved,
       });
       const r = await pool.query(query, params);
-      await assertPlanRegiosWithDb(
+      await assertPlanRegiosWithDb({
         pool,
-        "Swagger-style: RWS NN session, no regio_id param",
-        r.rows as Array<{ id?: number; regio_id?: string }>,
-        REGIO
-      );
+        endpoint: "Swagger-style: RWS NN session, no regio_id param",
+        rows: r.rows as Array<{ id?: number; regio_id?: string }>,
+        expectedRegio: REGIO,
+      });
 
-      const adminResolved = resolveRegioFilter(mockReq(["admin"], {}));
+      const adminResolved = resolveRegioFilter(mockReq({ roles: ["admin"], query: {} }));
       const { query: qAdmin, params: pAdmin } = buildFinishedPlansWithPointsQuery({
         regio_id: adminResolved,
       });

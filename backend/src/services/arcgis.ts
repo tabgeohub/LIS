@@ -76,7 +76,7 @@ async function fetchArcgisTokenWithRetry(): Promise<{
       return await fetchArcgisTokenOnce();
     } catch (err: any) {
       lastErr = err;
-      if (isHttpErrorWithStatus(err, 400, 499)) break;
+      if (isHttpErrorWithStatus({ err, min: 400, max: 499 })) break;
       if (attempt < cfg!.retryCount) {
         await sleep(cfg!.retryBaseDelayMs * 2 ** attempt);
       }
@@ -231,8 +231,15 @@ class HttpError extends Error {
   }
 }
 
-function isHttpErrorWithStatus(err: any, lo: number, hi: number) {
-  return err instanceof HttpError && err.status >= lo && err.status <= hi;
+type HttpErrorStatusInput = {
+  err: unknown;
+  min: number;
+  max: number;
+};
+
+function isHttpErrorWithStatus(input: HttpErrorStatusInput) {
+  const { err, min, max } = input;
+  return err instanceof HttpError && err.status >= min && err.status <= max;
 }
 
 function sleep(ms: number) {

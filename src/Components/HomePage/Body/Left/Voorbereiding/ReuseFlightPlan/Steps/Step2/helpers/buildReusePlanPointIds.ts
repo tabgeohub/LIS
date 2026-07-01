@@ -1,14 +1,27 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 
+export type BuildReuseFlightPlanPointIdsInput = {
+  currentPoints: number[];
+  newPoints: number[];
+  currentGeometryIds: number[];
+  newGeometryIds: number[];
+  dbGeometries: Geometry[];
+  planGeometries?: Geometry[];
+};
+
 /** All point IDs for create: standalone points + vertices of selected geometries. */
 export function buildReuseFlightPlanPointIds(
-  currentPoints: number[],
-  newPoints: number[],
-  currentGeometryIds: number[],
-  newGeometryIds: number[],
-  dbGeometries: Geometry[],
-  planGeometries: Geometry[] = []
+  input: BuildReuseFlightPlanPointIdsInput
 ): number[] {
+  const {
+    currentPoints,
+    newPoints,
+    currentGeometryIds,
+    newGeometryIds,
+    dbGeometries,
+    planGeometries = [],
+  } = input;
+
   const selectedGeometryIds = new Set([
     ...currentGeometryIds,
     ...newGeometryIds,

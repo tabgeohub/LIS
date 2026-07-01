@@ -42,14 +42,14 @@ export default function Buttons() {
   const { logStep, labels } = useWizardButtons("Second step");
 
   const handleSubmit = () => {
-    const points = buildReuseFlightPlanPointIds(
+    const points = buildReuseFlightPlanPointIds({
       currentPoints,
       newPoints,
-      currentGeometries,
-      newGeometries,
+      currentGeometryIds: currentGeometries,
+      newGeometryIds: newGeometries,
       dbGeometries,
-      selectedPlan?.geometries ?? []
-    );
+      planGeometries: selectedPlan?.geometries ?? [],
+    });
 
     const newPlan = {
       vluchtnummer,

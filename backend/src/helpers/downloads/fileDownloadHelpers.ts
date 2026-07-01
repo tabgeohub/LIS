@@ -1,10 +1,15 @@
 import type { Request, Response } from "express";
 
+export type ResolveDownloadFilenameInput = {
+  req: Request;
+  res: Response;
+  onExpired: (res: Response) => void;
+};
+
 export function resolveDownloadFilename(
-  req: Request,
-  res: Response,
-  onExpired: (res: Response) => void
+  input: ResolveDownloadFilenameInput
 ): string | null {
+  const { req, res, onExpired } = input;
   const filename = parseValidFilename(req.params.filename || "");
 
   if (!filename) {
