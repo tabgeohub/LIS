@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import type { InstallerMeta } from "Types/installer";
+import {
+  deleteLatestInstaller,
+  fetchLatestInstaller,
+  uploadInstaller,
+} from "./installersApi";
 
 function formatSize(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
@@ -24,30 +29,20 @@ export default function InstallationsPage() {
 
   const isAdmin = useMemo(() => user.role === "admin", [user.role]);
 
-  async function fetchLatestInstaller() {
+  async function loadLatestInstaller() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${getBackEndUrl()}/api/installers`, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Failed to fetch installer data");
-      }
-      const body = (await response.json()) as { installer: InstallerMeta | null };
-      setInstaller(body.installer);
+      setInstaller(await fetchLatestInstaller());
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchLatestInstaller();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void loadLatestInstaller();
   }, []);
 
   async function handleUpload(e: React.FormEvent<HTMLFormElement>) {
@@ -60,27 +55,12 @@ export default function InstallationsPage() {
     setUploading(true);
     setError(null);
     try {
-      const formData = new FormData();
-      formData.append("installer", file);
-      if (version.trim()) formData.append("version", version.trim());
-
-      const response = await fetch(`${getBackEndUrl()}/api/installers/upload`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Upload failed");
-      }
-
+      await uploadInstaller({ file, version });
       setFile(null);
       setVersion("");
-      await fetchLatestInstaller();
+      await loadLatestInstaller();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setUploading(false);
     }
@@ -90,20 +70,12 @@ export default function InstallationsPage() {
     setDeleting(true);
     setError(null);
     try {
-      const response = await fetch(`${getBackEndUrl()}/api/installers/latest`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Failed to delete installer");
-      }
+      await deleteLatestInstaller();
       setInstaller(null);
       setFile(null);
       setVersion("");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setDeleting(false);
     }

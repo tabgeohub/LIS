@@ -6,7 +6,7 @@
 **Delta vs `exported-findings-5`:** +29 maint+arch RAW (1052 → 1081). Dashboard: Maintainability **2.9 → 3.1** (+0.2) despite net RAW increase — see [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md).
 
 
-## Progress (STEPS 01–06 deployed)
+## Progress (STEPS 01–08 implemented)
 
 | Step | Status | E5→E6 outcome |
 |------|--------|---------------|
@@ -16,9 +16,12 @@
 | STEP-04 | ✅ Done | api-hooks factory; component independence −19 |
 | STEP-05 | ✅ Done | EditPointCoordinates, generatePdfReport, Timeslider splits |
 | STEP-06 | ✅ Done | Map hooks + popUpModal + regio hook options |
-| **STEP-07** | **Next** | Tools, Bottom lists, misc Common UI |
+| STEP-07 | ✅ Done | Tools, Bottom lists, misc Common UI |
+| **STEP-08** | **✅ Done (await deploy + E7)** | ArcGIS, admin, dup tail, MapComp |
 
 **Key metric:** HIGH severity maint+arch **128 → 79** (−49). Extraction trade-off: +51 unit size from new helper files — avoid unnecessary splits.
+
+> **Next:** Deploy, re-export Sigrid as `exported-findings-7`, run `compare-6-vs-7.py`, regenerate plan.
 
 > **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)
 
@@ -38,7 +41,7 @@
 
 **Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
 
-> **Note:** Step RAW counts are **scopes at `exported-findings-6`**. STEPS 01–06 are deployed; continue from **STEP-07**.
+> **Note:** Step RAW counts are **scopes at `exported-findings-6`**. STEPS 01–08 are implemented; deploy and re-export before further work.
 
 | Step | Name | Open RAW (E6) | Size | Primary tactic |
 |------|------|--------------:|:----:|----------------|

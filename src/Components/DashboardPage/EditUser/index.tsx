@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import {
+  assignKeycloakUserRoles,
+  updateKeycloakUserProfile,
+} from "../shared/keycloakUserApi";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
 import { IoIosArrowBack } from "react-icons/io";
 import RoleSelect from "../shared/RoleSelect";
@@ -44,46 +47,16 @@ export default function EditUser() {
     setLoading(true);
 
     try {
-      // Update user info
-      const updateResponse = await fetch(
-        `${getBackEndUrl()}/api/keycloak/management/users/${selectedUser.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email || undefined,
-          }),
-        }
-      );
+      await updateKeycloakUserProfile({
+        userId: selectedUser.id,
+        username: formData.username,
+        email: formData.email,
+      });
 
-      if (!updateResponse.ok) {
-        const errorData = await updateResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to update user");
-      }
-
-      // Update user roles (single role)
-      const rolesResponse = await fetch(
-        `${getBackEndUrl()}/api/keycloak/management/users/${selectedUser.id}/roles`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            roles: formData.role ? [formData.role] : [],
-          }),
-        }
-      );
-
-      if (!rolesResponse.ok) {
-        const errorData = await rolesResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to update user roles");
-      }
+      await assignKeycloakUserRoles({
+        userId: selectedUser.id,
+        roles: formData.role ? [formData.role] : [],
+      });
 
       toast.success("User updated successfully");
 

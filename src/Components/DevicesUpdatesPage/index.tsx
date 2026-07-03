@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import type { DeviceStatus, GetacDevice } from "Types/devices";
+import {
+  fetchDevicesUpdates,
+  isWaitingForDeviceCommand,
+  queueDeviceAction,
+  resetDeviceUpdate,
+} from "./devicesUpdatesApi";
+import { useDeviceActionPolling } from "./useDeviceActionPolling";
 
 const STATUS_LABELS: Record<DeviceStatus, string> = {
   unknown: "Unknown",
@@ -18,35 +24,26 @@ function formatDate(value: string | null): string {
   return new Date(value).toLocaleString();
 }
 
-function isWaitingForCommand(device: GetacDevice): boolean {
-  return (
-    device.command_status === "queued" || device.command_status === "in_progress"
-  );
-}
-
 export default function DevicesUpdatesPage() {
   const { user } = useAuth();
   const [devices, setDevices] = useState<GetacDevice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionDeviceId, setActionDeviceId] = useState<string | null>(null);
-  const pollRef = useRef<number | null>(null);
-
   const isAdmin = useMemo(() => user.role === "admin", [user.role]);
+
+  const { stopPolling, startPolling } = useDeviceActionPolling({
+    setError,
+    setActionDeviceId,
+    onDevicesLoaded: setDevices,
+  });
 
   const fetchDevices = useCallback(async () => {
     setError(null);
     try {
-      const response = await fetch(`${getBackEndUrl()}/api/devices-updates/devices`, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Failed to fetch devices");
-      }
-      const body = (await response.json()) as { devices: GetacDevice[] };
-      setDevices(body.devices);
-      return body.devices;
+      const next = await fetchDevicesUpdates();
+      setDevices(next);
+      return next;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
@@ -64,43 +61,7 @@ export default function DevicesUpdatesPage() {
     fetchDevices();
   }, [fetchDevices, isAdmin]);
 
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) window.clearInterval(pollRef.current);
-    };
-  }, []);
-
-  function stopPolling() {
-    if (pollRef.current) {
-      window.clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  }
-
-  function startPolling(deviceId: string, action: "check-status" | "update") {
-    stopPolling();
-    const startedAt = Date.now();
-    const timeoutMs = action === "update" ? 15 * 60 * 1000 : 90 * 1000;
-    pollRef.current = window.setInterval(async () => {
-      if (Date.now() - startedAt > timeoutMs) {
-        stopPolling();
-        setActionDeviceId(null);
-        setError(
-          action === "update"
-            ? "Update timed out after 15 minutes. Check the agent terminal, then click Reset if needed."
-            : "Command timed out after 90 seconds. Click Reset, then try again."
-        );
-        return;
-      }
-
-      const latest = await fetchDevices();
-      const device = latest.find((item) => item.id === deviceId);
-      if (!device || !isWaitingForCommand(device)) {
-        stopPolling();
-        setActionDeviceId(null);
-      }
-    }, 5000);
-  }
+  useEffect(() => () => stopPolling(), [stopPolling]);
 
   async function resetDevice(deviceId: string) {
     setError(null);
@@ -108,23 +69,10 @@ export default function DevicesUpdatesPage() {
     setActionDeviceId(null);
 
     try {
-      const response = await fetch(
-        `${getBackEndUrl()}/api/devices-updates/devices/${deviceId}/reset`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Reset failed");
-      }
-
+      await resetDeviceUpdate(deviceId);
       await fetchDevices();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Unknown error");
     }
   }
 
@@ -133,24 +81,11 @@ export default function DevicesUpdatesPage() {
     setError(null);
 
     try {
-      const response = await fetch(
-        `${getBackEndUrl()}/api/devices-updates/devices/${deviceId}/${action}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || "Action failed");
-      }
-
+      await queueDeviceAction(deviceId, action);
       await fetchDevices();
       startPolling(deviceId, action);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Unknown error");
       setActionDeviceId(null);
     }
   }
@@ -211,7 +146,8 @@ export default function DevicesUpdatesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {devices.map((device) => {
                     const busy =
-                      actionDeviceId === device.id || isWaitingForCommand(device);
+                      actionDeviceId === device.id ||
+                      isWaitingForDeviceCommand(device);
 
                     return (
                       <tr key={device.id}>

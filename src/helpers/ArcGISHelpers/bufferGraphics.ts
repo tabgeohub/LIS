@@ -20,29 +20,56 @@ const BLUE_BUFFER_SYMBOL = new SimpleFillSymbol({
   outline: { color: [0, 0, 255], width: 2 },
 });
 
-export function bufferPointsOnLayer(
-  points: EnrichedPointType[],
-  distance: number,
-  unit: "kilometers" | "meters",
+type BufferUnit = "kilometers" | "meters";
+
+export type BufferPointsOnLayerInput = {
+  points: EnrichedPointType[];
+  distance: number;
+  unit: BufferUnit;
+  graphicsLayer: GraphicsLayer;
+  mapView: MapView;
+};
+
+export type BufferFlightPlansOnLayerInput = {
+  flightPlans: FlightPlanType[];
+  distance: number;
+  unit: BufferUnit;
+  graphicsLayer: GraphicsLayer;
+};
+
+function addBufferedGraphics(
   graphicsLayer: GraphicsLayer,
-  mapView: MapView
-): void {
-  points.forEach((point) => {
+  buffered: __esri.Geometry | __esri.Geometry[],
+  symbol: SimpleFillSymbol,
+  id: number
+) {
+  const addGraphic = (geometry: __esri.Geometry) => {
+    graphicsLayer.add(
+      new Graphic({ geometry, symbol, attributes: { id } })
+    );
+  };
+
+  if (Array.isArray(buffered)) buffered.forEach(addGraphic);
+  else addGraphic(buffered);
+}
+
+export function bufferPointsOnLayer(input: BufferPointsOnLayerInput): void {
+  input.points.forEach((point) => {
     const center = new Point({
       latitude: point.latitude,
       longitude: point.longitude,
-      spatialReference: mapView.spatialReference,
+      spatialReference: input.mapView.spatialReference,
     });
 
     const circle = new Circle({
       center,
-      radius: distance,
-      radiusUnit: unit,
+      radius: input.distance,
+      radiusUnit: input.unit,
       numberOfPoints: 64,
-      spatialReference: mapView.spatialReference,
+      spatialReference: input.mapView.spatialReference,
     });
 
-    graphicsLayer.add(
+    input.graphicsLayer.add(
       new Graphic({
         geometry: circle,
         symbol: RED_BUFFER_SYMBOL,
@@ -53,12 +80,9 @@ export function bufferPointsOnLayer(
 }
 
 export function bufferFlightPlansOnLayer(
-  flightPlans: FlightPlanType[],
-  distance: number,
-  unit: "kilometers" | "meters",
-  graphicsLayer: GraphicsLayer
+  input: BufferFlightPlansOnLayerInput
 ): void {
-  flightPlans.forEach((plan) => {
+  input.flightPlans.forEach((plan) => {
     const points = plan.points;
     if (!Array.isArray(points) || points.length < 3) return;
 
@@ -69,31 +93,21 @@ export function bufferFlightPlansOnLayer(
       polygonRings.push(first);
     }
 
-    const polyg = new Polygon({ rings: [polygonRings] });
     const projectedPolygon = projection.project(
-      polyg,
+      new Polygon({ rings: [polygonRings] }),
       SpatialReference.WebMercator
     ) as Polygon;
 
-    const buffered = bufferOperator.execute(projectedPolygon, distance, {
-      unit,
+    const buffered = bufferOperator.execute(projectedPolygon, input.distance, {
+      unit: input.unit,
     });
     if (!buffered) return;
 
-    const addGraphic = (geometry: __esri.Geometry) => {
-      graphicsLayer.add(
-        new Graphic({
-          geometry,
-          symbol: BLUE_BUFFER_SYMBOL,
-          attributes: { id: plan.id },
-        })
-      );
-    };
-
-    if (Array.isArray(buffered)) {
-      buffered.forEach(addGraphic);
-    } else {
-      addGraphic(buffered);
-    }
+    addBufferedGraphics(
+      input.graphicsLayer,
+      buffered,
+      BLUE_BUFFER_SYMBOL,
+      plan.id
+    );
   });
 }

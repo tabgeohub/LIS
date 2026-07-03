@@ -32,22 +32,22 @@ export default function PointsBuffer({
     const includePlans = target !== "points";
 
     if (includePoints) {
-      bufferPointsOnLayer(
-        pointsData,
+      bufferPointsOnLayer({
+        points: pointsData,
         distance,
         unit,
         graphicsLayer,
-        mapView
-      );
+        mapView,
+      });
     }
 
     if (includePlans) {
-      bufferFlightPlansOnLayer(
-        flightPlansData,
+      bufferFlightPlansOnLayer({
+        flightPlans: flightPlansData,
         distance,
         unit,
-        graphicsLayer
-      );
+        graphicsLayer,
+      });
     }
 
     setFase("all");

@@ -1,4 +1,8 @@
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import {
+  assertDeleteAttachmentsSuccess,
+  type FeatureDeleteAttachmentsResponse,
+} from "./deleteAttachmentsResponse";
 
 export const ATTACHMENTS_FEATURE_LAYER_URL =
   "https://services-eu1.arcgis.com/4D1GBrbE6xp1T4YG/arcgis/rest/services/attachments_layer/FeatureServer";
@@ -30,40 +34,8 @@ function resolveIds(
   return null;
 }
 
-type ArcgisError = {
-  message?: string;
-  details?: string | string[];
-};
-
 /**
- * Response for POST .../FeatureServer/{layerId}/{objectId}/deleteAttachments
- * (same pattern ArcGIS Online uses in the browser).
- */
-type FeatureDeleteAttachmentsResponse = {
-  error?: ArcgisError;
-  deleteResults?: Array<{
-    objectId?: number;
-    success?: boolean;
-    error?: { description?: string };
-  }>;
-};
-
-function formatArcgisError(payload: ArcgisError | undefined): string {
-  if (!payload) return "ArcGIS deleteAttachments fout";
-  const details = payload.details;
-  const detailStr = Array.isArray(details)
-    ? details.join("; ")
-    : details || "";
-  return (
-    [payload.message, detailStr].filter(Boolean).join(" ").trim() ||
-    "ArcGIS deleteAttachments fout"
-  );
-}
-
-/**
- * Deletes one attachment via the per-feature REST operation:
- * POST .../FeatureServer/{layerId}/{featureObjectId}/deleteAttachments
- * Body: attachmentIds, f=json (token added by session proxy in body).
+ * Deletes one attachment via the per-feature REST operation.
  */
 export async function deleteArcgisPointAttachment(
   attachmentUrl: string,
@@ -98,25 +70,5 @@ export async function deleteArcgisPointAttachment(
     throw new Error(`ArcGIS deleteAttachments: ongeldig antwoord (HTTP ${res.status})`);
   }
 
-  if (payload.error) {
-    throw new Error(formatArcgisError(payload.error));
-  }
-
-  const results = payload.deleteResults;
-  if (Array.isArray(results) && results.length > 0) {
-    const failed = results.find((r) => r.success === false);
-    if (failed) {
-      const desc = (failed.error?.description || "").toLowerCase();
-      if (
-        desc.includes("cannot find") ||
-        desc.includes("not found") ||
-        desc.includes("does not exist")
-      ) {
-        return;
-      }
-      throw new Error(
-        failed.error?.description || "ArcGIS deleteAttachments mislukt"
-      );
-    }
-  }
+  assertDeleteAttachmentsSuccess(payload);
 }

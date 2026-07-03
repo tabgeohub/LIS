@@ -1,7 +1,7 @@
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { getTransformedCoordinates } from "./getTransformedCoordinates";
+import { buildPointMarkerSymbol } from "./pointMarkerSymbol";
 
 /**
  * Point data interface
@@ -37,21 +37,7 @@ export interface CreatePointGraphicOptions {
 }
 
 /**
- * Default symbol options (blue marker)
- */
-const DEFAULT_SYMBOL_OPTIONS: Required<PointSymbolOptions> = {
-  color: "blue",
-  size: 12,
-  style: "circle",
-  outlineColor: "white",
-  outlineWidth: 1,
-};
-
-/**
  * Gets coordinates from point data, with optional RD to WGS84 transformation
- * @param point - Point data object
- * @param transformCoordinates - Whether to transform coordinates if needed
- * @returns Object with longitude and latitude, or null if invalid
  */
 export function getPointCoordinates(
   point: PointData,
@@ -60,20 +46,22 @@ export function getPointCoordinates(
   let longitude: number | undefined = point.longitude;
   let latitude: number | undefined = point.latitude;
 
-  // If coordinates are missing and RD coordinates exist, transform them
   if (
     transformCoordinates &&
     (typeof longitude !== "number" || typeof latitude !== "number") &&
     typeof point.xcoordinaat_rd === "number" &&
     typeof point.ycoordinaat_rd === "number"
   ) {
-    const wgs = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: point.xcoordinaat_rd, y: point.ycoordinaat_rd
-     });
+    const wgs = getTransformedCoordinates({
+      fromProjection: "RD",
+      toProjection: "WGS84",
+      x: point.xcoordinaat_rd,
+      y: point.ycoordinaat_rd,
+    });
     longitude = wgs.x;
     latitude = wgs.y;
   }
 
-  // Validate coordinates
   if (typeof longitude !== "number" || typeof latitude !== "number") {
     return null;
   }
@@ -83,9 +71,6 @@ export function getPointCoordinates(
 
 /**
  * Creates a Graphic object from point data
- * @param point - Point data object
- * @param options - Options for creating the graphic
- * @returns Graphic object or null if point is invalid
  */
 export function createPointGraphic(
   point: PointData,
@@ -97,60 +82,30 @@ export function createPointGraphic(
     transformCoordinates = true,
   } = options;
 
-  // Get coordinates
   const coords = getPointCoordinates(point, transformCoordinates);
-  if (!coords) {
-    return null;
-  }
+  if (!coords) return null;
 
-  // Merge symbol options with defaults
-  const finalSymbolOptions: Required<PointSymbolOptions> = {
-    color: symbolOptions.color ?? DEFAULT_SYMBOL_OPTIONS.color,
-    size: symbolOptions.size ?? DEFAULT_SYMBOL_OPTIONS.size,
-    style: symbolOptions.style ?? DEFAULT_SYMBOL_OPTIONS.style,
-    outlineColor:
-      symbolOptions.outlineColor ?? DEFAULT_SYMBOL_OPTIONS.outlineColor,
-    outlineWidth:
-      symbolOptions.outlineWidth ?? DEFAULT_SYMBOL_OPTIONS.outlineWidth,
-  };
-
-  // Create point geometry
   const pointGeometry = new Point({
     longitude: coords.longitude,
     latitude: coords.latitude,
     spatialReference: { wkid: 4326 },
   });
 
-  // Create symbol
-  const symbol = new SimpleMarkerSymbol({
-    color: finalSymbolOptions.color,
-    size: finalSymbolOptions.size,
-    style: finalSymbolOptions.style,
-    outline: {
-      color: finalSymbolOptions.outlineColor,
-      width: finalSymbolOptions.outlineWidth,
-    },
-  });
-
-  // Build attributes object
   const graphicAttributes: Record<string, any> = {
     id: point.id,
     omschrijving: point.omschrijving,
-    ...attributes, // Allow overriding with custom attributes
+    ...attributes,
   };
 
   return new Graphic({
     geometry: pointGeometry,
-    symbol: symbol,
+    symbol: buildPointMarkerSymbol(symbolOptions),
     attributes: graphicAttributes,
   });
 }
 
 /**
  * Creates multiple Graphic objects from an array of points
- * @param points - Array of point data objects
- * @param options - Options for creating the graphics
- * @returns Array of Graphic objects (invalid points are filtered out)
  */
 export function createPointGraphics(
   points: PointData[],
@@ -160,4 +115,3 @@ export function createPointGraphics(
     .map((point) => createPointGraphic(point, options))
     .filter((graphic): graphic is Graphic => graphic !== null);
 }
-

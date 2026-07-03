@@ -122,21 +122,17 @@ export function calculateCenterAndZoom(
   const centerLon = sumLon / numPoints;
 
   let maxDistance = 0;
-  valid.forEach((point) => {
-    valid.forEach((otherPoint) => {
-      const distance = haversineDistance(
-        point.latitude,
-        point.longitude,
-        otherPoint.latitude,
-        otherPoint.longitude
-      );
-      if (distance > maxDistance) {
-        maxDistance = distance;
-      }
-    });
-  });
+  for (const point of valid) {
+    const distance = haversineDistance(
+      centerLat,
+      centerLon,
+      point.latitude,
+      point.longitude
+    );
+    if (distance > maxDistance) maxDistance = distance;
+  }
 
-  let zoom = calculateZoom(maxDistance);
+  const zoom = calculateZoom(maxDistance * 2);
 
   return {
     center: { latitude: centerLat, longitude: centerLon },

@@ -6,6 +6,11 @@ import Point from "@arcgis/core/geometry/Point";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import {
+  closePolygonRing,
+  geometryPathFromPoints,
+  isPolygonGeometryType,
+} from "@helpers/ArcGISHelpers/geometryPathFromPoints";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
@@ -79,28 +84,16 @@ export function drawSelectedPlansYellowHighlights(
     }
 
     for (const g of plan.geometries || []) {
-      const path = (g.points || [])
-        .map((pt) => getPointCoordinates(pt, true))
-        .filter(
-          (c): c is { longitude: number; latitude: number } => c != null
-        )
-        .map((c) => [c.longitude, c.latitude] as [number, number]);
-
+      const path = geometryPathFromPoints(g.points);
       if (path.length < 2) continue;
 
-      const type = (g.geometry_type || "").toLowerCase();
-      const isPolygon = type.includes("polygon");
+      const isPolygon = isPolygonGeometryType(g.geometry_type);
 
       if (isPolygon && path.length >= 3) {
-        const ring = [...path];
-        const [firstX, firstY] = ring[0];
-        const [lastX, lastY] = ring[ring.length - 1];
-        if (firstX !== lastX || firstY !== lastY) ring.push([firstX, firstY]);
-
         layer.add(
           new Graphic({
             geometry: new Polygon({
-              rings: [ring],
+              rings: [closePolygonRing(path)],
               spatialReference: { wkid: 4326 },
             }),
             symbol: polygonSymbol,

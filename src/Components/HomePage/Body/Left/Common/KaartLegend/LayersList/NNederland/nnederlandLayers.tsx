@@ -1,427 +1,244 @@
-﻿import { TfiLayoutAccordionList } from "react-icons/tfi";
-import { BsFillPentagonFill } from "react-icons/bs";
-import { IoTriangleSharp } from "react-icons/io5";
-import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
-import { LegendLayerDefinition } from "../helpers/layerTypes";
+﻿import {
+  nnFeatureLayerSpec,
+  nnMapImageLayerSpec,
+  toLegendLayerDefinitions,
+} from "./nnederlandLayerBuilders";
+import { nnLineIcon, nnSquareIcon, nnederlandLayerIcons } from "./nnederlandLayerIcons";
 
-const EU_SERVICES =
-  "https://services-eu1.arcgis.com/4D1GBrbE6xp1T4YG/arcgis/rest/services";
+const NN = ["NN"] as const;
+const NN_MN = ["NN", "MN"] as const;
 
-export const NNEDERLAND_LAYERS: LegendLayerDefinition[] = [
-  {
+const layerSpecs = [
+  nnFeatureLayerSpec({
     id: "9.1",
+    serviceName: "Betonning_Totaal",
     title: "Betonning Totaal",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Betonning_Totaal/FeatureServer`,
-      title: "Betonning Totaal",
-    }),
-    checked: false,
-    icon: <TfiLayoutAccordionList className="fill-blue-400" />,
-    regio: ["NN", "MN"],
-  },
-  {
+    icon: nnederlandLayerIcons.betonning,
+    regio: [...NN_MN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.2",
+    serviceName: "ARZ",
     title: "ARZ",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/ARZ/FeatureServer`,
-      title: "ARZ",
-    }),
-    checked: false,
-    icon: <div className="w-[70%] h-[5px] bg-red-500 border" />,
-  },
-  {
+    icon: nnederlandLayerIcons.arz,
+  }),
+  nnFeatureLayerSpec({
     id: "9.3",
+    serviceName: "Strandpaviljoens",
     title: "Strandpaviljoens",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Strandpaviljoens/FeatureServer`,
-      title: "Strandpaviljoens",
-    }),
-    checked: false,
-    icon: (
-      <div className="relative">
-        <BsFillPentagonFill className="fill-orange-400" />
-        <div className="h-[3px] aspect-square bg-black absolute top-[48%] left-[50%] translate-x-[-50%]" />
-      </div>
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.strandpaviljoens,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.4",
+    serviceName: "Strandpalen",
     title: "Strandpalen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Strandpalen/FeatureServer`,
-      title: "Strandpalen",
-    }),
-    checked: false,
-    icon: (
-      <div className="relative">
-        <div className="h-[12px] aspect-square bg-orange-500 rounded-full border border-orange-600" />
-        <div className="h-[2px] aspect-square bg-black absolute top-[48%] left-[50%] translate-x-[-50%]" />
-      </div>
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.strandpalen,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.5",
+    serviceName: "Damnummers",
     title: "Damnummers",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Damnummers/FeatureServer`,
-      title: "Damnummers",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[6px] aspect-square border-2 border-black bg-orange-600 rotate-45" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.damnummers,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.6",
+    serviceName: "Lozingspunten",
     title: "Lozingspunten",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Lozingspunten/FeatureServer`,
-      title: "Lozingspunten",
-    }),
-    checked: false,
-    icon: (
-      <div className="relative">
-        <IoTriangleSharp className="fill-green-400" />
-        <div className="h-[2px] aspect-square bg-black absolute top-[48%] left-[50%] translate-x-[-50%] translate-y-[50%] rounded-full" />
-      </div>
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.lozingspunten,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.7",
+    serviceName: "Vloeistofleidingen",
     title: "Vloestofleidingen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Vloeistofleidingen/FeatureServer`,
-      title: "Vloestofleidingen",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-blue-800" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#1e40af"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.8",
+    serviceName: "DataTelecom",
     title: "DataTelecom",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/DataTelecom/FeatureServer`,
-      title: "DataTelecom",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-green-400" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#4ade80"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.9",
+    serviceName: "Electrkabels",
     title: "Electrkabels",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Electrkabels/FeatureServer`,
-      title: "Electrkabels",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-red-500" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#ef4444"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.10",
+    serviceName: "Gasleidingen",
     title: "Gasleidingen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Gasleidingen/FeatureServer`,
-      title: "Gasleidingen",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-orange-500" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#f97316"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.11",
+    serviceName: "Primaire_keringen",
     title: "Primaire_keringen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Primaire_keringen/FeatureServer`,
-      title: "Primaire_keringen",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[7px] bg-green-500" />,
-    regio: ["NN", "MN"],
-  },
-  {
+    icon: nnLineIcon("#22c55e", 7),
+    regio: [...NN_MN],
+  }),
+  nnMapImageLayerSpec({
     id: "9.12",
+    url: "https://geo.rijkswaterstaat.nl/arcgis/rest/services/GDR/nwb_wegen/MapServer/2",
     title: "Vaarwegen",
-    layer: new MapImageLayer({
-      url: "https://geo.rijkswaterstaat.nl/arcgis/rest/services/GDR/nwb_wegen/MapServer/2",
-      title: "Vaarwegen",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-blue-700" />,
-    regio: ["NN", "MN"],
-  },
-  {
+    icon: nnLineIcon("#1d4ed8"),
+    regio: [...NN_MN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.13",
+    serviceName: "Snelvaren",
     title: "Snelvaren",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Snelvaren/FeatureServer`,
-      title: "Snelvaren",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-blue-200" />,
-    regio: ["NN", "MN"],
-  },
-  {
+    icon: nnLineIcon("#bfdbfe"),
+    regio: [...NN_MN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.14",
+    serviceName: "Strandovergangen",
     title: "Strandovergangen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Strandovergangen/FeatureServer`,
-      title: "Strandovergangen",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[6px] bg-yellow-200" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#fef08a", 6),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.15",
+    serviceName: "Wadlooproutes",
     title: "Wadlooproutes",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Wadlooproutes/FeatureServer`,
-      title: "Wadlooproutes",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[8px] bg-green-200" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#bbf7d0", 8),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.16",
+    serviceName: "Tycomkabel",
     title: "Tycomkabel",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Tycomkabel/FeatureServer`,
-      title: "Tycomkabel",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-green-400" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#4ade80"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.17",
+    serviceName: "NGTleiding",
     title: "NGTleiding",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/NGTleiding/FeatureServer`,
-      title: "NGTleiding",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-orange-400" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#fb923c"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.18",
+    serviceName: "NorNedkabel",
     title: "NorNedkabel",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/NorNedkabel/FeatureServer`,
-      title: "NorNedkabel",
-    }),
-    checked: false,
-    icon: <div className="w-[80%] h-[2px] bg-red-500" />,
-    regio: ["NN"],
-  },
-  {
+    icon: nnLineIcon("#ef4444"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.19",
+    serviceName: "Kwelderdammen",
     title: "Kwelderdammen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Kwelderdammen/FeatureServer`,
-      title: "Kwelderdammen",
-    }),
-    checked: false,
-    icon: (
-      <div className="relative w-full flex items-center justify-center">
-        <div className="w-[80%] h-[2px] bg-orange-500" />
-        <div className="h-[8px] w-[2px] bg-gray-700 absolute right-1.5" />
-      </div>
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.kwelderdammen,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.20",
+    serviceName: "Eemsverdrag",
     title: "Eemsverdrag",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Eemsverdrag/FeatureServer`,
-      title: "Eemsverdrag",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-2 border-dashed border-red-500" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.eemsverdrag,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.21",
+    serviceName: "Pierenwinning",
     title: "Pierenwinning",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Pierenwinning/FeatureServer`,
-      title: "Pierenwinning",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-pink-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#fbcfe8", 1.5),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.22",
+    serviceName: "MZI_installaties2018",
     title: "MZI_installaties2018",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/MZI_installaties2018/FeatureServer`,
-      title: "MZI_installaties2018",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-orange-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#fed7aa"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.23",
+    serviceName: "MZI_locaties2018",
     title: "MZI_locaties",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/MZI_locaties2018/FeatureServer`,
-      title: "MZI_locaties",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-purple-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#e9d5ff", 1.5),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.24",
+    serviceName: "Mosselpercelen",
     title: "Mosselpercelen",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Mosselpercelen/FeatureServer`,
-      title: "Mosselpercelen",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-blue-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#bfdbfe"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.25",
+    serviceName: "Schelpenwinning",
     title: "Schelpenwinning",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Schelpenwinning/FeatureServer`,
-      title: "Schelpenwinning",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-pink-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#fbcfe8", 1.5),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.26",
+    serviceName: "Bruggen_Sluizen_HLD",
     title: "Bruggen_Sluizen_HLD",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Bruggen_Sluizen_HLD/FeatureServer`,
-      title: "Bruggen_Sluizen_HLD",
-    }),
-    checked: false,
-    icon: (
-      <div className="relative w-full flex items-center justify-center">
-        <div className="w-[80%] aspect-square bg-green-400" />
-        <div className="h-[4px] aspect-square bg-black absolute left-[50%] -translate-x-[50%] -translate-y-[50%] top-[50%] rounded-full" />
-      </div>
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnederlandLayerIcons.bruggenSluizen,
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.27",
+    serviceName: "BeheersgrensHLD",
     title: "BeheersgrensHLD",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/BeheersgrensHLD/FeatureServer`,
-      title: "BeheersgrensHLD",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-purple-500" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#a855f7"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.28",
+    serviceName: "Waterregeling",
     title: "Waterregeling",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Waterregeling/FeatureServer`,
-      title: "Waterregeling",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-yellow-200" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#fef08a"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.29",
+    serviceName: "Paviljoens",
     title: "Paviljoens",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Paviljoens/FeatureServer`,
-      title: "Paviljoens",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-orange-500" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#f97316"),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.30",
+    serviceName: "Verspreidingsvakken",
     title: "Verspreidingsvakken",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Verspreidingsvakken/FeatureServer`,
-      title: "Verspreidingsvakken",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-green-200/50" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "rgba(187, 247, 208, 0.5)", 1.5),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.31",
+    serviceName: "Kitesurfgebieden",
     title: "Kitesurfgebieden",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Kitesurfgebieden/FeatureServer`,
-      title: "Kitesurfgebieden",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-purple-200" />
-    ),
-    regio: ["NN", "MN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#e9d5ff", 1.5),
+    regio: [...NN_MN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.32",
+    serviceName: "Artikel20_2017",
     title: "Artikel20_2017",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Artikel20_2017/FeatureServer`,
-      title: "Artikel20_2017",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1.5px] border-black bg-green-400" />
-    ),
-    regio: ["NN"],
-  },
-  {
+    icon: nnSquareIcon("#000000", "#4ade80", 1.5),
+    regio: [...NN],
+  }),
+  nnFeatureLayerSpec({
     id: "9.33",
+    serviceName: "Natura2000_NN",
     title: "Natura2000_NN",
-    layer: new FeatureLayer({
-      url: `${EU_SERVICES}/Natura2000_NN/FeatureServer`,
-      title: "Natura2000_NN",
-    }),
-    checked: false,
-    icon: (
-      <div className="w-[80%] aspect-square border-[1px] border-black bg-lime-600" />
-    ),
-    regio: ["NN"],
-  },
+    icon: nnSquareIcon("#000000", "#65a30d"),
+    regio: [...NN],
+  }),
 ];
+
+export const NNEDERLAND_LAYERS = toLegendLayerDefinitions(layerSpecs);

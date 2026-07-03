@@ -6,6 +6,11 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import {
+  closePolygonRing,
+  geometryPathFromPoints,
+  isPolygonGeometryType,
+} from "@helpers/ArcGISHelpers/geometryPathFromPoints";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import {
   FinishedFlightPlanType,
@@ -164,27 +169,16 @@ export function drawGeometryHoverSkyBlue(
   layer: __esri.GraphicsLayer,
   geometry: FinishedGeometryType
 ) {
-  const path = (geometry.points || [])
-    .map((p) => getPointCoordinates(p, true))
-    .filter((c): c is { longitude: number; latitude: number } => c != null)
-    .map((c) => [c.longitude, c.latitude] as [number, number]);
-
+  const path = geometryPathFromPoints(geometry.points);
   if (path.length < 2) return;
 
-  const isPolygon = (geometry.geometry_type || "")
-    .toLowerCase()
-    .includes("polygon");
+  const isPolygon = isPolygonGeometryType(geometry.geometry_type);
 
   if (isPolygon && path.length >= 3) {
-    const ring = [...path];
-    const [firstX, firstY] = ring[0];
-    const [lastX, lastY] = ring[ring.length - 1];
-    if (firstX !== lastX || firstY !== lastY) ring.push([firstX, firstY]);
-
     layer.add(
       new Graphic({
         geometry: new Polygon({
-          rings: [ring],
+          rings: [closePolygonRing(path)],
           spatialReference: { wkid: 4326 },
         }),
         symbol: new SimpleFillSymbol({

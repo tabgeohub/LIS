@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
+import { createKeycloakUser } from "../shared/keycloakUserApi";
 import RoleSelect from "../shared/RoleSelect";
 import { useKeycloakRoles } from "../shared/useKeycloakRoles";
 
@@ -39,28 +39,12 @@ export default function AddUser() {
     }
 
     try {
-      const response = await fetch(
-        `${getBackEndUrl()}/api/keycloak/management/users`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email || undefined,
-            password: formData.password,
-            role: formData.role || undefined,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create user");
-      }
+      await createKeycloakUser({
+        username: formData.username,
+        email: formData.email || undefined,
+        password: formData.password,
+        role: formData.role || undefined,
+      });
 
       toast.success("User created successfully");
 
