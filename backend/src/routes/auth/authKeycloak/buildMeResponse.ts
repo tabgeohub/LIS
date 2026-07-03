@@ -1,6 +1,7 @@
 import type { Session } from "express-session";
 import { decodeJwtPayload } from "../jwt";
 import { consumePendingClientRedirect } from "./resolvePostLoginRedirect";
+import { firstNonEmpty } from "../../../helpers/firstNonEmpty";
 
 type SessionWithPending = Session & { pendingClientPath?: string };
 
@@ -40,13 +41,12 @@ class MeResponseBuilder {
   }
 
   private username(): string | null {
-    return (
-      this.idClaims.preferred_username ??
-      this.accessClaims?.preferred_username ??
-      this.auth.userInfo?.preferred_username ??
-      this.auth.userInfo?.email ??
-      null
-    );
+    return firstNonEmpty([
+      this.idClaims.preferred_username,
+      this.accessClaims?.preferred_username,
+      this.auth.userInfo?.preferred_username,
+      this.auth.userInfo?.email,
+    ]) || null;
   }
 
   private realmRoles(): string[] {
@@ -64,9 +64,9 @@ class MeResponseBuilder {
   private user() {
     return {
       username: this.username(),
-      name: this.auth.userInfo?.name ?? this.idClaims.name ?? null,
-      email: this.auth.userInfo?.email ?? this.idClaims.email ?? null,
-      sub: this.idClaims.sub ?? this.accessClaims?.sub ?? null,
+      name: firstNonEmpty([this.auth.userInfo?.name, this.idClaims.name]) || null,
+      email: firstNonEmpty([this.auth.userInfo?.email, this.idClaims.email]) || null,
+      sub: firstNonEmpty([this.idClaims.sub, this.accessClaims?.sub]) || null,
     };
   }
 

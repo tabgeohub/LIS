@@ -1,19 +1,8 @@
 import { ProxyAgent, setGlobalDispatcher } from "undici";
 import type { ArcgisTokenConfig } from "./arcgis";
+import { firstNonEmpty } from "../helpers/firstNonEmpty";
 
 export type ResolvedArcgisTokenConfig = Required<ArcgisTokenConfig>;
-
-function firstNonEmpty(
-  candidates: Array<string | undefined>,
-  fallback = ""
-): string {
-  for (const value of candidates) {
-    if (value) {
-      return value;
-    }
-  }
-  return fallback;
-}
 
 export function resolveArcgisTokenConfig(
   config?: ArcgisTokenConfig

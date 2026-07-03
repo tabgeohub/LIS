@@ -2,9 +2,11 @@ import { pool } from "../../db";
 import type {
   AgentReportBody,
   DeviceCommand,
-  DeviceStatus,
   GetacDevice,
 } from "./types";
+import { upsertRegisteredDevice } from "./upsertRegisteredDevice";
+import { mapGetacDeviceRow } from "./mapGetacDeviceRow";
+import { resolveReportedDeviceStatus } from "./agent/parseAgentReport";
 
 let schemaReady: Promise<void> | null = null;
 
@@ -40,35 +42,6 @@ export function ensureDevicesUpdatesSchema(): Promise<void> {
   return schemaReady;
 }
 
-function mapRow(row: Record<string, unknown>): GetacDevice {
-  return {
-    id: String(row.id),
-    hostname: String(row.hostname),
-    machine_id: String(row.machine_id),
-    windows_version: row.windows_version ? String(row.windows_version) : null,
-    os_build: row.os_build ? String(row.os_build) : null,
-    status: row.status as DeviceStatus,
-    pending_update_count: Number(row.pending_update_count ?? 0),
-    pending_command: row.pending_command
-      ? (String(row.pending_command) as DeviceCommand)
-      : null,
-    command_status: row.command_status
-      ? (String(row.command_status) as GetacDevice["command_status"])
-      : null,
-    last_error: row.last_error ? String(row.last_error) : null,
-    last_seen_at: row.last_seen_at
-      ? new Date(String(row.last_seen_at)).toISOString()
-      : null,
-    last_checked_at: row.last_checked_at
-      ? new Date(String(row.last_checked_at)).toISOString()
-      : null,
-    last_updated_at: row.last_updated_at
-      ? new Date(String(row.last_updated_at)).toISOString()
-      : null,
-    registered_at: new Date(String(row.registered_at)).toISOString(),
-  };
-}
-
 export async function registerDevice(input: {
   machineId: string;
   hostname: string;
@@ -77,60 +50,7 @@ export async function registerDevice(input: {
   osBuild?: string;
 }): Promise<{ device: GetacDevice; deviceToken: string }> {
   await ensureDevicesUpdatesSchema();
-
-  const existing = await pool.query(
-    `SELECT * FROM lis.getac_devices WHERE machine_id = $1 LIMIT 1`,
-    [input.machineId]
-  );
-
-  if (existing.rows[0]) {
-    const result = await pool.query(
-      `
-        UPDATE lis.getac_devices
-        SET
-          hostname = $2,
-          windows_version = COALESCE($3, windows_version),
-          os_build = COALESCE($4, os_build),
-          last_seen_at = NOW(),
-          updated_at = NOW()
-        WHERE machine_id = $1
-        RETURNING *;
-      `,
-      [
-        input.machineId,
-        input.hostname,
-        input.windowsVersion ?? null,
-        input.osBuild ?? null,
-      ]
-    );
-
-    return {
-      device: mapRow(result.rows[0]),
-      deviceToken: String(existing.rows[0].device_token),
-    };
-  }
-
-  const result = await pool.query(
-    `
-      INSERT INTO lis.getac_devices (
-        device_token, hostname, machine_id, windows_version, os_build, last_seen_at
-      )
-      VALUES ($1, $2, $3, $4, $5, NOW())
-      RETURNING *;
-    `,
-    [
-      input.deviceToken,
-      input.hostname,
-      input.machineId,
-      input.windowsVersion ?? null,
-      input.osBuild ?? null,
-    ]
-  );
-
-  return {
-    device: mapRow(result.rows[0]),
-    deviceToken: input.deviceToken,
-  };
+  return upsertRegisteredDevice(input);
 }
 
 export async function getDeviceByToken(
@@ -144,7 +64,7 @@ export async function getDeviceByToken(
   );
 
   if (!result.rows[0]) return null;
-  return { ...mapRow(result.rows[0]), device_token: deviceToken };
+  return { ...mapGetacDeviceRow(result.rows[0]), device_token: deviceToken };
 }
 
 export async function listDevices(): Promise<GetacDevice[]> {
@@ -154,7 +74,7 @@ export async function listDevices(): Promise<GetacDevice[]> {
   const result = await pool.query(
     `SELECT * FROM lis.getac_devices ORDER BY hostname ASC`
   );
-  return result.rows.map(mapRow);
+  return result.rows.map(mapGetacDeviceRow);
 }
 
 export async function getDeviceById(id: string): Promise<GetacDevice | null> {
@@ -165,7 +85,7 @@ export async function getDeviceById(id: string): Promise<GetacDevice | null> {
     [id]
   );
   if (!result.rows[0]) return null;
-  return mapRow(result.rows[0]);
+  return mapGetacDeviceRow(result.rows[0]);
 }
 
 export async function releaseStaleCommands(
@@ -227,7 +147,7 @@ export async function resetDeviceCommand(id: string): Promise<GetacDevice | null
   );
 
   if (!result.rows[0]) return null;
-  return mapRow(result.rows[0]);
+  return mapGetacDeviceRow(result.rows[0]);
 }
 
 export async function queueDeviceCommand(
@@ -253,7 +173,7 @@ export async function queueDeviceCommand(
   );
 
   if (!result.rows[0]) return null;
-  return mapRow(result.rows[0]);
+  return mapGetacDeviceRow(result.rows[0]);
 }
 
 export async function claimPendingCommand(deviceId: string): Promise<DeviceCommand | null> {
@@ -301,9 +221,7 @@ export async function applyAgentReport(
   const { deviceId, report, completedCommand } = input;
   await ensureDevicesUpdatesSchema();
 
-  const status: DeviceStatus = report.reboot_required
-    ? "reboot_required"
-    : report.status;
+  const status = resolveReportedDeviceStatus(report);
 
   const clearCommand = report.command_completed === true;
 
@@ -342,5 +260,5 @@ export async function applyAgentReport(
   );
 
   if (!result.rows[0]) return null;
-  return mapRow(result.rows[0]);
+  return mapGetacDeviceRow(result.rows[0]);
 }

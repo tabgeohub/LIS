@@ -8,6 +8,7 @@ import {
   serverError,
 } from "../../helpers/http/routeResponses";
 import { requireArray } from "../../helpers/http/validateBody";
+import { updateFinishedPointAttachmentsTx } from "../../helpers/queries/finished-plans/updateFinishedPointAttachmentsTx";
 
 export async function updateFinishedPointAttachments(
   req: Request,
@@ -15,71 +16,34 @@ export async function updateFinishedPointAttachments(
 ): Promise<void> {
   const { point_id, plan_id, attachments_id } = req.body;
 
-  if (
-    point_id == null ||
-    plan_id == null ||
-    !requireArray(attachments_id)
-  ) {
+  if (point_id == null || plan_id == null || !requireArray(attachments_id)) {
     missingFields(res, MISSING_FIELDS_MESSAGE_WITH_PERIOD);
     return;
   }
 
   const newIds: number[] = attachments_id.map((id: unknown) => Number(id));
-
   const client = await pool.connect();
+
   try {
     await client.query("BEGIN");
 
-    const existing = await client.query<{
-      attachments_id: number[] | null;
-    }>(
-      `
-      SELECT attachments_id
-      FROM lis.finished_plans
-      WHERE point_id = $1 AND plan_id = $2
-      FOR UPDATE
-    `,
-      [point_id, plan_id]
-    );
+    const result = await updateFinishedPointAttachmentsTx({
+      client,
+      pointId: point_id,
+      planId: plan_id,
+      attachmentIds: newIds,
+    });
 
-    if (existing.rows.length === 0) {
+    if (!result.ok) {
       await client.query("ROLLBACK");
-      notFound(res, "Geen bestaande attachment gevonden.");
+      notFound(res, result.message);
       return;
     }
 
-    const oldIds: number[] = existing.rows[0].attachments_id || [];
-    const removed = oldIds.filter((id) => !newIds.includes(id));
-
-    const result = await client.query(
-      `
-      UPDATE lis.finished_plans SET
-        attachments_id = $1
-      WHERE point_id = $2 AND plan_id = $3
-      RETURNING *;
-    `,
-      [newIds, point_id, plan_id]
-    );
-
-    if (removed.length > 0) {
-      await client.query(
-        `
-        DELETE FROM lis.attachments a
-        WHERE a.id = ANY($1::int[])
-        AND NOT EXISTS (
-          SELECT 1 FROM lis.finished_plans fp
-          WHERE a.id = ANY(fp.attachments_id)
-        )
-      `,
-        [removed]
-      );
-    }
-
     await client.query("COMMIT");
-
     okResult({
       res,
-      result: result.rows[0],
+      result: result.row,
       message: "Attachment succesvol bijgewerkt.",
     });
   } catch (err) {

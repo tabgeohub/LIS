@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { validateFinishedPlanPoint } from "./validateFinishedPlanPoint";
 
 export type FinishedPlanOkInput = {
   res: Response;
@@ -32,7 +33,7 @@ type FinishedPlanAttachment = {
   lat?: number | null;
 };
 
-type IncomingPoint = {
+export type IncomingPoint = {
   id: number;
   omschrijving: string;
   regio_id?: string;
@@ -61,10 +62,6 @@ export type IncomingPlan = {
   flightTime?: string | number | null;
 };
 
-function isNonEmptyArray<T>(x: unknown): x is T[] {
-  return Array.isArray(x) && x.length >= 0;
-}
-
 export function validateFinishedPlan(
   raw: unknown
 ): { ok: true; plan: IncomingPlan } | { ok: false; reason: string } {
@@ -80,23 +77,16 @@ export function validateFinishedPlan(
   if (typeof typedPlan.id !== "number" || !Number.isInteger(typedPlan.id))
     return { ok: false, reason: "`plan.id` must be an integer." };
 
-  if (!isNonEmptyArray<IncomingPoint>(typedPlan.points))
+  if (!Array.isArray(typedPlan.points)) {
     return {
       ok: false,
       reason: "`plan.points` must be an array (can be empty if needed).",
     };
+  }
 
   for (let i = 0; i < typedPlan.points.length; i++) {
-    const p = typedPlan.points[i];
-    if (typeof p !== "object")
-      return { ok: false, reason: `points[${i}] must be an object.` };
-    if (typeof p.id !== "number")
-      return { ok: false, reason: `points[${i}].id must be a number.` };
-    if (typeof p.omschrijving !== "string")
-      return {
-        ok: false,
-        reason: `points[${i}].omschrijving must be a string.`,
-      };
+    const pointResult = validateFinishedPlanPoint(typedPlan.points[i], i);
+    if (!pointResult.ok) return pointResult;
   }
 
   return { ok: true, plan: typedPlan };

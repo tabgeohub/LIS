@@ -1,18 +1,12 @@
 import { resolveProfile } from "../routes/auth/authKeycloak/resolveProfile";
 import { OIDC_PROFILES } from "../routes/auth/oidcProfiles";
 import { fetch, Response } from "undici";
+import { parseKeycloakIssuer } from "./parseKeycloakIssuer";
 
 export async function getKeycloakAdminToken(req: any): Promise<string> {
   const profile = resolveProfile(req);
   const profileConfig = OIDC_PROFILES[profile];
-
-  // Extract server URL and realm from issuer URL
-  // e.g., https://otggate.rws.nl/realms/tst-lis -> server: https://otggate.rws.nl, realm: tst-lis
-  const issuerUrl = profileConfig.issuer;
-  const urlParts = issuerUrl.split("/realms/");
-  const serverUrl = urlParts[0];
-  const realm = urlParts[1];
-
+  const { serverUrl, realm } = parseKeycloakIssuer(profileConfig.issuer);
   const tokenUrl = `${serverUrl}/realms/${realm}/protocol/openid-connect/token`;
 
   const params = new URLSearchParams({
@@ -25,9 +19,7 @@ export async function getKeycloakAdminToken(req: any): Promise<string> {
   try {
     response = await fetch(tokenUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,
     });
   } catch (fetchError: any) {
@@ -77,13 +69,6 @@ export async function getKeycloakAdminToken(req: any): Promise<string> {
 export function getKeycloakAdminBase(req: any): string {
   const profile = resolveProfile(req);
   const profileConfig = OIDC_PROFILES[profile];
-
-  // Extract server URL and realm from issuer URL
-  const issuerUrl = profileConfig.issuer;
-  const urlParts = issuerUrl.split("/realms/");
-  const serverUrl = urlParts[0];
-  const realm = urlParts[1];
-
+  const { serverUrl, realm } = parseKeycloakIssuer(profileConfig.issuer);
   return `${serverUrl}/admin/realms/${realm}`;
 }
-

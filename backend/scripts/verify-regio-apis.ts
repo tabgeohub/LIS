@@ -4,14 +4,16 @@
  */
 import "dotenv/config";
 import { Pool } from "pg";
-import { buildFlightPlanQuery } from "../src/helpers/queries/flight-plans/buildFlightPlanQuery";
-import {
-  buildFinishedFlightPlansListQuery,
-  buildFinishedPlansTimeRangeQuery,
-  buildFinishedPlansWithPointsQuery,
-} from "../src/helpers/queries/finished-plans/buildFinishedPlanQuery";
-import { appendRegioFilter } from "../src/helpers/queries/shared/regioFilter";
 import { resolveRegioFilter } from "../src/helpers/queries/shared/resolveRegioFilter";
+import {
+  runFlightPlanRegioCases,
+  runPreparedPlansRegioCheck,
+  runSwaggerStyleRegioCheck,
+} from "./verifyRegioFlightPlanCases";
+import {
+  runGeometriesRegioCheck,
+  runPointsRegioCheck,
+} from "./verifyRegioPointsGeometries";
 
 const REGIO = "RWS NN";
 const ADMIN = "admin";
@@ -30,6 +32,8 @@ function fail(name: string, detail: string) {
   console.log(`  ✗ ${name} — ${detail}`);
 }
 
+const reporter = { pass, fail };
+
 function makeFakeAccessToken(roles: string[]): string {
   const payload = Buffer.from(
     JSON.stringify({ realm_access: { roles } })
@@ -37,12 +41,7 @@ function makeFakeAccessToken(roles: string[]): string {
   return `e30.${payload}.e30`;
 }
 
-type MockReqInput = {
-  roles: string[];
-  query?: Record<string, string>;
-};
-
-function mockReq(input: MockReqInput) {
+function mockReq(input: { roles: string[]; query?: Record<string, string> }) {
   const { roles, query = {} } = input;
   return {
     query,
@@ -114,354 +113,31 @@ function testResolveRegioFilter() {
   }
 }
 
-type AssertPlanRegiosInput = {
-  endpoint: string;
-  rows: Array<{ id?: number; regio_id?: string }>;
-  expectedRegio: string;
-};
-
-function assertPlanRegios(input: AssertPlanRegiosInput): boolean {
-  const { endpoint, rows, expectedRegio } = input;
-  const bad = rows.filter(
-    (r) => (r.regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
-  );
-  if (bad.length > 0) {
-    fail(
-      endpoint,
-      `${bad.length} plan(s) with wrong regio_id: ${bad
-        .slice(0, 3)
-        .map((r) => `${r.id}:${r.regio_id}`)
-        .join(", ")}`
-    );
-    return false;
-  }
-  pass(endpoint, `${rows.length} plan(s), all regio_id=${expectedRegio}`);
-  return true;
-}
-
-const PLAN_TABLE_BY_KEY = {
-  "lis.flightplans": "lis.flightplans",
-  "lis.template_plans": "lis.template_plans",
-} as const;
-
-type AssertPlanRegiosWithDbInput = {
-  pool: Pool;
-  endpoint: string;
-  rows: Array<{ id?: number; regio_id?: string }>;
-  expectedRegio: string;
-  table?: keyof typeof PLAN_TABLE_BY_KEY;
-};
-
-async function assertPlanRegiosWithDb(
-  input: AssertPlanRegiosWithDbInput
-): Promise<boolean> {
-  const {
-    pool,
-    endpoint,
-    rows,
-    expectedRegio,
-    table = "lis.flightplans",
-  } = input;
-  if (rows.length === 0) {
-    pass(endpoint, "0 plan(s)");
-    return true;
-  }
-
-  const ids = rows.map((r) => r.id).filter((id): id is number => id != null);
-  if (ids.length === 0) {
-    fail(endpoint, "rows returned without plan ids");
-    return false;
-  }
-
-  const tableName = PLAN_TABLE_BY_KEY[table];
-  const r = await pool.query(
-    "SELECT id, regio_id FROM " + tableName + " WHERE id = ANY($1::int[])",
-    [ids]
-  );
-  return assertPlanRegios({ endpoint, rows: r.rows, expectedRegio });
-}
-
-async function runPointsQuery(regio: string | undefined): Promise<unknown[]> {
-  const params: unknown[] = [];
-  let query = "SELECT id, regio_id FROM lis.points";
-  if (regio && regio !== ADMIN) {
-    params.push(regio.toLowerCase());
-    query += ` WHERE LOWER(regio_id) = $${params.length}`;
-  }
-  query += " ORDER BY id DESC LIMIT 5000";
-  const pool = new Pool();
-  try {
-    const r = await pool.query(query, params);
-    return r.rows;
-  } finally {
-    await pool.end();
-  }
-}
-
-async function runGeometriesQuery(regio: string | undefined): Promise<unknown[]> {
-  const params: unknown[] = [];
-  let query = `
-    SELECT g.id, g.regio_id, p.regio_id AS point_regio_id
-    FROM lis.geometries g
-    JOIN lis.points p ON p.geometry_id = g.id`;
-  const conditions: string[] = [];
-  if (regio && regio !== ADMIN) {
-    params.push(regio.toLowerCase());
-    conditions.push(`LOWER(p.regio_id) = $${params.length}`);
-  }
-  if (conditions.length) {
-    query += " WHERE " + conditions.join(" AND ");
-  }
-  query += " ORDER BY g.id DESC LIMIT 5000";
-  const pool = new Pool();
-  try {
-    const r = await pool.query(query, params);
-    return r.rows;
-  } finally {
-    await pool.end();
-  }
-}
-
-type RunQueryInput = {
-  label: string;
-  sql: string;
-  params: unknown[];
-};
-
-async function runQuery(input: RunQueryInput): Promise<unknown[]> {
-  const { label, sql, params } = input;
-  const pool = new Pool();
-  try {
-    const r = await pool.query(sql, params);
-    return r.rows;
-  } catch (e) {
-    fail(label, `SQL error: ${e instanceof Error ? e.message : String(e)}`);
-    return [];
-  } finally {
-    await pool.end();
-  }
-}
-
 async function testDatabaseQueries() {
   console.log("\n── Database queries (regio filter) ──");
 
   const pool = new Pool();
-
-  const flightPlanCases = [
-    {
-      name: "GET /flightPlans",
-      build: (regio: string | undefined) =>
-        buildFlightPlanQuery({
-          columnPreset: "all",
-          pointPreset: "full",
-          includeGeometryJoin: true,
-          where: "fp.status <> 'inactief'",
-          regio_id: regio,
-          regioFilter: { caseInsensitiveAdmin: true },
-        }),
-    },
-    {
-      name: "GET /flightPlans/prepreparedFlightPlans",
-      build: (regio: string | undefined) =>
-        buildFlightPlanQuery({
-          columnPreset: "search",
-          pointPreset: "search",
-          where: "fp.status = 'pre-prepared'",
-          regio_id: regio,
-          regioFilter: { caseInsensitiveAdmin: true },
-        }),
-    },
-    {
-      name: "GET /flightPlans/fullPreparedFlightPlans",
-      build: (regio: string | undefined) =>
-        buildFlightPlanQuery({
-          columnPreset: "prepared",
-          pointPreset: "minimal",
-          where: "fp.status = 'prepared'",
-          regio_id: regio,
-          regioFilter: { caseInsensitiveAdmin: true },
-        }),
-    },
-    {
-      name: "GET /flightPlans/unPreparedPlans",
-      build: (regio: string | undefined) =>
-        buildFlightPlanQuery({
-          columnPreset: "minimal",
-          pointPreset: "minimal",
-          where: "fp.status = 'pre-prepared'",
-          regio_id: regio,
-          regioFilter: { caseInsensitiveAdmin: true },
-        }),
-    },
-    {
-      name: "GET /templateFlight",
-      build: (regio: string | undefined) =>
-        buildFlightPlanQuery({
-          planTable: "lis.template_plans",
-          planAlias: "tp",
-          columnPreset: "template",
-          pointPreset: "template",
-          includeGeometryJoin: true,
-          regio_id: regio,
-          regioColumn: "tp.regio_id",
-          regioFilter: { caseInsensitiveAdmin: true },
-        }),
-    },
-    {
-      name: "GET /finished_plans/getPartialFinishedFlightPlans",
-      build: (regio: string | undefined) =>
-        buildFinishedPlansWithPointsQuery({ regio_id: regio }),
-    },
-    {
-      name: "GET /finished_plans/",
-      build: (regio: string | undefined) =>
-        buildFinishedFlightPlansListQuery(regio),
-    },
-    {
-      name: "GET /timeslider/getTimeRange",
-      build: (regio: string | undefined) =>
-        buildFinishedPlansTimeRangeQuery(regio),
-    },
-  ];
-
   try {
-    for (const c of flightPlanCases) {
-      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }));
-      const admin = resolveRegioFilter(mockReq({ roles: ["admin"] }));
-
-      const { query: qRegio, params: pRegio } = c.build(regional);
-      const { query: qAdmin, params: pAdmin } = c.build(admin);
-
-      const rowsRegio = await pool.query(qRegio, pRegio);
-      const rowsAdmin = await pool.query(qAdmin, pAdmin);
-
-      if (c.name.includes("getTimeRange")) {
-        pass(
-          c.name,
-          `RWS NN range: ${rowsRegio.rows[0]?.from ?? "null"}–${rowsRegio.rows[0]?.to ?? "null"} | admin: ${rowsAdmin.rows[0]?.from ?? "null"}–${rowsAdmin.rows[0]?.to ?? "null"}`
-        );
-        continue;
-      }
-
-      const table = c.name.includes("templateFlight")
-        ? "lis.template_plans"
-        : "lis.flightplans";
-
-      await assertPlanRegiosWithDb({
-        pool,
-        endpoint: `${c.name} [RWS NN]`,
-        rows: rowsRegio.rows as Array<{ id?: number; regio_id?: string }>,
-        expectedRegio: REGIO,
-        table,
-      });
-
-      const adminCount = rowsAdmin.rows.length;
-      const regioCount = rowsRegio.rows.length;
-      if (adminCount >= regioCount) {
-        pass(
-          `${c.name} [admin >= regional]`,
-          `admin=${adminCount}, RWS NN=${regioCount}`
-        );
-      } else {
-        fail(
-          `${c.name} [admin >= regional]`,
-          `admin=${adminCount} < RWS NN=${regioCount} (unexpected)`
-        );
-      }
-    }
-
-    // preparedFlighPlans — raw SQL route
-    {
-      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
-      const params: unknown[] = [];
-      let query = `SELECT id, regio_id FROM lis.flightPlans WHERE status = 'prepared'`;
-      query = appendRegioFilter({
-        sql: query,
-        params,
-        regio_id: regional,
-        column: "regio_id",
-        options: { caseInsensitiveAdmin: true },
-      });
-      const r = await pool.query(query, params);
-      await assertPlanRegiosWithDb({
-        pool,
-        endpoint: "GET /flightPlans/preparedFlighPlans [RWS NN]",
-        rows: r.rows,
-        expectedRegio: REGIO,
-      });
-    }
-
-    // Points
-    {
-      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
-      const rows = (await runPointsQuery(regional)) as Array<{
-        regio_id?: string;
-      }>;
-      const bad = rows.filter(
-        (r) => (r.regio_id ?? "").toLowerCase() !== REGIO.toLowerCase()
-      );
-      if (bad.length) {
-        fail("GET /points [RWS NN]", `${bad.length} point(s) wrong regio`);
-      } else {
-        pass("GET /points [RWS NN]", `${rows.length} point(s), all regio_id=${REGIO}`);
-      }
-
-      const adminRows = (await runPointsQuery(ADMIN)) as unknown[];
-      if (adminRows.length >= rows.length) {
-        pass(
-          "GET /points [admin >= regional]",
-          `admin=${adminRows.length}, RWS NN=${rows.length}`
-        );
-      } else {
-        fail("GET /points [admin >= regional]", `admin=${adminRows.length} < RWS NN=${rows.length}`);
-      }
-    }
-
-    // Geometries (filtered via point regio)
-    {
-      const regional = resolveRegioFilter(mockReq({ roles: ["RWS NN"] }))!;
-      const rows = (await runGeometriesQuery(regional)) as Array<{
-        point_regio_id?: string;
-      }>;
-      const bad = rows.filter(
-        (r) => (r.point_regio_id ?? "").toLowerCase() !== REGIO.toLowerCase()
-      );
-      if (bad.length) {
-        fail("GET /geometries [RWS NN]", `${bad.length} row(s) wrong point regio`);
-      } else {
-        pass(
-          "GET /geometries [RWS NN]",
-          `${rows.length} geometry-point row(s), all point regio=${REGIO}`
-        );
-      }
-    }
-
-    // Session → query wiring (simulates Swagger without query param)
-    {
-      const resolved = resolveRegioFilter(mockReq({ roles: ["RWS NN"], query: {} }));
-      const { query, params } = buildFinishedPlansWithPointsQuery({
-        regio_id: resolved,
-      });
-      const r = await pool.query(query, params);
-      await assertPlanRegiosWithDb({
-        pool,
-        endpoint: "Swagger-style: RWS NN session, no regio_id param",
-        rows: r.rows as Array<{ id?: number; regio_id?: string }>,
-        expectedRegio: REGIO,
-      });
-
-      const adminResolved = resolveRegioFilter(mockReq({ roles: ["admin"], query: {} }));
-      const { query: qAdmin, params: pAdmin } = buildFinishedPlansWithPointsQuery({
-        regio_id: adminResolved,
-      });
-      const rAdmin = await pool.query(qAdmin, pAdmin);
-      if (rAdmin.rows.length >= r.rows.length) {
-        pass(
-          "Swagger-style: admin session, no param",
-          `admin=${rAdmin.rows.length} plans (unfiltered), RWS NN=${r.rows.length}`
-        );
-      }
-    }
+    await runFlightPlanRegioCases({
+      pool,
+      reporter,
+      mockReq,
+      expectedRegio: REGIO,
+    });
+    await runPreparedPlansRegioCheck({
+      pool,
+      reporter,
+      mockReq,
+      expectedRegio: REGIO,
+    });
+    await runPointsRegioCheck({ reporter, expectedRegio: REGIO });
+    await runGeometriesRegioCheck({ reporter, expectedRegio: REGIO });
+    await runSwaggerStyleRegioCheck({
+      pool,
+      reporter,
+      mockReq,
+      expectedRegio: REGIO,
+    });
   } finally {
     await pool.end();
   }
@@ -477,7 +153,9 @@ async function main() {
 
   const failed = results.filter((r) => !r.ok);
   console.log("\n══════════════════════════════════════");
-  console.log(`Total: ${results.length}  Passed: ${results.length - failed.length}  Failed: ${failed.length}`);
+  console.log(
+    `Total: ${results.length}  Passed: ${results.length - failed.length}  Failed: ${failed.length}`
+  );
 
   if (failed.length) {
     console.log("\nFailed checks:");
