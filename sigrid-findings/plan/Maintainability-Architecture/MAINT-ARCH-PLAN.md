@@ -1,44 +1,99 @@
 # Maintainability & Architecture Plan
 
-**Source:** `exported-findings-4` · **Generated:** 2026-06-30
+**Source:** `exported-findings-5` · **Generated:** 2026-07-01
 
-Split from the former single **DEFER** bucket (1085 RAW maintainability + architecture findings in `exported-findings-4`).
+**1052 RAW** maintainability + architecture findings in `exported-findings-5`.
+**Delta vs `exported-findings-4`:** -33 maint+arch RAW (1085 → 1052). Stars may lag until ~300–500 findings cleared.
 
-> **Before picking work, read [STRATEGY.md](./STRATEGY.md) and [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md).** Naive extract-to-helper refactors *increased* findings in export 4 — follow the Sigrid thresholds.
 
-**Related:** duplication work (DUP-01…) clears overlapping units in Voorbereiding/Nabewerking — do duplication first where noted.
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md) · [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)
 
 ## Finding counts (code only)
 
 | Category | RAW |
 |----------|----:|
-| Unit size | 566 |
-| Unit complexity | 240 |
-| Unit interfacing | 133 |
+| Unit size | 568 |
+| Unit complexity | 239 |
+| Unit interfacing | 99 |
 | Module coupling | 24 |
 | Component independence | 113 |
 | Component entanglement | 9 |
-| **Total in this plan** | **1085** |
+| **Total in this plan** | **1052** |
 
-## Recommended order
+## Execution steps (≥100 findings each)
 
-```
-1. Finish DUP-01 / DUP-02 / DUP-07 / DUP-08  (overlap with MAINT-02/03/08)
-2. MAINT-01  Backend heavy routes
-3. MAINT-02  Nabewerking monsters
-4. MAINT-03  Voorbereiding (remaining after DUP)
-5. MAINT-06  Admin pages (low risk)
-6. MAINT-07  Timeslider
-7. MAINT-04 + MAINT-05  Map shell + ArcGIS (pair with map QA)
-8. MAINT-08  Frontend catch-all — one sub-slice per PR (see below)
-9. ARCH-01–04  Incremental / long-term
-```
+**Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
 
-## Work packages
+> **Note:** Step RAW counts are **scopes at export 5**. STEP-01 combines DUP-01 + Unit interfacing (disjoint categories). Execute **in order** — later steps assume earlier categories are cleared.
+
+| Step | Name | Open RAW (E5) | Size | Primary tactic |
+|------|------|--------------:|:----:|----------------|
+| STEP-01 | DUP-01 wizard buttons + A1 interfacing sweep | **265** | ✓ | Part A: extract shared WizardButtonBar / step action patterns (DUP-01). Part B: every remaining Unit interfacing finding → single input object or class fields (≤2 params). Backend mostly done in E4→E5. |
+| STEP-02 | Voorbereiding complexity (MAINT-03) | **175** | ✓ | A2 on highest McCabe units: SelectFromSource (54), ImportVluchtPlan (39), GeometriesList, DrawingTool. Use lookup tables / early returns |
+| STEP-03 | Backend complexity + size (MAINT-01) | **236** | ✓ | A2 on backend routes/services (getPoints, postProxyHandler, devices-updates). A3 only where extractions stay ≤2 params and ≤5 McCabe. No file moves. |
+| STEP-04 | Architecture — api-hooks factory (ARCH-03) | **113** | ✓ | B2: consolidate const/lookup api-hooks (~21) into useLookupQuery(resource) factory |
+| STEP-05 | Nabewerking + Timeslider (MAINT-02 + MAINT-07) | **136** | ✓ | A2 on EditPointCoordinates (46), generatePdfReport (26), useTimesliderImagePageData (46), TimesliderItemDetailPage. |
+| STEP-06 | Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) | **144** | ✓ | Reduce complexity in hover-click-handlers, features hooks, api-hooks folder |
+| STEP-07 | Frontend catch-all remainder (MAINT-08a/b/f) | **145** | ✓ | Tools, Bottom lists (overlap DUP-08), misc Common UI — A2 then selective A3. |
+| STEP-08 | ArcGIS + remaining duplication + admin + arch tail | **151** | ✓ | MAINT-05 ArcGIS helpers |
+
+### Step details
+
+#### STEP-01 — DUP-01 wizard buttons + A1 interfacing sweep (265 RAW)
+
+- **Tactic:** Part A: extract shared WizardButtonBar / step action patterns (DUP-01). Part B: every remaining Unit interfacing finding → single input object or class fields (≤2 params). Backend mostly done in E4→E5.
+- **Verify:** Duplication −166; Unit interfacing → 0; Voorbereiding + full build smoke
+- **Depends on:** —
+
+#### STEP-02 — Voorbereiding complexity (MAINT-03) (175 RAW)
+
+- **Tactic:** A2 on highest McCabe units: SelectFromSource (54), ImportVluchtPlan (39), GeometriesList, DrawingTool. Use lookup tables / early returns; no naive extract-to-helper.
+- **Verify:** MAINT-03 RAW −175; Voorbereiding wizard smoke
+- **Depends on:** STEP-01
+
+#### STEP-03 — Backend complexity + size (MAINT-01) (236 RAW)
+
+- **Tactic:** A2 on backend routes/services (getPoints, postProxyHandler, devices-updates). A3 only where extractions stay ≤2 params and ≤5 McCabe. No file moves.
+- **Verify:** MAINT-01 RAW −236; backend build + route smoke
+- **Depends on:** STEP-01
+
+#### STEP-04 — Architecture — api-hooks factory (ARCH-03) (113 RAW)
+
+- **Tactic:** B2: consolidate const/lookup api-hooks (~21) into useLookupQuery(resource) factory; biggest architecture star lever.
+- **Verify:** Component independence RAW −113; frontend build + const dropdown smoke
+- **Depends on:** STEP-01
+
+#### STEP-05 — Nabewerking + Timeslider (MAINT-02 + MAINT-07) (136 RAW)
+
+- **Tactic:** A2 on EditPointCoordinates (46), generatePdfReport (26), useTimesliderImagePageData (46), TimesliderItemDetailPage.
+- **Verify:** MAINT-02+07 RAW −136; Nabewerking + timeslider smoke
+- **Depends on:** STEP-02
+
+#### STEP-06 — Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (144 RAW)
+
+- **Tactic:** Reduce complexity in hover-click-handlers, features hooks, api-hooks folder; A2 pattern sweeps.
+- **Verify:** MAINT-08 slice RAW −144; map interaction smoke
+- **Depends on:** STEP-04
+
+#### STEP-07 — Frontend catch-all remainder (MAINT-08a/b/f) (145 RAW)
+
+- **Tactic:** Tools, Bottom lists (overlap DUP-08), misc Common UI — A2 then selective A3.
+- **Verify:** MAINT-08 remainder RAW −145
+- **Depends on:** STEP-06
+
+#### STEP-08 — ArcGIS + remaining duplication + admin + arch tail (151 RAW)
+
+- **Tactic:** MAINT-05 ArcGIS helpers; DUP-02/07/08 remainder; MAINT-06 admin pages; ARCH-01/02/04 + MAINT-04 long tail.
+- **Verify:** 151 findings cleared; map + admin smoke
+- **Depends on:** STEP-07
+
+## Work packages (reference — do not PR whole packages at once)
+
+Use the steps above; packages below are for mapping and CSV filters only.
 
 | ID | Phase | Name | Open RAW | Categories (RAW) |
 |----|-------|------|----------:|------------------|
-| MAINT-01 | 5 - Maintainability | Backend routes and services | 269 | Unit complexity 67, Unit interfacing 58, Unit size 144 |
+| MAINT-01 | 5 - Maintainability | Backend routes and services | 236 | Unit complexity 66, Unit interfacing 24, Unit size 146 |
 | MAINT-02 | 5 - Maintainability | Nabewerking flows | 107 | Unit complexity 24, Unit interfacing 17, Unit size 66 |
 | MAINT-03 | 5 - Maintainability | Voorbereiding wizards | 175 | Unit complexity 36, Unit interfacing 16, Unit size 123 |
 | MAINT-04 | 5 - Maintainability | Map shell UI | 4 | Unit complexity 1, Unit size 3 |
@@ -51,16 +106,19 @@ Split from the former single **DEFER** bucket (1085 RAW maintainability + archit
 | ARCH-03 | 6 - Architecture | Component independence | 113 | Component independence 113 |
 | ARCH-04 | 6 - Architecture | Component entanglement | 9 | Component entanglement 9 |
 
-## MAINT-08 sub-slices (one PR each)
+## MAINT-08 sub-slices (used by STEP-06 / STEP-07)
 
-| Slice | Area | ~RAW | Paths |
-|-------|------|-----:|-------|
-| MAINT-08a | Tools | ~37 | `HomePage/Body/Left/Tools/` |
-| MAINT-08b | Bottom lists | ~32 | `HomePage/Body/Bottom/`, overlaps DUP-08 |
-| MAINT-08c | Map interaction hooks | ~77 | `src/hooks/hover-click-handlers/`, `src/hooks/features/` |
-| MAINT-08d | Common UI + misc | ~146 | `HomePage/Body/Left/Common/`, `api-hooks/`, `utils/` |
+| Slice | ~RAW (E5) | Paths |
+|-------|----------:|-------|
+| 08a-tools | 37 | `HomePage/Body/Left/Tools/` |
+| 08b-bottom | 32 | `HomePage/Body/Bottom/`, overlaps DUP-08 |
+| 08c-map-hooks | 39 | `src/hooks/hover-click-handlers/`, `src/hooks/features/` |
+| 08d-api-hooks | 60 | `src/hooks/api-hooks/` |
+| 08d-utils | 9 | `src/utils/` |
+| 08e-hooks-other | 38 | other `src/hooks/` |
+| 08f-misc | 76 | remaining MAINT-08 |
 
-## Top HIGH-priority units (start here within each package)
+## Top HIGH-priority units (within current step scope)
 
 | WP | Severity | LOC | Cplx | File | Unit |
 |----|----------|----:|-----:|------|------|
@@ -92,16 +150,17 @@ Split from the former single **DEFER** bucket (1085 RAW maintainability + archit
 
 ## Principles
 
-1. **One PR = one file cluster or MAINT-08 sub-slice** — not the whole package at once.
-2. **Prioritize files with both size and complexity** findings (see mapping CSV).
-3. **Architecture (ARCH-*)** — expect slower dashboard movement; entanglement needs boundary work.
-4. **Re-export Sigrid** after each phase → `python sigrid-findings/plan/generate-plan.py`
+1. **One step = ≥100 findings cleared** — not one file, not one MAINT package slice.
+2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
+3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
+4. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `compare-4-vs-5.py` (update folder names).
 
 ## Files
 
 | File | Contents |
 |------|----------|
+| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…08 with open RAW counts |
 | `maint-arch-00-work-packages.csv` | MAINT-01…08 and ARCH-01…04 definitions |
 | `maint-arch-01-findings-mapping.csv` | Every finding mapped to a work package |
-| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — sprint shortlist |
+| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — units to hit inside current step |
 | `../plan-02-maintainability-mapping.csv` | Same mappings (includes DUP/WP-06 overlaps) |

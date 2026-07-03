@@ -8,8 +8,11 @@ FINDINGS = os.path.join(ROOT, "sigrid-findings")
 # Latest Sigrid export folder (override with SIGRID_EXPORT_DIR env var)
 EXPORT_DIR = os.environ.get(
     "SIGRID_EXPORT_DIR",
-    os.path.join(FINDINGS, "exported-findings-4"),
+    os.path.join(FINDINGS, "exported-findings-5"),
 )
+
+# Each execution step must clear at least this many RAW findings (maint + arch + dup).
+MIN_STEP_FINDINGS = 100
 PLAN = os.path.join(FINDINGS, "plan")
 DEVOPS = os.path.join(PLAN, "devops")
 MAINT_ARCH = os.path.join(PLAN, "Maintainability-Architecture")
@@ -219,7 +222,7 @@ wp(
     "WP-08",
     "3 - Auth/HTML",
     "renderDownloadPage HTML template",
-    "backend/src/helpers/renderDownloadPage.ts",
+    "backend/src/helpers/html/renderDownloadPage.ts",
     "Escape all interpolated data; share HTML utilities with WP-06.",
     "XSS on download page",
     "WP-06",
@@ -768,6 +771,148 @@ def enrich_maint_arch_packages(packages: list[dict], mapping: list[dict]) -> lis
     return enriched
 
 
+def maint08_subslice(file: str) -> str:
+    """Sub-slice within MAINT-08 for step packing (export-5 calibrated)."""
+    f = norm_file(file).lower()
+    if "/left/tools/" in f:
+        return "08a-tools"
+    if "/body/bottom/" in f:
+        return "08b-bottom"
+    if "hover-click-handlers" in f or "/hooks/features/" in f:
+        return "08c-map-hooks"
+    if "/left/common/" in f or "api-hooks" in f:
+        return "08d-api-hooks"
+    if f.startswith("src/utils/"):
+        return "08d-utils"
+    if f.startswith("src/hooks/"):
+        return "08e-hooks-other"
+    return "08f-misc"
+
+
+def count_execution_step_findings(
+    step: dict,
+    maint_mapping: list[dict],
+    dup_rows: list[dict],
+) -> int:
+    """Count RAW findings that match a step's filters."""
+    wp_ids = set(step.get("work_packages") or [])
+    categories = set(step.get("categories") or [])
+    maint08_slices = set(step.get("maint08_slices") or [])
+    dup_ids = set(step.get("dup_packages") or [])
+    count_maint = bool(wp_ids or categories or maint08_slices)
+    count_dup = bool(dup_ids)
+    n = 0
+    if count_maint:
+        for m in maint_mapping:
+            if m.get("Status") != "RAW":
+                continue
+            wp = m.get("WorkPackageID", "")
+            cat = m.get("Category", "")
+            if wp_ids and wp not in wp_ids:
+                continue
+            if categories and cat not in categories:
+                continue
+            if maint08_slices:
+                if wp != "MAINT-08" or maint08_subslice(m.get("File", "")) not in maint08_slices:
+                    continue
+            n += 1
+    if count_dup:
+        for r in dup_rows:
+            if r.get("Status") != "RAW":
+                continue
+            if r.get("WorkPackageID") not in dup_ids:
+                continue
+            n += 1
+    return n
+
+
+def build_execution_steps(
+    maint_mapping: list[dict],
+    dup_rows: list[dict],
+) -> list[dict]:
+    """
+    Ordered remediation steps; each targets >= MIN_STEP_FINDINGS RAW cleared.
+    Counts are validated against the current export when the plan is generated.
+    """
+    steps = [
+        {
+            "StepID": "STEP-01",
+            "Name": "DUP-01 wizard buttons + A1 interfacing sweep",
+            "Tactic": "Part A: extract shared WizardButtonBar / step action patterns (DUP-01). Part B: every remaining Unit interfacing finding → single input object or class fields (≤2 params). Backend mostly done in E4→E5.",
+            "dup_packages": ["DUP-01"],
+            "categories": ["Unit interfacing"],
+            "Verification": "Duplication −166; Unit interfacing → 0; Voorbereiding + full build smoke",
+            "DependsOn": "",
+        },
+        {
+            "StepID": "STEP-02",
+            "Name": "Voorbereiding complexity (MAINT-03)",
+            "Tactic": "A2 on highest McCabe units: SelectFromSource (54), ImportVluchtPlan (39), GeometriesList, DrawingTool. Use lookup tables / early returns; no naive extract-to-helper.",
+            "work_packages": ["MAINT-03"],
+            "Verification": "MAINT-03 RAW −175; Voorbereiding wizard smoke",
+            "DependsOn": "STEP-01",
+        },
+        {
+            "StepID": "STEP-03",
+            "Name": "Backend complexity + size (MAINT-01)",
+            "Tactic": "A2 on backend routes/services (getPoints, postProxyHandler, devices-updates). A3 only where extractions stay ≤2 params and ≤5 McCabe. No file moves.",
+            "work_packages": ["MAINT-01"],
+            "Verification": "MAINT-01 RAW −236; backend build + route smoke",
+            "DependsOn": "STEP-01",
+        },
+        {
+            "StepID": "STEP-04",
+            "Name": "Architecture — api-hooks factory (ARCH-03)",
+            "Tactic": "B2: consolidate const/lookup api-hooks (~21) into useLookupQuery(resource) factory; biggest architecture star lever.",
+            "work_packages": ["ARCH-03"],
+            "Verification": "Component independence RAW −113; frontend build + const dropdown smoke",
+            "DependsOn": "STEP-01",
+        },
+        {
+            "StepID": "STEP-05",
+            "Name": "Nabewerking + Timeslider (MAINT-02 + MAINT-07)",
+            "Tactic": "A2 on EditPointCoordinates (46), generatePdfReport (26), useTimesliderImagePageData (46), TimesliderItemDetailPage.",
+            "work_packages": ["MAINT-02", "MAINT-07"],
+            "Verification": "MAINT-02+07 RAW −136; Nabewerking + timeslider smoke",
+            "DependsOn": "STEP-02",
+        },
+        {
+            "StepID": "STEP-06",
+            "Name": "Map hooks + api-hooks slice (MAINT-08c + 08d + 08e)",
+            "Tactic": "Reduce complexity in hover-click-handlers, features hooks, api-hooks folder; A2 pattern sweeps.",
+            "work_packages": ["MAINT-08"],
+            "maint08_slices": ["08c-map-hooks", "08d-api-hooks", "08d-utils", "08e-hooks-other"],
+            "Verification": "MAINT-08 slice RAW −144; map interaction smoke",
+            "DependsOn": "STEP-04",
+        },
+        {
+            "StepID": "STEP-07",
+            "Name": "Frontend catch-all remainder (MAINT-08a/b/f)",
+            "Tactic": "Tools, Bottom lists (overlap DUP-08), misc Common UI — A2 then selective A3.",
+            "work_packages": ["MAINT-08"],
+            "maint08_slices": ["08a-tools", "08b-bottom", "08f-misc"],
+            "Verification": "MAINT-08 remainder RAW −145",
+            "DependsOn": "STEP-06",
+        },
+        {
+            "StepID": "STEP-08",
+            "Name": "ArcGIS + remaining duplication + admin + arch tail",
+            "Tactic": "MAINT-05 ArcGIS helpers; DUP-02/07/08 remainder; MAINT-06 admin pages; ARCH-01/02/04 + MAINT-04 long tail.",
+            "work_packages": ["MAINT-05", "MAINT-06", "MAINT-04", "ARCH-01", "ARCH-02", "ARCH-04"],
+            "dup_packages": ["DUP-02", "DUP-04", "DUP-05", "DUP-06", "DUP-07", "DUP-08"],
+            "Verification": "151 findings cleared; map + admin smoke",
+            "DependsOn": "STEP-07",
+        },
+    ]
+    for step in steps:
+        step["OpenRAW"] = count_execution_step_findings(step, maint_mapping, dup_rows)
+        if step["OpenRAW"] < MIN_STEP_FINDINGS:
+            step["SizeFlag"] = "BELOW_MIN"
+        else:
+            step["SizeFlag"] = "OK"
+    return steps
+
+
 def maint_arch_high_priority(mapping: list[dict]) -> list[dict]:
     """HIGH severity RAW findings for sprint picking."""
     rows = []
@@ -796,9 +941,12 @@ def build_maint_arch_markdown(
     packages: list[dict],
     mapping: list[dict],
     high_priority: list[dict],
+    execution_steps: list[dict],
     export_label: str,
     today: str,
     maint_raw: int,
+    prev_export_label: str = "exported-findings-4",
+    prev_maint_raw: int | None = None,
 ) -> str:
     raw_by_wp = raw_count_by_wp(mapping)
     cat_by_wp: dict[str, dict[str, int]] = {}
@@ -810,15 +958,18 @@ def build_maint_arch_markdown(
         cat_by_wp.setdefault(wp_id, {})
         cat_by_wp[wp_id][cat] = cat_by_wp[wp_id].get(cat, 0) + 1
 
+    delta_line = ""
+    if prev_maint_raw is not None:
+        delta = maint_raw - prev_maint_raw
+        delta_line = f"\n**Delta vs `{prev_export_label}`:** {delta:+d} maint+arch RAW ({prev_maint_raw} → {maint_raw}). Stars may lag until ~300–500 findings cleared.\n"
+
     md = f"""# Maintainability & Architecture Plan
 
 **Source:** `{export_label}` · **Generated:** {today}
 
-Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability + architecture findings in `{export_label}`).
+**{maint_raw} RAW** maintainability + architecture findings in `{export_label}`.{delta_line}
 
-> **Before picking work, read [STRATEGY.md](./STRATEGY.md) and [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md).** Naive extract-to-helper refactors *increased* findings in export 4 — follow the Sigrid thresholds.
-
-**Related:** duplication work (DUP-01…) clears overlapping units in Voorbereiding/Nabewerking — do duplication first where noted.
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md) · [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)
 
 ## Finding counts (code only)
 
@@ -832,21 +983,35 @@ Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability +
 | Component entanglement | {sum(1 for m in mapping if m.get('Status')=='RAW' and m.get('Category')=='Component entanglement')} |
 | **Total in this plan** | **{maint_raw}** |
 
-## Recommended order
+## Execution steps (≥{MIN_STEP_FINDINGS} findings each)
 
-```
-1. Finish DUP-01 / DUP-02 / DUP-07 / DUP-08  (overlap with MAINT-02/03/08)
-2. MAINT-01  Backend heavy routes
-3. MAINT-02  Nabewerking monsters
-4. MAINT-03  Voorbereiding (remaining after DUP)
-5. MAINT-06  Admin pages (low risk)
-6. MAINT-07  Timeslider
-7. MAINT-04 + MAINT-05  Map shell + ArcGIS (pair with map QA)
-8. MAINT-08  Frontend catch-all — one sub-slice per PR (see below)
-9. ARCH-01–04  Incremental / long-term
-```
+**Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
 
-## Work packages
+> **Note:** Step RAW counts are **scopes at export 5**. STEP-01 combines DUP-01 + Unit interfacing (disjoint categories). Execute **in order** — later steps assume earlier categories are cleared.
+
+| Step | Name | Open RAW (E5) | Size | Primary tactic |
+|------|------|--------------:|:----:|----------------|
+"""
+    for s in execution_steps:
+        flag = "⚠" if s.get("SizeFlag") == "BELOW_MIN" else "✓"
+        md += f"| {s['StepID']} | {s['Name']} | **{s['OpenRAW']}** | {flag} | {s['Tactic'].split(';')[0]} |\n"
+
+    md += f"""
+### Step details
+
+"""
+    for s in execution_steps:
+        md += f"""#### {s['StepID']} — {s['Name']} ({s['OpenRAW']} RAW)
+
+- **Tactic:** {s['Tactic']}
+- **Verify:** {s['Verification']}
+- **Depends on:** {s.get('DependsOn') or '—'}
+
+"""
+
+    md += """## Work packages (reference — do not PR whole packages at once)
+
+Use the steps above; packages below are for mapping and CSV filters only.
 
 | ID | Phase | Name | Open RAW | Categories (RAW) |
 |----|-------|------|----------:|------------------|
@@ -859,16 +1024,19 @@ Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability +
         md += f"| {wp_id} | {w['Phase']} | {w['Name']} | {n} | {cat_str} |\n"
 
     md += """
-## MAINT-08 sub-slices (one PR each)
+## MAINT-08 sub-slices (used by STEP-06 / STEP-07)
 
-| Slice | Area | ~RAW | Paths |
-|-------|------|-----:|-------|
-| MAINT-08a | Tools | ~37 | `HomePage/Body/Left/Tools/` |
-| MAINT-08b | Bottom lists | ~32 | `HomePage/Body/Bottom/`, overlaps DUP-08 |
-| MAINT-08c | Map interaction hooks | ~77 | `src/hooks/hover-click-handlers/`, `src/hooks/features/` |
-| MAINT-08d | Common UI + misc | ~146 | `HomePage/Body/Left/Common/`, `api-hooks/`, `utils/` |
+| Slice | ~RAW (E5) | Paths |
+|-------|----------:|-------|
+| 08a-tools | 37 | `HomePage/Body/Left/Tools/` |
+| 08b-bottom | 32 | `HomePage/Body/Bottom/`, overlaps DUP-08 |
+| 08c-map-hooks | 39 | `src/hooks/hover-click-handlers/`, `src/hooks/features/` |
+| 08d-api-hooks | 60 | `src/hooks/api-hooks/` |
+| 08d-utils | 9 | `src/utils/` |
+| 08e-hooks-other | 38 | other `src/hooks/` |
+| 08f-misc | 76 | remaining MAINT-08 |
 
-## Top HIGH-priority units (start here within each package)
+## Top HIGH-priority units (within current step scope)
 
 | WP | Severity | LOC | Cplx | File | Unit |
 |----|----------|----:|-----:|------|------|
@@ -879,21 +1047,23 @@ Split from the former single **DEFER** bucket ({maint_raw} RAW maintainability +
             f"{m.get('Complexity','')} | `{m['File']}` | {(m.get('Unit') or '')[:50]} |\n"
         )
 
-    md += """
+    n_steps = len(execution_steps)
+    md += f"""
 ## Principles
 
-1. **One PR = one file cluster or MAINT-08 sub-slice** — not the whole package at once.
-2. **Prioritize files with both size and complexity** findings (see mapping CSV).
-3. **Architecture (ARCH-*)** — expect slower dashboard movement; entanglement needs boundary work.
-4. **Re-export Sigrid** after each phase → `python sigrid-findings/plan/generate-plan.py`
+1. **One step = ≥{MIN_STEP_FINDINGS} findings cleared** — not one file, not one MAINT package slice.
+2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
+3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
+4. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `compare-4-vs-5.py` (update folder names).
 
 ## Files
 
 | File | Contents |
 |------|----------|
+| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…{n_steps:02d} with open RAW counts |
 | `maint-arch-00-work-packages.csv` | MAINT-01…08 and ARCH-01…04 definitions |
 | `maint-arch-01-findings-mapping.csv` | Every finding mapped to a work package |
-| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — sprint shortlist |
+| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — units to hit inside current step |
 | `../plan-02-maintainability-mapping.csv` | Same mappings (includes DUP/WP-06 overlaps) |
 """
     return md
@@ -918,16 +1088,67 @@ write_csv(PLAN, "plan-03-duplication-mapping.csv", dup_detail)
 write_csv(PLAN, "plan-04-false-positives-remarks.csv", code_remarks)
 write_csv(PLAN, "plan-MASTER-action-items.csv", build_master(code_mapping, code_work_packages))
 
+export_label = os.path.basename(EXPORT_DIR.rstrip("/\\"))
+today = date.today().isoformat()
+
+
+def load_export_maint_arch_raw(export_dir: str) -> int:
+    """Count maint+arch RAW for an export folder."""
+    n = 0
+    for cat, csv_name in categories.items():
+        if cat in ("Security", "Reliability", "Duplication", "Duplicates"):
+            continue
+        path = os.path.join(export_dir, csv_name)
+        if not os.path.exists(path) or os.path.getsize(path) == 0:
+            continue
+        with open(path, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r.get("Status") != "RAW":
+                    continue
+                if cat != "Component entanglement" and is_devops_maint_row(r):
+                    continue
+                if cat == "Component entanglement":
+                    n += 1
+                    continue
+                fpath = norm_file(r.get("File") or "")
+                wp = assign_maint_arch_wp(fpath, cat)
+                if wp.startswith(("MAINT-", "ARCH-")):
+                    n += 1
+    return n
+
+
 maint_arch_mapping = [
     m for m in code_maint if (m.get("WorkPackageID") or "").startswith(("MAINT-", "ARCH-"))
 ]
 maint_arch_raw = sum(1 for m in maint_arch_mapping if m.get("Status") == "RAW")
 maint_arch_packages = enrich_maint_arch_packages(maint_arch_work_packages, maint_arch_mapping)
 maint_arch_master = maint_arch_high_priority(maint_arch_mapping)
+execution_steps = build_execution_steps(maint_arch_mapping, dup_detail)
+
+prev_export_dir = os.path.join(FINDINGS, "exported-findings-4")
+prev_maint_raw: int | None = None
+if os.path.isdir(prev_export_dir) and export_label != "exported-findings-4":
+    prev_maint_raw = load_export_maint_arch_raw(prev_export_dir)
 
 write_csv(MAINT_ARCH, "maint-arch-00-work-packages.csv", maint_arch_packages)
 write_csv(MAINT_ARCH, "maint-arch-01-findings-mapping.csv", maint_arch_mapping)
 write_csv(MAINT_ARCH, "maint-arch-MASTER-action-items.csv", maint_arch_master)
+write_csv(
+    MAINT_ARCH,
+    "maint-arch-EXECUTION-STEPS.csv",
+    [
+        {
+            "StepID": s["StepID"],
+            "Name": s["Name"],
+            "OpenRAW": s["OpenRAW"],
+            "SizeFlag": s.get("SizeFlag", ""),
+            "Tactic": s["Tactic"],
+            "Verification": s["Verification"],
+            "DependsOn": s.get("DependsOn", ""),
+        }
+        for s in execution_steps
+    ],
+)
 
 write_csv(DEVOPS, "devops-00-work-packages.csv", devops_work_packages)
 write_csv(DEVOPS, "devops-01-security-reliability-mapping.csv", devops_mapping)
@@ -942,8 +1163,17 @@ devops_fixed = sum(1 for m in devops_mapping if m["Status"] == "FIXED")
 code_master = build_master(code_mapping, code_work_packages)
 maint_raw = sum(1 for r in code_maint if r.get("Status") == "RAW")
 dup_raw_total = sum(1 for r in dup_detail if r.get("Status") == "RAW")
-export_label = os.path.basename(EXPORT_DIR.rstrip("/\\"))
-today = date.today().isoformat()
+
+n_exec_steps = len(execution_steps)
+step_order_block = "\n".join(
+    f"{s['StepID']} → {s['Name']} ({s['OpenRAW']} RAW)" for s in execution_steps
+)
+step01_raw = execution_steps[0]["OpenRAW"] if execution_steps else 0
+step02_preview = (
+    f"{execution_steps[1]['StepID']} — {execution_steps[1]['Name']} ({execution_steps[1]['OpenRAW']} findings)"
+    if len(execution_steps) > 1
+    else "—"
+)
 
 code_md = f"""# Sigrid Remediation Plan — Code only
 
@@ -960,8 +1190,8 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | Maintainability RAW | {maint_raw} |
 | Duplication RAW | {dup_raw_total} |
 
-**Dashboard (export 4):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9 · Architecture 2.2
-_(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchanged — see analysis below.)_
+**Dashboard (export 5):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **2.9** · Architecture **2.2**
+_(export 4 → 5: maint+arch RAW **1091 → {maint_arch_raw}** (−33); stars unchanged — need **≥100 findings per step** and ~300+ total to move a star. See [ANALYSIS-export-4-to-5.md](./Maintainability-Architecture/ANALYSIS-export-4-to-5.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -980,21 +1210,19 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 
 ## Principles
 
-1. **One work package = one PR** (unless explicitly noted).
-2. **Re-export Sigrid CSVs** after each phase → `python sigrid-findings/plan/generate-plan.py`
+1. **Each execution step clears ≥{MIN_STEP_FINDINGS} findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…{n_exec_steps:02d}.
+2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-4-vs-5.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
-4. **WP-07** — code fix deployed; remaining step is **Sigrid remark** (scanner false positive).
+4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
 ## What’s next (recommended order)
 
 ```
-1. WP-07  → Sigrid remark on callbackHandler (2 MEDIUM RAW → 0)
-2. DUP-01 → Wizard button clusters (largest open duplication)
-3. DUP-02 → Flight plan form fields (partial — continue shared components)
-4. DUP-07 → Zustand plan state (partial — view/duplicate stores done)
-5. DUP-08 → PointsList variants (partial — Voorbereiding lists done)
-6. **[Maintainability-Architecture/](./Maintainability-Architecture/)** — MAINT-01…08 + ARCH-01…04 (after duplication)
+Prep  → WP-07 Sigrid remark on callbackHandler (1 code RAW; not a full step)
+{step_order_block}
 ```
+
+Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
 
 ## Open security/reliability ({code_raw} RAW)
 
@@ -1036,12 +1264,12 @@ for dup_id, _, scope in dup_clusters:
     status = package_status(dup_id, {}, dup_raw)
     code_md += f"| {dup_id} | {n} | {scope[:55]} ({status}) |\n"
 
-code_md += """
-## Suggested next sprint (code only)
+code_md += f"""
+## Suggested next work
 
-1. **WP-07** — Add Sigrid remark (fixed redirect + `pendingClientPath` via `/auth/me`)
-2. **DUP-01** — One wizard button sub-cluster per PR
-3. **DUP-02** — Extend `usePopulateFlightPlanFormEffect` to remaining Step1/Form views
+1. **WP-07** — Sigrid remark (parallel, small)
+2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep ({step01_raw} findings)
+3. **{step02_preview}** — after STEP-01 deploy + re-export
 
 ## Files
 
@@ -1119,28 +1347,32 @@ maint_arch_md = build_maint_arch_markdown(
     maint_arch_packages,
     maint_arch_mapping,
     maint_arch_master,
+    execution_steps,
     export_label,
     today,
     maint_arch_raw,
+    prev_export_label="exported-findings-4",
+    prev_maint_raw=prev_maint_raw,
 )
 with open(os.path.join(MAINT_ARCH, "MAINT-ARCH-PLAN.md"), "w", encoding="utf-8") as f:
     f.write(maint_arch_md)
 
 maint_arch_readme = f"""# Maintainability & Architecture
 
-**{maint_arch_raw} RAW** findings split into **MAINT-01…08** (refactor) and **ARCH-01…04** (structure).
+**{maint_arch_raw} RAW** · **{n_exec_steps} execution steps** (each ≥{MIN_STEP_FINDINGS} findings) — see **`maint-arch-EXECUTION-STEPS.csv`**
 
 ## Read these first
-1. **[ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)** — why export 3→4 showed no movement (and how to avoid repeating it)
-2. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + pattern-based plan to actually move both stars
+1. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5: −33 maint/arch, stars still 2.9 / 2.2
+2. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + ≥100 finding steps
+3. **[ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)** — why naive refactors backfired
 
 ## Work breakdown
-3. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — order, package table, MAINT-08 sub-slices
-4. **`maint-arch-MASTER-action-items.csv`** — HIGH severity shortlist for sprints
-5. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
+4. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — **STEP-01…{n_exec_steps:02d}** (primary execution order)
+5. **`maint-arch-EXECUTION-STEPS.csv`** — step scope and open RAW counts
+6. **`maint-arch-MASTER-action-items.csv`** — HIGH severity units inside the current step
+7. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
 
-> Note: `ANALYSIS-*.md` and `STRATEGY.md` are hand-maintained; the generator does not overwrite them.
-> `MAINT-ARCH-PLAN.md`, `README.md`, and the CSVs are regenerated.
+> `ANALYSIS-*.md` and `STRATEGY.md` are hand-maintained. CSVs and `MAINT-ARCH-PLAN.md` are regenerated.
 
 ## Regenerate
 

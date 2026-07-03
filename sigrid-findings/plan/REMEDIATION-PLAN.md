@@ -1,20 +1,20 @@
 # Sigrid Remediation Plan — Code only
 
-**Source:** `exported-findings-4` · **Generated:** 2026-06-30
+**Source:** `exported-findings-5` · **Generated:** 2026-07-01
 
 Application code, dependencies, and maintainability. **DevOps (Docker) is in [`devops/`](./devops/) — out of scope for code sprints.**
 
-## Current state (`exported-findings-4`)
+## Current state (`exported-findings-5`)
 
 | Metric | Value |
 |--------|------:|
 | Security + Reliability (code) RAW | **1** |
 | Security + Reliability FIXED (code) | 48 |
-| Maintainability RAW | 1090 |
-| Duplication RAW | 209 |
+| Maintainability RAW | 1057 |
+| Duplication RAW | 214 |
 
-**Dashboard (export 4):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability 2.9 · Architecture 2.2
-_(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchanged — see analysis below.)_
+**Dashboard (export 5):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **2.9** · Architecture **2.2**
+_(export 4 → 5: maint+arch RAW **1091 → 1052** (−33); stars unchanged — need **≥100 findings per step** and ~300+ total to move a star. See [ANALYSIS-export-4-to-5.md](./Maintainability-Architecture/ANALYSIS-export-4-to-5.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -33,21 +33,26 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 
 ## Principles
 
-1. **One work package = one PR** (unless explicitly noted).
-2. **Re-export Sigrid CSVs** after each phase → `python sigrid-findings/plan/generate-plan.py`
+1. **Each execution step clears ≥100 findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…08.
+2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-4-vs-5.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
-4. **WP-07** — code fix deployed; remaining step is **Sigrid remark** (scanner false positive).
+4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
 ## What’s next (recommended order)
 
 ```
-1. WP-07  → Sigrid remark on callbackHandler (2 MEDIUM RAW → 0)
-2. DUP-01 → Wizard button clusters (largest open duplication)
-3. DUP-02 → Flight plan form fields (partial — continue shared components)
-4. DUP-07 → Zustand plan state (partial — view/duplicate stores done)
-5. DUP-08 → PointsList variants (partial — Voorbereiding lists done)
-6. **[Maintainability-Architecture/](./Maintainability-Architecture/)** — MAINT-01…08 + ARCH-01…04 (after duplication)
+Prep  → WP-07 Sigrid remark on callbackHandler (1 code RAW; not a full step)
+STEP-01 → DUP-01 wizard buttons + A1 interfacing sweep (265 RAW)
+STEP-02 → Voorbereiding complexity (MAINT-03) (175 RAW)
+STEP-03 → Backend complexity + size (MAINT-01) (236 RAW)
+STEP-04 → Architecture — api-hooks factory (ARCH-03) (113 RAW)
+STEP-05 → Nabewerking + Timeslider (MAINT-02 + MAINT-07) (136 RAW)
+STEP-06 → Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (144 RAW)
+STEP-07 → Frontend catch-all remainder (MAINT-08a/b/f) (145 RAW)
+STEP-08 → ArcGIS + remaining duplication + admin + arch tail (151 RAW)
 ```
+
+Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
 
 ## Open security/reliability (1 RAW)
 
@@ -67,7 +72,7 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 | WP-07 | OPEN | 3 - Auth/HTML | Keycloak callback open redirect | 1 | — |
 | WP-08 | DONE | 3 - Auth/HTML | renderDownloadPage HTML template | — | — |
 | WP-09 | DONE | 3 - Auth/HTML | fileDownload.ts verify FIXED | — | — |
-| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 161 |
+| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 166 |
 | DUP-02 | PARTIAL | 4 - Duplication | Flight plan FormElements | — | 7 |
 | DUP-03 | DONE | 4 - Duplication | useFilterPlans duplicate | — | — |
 | DUP-04 | PARTIAL | 4 - Duplication | PointsBuffer internal dup | — | 1 |
@@ -80,7 +85,7 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 
 | ID | Open RAW | Notes |
 |----|----------:|-------|
-| DUP-01 | 161 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
+| DUP-01 | 166 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
 | DUP-02 | 7 | FormElements / FormInputs / Step1 shared form blocks (PARTIAL) |
 | DUP-03 | 0 | src/hooks/filters/useFilterPlans.ts + Nabewerking copy  (DONE) |
 | DUP-04 | 1 | PointsBuffer.tsx internal duplication (PARTIAL) |
@@ -89,11 +94,11 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 | DUP-07 | 5 | Finished/reuse/view/duplicate plan state hooks (PARTIAL) |
 | DUP-08 | 31 | PointsList.tsx / PointsListEdit.tsx (PARTIAL) |
 
-## Suggested next sprint (code only)
+## Suggested next work
 
-1. **WP-07** — Add Sigrid remark (fixed redirect + `pendingClientPath` via `/auth/me`)
-2. **DUP-01** — One wizard button sub-cluster per PR
-3. **DUP-02** — Extend `usePopulateFlightPlanFormEffect` to remaining Step1/Form views
+1. **WP-07** — Sigrid remark (parallel, small)
+2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep (265 findings)
+3. **STEP-02 — Voorbereiding complexity (MAINT-03) (175 findings)** — after STEP-01 deploy + re-export
 
 ## Files
 
@@ -104,4 +109,4 @@ _(export 3 → 4: Security 3.8 → 4.3; Maintainability and Architecture unchang
 | `plan-01-cleared-security-reliability.csv` | FIXED sec/reliability (archive) |
 | `plan-03-duplication-mapping.csv` | All duplication findings |
 | `plan-04-false-positives-remarks.csv` | Remark text for WP-07 |
-| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages ({maint_arch_raw} RAW) |
+| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages (1052 RAW) |
