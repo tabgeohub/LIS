@@ -37,7 +37,7 @@ export function addGeneralInfoTable(
       ],
     ],
   });
-  wrapPdfSection(generalStart, doc.lastAutoTable.finalY - generalStart);
+  wrapPdfSection(doc, generalStart, doc.lastAutoTable.finalY - generalStart);
 }
 
 export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
@@ -73,7 +73,7 @@ export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
       ],
     ],
   });
-  wrapPdfSection(coordsStart, doc.lastAutoTable.finalY - coordsStart);
+  wrapPdfSection(doc, coordsStart, doc.lastAutoTable.finalY - coordsStart);
 }
 
 export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
@@ -111,5 +111,5 @@ export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
       ],
     ],
   });
-  wrapPdfSection(detailStart, doc.lastAutoTable.finalY - detailStart);
+  wrapPdfSection(doc, detailStart, doc.lastAutoTable.finalY - detailStart);
 }

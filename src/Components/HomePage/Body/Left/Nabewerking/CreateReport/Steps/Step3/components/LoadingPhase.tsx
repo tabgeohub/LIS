@@ -1,5 +1,6 @@
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useContent } from "hooks/useContent";
+import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 
 interface LoadingPhaseProps {
   zippingStatus: string;
@@ -11,8 +12,29 @@ export default function LoadingPhase({
   isPreparingLink,
 }: LoadingPhaseProps) {
   const content = useContent();
+  const { setStep, setZippingStatus } = useCreateReportState();
 
-  // Phase 1: generation/packaging in progress
+  if (zippingStatus.startsWith("error:")) {
+    return (
+      <div className="px-3 pt-2 flex flex-col items-center text-center gap-3">
+        <p className="text-[14px] font-medium text-red-600">
+          Rapport genereren mislukt
+        </p>
+        <p className="text-[12px] text-gray-600">{zippingStatus.slice(6)}</p>
+        <button
+          type="button"
+          className="gray-button"
+          onClick={() => {
+            setZippingStatus("");
+            setStep(2);
+          }}
+        >
+          {content.common.vorige}
+        </button>
+      </div>
+    );
+  }
+
   if (zippingStatus !== "finish.") {
     return (
       <div className="px-3 pt-2 flex flex-col items-center text-center">
@@ -25,7 +47,6 @@ export default function LoadingPhase({
     );
   }
 
-  // Phase 2: zipping finished but link still being prepared/uploaded
   if (isPreparingLink) {
     return (
       <div className="px-3 pt-2 flex flex-col items-center text-center">
@@ -42,6 +63,3 @@ export default function LoadingPhase({
 
   return null;
 }
-
-
-

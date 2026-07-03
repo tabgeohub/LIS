@@ -62,64 +62,72 @@ export function useHandleStep2(input: UseHandleStep2Input) {
 
     setZippingStatus("Waarnemingsrapporten worden gegenereerd...");
 
-    const { attachmentsByPoint, attachmentsByGeometry, logoDataUrl } =
-      await preloadReportAttachments({
-        selectedPointsData,
-        selectedGeometriesData,
+    try {
+      const { attachmentsByPoint, attachmentsByGeometry, logoDataUrl } =
+        await preloadReportAttachments({
+          selectedPointsData,
+          selectedGeometriesData,
+        });
+
+      const pointTasks = selectedPointsData.map((point, index) => () =>
+        processPoint({
+          point,
+          index,
+          totalItems,
+          selectedPlan,
+          activities,
+          organizations,
+          attachmentsByPoint,
+          featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
+          tempLayer,
+          mapServerUrl,
+          pilootOptions,
+          logoDataUrl,
+          setZippingStatus,
+        } as ProcessPointParams)
+      );
+
+      const geometryTasks = selectedGeometriesData.map((geometry, index) => () =>
+        processGeometry({
+          geometry,
+          index,
+          totalItems,
+          pointsOffset: selectedPointsData.length,
+          selectedPlan,
+          activities,
+          organizations,
+          attachmentsByGeometry,
+          featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
+          tempLayer,
+          mapServerUrl,
+          pilootOptions,
+          logoDataUrl,
+          setZippingStatus,
+        } as ProcessGeometryParams)
+      );
+
+      const processedItems = await runWithConcurrency(
+        [...pointTasks, ...geometryTasks],
+        4
+      );
+
+      addProcessedItemsToZip(zip, processedItems);
+
+      setZippingStatus("Bestanden worden ingepakt...");
+      const zipBlob = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 1 },
       });
-
-    const pointTasks = selectedPointsData.map((point, index) => () =>
-      processPoint({
-        point,
-        index: index + 1,
-        totalItems,
-        selectedPlan,
-        activities,
-        organizations,
-        attachmentsByPoint,
-        featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
-        tempLayer,
-        mapServerUrl,
-        pilootOptions,
-        logoDataUrl,
-        setZippingStatus,
-      } as ProcessPointParams)
-    );
-
-    const geometryTasks = selectedGeometriesData.map((geometry, index) => () =>
-      processGeometry({
-        geometry,
-        index,
-        totalItems,
-        pointsOffset: selectedPointsData.length,
-        selectedPlan,
-        activities,
-        organizations,
-        attachmentsByGeometry,
-        featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
-        tempLayer,
-        mapServerUrl,
-        pilootOptions,
-        logoDataUrl,
-        setZippingStatus,
-      } as ProcessGeometryParams)
-    );
-
-    const processedItems = await runWithConcurrency(
-      [...pointTasks, ...geometryTasks],
-      4
-    );
-
-    addProcessedItemsToZip(zip, processedItems);
-
-    setZippingStatus("Bestanden worden ingepakt...");
-    mapView.map.remove(tempLayer);
-    const zipBlob = await zip.generateAsync({
-      type: "blob",
-      compression: "DEFLATE",
-      compressionOptions: { level: 1 },
-    });
-    setZipFile(zipBlob);
-    setZippingStatus("finish.");
+      setZipFile(zipBlob);
+      setZippingStatus("finish.");
+    } catch (err) {
+      console.error("Report generation failed:", err);
+      setZippingStatus(
+        `error:${err instanceof Error ? err.message : "Rapport genereren mislukt"}`
+      );
+    } finally {
+      mapView.map.remove(tempLayer);
+    }
   };
 }
