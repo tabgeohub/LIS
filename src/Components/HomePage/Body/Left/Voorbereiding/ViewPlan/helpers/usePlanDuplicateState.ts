@@ -1,10 +1,10 @@
 import { FlightPlanType } from "Types";
 import { create } from "zustand";
 import {
-  createFlightPlanFormFieldSetters,
-  emptyFlightPlanFormFields,
+  createFlightPlanFormFieldSettersWithZeroPassagiers,
   FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,
+  viewPlanFlightPlanFormDefaults,
 } from "hooks/zustand/shared/flightPlanFormFields";
 
 interface PlanDuplicateState
@@ -32,12 +32,6 @@ interface PlanDuplicateState
   setStatus: (status: string) => void;
 }
 
-const duplicateFormDefaults = {
-  ...emptyFlightPlanFormFields,
-  geplandeVliegduur: "0:00",
-  aantalPassagiers: 0 as number,
-};
-
 export const usePlanDuplicateState = create<PlanDuplicateState>((set) => ({
   duplicatedFlightPlan: null,
   setDuplicatedFlightPlan: (duplicatedFlightPlan: FlightPlanType) =>
@@ -52,17 +46,8 @@ export const usePlanDuplicateState = create<PlanDuplicateState>((set) => ({
   aanmaaldatum: "",
   setAanmaaldatum: (aanmaaldatum: string) => set(() => ({ aanmaaldatum })),
 
-  ...duplicateFormDefaults,
-  ...createFlightPlanFormFieldSetters((partial) =>
-    set((state) => ({
-      ...state,
-      ...partial,
-      aantalPassagiers:
-        partial.aantalPassagiers !== undefined
-          ? (partial.aantalPassagiers ?? 0)
-          : state.aantalPassagiers,
-    }))
-  ),
+  ...viewPlanFlightPlanFormDefaults,
+  ...createFlightPlanFormFieldSettersWithZeroPassagiers(set),
 
   basemap: "",
   setBasemap: (basemap: string) => set(() => ({ basemap })),

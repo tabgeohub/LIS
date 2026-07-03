@@ -1,10 +1,10 @@
 import { FlightPlanType } from "Types";
 import { create } from "zustand";
 import {
-  createFlightPlanFormFieldSetters,
-  emptyFlightPlanFormFields,
+  createFlightPlanFormFieldSettersWithZeroPassagiers,
   FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,
+  viewPlanFlightPlanFormDefaults,
 } from "hooks/zustand/shared/flightPlanFormFields";
 
 interface ViewPlanState
@@ -44,12 +44,6 @@ interface ViewPlanState
   setClickedGeometry: (clickedGeometry: number | null) => void;
 }
 
-const viewPlanFormDefaults = {
-  ...emptyFlightPlanFormFields,
-  geplandeVliegduur: "0:00",
-  aantalPassagiers: 0 as number,
-};
-
 export const useViewPlanState = create<ViewPlanState>((set) => ({
   initialPlans: [],
   setInitialPlans: (initialPlans: FlightPlanType[]) =>
@@ -77,17 +71,8 @@ export const useViewPlanState = create<ViewPlanState>((set) => ({
   selectedIndex: 0,
   setSelectedIndex: (selectedIndex: number) => set(() => ({ selectedIndex })),
 
-  ...viewPlanFormDefaults,
-  ...createFlightPlanFormFieldSetters((partial) =>
-    set((state) => ({
-      ...state,
-      ...partial,
-      aantalPassagiers:
-        partial.aantalPassagiers !== undefined
-          ? (partial.aantalPassagiers ?? 0)
-          : state.aantalPassagiers,
-    }))
-  ),
+  ...viewPlanFlightPlanFormDefaults,
+  ...createFlightPlanFormFieldSettersWithZeroPassagiers(set),
 
   clickedPoint: 0,
   setClickedPoint: (clickedPoint: number) => set(() => ({ clickedPoint })),

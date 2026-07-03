@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import Graphic from "@arcgis/core/Graphic";
 import useLogAction from "hooks/useLogAction";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
+import { buildPlanGeometryGraphics } from "./buildPlanGeometryGraphics";
 
 export function useRenderGeometries(
   selectedPlan: FinishedFlightPlanType | null,
@@ -17,77 +16,13 @@ export function useRenderGeometries(
   useEffect(() => {
     if (!validateMapView(mapView, geometriesGraphicsLayer) || !selectedPlan) return;
 
-    const graphics: Graphic[] = [];
-
-    // First, render all geometries in blue
-    selectedPlan.geometries?.forEach((geometry) => {
-      if (!geometry.points || geometry.points.length === 0) return;
-
-      const graphic = createGeometryGraphic(
-        {
-          id: geometry.id,
-          geometry_type: (geometry.geometry_type as "polygon" | "line") || undefined,
-          geometry_omschrijving: geometry.geometry_omschrijving || undefined,
-          points: geometry.points,
-        },
-        {
-          attributes: {
-            geometryId: geometry.id,
-            geometryType: geometry.geometry_type,
-            omschrijving: geometry.geometry_omschrijving,
-            type: "geometry",
-          },
-        }
-      );
-
-      if (graphic) {
-        graphics.push(graphic);
-      }
-    });
-
-    // Then, overlay selected geometries in yellow on top
-    if (selectedGeometries.length > 0) {
-      selectedPlan.geometries
-        ?.filter((geometry) => selectedGeometries.includes(geometry.id))
-        .forEach((geometry) => {
-          if (!geometry.points || geometry.points.length === 0) return;
-
-          const graphic = createGeometryGraphic(
-            {
-              id: geometry.id,
-              geometry_type: (geometry.geometry_type as "polygon" | "line") || undefined,
-              geometry_omschrijving: geometry.geometry_omschrijving || undefined,
-              points: geometry.points,
-            },
-            {
-              symbolOptions: {
-                fillColor: [0, 0, 0, 0], // Transparent fill
-                outlineColor: [255, 255, 0, 1], // Yellow outline
-                lineColor: [255, 255, 0, 1], // Yellow line
-                outlineWidth: 3,
-                lineWidth: 4,
-              },
-              attributes: {
-                ...geometry,
-                isSelected: true,
-              },
-            }
-          );
-
-          if (graphic) {
-            graphics.push(graphic);
-          }
-        });
-    }
-
+    const graphics = buildPlanGeometryGraphics(selectedPlan, selectedGeometries);
     replaceGraphics(geometriesGraphicsLayer, graphics);
 
     logAction({
       message: "User selected geometries",
       step: "First step",
-      newData: {
-        geometries: selectedGeometries,
-      },
+      newData: { geometries: selectedGeometries },
     });
   }, [
     selectedGeometries,
@@ -97,6 +32,3 @@ export function useRenderGeometries(
     logAction,
   ]);
 }
-
-
-

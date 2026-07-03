@@ -2,16 +2,19 @@ import { useGetPiloot, useGetWaarnemers, useGetLuchtvaartuig } from "hooks/const
 /* eslint-disable react-hooks/exhaustive-deps */
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
-
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
-import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
 import { useEffect } from "react";
 import Vluchtnummer from "./Vluchtnummer";
+import FlightPlanStandardFields, {
+  pickFlightPlanFormFields,
+} from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
 
 export default function Form() {
   const pilootOptions = useGetPiloot();
   const waarnemerOptions = useGetWaarnemers();
   const typeLuchtvaartuigOptions = useGetLuchtvaartuig();
+  const store = usePlanDuplicateState();
+  const fields = pickFlightPlanFormFields(store);
 
   const {
     duplicatedFlightPlan,
@@ -29,16 +32,8 @@ export default function Form() {
     setBasemap,
     setLayers,
     aanmaker,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
-  } = usePlanDuplicateState();
+    aanmaaldatum,
+  } = store;
 
   useEffect(() => {
     if (!duplicatedFlightPlan) return;
@@ -60,84 +55,30 @@ export default function Form() {
   if (!duplicatedFlightPlan) return null;
 
   return (
-    <>
-      <Vluchtnummer />
-
-      <InputComp
-        label="Aanmaker"
-        value={aanmaker}
-        setValue={setAanmaker}
-        required={true}
-      />
-
-      <InputComp
-        type="date"
-        label="Aanmaaldatum"
-        value={datum}
-        setValue={setDatum}
-        required={true}
-      />
-
-      <InputComp
-        label="Omschrijving"
-        value={omschrijving}
-        setValue={setOmschrijving}
-      />
-
-      <SelectComp
-        label="Waarnemer"
-        value={waarnemer}
-        setValue={setWaarnemer}
-        required={true}
-        options={waarnemerOptions}
-      />
-
-      <SelectComp
-        label="Piloot"
-        value={piloot}
-        setValue={setPiloot}
-        options={pilootOptions}
-      />
-
-      <InputComp
-        label="Inspectiedatum"
-        value={datum}
-        setValue={setDatum}
-        required={true}
-        type="date"
-      />
-
-      <InputComp
-        label="Geplande vliegduur"
-        value={geplandeVliegduur}
-        setValue={setGeplandeVliegduur}
-      />
-
-      <SelectComp
-        label="Type luchtvaartuig"
-        value={typeLuchtvaartuig}
-        setValue={setTypeLuchtvaartuig}
-        options={typeLuchtvaartuigOptions}
-      />
-
-      <InputCompNum
-        label="Aantal passagiers"
-        type="number"
-        value={aantalPassagiers}
-        setValue={setAantalPassagiers}
-      />
-
-      <InputComp
-        label="Doel en hoofdthema"
-        value={doelEnHoofdthema}
-        setValue={setDoelEnHoofdthema}
-      />
-
-      <InputComp
-        label="Aanvullende info"
-        value={aanvullendeInfo}
-        setValue={setAanvullendeInfo}
-      />
-    </>
+    <FlightPlanStandardFields
+      fields={fields}
+      labels={defaultFlightPlanFieldLabels}
+      pilootOptions={pilootOptions}
+      waarnemerOptions={waarnemerOptions}
+      typeLuchtvaartuigOptions={typeLuchtvaartuigOptions}
+      header={
+        <>
+          <Vluchtnummer />
+          <InputComp
+            label="Aanmaker"
+            value={aanmaker}
+            setValue={setAanmaker}
+            required
+          />
+          <InputComp
+            type="date"
+            label="Aanmaaldatum"
+            value={aanmaaldatum}
+            setValue={setAanmaaldatum}
+            required
+          />
+        </>
+      }
+    />
   );
 }

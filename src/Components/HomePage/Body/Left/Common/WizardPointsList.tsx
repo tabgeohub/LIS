@@ -1,0 +1,134 @@
+import { ReactNode, useCallback, useMemo } from "react";
+import { EnrichedPointType } from "Types";
+import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import usePointHover from "hooks/hover-click-handlers/usePointHover";
+import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
+import useNearestPointClick from "hooks/hover-click-handlers/useNearestPointClick";
+import useLogAction from "hooks/useLogAction";
+import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
+import { sortPointsWithSelectionOrder } from "hooks/points/sortPointsWithSelectionOrder";
+import { useMapPointSelectionClick } from "hooks/viewPlan/useMapPointSelectionClick";
+import { getPointsSelectionStep } from "hooks/points/pointsSelectionLog";
+
+export type WizardPointsListProps = {
+  points: EnrichedPointType[];
+  selectedPoints: number[];
+  setSelectedPoints: (value: number[]) => void;
+  mapClick?: "nearest" | "hitTest" | "none";
+  itemClick?: "toggle" | "single" | "singleOrClear";
+  drawYellowMarkers?: boolean;
+  hoverMode?: "pointHover" | "graphicState";
+  header?: ReactNode;
+};
+
+function togglePointInList(
+  pointId: number,
+  selectedPoints: number[],
+  setSelectedPoints: (value: number[]) => void
+) {
+  if (selectedPoints.includes(pointId)) {
+    setSelectedPoints(selectedPoints.filter((id) => id !== pointId));
+  } else {
+    setSelectedPoints([...selectedPoints, pointId]);
+  }
+}
+
+export default function WizardPointsList({
+  points,
+  selectedPoints,
+  setSelectedPoints,
+  mapClick = "none",
+  itemClick = "toggle",
+  drawYellowMarkers = false,
+  hoverMode = "pointHover",
+  header,
+}: WizardPointsListProps) {
+  const logAction = useLogAction();
+  const { setHovered } = useHoveredGraphicState();
+  const { handleHoveredPoint, handleRemoveHoverePoint } = usePointHover();
+
+  const handlePointClick = useCallback(
+    (point: EnrichedPointType) => {
+      if (itemClick === "single") {
+        setSelectedPoints([point.id]);
+        return;
+      }
+      if (itemClick === "singleOrClear") {
+        if (selectedPoints.length === 1 && selectedPoints[0] === point.id) {
+          setSelectedPoints([]);
+        } else {
+          setSelectedPoints([point.id]);
+        }
+        return;
+      }
+      togglePointInList(point.id, selectedPoints, setSelectedPoints);
+    },
+    [itemClick, selectedPoints, setSelectedPoints]
+  );
+
+  useNearestPointClick({
+    points,
+    onPointClick: handlePointClick,
+    maxDistanceMeters: 5000,
+    enabled: mapClick === "nearest",
+  });
+
+  useMapPointSelectionClick({
+    onPointClick: handlePointClick,
+    enabled: mapClick === "hitTest",
+  });
+
+  useDrawYellowMarkers({
+    selectedPointIds: drawYellowMarkers ? selectedPoints : [],
+    points: drawYellowMarkers ? points : [],
+    onPointsDrawn: (selectedPointIds) => {
+      if (!drawYellowMarkers) return;
+      logAction({
+        message: "User is selecting points",
+        step: `Step ${getPointsSelectionStep(points)}`,
+        newData: { selectedPoints: selectedPointIds },
+      });
+    },
+  });
+
+  const sortedPoints = useMemo(
+    () => sortPointsWithSelectionOrder(points, selectedPoints),
+    [points, selectedPoints]
+  );
+
+  const onMouseEnter = (point: EnrichedPointType) => {
+    if (hoverMode === "graphicState") {
+      setHovered({ id: point.id, label: point.omschrijving || "" });
+      return;
+    }
+    handleHoveredPoint(point);
+  };
+
+  const onMouseLeave = () => {
+    if (hoverMode === "graphicState") {
+      setHovered(null);
+      return;
+    }
+    handleRemoveHoverePoint();
+  };
+
+  return (
+    <>
+      {header}
+      {sortedPoints.map((point) => (
+        <PointItemCheckBox
+          key={point.id}
+          point={point}
+          isSelected={selectedPoints.includes(point.id)}
+          onMouseEnter={() => onMouseEnter(point)}
+          onMouseLeave={onMouseLeave}
+          onCheckboxClick={(e) => {
+            e.stopPropagation();
+            togglePointInList(point.id, selectedPoints, setSelectedPoints);
+          }}
+          onItemClick={() => handlePointClick(point)}
+        />
+      ))}
+    </>
+  );
+}

@@ -73,3 +73,43 @@ export function createPlanListFilterSetters(
     setFilterTerm: (value) => set({ filterTerm: value }),
   };
 }
+
+/** Defaults used by view-plan and duplicate-plan zustand slices. */
+export const viewPlanFlightPlanFormDefaults: FlightPlanFormFieldValues = {
+  ...emptyFlightPlanFormFields,
+  geplandeVliegduur: "0:00",
+  aantalPassagiers: 0,
+};
+
+export const defaultFlightPlanFieldLabels = {
+  omschrijving: "Omschrijving",
+  waarnemer: "Waarnemer",
+  piloot: "Piloot",
+  datum: "Inspectiedatum",
+  geplandeVliegduur: "Geplande vliegduur",
+  typeLuchtvaartuig: "Type luchtvaartuig",
+  aantalPassagiers: "Aantal passagiers",
+  doelEnHoofdthema: "Doel en hoofdthema",
+  aanvullendeInfo: "Aanvullende info",
+} as const;
+
+type ZustandSet<T> = (
+  partial:
+    | Partial<T>
+    | ((state: T) => Partial<T>)
+) => void;
+
+export function createFlightPlanFormFieldSettersWithZeroPassagiers<T extends FlightPlanFormFieldValues>(
+  set: ZustandSet<T>
+): FlightPlanFormFieldSetters {
+  return createFlightPlanFormFieldSetters((partial) =>
+    set((state) => ({
+      ...state,
+      ...partial,
+      aantalPassagiers:
+        partial.aantalPassagiers !== undefined
+          ? (partial.aantalPassagiers ?? 0)
+          : state.aantalPassagiers,
+    }))
+  );
+}

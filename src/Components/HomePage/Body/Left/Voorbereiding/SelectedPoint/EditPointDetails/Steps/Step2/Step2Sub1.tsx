@@ -1,10 +1,8 @@
-import createPoint from "@helpers/ArcGISHelpers/createPoint";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import EditPointMapClickStep from "Components/HomePage/Body/Common/EditPoint/EditPointMapClickStep";
 import { useFormikContext } from "formik";
 import useLogAction from "hooks/useLogAction";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useEditPointFormMapClick } from "./useEditPointFormMapClick";
 
 export default function Step2Sub1({
   setStep,
@@ -24,9 +22,6 @@ export default function Step2Sub1({
   setCurrentPoint: (value: { x: number; y: number }) => void;
 }) {
   const logAction = useLogAction();
-
-  const { mapView, redGraphicsLayer } = useMapViewState();
-
   const { values, setValues } = useFormikContext<{
     id: number;
     herhalen: number;
@@ -47,75 +42,14 @@ export default function Step2Sub1({
 
   const [mapClickedNotify, setMapClickedNotify] = useState(0);
 
-  useEffect(() => {
-    let clickHandle: __esri.Handle;
-
-    if (subStep === 1 && mapView) {
-      clickHandle = mapView.on("click", async (event) => {
-        // @ts-ignore ArcGIS event may expose stopPropagation
-        event.stopPropagation?.();
-
-        if (!event.mapPoint.longitude || !event.mapPoint.latitude) return;
-
-        setMapClickedNotify(mapClickedNotify + 1);
-
-        setCurrentPoint({
-          x: event.mapPoint.longitude,
-          y: event.mapPoint.latitude,
-        });
-
-        redGraphicsLayer?.removeAll();
-
-        if (mapView.map && redGraphicsLayer) {
-          mapView.map.reorder(redGraphicsLayer, mapView.map.layers.length - 1);
-        }
-
-        const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: event.mapPoint.longitude, y: event.mapPoint.latitude
-         });
-
-        setValues({
-          ...values,
-          x: transformed.x,
-          y: transformed.y,
-          latitude: event.mapPoint.latitude,
-          longitude: event.mapPoint.longitude,
-        });
-
-        const pointGraphic = createPoint(
-          event.mapPoint.longitude,
-          event.mapPoint.latitude
-        );
-
-        if (redGraphicsLayer) {
-          redGraphicsLayer.add(pointGraphic);
-        } else {
-          mapView.graphics.add(pointGraphic);
-        }
-
-        logAction({
-          message: "User clicked on a point",
-          newData: {
-            point: {
-              x: event.mapPoint.longitude,
-              y: event.mapPoint.latitude,
-            },
-          },
-        });
-      });
-    }
-
-    return () => {
-      clickHandle?.remove();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    currentPoint,
-    mapClickedNotify,
-    mapView,
-    redGraphicsLayer,
-    setValues,
+  useEditPointFormMapClick({
     subStep,
-  ]);
+    mapClickedNotify,
+    setMapClickedNotify,
+    setCurrentPoint,
+    setValues,
+    values,
+  });
 
   return (
     <EditPointMapClickStep
@@ -126,7 +60,6 @@ export default function Step2Sub1({
       onSave={handleSubmit}
       onEnterCoordinates={() => {
         setSubStep(2);
-
         logAction({
           message: "User clicked 'Enter coordinates' button",
           step: "Edit point details - Step 2",
@@ -134,7 +67,6 @@ export default function Step2Sub1({
       }}
       onCancel={() => {
         setStep(1);
-
         logAction({
           message: "User clicked 'Cancel' button",
           step: "Edit point details - Step 2",

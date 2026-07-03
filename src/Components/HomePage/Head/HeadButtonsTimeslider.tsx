@@ -1,210 +1,29 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
 import { Range, getTrackBackground } from "react-range";
-import DatePicker from "react-datepicker";
 import { useContent } from "hooks/useContent";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useTimeRange } from "hooks/useTimeRange";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import {
-  format,
-  differenceInMilliseconds,
-  parseISO,
-  startOfDay,
-} from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
+import TimesliderDateField from "./timeslider/TimesliderDateField";
+import { useTimesliderRange } from "./timeslider/useTimesliderRange";
 
-const FALLBACK_MIN = new Date(2024, 0, 1);
-const FALLBACK_MAX = new Date(2025, 11, 31);
-const SLIDER_PARTS = 10;
-/** Tailwind theme primary */
 const PRIMARY_HEX = "#0070BC";
 const TRACK_OUTER_HEX = "#e5e7eb";
-
-const datePickerInputFocus =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50";
-
-const dateFieldWhiteBase =
-  "bg-white shadow-sm transition-all duration-200 ease-out hover:border-primary/40 hover:shadow-md focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/35 focus-within:ring-offset-2 focus-within:ring-offset-white focus-within:shadow-md";
-
-function TimesliderDateField({
-  variant,
-  label,
-  selected,
-  onChange,
-}: {
-  variant: "from" | "to";
-  label: string;
-  selected: Date;
-  onChange: (date: Date | null) => void;
-}) {
-  const popperPlacement = variant === "from" ? "bottom-start" : "bottom-end";
-  const inputClassName =
-    variant === "from"
-      ? `!border-0 !shadow-none !rounded-none !rounded-r-lg bg-transparent py-2 px-2.5 w-[118px] !text-xs font-medium text-gray-800 cursor-pointer ${datePickerInputFocus}`
-      : `!border-0 !shadow-none !rounded-none !rounded-l-lg bg-transparent py-2 px-2.5 w-[118px] !text-xs font-medium text-gray-800 cursor-pointer ${datePickerInputFocus}`;
-
-  const labelClass =
-    "flex shrink-0 items-center bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white";
-
-  if (variant === "from") {
-    return (
-      <div className="flex shrink-0 shadow-sm">
-        <span className={`${labelClass} rounded-l-lg rounded-r-none`}>
-          {label}
-        </span>
-        <div
-          className={`flex min-w-0 items-stretch rounded-r-lg rounded-l-none border-y border-r border-gray-200 ${dateFieldWhiteBase}`}
-        >
-          <DatePicker
-            selected={selected}
-            onChange={onChange}
-            dateFormat="dd/MM/yyyy"
-            wrapperClassName="timeslider-datepicker-wrapper"
-            calendarClassName="timeslider-datepicker-calendar"
-            popperClassName="timeslider-datepicker-popper"
-            popperPlacement={popperPlacement}
-            className={inputClassName}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex shrink-0 shadow-sm">
-      <div
-        className={`flex min-w-0 items-stretch rounded-l-lg rounded-r-none border-y border-l border-gray-200 ${dateFieldWhiteBase}`}
-      >
-        <DatePicker
-          selected={selected}
-          onChange={onChange}
-          dateFormat="dd/MM/yyyy"
-          wrapperClassName="timeslider-datepicker-wrapper"
-          calendarClassName="timeslider-datepicker-calendar"
-          popperClassName="timeslider-datepicker-popper"
-          popperPlacement={popperPlacement}
-          className={inputClassName}
-        />
-      </div>
-      <span className={`${labelClass} rounded-r-lg rounded-l-none`}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function clampToStepIndex(stepIndex: number, stepCount: number): number {
-  return Math.max(0, Math.min(stepCount - 1, stepIndex));
-}
 
 export default function HeadButtonsTimeslider() {
   const content = useContent();
   const { user } = useAuth();
   const regioId = user?.role || undefined;
-  const { range, loading } = useTimeRange(regioId);
 
-  const { minDate, maxDate } = useMemo(() => {
-    let min = FALLBACK_MIN;
-    let max = FALLBACK_MAX;
-    if (range.from && range.to) {
-      const fromDate = parseISO(range.from);
-      const toDate = parseISO(range.to);
-      // Exact inspectiedatum bounds (no month padding)
-      if (!isNaN(fromDate.getTime())) min = fromDate;
-      if (!isNaN(toDate.getTime())) max = toDate;
-    }
-    if (min > max) [min, max] = [max, min];
-    return {
-      minDate: min,
-      maxDate: max,
-    };
-  }, [range.from, range.to]);
-
-  const maxStep = SLIDER_PARTS;
-  const totalMs = Math.max(1, differenceInMilliseconds(maxDate, minDate));
-
-  const stepIndexToDate = useCallback(
-    (stepIndex: number): Date => {
-      const ratio = stepIndex / maxStep;
-      return new Date(minDate.getTime() + ratio * totalMs);
-    },
-    [minDate, totalMs, maxStep]
-  );
-
-  const dateToStepIndex = useCallback(
-    (date: Date): number => {
-      const distance = date.getTime() - minDate.getTime();
-      const ratio = distance / totalMs;
-      const stepIndex = Math.round(ratio * maxStep);
-      return clampToStepIndex(stepIndex, maxStep + 1);
-    },
-    [minDate, totalMs, maxStep]
-  );
-
-  const [values, setValues] = useState<[number, number]>(() => [0, maxStep]);
-  const [orderHint, setOrderHint] = useState<string | null>(null);
-
-  useEffect(() => {
-    setValues([0, maxStep]);
-  }, [maxStep, range.from, range.to]);
-
-  useEffect(() => {
-    if (!orderHint) return;
-    const id = window.setTimeout(() => setOrderHint(null), 4500);
-    return () => window.clearTimeout(id);
-  }, [orderHint]);
-
-  const safeValues: [number, number] = useMemo(() => {
-    const from = Math.max(0, Math.min(values[0], maxStep));
-    const to = Math.max(0, Math.min(values[1], maxStep));
-    return from <= to ? [from, to] : [to, to];
-  }, [values, maxStep]);
-
-  const dateFrom = useMemo(
-    () => stepIndexToDate(safeValues[0]),
-    [safeValues[0], stepIndexToDate]
-  );
-  const dateTo = useMemo(() => stepIndexToDate(safeValues[1]), [
-    safeValues[1],
-    stepIndexToDate,
-  ]);
-
-  const { setDateRange } = useTimesliderState();
-  useEffect(() => {
-    setDateRange(
-      format(dateFrom, "yyyy-MM-dd"),
-      format(dateTo, "yyyy-MM-dd")
-    );
-  }, [dateFrom, dateTo, setDateRange]);
-
-  const handleSliderChange = useCallback((newValues: number[]) => {
-    setOrderHint(null);
-    setValues([newValues[0], newValues[1]]);
-  }, []);
-
-  const handleFromChange = (date: Date | null) => {
-    if (!date) return;
-    if (startOfDay(date) > startOfDay(dateTo)) {
-      setOrderHint(content.layout.timeslider.invalidRangeHint);
-    } else {
-      setOrderHint(null);
-    }
-    const step = dateToStepIndex(date);
-    const clamped = Math.max(0, Math.min(step, safeValues[1] - 1));
-    setValues([clamped, safeValues[1]]);
-  };
-
-  const handleToChange = (date: Date | null) => {
-    if (!date) return;
-    if (startOfDay(date) < startOfDay(dateFrom)) {
-      setOrderHint(content.layout.timeslider.invalidRangeHint);
-    } else {
-      setOrderHint(null);
-    }
-    const step = dateToStepIndex(date);
-    const clamped = Math.min(maxStep, Math.max(step, safeValues[0] + 1));
-    setValues([safeValues[0], clamped]);
-  };
+  const {
+    loading,
+    maxStep,
+    safeValues,
+    dateFrom,
+    dateTo,
+    orderHint,
+    handleSliderChange,
+    handleFromChange,
+    handleToChange,
+  } = useTimesliderRange(regioId);
 
   const trackBackground = getTrackBackground({
     values: safeValues,
@@ -223,6 +42,8 @@ export default function HeadButtonsTimeslider() {
     );
   }
 
+  const invalidHint = content.layout.timeslider.invalidRangeHint;
+
   return (
     <div className="flex w-full justify-center px-1">
       <div className="flex min-h-[88px] w-full max-w-7xl items-center rounded-lg border border-gray-200 bg-white px-6 py-2.5 shadow-sm">
@@ -231,7 +52,7 @@ export default function HeadButtonsTimeslider() {
             variant="from"
             label={content.layout.timeslider.van}
             selected={dateFrom}
-            onChange={handleFromChange}
+            onChange={(date) => handleFromChange(date, invalidHint)}
           />
 
           <div className="flex min-w-[min(100%,320px)] max-w-5xl flex-[1_1_400px] items-center px-1 sm:px-2">
@@ -283,7 +104,7 @@ export default function HeadButtonsTimeslider() {
               variant="to"
               label={content.layout.timeslider.tot}
               selected={dateTo}
-              onChange={handleToChange}
+              onChange={(date) => handleToChange(date, invalidHint)}
             />
             {orderHint ? (
               <p

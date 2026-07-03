@@ -16,13 +16,15 @@ export function togglePointSelection(
 
 export function useMapPointSelectionClick({
   onPointClick,
+  enabled = true,
 }: {
   onPointClick: (point: EnrichedPointType) => void;
+  enabled?: boolean;
 }) {
   const { mapView, redGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!mapView || !redGraphicsLayer) return;
+    if (!enabled || !mapView || !redGraphicsLayer) return;
 
     const handle = mapView.on("click", async (event) => {
       event.stopPropagation();
@@ -42,5 +44,5 @@ export function useMapPointSelectionClick({
     });
 
     return () => handle.remove();
-  }, [mapView, redGraphicsLayer, onPointClick]);
+  }, [mapView, redGraphicsLayer, onPointClick, enabled]);
 }

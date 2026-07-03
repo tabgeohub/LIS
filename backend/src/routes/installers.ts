@@ -1,8 +1,20 @@
 import express, { type Request, type Response, type RequestHandler } from "express";
+import fs from "fs";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import { decodeJwtPayload } from "./auth/jwt";
+import {
+  ALLOWED_EXTENSIONS,
+  clearInstallersDirectory,
+  ensureInstallersDirectory,
+  InstallerMeta,
+  INSTALLERS_DIR,
+  MAX_INSTALLER_BYTES,
+  parseInstallerVersion,
+  readLatestMeta,
+  resolveInstallerPath,
+  writeLatestMeta,
+} from "./installersStorage";
 
 type AccessClaims = {
   realm_access?: {
@@ -10,25 +22,9 @@ type AccessClaims = {
   };
 };
 
-type InstallerMeta = {
-  originalName: string;
-  savedAs: string;
-  size: number;
-  mimetype: string;
-  uploadedAt: string;
-  version: string | null;
-};
-
 const router = express.Router();
 
-const INSTALLERS_DIR = path.join(__dirname, "..", "installers");
-const META_PATH = path.join(INSTALLERS_DIR, "latest.json");
-const MAX_INSTALLER_BYTES = 1024 * 1024 * 1024; // 1 GB
-const ALLOWED_EXTENSIONS = new Set([".exe", ".msi", ".zip"]);
-
-if (!fs.existsSync(INSTALLERS_DIR)) {
-  fs.mkdirSync(INSTALLERS_DIR, { recursive: true });
-}
+ensureInstallersDirectory();
 
 function getRealmRoles(req: Request): string[] {
   const token = req.session?.auth?.tokenSet?.access_token;
@@ -48,24 +44,6 @@ const requireAdminUpload: RequestHandler = (req, res, next) => {
   next();
 };
 
-function clearInstallersDirectory(): void {
-  if (!fs.existsSync(INSTALLERS_DIR)) return;
-
-  for (const entry of fs.readdirSync(INSTALLERS_DIR)) {
-    const fullPath = path.join(INSTALLERS_DIR, entry);
-    fs.rmSync(fullPath, { recursive: true, force: true });
-  }
-}
-
-function readLatestMeta(): InstallerMeta | null {
-  if (!fs.existsSync(META_PATH)) return null;
-  const raw = fs.readFileSync(META_PATH, "utf-8");
-  const parsed = JSON.parse(raw) as InstallerMeta;
-  const absolutePath = path.join(INSTALLERS_DIR, parsed.savedAs);
-  if (!fs.existsSync(absolutePath)) return null;
-  return parsed;
-}
-
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, INSTALLERS_DIR),
   filename: (_req, file, cb) => {
@@ -76,10 +54,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: MAX_INSTALLER_BYTES,
-    files: 1,
-  },
+  limits: { fileSize: MAX_INSTALLER_BYTES, files: 1 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname || "").toLowerCase();
     if (!ALLOWED_EXTENSIONS.has(ext)) {
@@ -91,8 +66,7 @@ const upload = multer({
 });
 
 router.get("/", (_req: Request, res: Response) => {
-  const installer = readLatestMeta();
-  res.json({ installer });
+  res.json({ installer: readLatestMeta() });
 });
 
 router.post(
@@ -103,10 +77,7 @@ router.post(
     upload.single("installer")(req, res, (err) => {
       if (err) {
         return res.status(400).json({
-          error:
-            err instanceof Error
-              ? err.message
-              : "Installer upload failed",
+          error: err instanceof Error ? err.message : "Installer upload failed",
         });
       }
       next();
@@ -118,21 +89,16 @@ router.post(
       return;
     }
 
-    const version =
-      typeof req.body?.version === "string" && req.body.version.trim() !== ""
-        ? req.body.version.trim()
-        : null;
-
     const installer: InstallerMeta = {
       originalName: req.file.originalname,
       savedAs: req.file.filename,
       size: req.file.size,
       mimetype: req.file.mimetype,
       uploadedAt: new Date().toISOString(),
-      version,
+      version: parseInstallerVersion(req.body),
     };
 
-    fs.writeFileSync(META_PATH, JSON.stringify(installer, null, 2), "utf-8");
+    writeLatestMeta(installer);
     res.status(201).json({ installer });
   }
 );
@@ -149,7 +115,7 @@ router.get("/download", (_req: Request, res: Response) => {
     return;
   }
 
-  const fullPath = path.join(INSTALLERS_DIR, installer.savedAs);
+  const fullPath = resolveInstallerPath(installer);
   if (!fs.existsSync(fullPath)) {
     res.status(404).json({ error: "Installer file not found" });
     return;

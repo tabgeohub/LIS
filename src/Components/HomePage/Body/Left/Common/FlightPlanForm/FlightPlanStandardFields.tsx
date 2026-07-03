@@ -31,6 +31,7 @@ export type FlightPlanStandardFieldsProps = {
   waarnemerDisabled?: boolean;
   datumDisabled?: boolean;
   geplandeVliegduurDisabled?: boolean;
+  typeLuchtvaartuigDisabled?: boolean;
   omschrijvingAsTextArea?: boolean;
   header?: ReactNode;
   footer?: ReactNode;
@@ -71,6 +72,7 @@ export default function FlightPlanStandardFields({
   waarnemerDisabled = false,
   datumDisabled = false,
   geplandeVliegduurDisabled = false,
+  typeLuchtvaartuigDisabled = false,
   omschrijvingAsTextArea = false,
   header,
   footer,
@@ -134,12 +136,21 @@ export default function FlightPlanStandardFields({
         disabled={datumDisabled}
       />
 
-      <SelectComp
-        label={labels.typeLuchtvaartuig}
-        value={fields.typeLuchtvaartuig}
-        setValue={fields.setTypeLuchtvaartuig}
-        options={typeLuchtvaartuigOptions}
-      />
+      {typeLuchtvaartuigDisabled ? (
+        <InputComp
+          label={labels.typeLuchtvaartuig}
+          value={fields.typeLuchtvaartuig}
+          setValue={() => {}}
+          disabled
+        />
+      ) : (
+        <SelectComp
+          label={labels.typeLuchtvaartuig}
+          value={fields.typeLuchtvaartuig}
+          setValue={fields.setTypeLuchtvaartuig}
+          options={typeLuchtvaartuigOptions}
+        />
+      )}
 
       <InputCompNum
         label={labels.aantalPassagiers}
