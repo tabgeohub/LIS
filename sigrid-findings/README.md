@@ -4,12 +4,12 @@
 
 | Location | Contents |
 |----------|----------|
-| **`exported-findings-5/`** | **Raw Sigrid CSV exports** (current scan) |
+| **`exported-findings-6/`** | **Raw Sigrid CSV exports** (current scan) |
 | **`plan/`** | **Remediation plan** — [start here](./plan/README.md) |
 | `plan/Maintainability-Architecture/` | MAINT + ARCH split plan |
 | `plan/devops/` | Docker/K8s (deferred) |
 
-Raw findings live **only** inside export folders (e.g. `exported-findings-5/`).  
+Raw findings live **only** inside export folders (e.g. `exported-findings-6/`).  
 After a new Sigrid export, add a folder `exported-findings-5/` and run the generator.
 
 ## Quick start
@@ -20,4 +20,4 @@ Open **[plan/REMEDIATION-PLAN.md](./plan/REMEDIATION-PLAN.md)** or **`plan/plan-
 python sigrid-findings/plan/generate-plan.py
 ```
 
-Default source: `exported-findings-5/`. Override: `SIGRID_EXPORT_DIR=path/to/folder`.
+Default source: `exported-findings-6/`. Override: `SIGRID_EXPORT_DIR=path/to/folder`.

@@ -1,0 +1,26 @@
+Description,Severity,Status,First Seen,Issue age,File,Technology,Lines of code,Fan-in
+Fan-in of 112 for module with 63 lines of code,HIGH,RAW,2026-06-04,30,src/hooks/useLogAction.ts,TypeScript,63,112
+Fan-in of 138 for module with 5 lines of code,HIGH,RAW,2026-06-04,30,src/hooks/useContent.ts,TypeScript,5,138
+Fan-in of 39 for module with 77 lines of code,MEDIUM,RAW,2026-07-04,0,src/hooks/consts/useConstSelectOptions.ts,TypeScript,77,39
+Fan-in of 27 for module with 70 lines of code,MEDIUM,RAW,2026-06-04,30,src/utils/useUpdateData.ts,TypeScript,70,27
+Fan-in of 37 for module with 41 lines of code,MEDIUM,RAW,2026-07-01,3,backend/src/helpers/http/routeResponses.ts,TypeScript,41,37
+Fan-in of 24 for module with 27 lines of code,MEDIUM,RAW,2026-06-04,30,src/helpers/ArcGISHelpers/getTransformedCoordinates.ts,TypeScript,27,24
+Fan-in of 24 for module with 11 lines of code,MEDIUM,RAW,2026-06-04,30,src/hooks/features/useResetFeatures.ts,TypeScript,11,24
+Fan-in of 24 for module with 9 lines of code,MEDIUM,RAW,2026-06-04,30,src/Components/HomePage/Body/Left/Tools/EditGeometry/EditForm/EditGeometryPointPanel/coords.ts,TypeScript,9,24
+Fan-in of 28 for module with 7 lines of code,MEDIUM,RAW,2026-06-04,30,src/helpers/ArcGISHelpers/validateMapView.ts,TypeScript,7,28
+Fan-in of 23 for module with 3 lines of code,MEDIUM,RAW,2026-06-04,30,src/helpers/classNames.ts,TypeScript,3,23
+Fan-in of 11 for module with 195 lines of code,LOW,RAW,2026-06-30,4,backend/src/helpers/queries/finished-plans/buildFinishedPlanQuery.ts,TypeScript,195,11
+Fan-in of 12 for module with 130 lines of code,LOW,RAW,2026-06-06,28,src/helpers/ArcGISHelpers/createPlanBoundingBoxGraphic.ts,TypeScript,130,12
+Fan-in of 14 for module with 129 lines of code,LOW,RAW,2026-06-29,5,backend/src/routes/keycloak/management/users/keycloakAdminClient.ts,TypeScript,129,14
+Fan-in of 13 for module with 122 lines of code,LOW,RAW,2026-06-10,24,src/helpers/ArcGISHelpers/createPointMapGraphics.ts,TypeScript,122,13
+Fan-in of 14 for module with 109 lines of code,LOW,RAW,2026-06-04,30,src/helpers/ArcGISHelpers/createPointGraphic.ts,TypeScript,109,14
+Fan-in of 16 for module with 90 lines of code,LOW,RAW,2026-07-04,0,src/api-hooks/flightPlans/useFlightPlanQuery.ts,TypeScript,90,16
+Fan-in of 13 for module with 85 lines of code,LOW,RAW,2026-06-04,30,src/utils/useCreateData.ts,TypeScript,85,13
+Fan-in of 14 for module with 68 lines of code,LOW,RAW,2026-06-29,5,src/hooks/zustand/shared/flightPlanFormFields.ts,TypeScript,68,14
+Fan-in of 16 for module with 57 lines of code,LOW,RAW,2026-07-01,3,backend/src/helpers/queries/shared/resolveRegioFilter.ts,TypeScript,57,16
+Fan-in of 12 for module with 41 lines of code,LOW,RAW,2026-07-04,0,src/hooks/wizard/useWizardButtons.ts,TypeScript,41,12
+Fan-in of 14 for module with 31 lines of code,LOW,RAW,2026-06-10,24,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts,TypeScript,31,14
+Fan-in of 14 for module with 20 lines of code,LOW,RAW,2026-07-01,3,backend/src/helpers/http/validateBody.ts,TypeScript,20,14
+Fan-in of 11 for module with 12 lines of code,LOW,RAW,2026-06-04,30,src/hooks/handleCancel/useHandleCancel.ts,TypeScript,12,11
+Fan-in of 13 for module with 8 lines of code,LOW,RAW,2026-06-04,30,src/api/fetchApi.ts,TypeScript,8,13
+Fan-in of 11 for module with 7 lines of code,LOW,RAW,2026-07-04,0,src/hooks/wizard/useWizardCleanup.ts,TypeScript,7,11

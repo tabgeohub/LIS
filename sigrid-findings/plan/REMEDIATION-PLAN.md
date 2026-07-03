@@ -1,20 +1,20 @@
 # Sigrid Remediation Plan — Code only
 
-**Source:** `exported-findings-5` · **Generated:** 2026-07-01
+**Source:** `exported-findings-6` · **Generated:** 2026-07-04
 
 Application code, dependencies, and maintainability. **DevOps (Docker) is in [`devops/`](./devops/) — out of scope for code sprints.**
 
-## Current state (`exported-findings-5`)
+## Current state (`exported-findings-6`)
 
 | Metric | Value |
 |--------|------:|
 | Security + Reliability (code) RAW | **1** |
 | Security + Reliability FIXED (code) | 48 |
-| Maintainability RAW | 1057 |
-| Duplication RAW | 214 |
+| Maintainability RAW | 1085 |
+| Duplication RAW | 209 |
 
-**Dashboard (export 5):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **2.9** · Architecture **2.2**
-_(export 4 → 5: maint+arch RAW **1091 → 1052** (−33); stars unchanged — need **≥100 findings per step** and ~300+ total to move a star. See [ANALYSIS-export-4-to-5.md](./Maintainability-Architecture/ANALYSIS-export-4-to-5.md).)_
+**Dashboard (export 6):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.1** (+0.2) · Architecture **2.19** (−0.03)
+_(export 5 → 6: maint+arch plan-mapped **1052 → 1081** (+29); CSV **1058 → 1086** (+28 net); HIGH **128 → 79** — star moved. See [ANALYSIS-export-5-to-6.md](./Maintainability-Architecture/ANALYSIS-export-5-to-6.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -34,7 +34,7 @@ _(export 4 → 5: maint+arch RAW **1091 → 1052** (−33); stars unchanged — 
 ## Principles
 
 1. **Each execution step clears ≥100 findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…08.
-2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-4-vs-5.py` (update export folder names).
+2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
 4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
@@ -42,14 +42,14 @@ _(export 4 → 5: maint+arch RAW **1091 → 1052** (−33); stars unchanged — 
 
 ```
 Prep  → WP-07 Sigrid remark on callbackHandler (1 code RAW; not a full step)
-STEP-01 → DUP-01 wizard buttons + A1 interfacing sweep (265 RAW)
-STEP-02 → Voorbereiding complexity (MAINT-03) (175 RAW)
-STEP-03 → Backend complexity + size (MAINT-01) (236 RAW)
-STEP-04 → Architecture — api-hooks factory (ARCH-03) (113 RAW)
-STEP-05 → Nabewerking + Timeslider (MAINT-02 + MAINT-07) (136 RAW)
-STEP-06 → Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (144 RAW)
-STEP-07 → Frontend catch-all remainder (MAINT-08a/b/f) (145 RAW)
-STEP-08 → ArcGIS + remaining duplication + admin + arch tail (151 RAW)
+STEP-01 → DUP-01 wizard buttons + A1 interfacing sweep (254 RAW)
+STEP-02 → Voorbereiding complexity (MAINT-03) (188 RAW)
+STEP-03 → Backend complexity + size (MAINT-01) (245 RAW)
+STEP-04 → Architecture — api-hooks factory (ARCH-03) (94 RAW)
+STEP-05 → Nabewerking + Timeslider (MAINT-02 + MAINT-07) (156 RAW)
+STEP-06 → Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (153 RAW)
+STEP-07 → Frontend catch-all remainder (MAINT-08a/b/f) (144 RAW)
+STEP-08 → ArcGIS + remaining duplication + admin + arch tail (148 RAW)
 ```
 
 Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
@@ -72,33 +72,33 @@ Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintaina
 | WP-07 | OPEN | 3 - Auth/HTML | Keycloak callback open redirect | 1 | — |
 | WP-08 | DONE | 3 - Auth/HTML | renderDownloadPage HTML template | — | — |
 | WP-09 | DONE | 3 - Auth/HTML | fileDownload.ts verify FIXED | — | — |
-| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 166 |
+| DUP-01 | OPEN | 4 - Duplication | Flight plan Buttons pattern | — | 162 |
 | DUP-02 | PARTIAL | 4 - Duplication | Flight plan FormElements | — | 7 |
 | DUP-03 | DONE | 4 - Duplication | useFilterPlans duplicate | — | — |
 | DUP-04 | PARTIAL | 4 - Duplication | PointsBuffer internal dup | — | 1 |
 | DUP-05 | PARTIAL | 4 - Duplication | PeriodFilter components | — | 1 |
 | DUP-06 | PARTIAL | 4 - Duplication | Dashboard user forms | — | 3 |
 | DUP-07 | PARTIAL | 4 - Duplication | Zustand plan state | — | 5 |
-| DUP-08 | PARTIAL | 4 - Duplication | PointsList variants | — | 31 |
+| DUP-08 | PARTIAL | 4 - Duplication | PointsList variants | — | 30 |
 
 ## Duplication clusters (open RAW per cluster)
 
 | ID | Open RAW | Notes |
 |----|----------:|-------|
-| DUP-01 | 166 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
+| DUP-01 | 162 | Shared 9-10 line button blocks across Voorbereiding wiz (OPEN) |
 | DUP-02 | 7 | FormElements / FormInputs / Step1 shared form blocks (PARTIAL) |
 | DUP-03 | 0 | src/hooks/filters/useFilterPlans.ts + Nabewerking copy  (DONE) |
 | DUP-04 | 1 | PointsBuffer.tsx internal duplication (PARTIAL) |
 | DUP-05 | 1 | Three PeriodFilter copies (PARTIAL) |
 | DUP-06 | 3 | AllRoles / AddUser / EditUser (PARTIAL) |
 | DUP-07 | 5 | Finished/reuse/view/duplicate plan state hooks (PARTIAL) |
-| DUP-08 | 31 | PointsList.tsx / PointsListEdit.tsx (PARTIAL) |
+| DUP-08 | 30 | PointsList.tsx / PointsListEdit.tsx (PARTIAL) |
 
 ## Suggested next work
 
 1. **WP-07** — Sigrid remark (parallel, small)
-2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep (265 findings)
-3. **STEP-02 — Voorbereiding complexity (MAINT-03) (175 findings)** — after STEP-01 deploy + re-export
+2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep (254 findings)
+3. **STEP-02 — Voorbereiding complexity (MAINT-03) (188 findings)** — after STEP-01 deploy + re-export
 
 ## Files
 
@@ -109,4 +109,4 @@ Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintaina
 | `plan-01-cleared-security-reliability.csv` | FIXED sec/reliability (archive) |
 | `plan-03-duplication-mapping.csv` | All duplication findings |
 | `plan-04-false-positives-remarks.csv` | Remark text for WP-07 |
-| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages (1052 RAW) |
+| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages (1081 RAW) |

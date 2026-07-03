@@ -8,6 +8,10 @@ FINDINGS = os.path.join(ROOT, "sigrid-findings")
 # Latest Sigrid export folder (override with SIGRID_EXPORT_DIR env var)
 EXPORT_DIR = os.environ.get(
     "SIGRID_EXPORT_DIR",
+    os.path.join(FINDINGS, "exported-findings-6"),
+)
+PREV_EXPORT_DIR = os.environ.get(
+    "SIGRID_PREV_EXPORT_DIR",
     os.path.join(FINDINGS, "exported-findings-5"),
 )
 
@@ -772,7 +776,7 @@ def enrich_maint_arch_packages(packages: list[dict], mapping: list[dict]) -> lis
 
 
 def maint08_subslice(file: str) -> str:
-    """Sub-slice within MAINT-08 for step packing (export-5 calibrated)."""
+    """Sub-slice within MAINT-08 for step packing."""
     f = norm_file(file).lower()
     if "/left/tools/" in f:
         return "08a-tools"
@@ -937,6 +941,17 @@ def maint_arch_high_priority(mapping: list[dict]) -> list[dict]:
     return rows
 
 
+def count_maint08_slice_raw(mapping: list[dict]) -> dict[str, int]:
+    """RAW counts per MAINT-08 sub-slice for the current export."""
+    counts: dict[str, int] = {}
+    for m in mapping:
+        if m.get("Status") != "RAW" or m.get("WorkPackageID") != "MAINT-08":
+            continue
+        sl = maint08_subslice(m.get("File", ""))
+        counts[sl] = counts.get(sl, 0) + 1
+    return counts
+
+
 def build_maint_arch_markdown(
     packages: list[dict],
     mapping: list[dict],
@@ -945,8 +960,9 @@ def build_maint_arch_markdown(
     export_label: str,
     today: str,
     maint_raw: int,
-    prev_export_label: str = "exported-findings-4",
+    prev_export_label: str = "exported-findings-5",
     prev_maint_raw: int | None = None,
+    maint08_slices: dict[str, int] | None = None,
 ) -> str:
     raw_by_wp = raw_count_by_wp(mapping)
     cat_by_wp: dict[str, dict[str, int]] = {}
@@ -959,17 +975,37 @@ def build_maint_arch_markdown(
         cat_by_wp[wp_id][cat] = cat_by_wp[wp_id].get(cat, 0) + 1
 
     delta_line = ""
+    star_line = ""
     if prev_maint_raw is not None:
         delta = maint_raw - prev_maint_raw
-        delta_line = f"\n**Delta vs `{prev_export_label}`:** {delta:+d} maint+arch RAW ({prev_maint_raw} → {maint_raw}). Stars may lag until ~300–500 findings cleared.\n"
+        delta_line = (
+            f"\n**Delta vs `{prev_export_label}`:** {delta:+d} maint+arch RAW "
+            f"({prev_maint_raw} → {maint_raw}). "
+            f"Dashboard: Maintainability **2.9 → 3.1** (+0.2) despite net RAW increase — "
+            f"see [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md).\n"
+        )
+        star_line = (
+            "\n## Progress (STEPS 01–06 deployed)\n\n"
+            "| Step | Status | E5→E6 outcome |\n"
+            "|------|--------|---------------|\n"
+            "| STEP-01 | ✅ Done | WizardButtonBar + A1 interfacing; interfacing −8 |\n"
+            "| STEP-02 | ✅ Done | SelectFromSource / ImportVluchtPlan / GeometriesList / DrawingTool |\n"
+            "| STEP-03 | ✅ Done | Backend routes/services A2 extractions |\n"
+            "| STEP-04 | ✅ Done | api-hooks factory; component independence −19 |\n"
+            "| STEP-05 | ✅ Done | EditPointCoordinates, generatePdfReport, Timeslider splits |\n"
+            "| STEP-06 | ✅ Done | Map hooks + popUpModal + regio hook options |\n"
+            "| **STEP-07** | **Next** | Tools, Bottom lists, misc Common UI |\n\n"
+            "**Key metric:** HIGH severity maint+arch **128 → 79** (−49). "
+            "Extraction trade-off: +51 unit size from new helper files — avoid unnecessary splits.\n"
+        )
 
     md = f"""# Maintainability & Architecture Plan
 
 **Source:** `{export_label}` · **Generated:** {today}
 
 **{maint_raw} RAW** maintainability + architecture findings in `{export_label}`.{delta_line}
-
-> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md) · [ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)
+{star_line}
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)
 
 ## Finding counts (code only)
 
@@ -987,9 +1023,9 @@ def build_maint_arch_markdown(
 
 **Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
 
-> **Note:** Step RAW counts are **scopes at export 5**. STEP-01 combines DUP-01 + Unit interfacing (disjoint categories). Execute **in order** — later steps assume earlier categories are cleared.
+> **Note:** Step RAW counts are **scopes at `{export_label}`**. STEPS 01–06 are deployed; continue from **STEP-07**.
 
-| Step | Name | Open RAW (E5) | Size | Primary tactic |
+| Step | Name | Open RAW (E6) | Size | Primary tactic |
 |------|------|--------------:|:----:|----------------|
 """
     for s in execution_steps:
@@ -1023,18 +1059,25 @@ Use the steps above; packages below are for mapping and CSV filters only.
         cat_str = ", ".join(f"{k} {v}" for k, v in sorted(cats.items())) if cats else "—"
         md += f"| {wp_id} | {w['Phase']} | {w['Name']} | {n} | {cat_str} |\n"
 
-    md += """
+    slice_rows = [
+        ("08a-tools", "`HomePage/Body/Left/Tools/`"),
+        ("08b-bottom", "`HomePage/Body/Bottom/`, overlaps DUP-08"),
+        ("08c-map-hooks", "`src/hooks/hover-click-handlers/`, `src/hooks/features/`"),
+        ("08d-api-hooks", "`src/api-hooks/`, `src/hooks/`"),
+        ("08d-utils", "`src/utils/`"),
+        ("08e-hooks-other", "other `src/hooks/`"),
+        ("08f-misc", "remaining MAINT-08"),
+    ]
+    md += f"""
 ## MAINT-08 sub-slices (used by STEP-06 / STEP-07)
 
-| Slice | ~RAW (E5) | Paths |
+| Slice | RAW ({export_label}) | Paths |
 |-------|----------:|-------|
-| 08a-tools | 37 | `HomePage/Body/Left/Tools/` |
-| 08b-bottom | 32 | `HomePage/Body/Bottom/`, overlaps DUP-08 |
-| 08c-map-hooks | 39 | `src/hooks/hover-click-handlers/`, `src/hooks/features/` |
-| 08d-api-hooks | 60 | `src/hooks/api-hooks/` |
-| 08d-utils | 9 | `src/utils/` |
-| 08e-hooks-other | 38 | other `src/hooks/` |
-| 08f-misc | 76 | remaining MAINT-08 |
+"""
+    for sl, paths in slice_rows:
+        n = (maint08_slices or {}).get(sl, 0)
+        md += f"| {sl} | {n} | {paths} |\n"
+    md += """
 
 ## Top HIGH-priority units (within current step scope)
 
@@ -1054,7 +1097,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
 1. **One step = ≥{MIN_STEP_FINDINGS} findings cleared** — not one file, not one MAINT package slice.
 2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
 3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
-4. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `compare-4-vs-5.py` (update folder names).
+4. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update folder names).
 
 ## Files
 
@@ -1125,9 +1168,10 @@ maint_arch_packages = enrich_maint_arch_packages(maint_arch_work_packages, maint
 maint_arch_master = maint_arch_high_priority(maint_arch_mapping)
 execution_steps = build_execution_steps(maint_arch_mapping, dup_detail)
 
-prev_export_dir = os.path.join(FINDINGS, "exported-findings-4")
+prev_export_dir = PREV_EXPORT_DIR
+prev_export_label = os.path.basename(prev_export_dir.rstrip("/\\"))
 prev_maint_raw: int | None = None
-if os.path.isdir(prev_export_dir) and export_label != "exported-findings-4":
+if os.path.isdir(prev_export_dir) and export_label != prev_export_label:
     prev_maint_raw = load_export_maint_arch_raw(prev_export_dir)
 
 write_csv(MAINT_ARCH, "maint-arch-00-work-packages.csv", maint_arch_packages)
@@ -1190,8 +1234,8 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | Maintainability RAW | {maint_raw} |
 | Duplication RAW | {dup_raw_total} |
 
-**Dashboard (export 5):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **2.9** · Architecture **2.2**
-_(export 4 → 5: maint+arch RAW **1091 → {maint_arch_raw}** (−33); stars unchanged — need **≥100 findings per step** and ~300+ total to move a star. See [ANALYSIS-export-4-to-5.md](./Maintainability-Architecture/ANALYSIS-export-4-to-5.md).)_
+**Dashboard (export 6):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.1** (+0.2) · Architecture **2.19** (−0.03)
+_(export 5 → 6: maint+arch plan-mapped **1052 → {maint_arch_raw}** (+{maint_arch_raw - (prev_maint_raw or maint_arch_raw)}); CSV **1058 → 1086** (+28 net); HIGH **128 → 79** — star moved. See [ANALYSIS-export-5-to-6.md](./Maintainability-Architecture/ANALYSIS-export-5-to-6.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -1211,7 +1255,7 @@ _(export 4 → 5: maint+arch RAW **1091 → {maint_arch_raw}** (−33); stars un
 ## Principles
 
 1. **Each execution step clears ≥{MIN_STEP_FINDINGS} findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…{n_exec_steps:02d}.
-2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-4-vs-5.py` (update export folder names).
+2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
 4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
@@ -1343,6 +1387,7 @@ devops_md += """
 with open(os.path.join(PLAN, "REMEDIATION-PLAN.md"), "w", encoding="utf-8") as f:
     f.write(code_md)
 
+maint08_slice_counts = count_maint08_slice_raw(maint_arch_mapping)
 maint_arch_md = build_maint_arch_markdown(
     maint_arch_packages,
     maint_arch_mapping,
@@ -1351,8 +1396,9 @@ maint_arch_md = build_maint_arch_markdown(
     export_label,
     today,
     maint_arch_raw,
-    prev_export_label="exported-findings-4",
+    prev_export_label=prev_export_label,
     prev_maint_raw=prev_maint_raw,
+    maint08_slices=maint08_slice_counts,
 )
 with open(os.path.join(MAINT_ARCH, "MAINT-ARCH-PLAN.md"), "w", encoding="utf-8") as f:
     f.write(maint_arch_md)
@@ -1362,9 +1408,9 @@ maint_arch_readme = f"""# Maintainability & Architecture
 **{maint_arch_raw} RAW** · **{n_exec_steps} execution steps** (each ≥{MIN_STEP_FINDINGS} findings) — see **`maint-arch-EXECUTION-STEPS.csv`**
 
 ## Read these first
-1. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5: −33 maint/arch, stars still 2.9 / 2.2
+1. **[ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)** — E5→E6: star **2.9 → 3.1**, HIGH −49, net RAW +28
 2. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + ≥100 finding steps
-3. **[ANALYSIS-export-3-to-4.md](./ANALYSIS-export-3-to-4.md)** — why naive refactors backfired
+3. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5 baseline
 
 ## Work breakdown
 4. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — **STEP-01…{n_exec_steps:02d}** (primary execution order)
