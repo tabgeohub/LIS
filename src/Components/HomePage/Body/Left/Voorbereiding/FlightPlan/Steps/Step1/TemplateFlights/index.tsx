@@ -39,7 +39,10 @@ export default function TemplateFlight({
 
   const { user } = useAuth();
 
-  const { data: flightTemplate } = useTemplateFlights(user.role, user.user_id);
+  const { data: flightTemplate } = useTemplateFlights({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   const { create } = useCreateData("/flightPlans");
 

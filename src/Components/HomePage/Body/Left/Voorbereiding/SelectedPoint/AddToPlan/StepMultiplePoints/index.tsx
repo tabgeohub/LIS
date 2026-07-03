@@ -13,10 +13,10 @@ export default function StepMultiplePoints({
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);
   const { user } = useAuth();
 
-  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
-    user.role,
-    user.user_id
-  );
+  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   if (!prepreparedFlightPlans) return null;
 

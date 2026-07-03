@@ -17,7 +17,10 @@ export default function Step1({
   const logAction = useLogAction();
   const { user } = useAuth();
 
-  const { data: unPreparedPlans } = useUnPreparedPlans(user.role, user.user_id);
+  const { data: unPreparedPlans } = useUnPreparedPlans({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   const options = [
     { id: 0, vluchtnummer: "Selecteer een vlucht" },

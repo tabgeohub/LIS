@@ -19,10 +19,10 @@ export default function StepNo({
   const { clickedPoint } = usePopUpState();
   const { user } = useAuth();
 
-  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans(
-    user.role,
-    user.user_id
-  );
+  const { data: prepreparedFlightPlans } = usePrepreparedFlightPlans({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   if (!prepreparedFlightPlans) return null;
 

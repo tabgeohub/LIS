@@ -15,7 +15,10 @@ export default function Step1() {
   const { openFilter, filterTerm, setFilterTerm } = useReuseFlightPlan();
 
   const { user } = useAuth();
-  const { data, isPending } = useFlightPlansList(user.role, user.user_id);
+  const { data, isPending } = useFlightPlansList({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   const plans = data ?? EMPTY_FLIGHT_PLANS;
 

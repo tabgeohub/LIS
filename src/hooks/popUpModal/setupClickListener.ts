@@ -1,5 +1,6 @@
 import { initialPointState } from "@helpers/ZustandStates/popUpState";
 import { EnrichedPointType } from "Types";
+import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
 
 export type SetupClickListenerInput = {
   mapView: __esri.MapView;
@@ -26,25 +27,11 @@ export const setupClickListener = (input: SetupClickListenerInput) => {
     return;
   }
 
-  let isProcessing = false;
-  let lastClickTime = 0;
-  const DEBOUNCE_MS = 150;
+  let clickGuard = createDebouncedClickGuard();
 
   const clickHandler = mapView.on("click", async (event) => {
-    if (isTabBlocked && isTabBlocked()) {
-      return;
-    }
-
-    const now = Date.now();
-    if (now - lastClickTime < DEBOUNCE_MS) {
-      return;
-    }
-    lastClickTime = now;
-
-    if (isProcessing) {
-      return;
-    }
-    isProcessing = true;
+    if (isTabBlocked?.()) return;
+    if (clickGuard.shouldSkip()) return;
 
     try {
       const includeLayers = pointsGraphicsLayer
@@ -86,7 +73,7 @@ export const setupClickListener = (input: SetupClickListenerInput) => {
     } catch (error) {
       console.error("Error querying features:", error);
     } finally {
-      isProcessing = false;
+      clickGuard.finish();
     }
   });
 

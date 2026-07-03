@@ -63,7 +63,7 @@ export default function ViewPlan({
     data,
     isPending,
     refetch: refetchFlightPlans,
-  } = useFlightPlansList(user.role, user.user_id);
+  } = useFlightPlansList({ regioId: user.role, userId: user.user_id });
 
   const flightPlans = data ?? EMPTY_FLIGHT_PLANS;
 

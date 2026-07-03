@@ -32,7 +32,7 @@ export default function RemoveFlightPlan() {
     data,
     isPending,
     refetch: refetchFlightPlans,
-  } = useFlightPlansList(user.role, user.user_id);
+  } = useFlightPlansList({ regioId: user.role, userId: user.user_id });
 
   const plans = data ?? EMPTY_FLIGHT_PLANS;
 

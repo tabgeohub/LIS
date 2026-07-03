@@ -12,7 +12,10 @@ export default function Step1() {
 
   const { user } = useAuth();
 
-  const { data: unPreparedPlans } = useUnPreparedPlans(user.role, user.user_id);
+  const { data: unPreparedPlans } = useUnPreparedPlans({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   const logAction = useLogAction();
 

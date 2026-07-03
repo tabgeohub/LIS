@@ -14,10 +14,10 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 export default function ChangeFlightPlanStatus() {
   const { user } = useAuth();
 
-  const { data: preparedFlightPlans } = useFullPreparedFlightPlans(
-    user.role,
-    user.user_id
-  );
+  const { data: preparedFlightPlans } = useFullPreparedFlightPlans({
+    regioId: user.role,
+    userId: user.user_id,
+  });
 
   const { setFilterTerm, openFilter, filterTerm } = useChangePlanStatusState();
 

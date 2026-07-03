@@ -39,12 +39,16 @@ export default function SelectFromSource({ source }: { source: Source }) {
   const { selectedPlan } = useViewPlanState();
   const { dbPoints } = usePointsStore();
   const { data: flightPlansData, isPending: flightPlansPending } =
-    useFlightPlansList(user.role, user.user_id, source === "flightPlans");
-  const { data: templateData, isPending: templatePending } = useTemplateFlights(
-    user.role,
-    user.user_id,
-    source === "templates"
-  );
+    useFlightPlansList({
+      regioId: user.role,
+      userId: user.user_id,
+      enabled: source === "flightPlans",
+    });
+  const { data: templateData, isPending: templatePending } = useTemplateFlights({
+    regioId: user.role,
+    userId: user.user_id,
+    enabled: source === "templates",
+  });
 
   const data = source === "flightPlans" ? flightPlansData ?? EMPTY_FLIGHT_PLANS : templateData;
   const dataLoading = source === "flightPlans" ? flightPlansPending : templatePending;
