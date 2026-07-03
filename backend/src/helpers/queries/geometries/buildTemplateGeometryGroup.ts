@@ -4,16 +4,16 @@ type RawPoint = Record<string, unknown> & {
   geometry_omschrijving?: string | null;
 };
 
-export function buildTemplateGeometryGroup(
-  point: RawPoint,
-  geometryId: number,
-  geometryDataMap: Map<number, Record<string, unknown>>
-) {
-  const fullGeometryData = geometryDataMap.get(geometryId);
+export function buildTemplateGeometryGroup(input: {
+  point: RawPoint;
+  geometryId: number;
+  geometryDataMap: Map<number, Record<string, unknown>>;
+}) {
+  const fullGeometryData = input.geometryDataMap.get(input.geometryId);
 
   if (fullGeometryData) {
     return {
-      id: geometryId,
+      id: input.geometryId,
       type: (fullGeometryData.type as string | null) ?? null,
       omschrijving: (fullGeometryData.omschrijving as string | null) ?? null,
       organisatie: fullGeometryData.organisatie,
@@ -27,9 +27,9 @@ export function buildTemplateGeometryGroup(
   }
 
   return {
-    id: geometryId,
-    type: point.geometry_type ?? null,
-    omschrijving: point.geometry_omschrijving ?? null,
+    id: input.geometryId,
+    type: input.point.geometry_type ?? null,
+    omschrijving: input.point.geometry_omschrijving ?? null,
     points: [],
   };
 }

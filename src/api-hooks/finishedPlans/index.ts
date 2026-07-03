@@ -4,4 +4,4 @@ export {
   useSingleFinishedPlan,
   useFinishedPlanPath,
   usePlanPointAttachments,
-} from "./useFinishedPlanQuery";
+} from "../useEntityQuery";

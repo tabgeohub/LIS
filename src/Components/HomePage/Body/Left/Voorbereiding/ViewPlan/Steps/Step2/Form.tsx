@@ -1,4 +1,4 @@
-import { useGetPiloot, useGetWaarnemers } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
@@ -14,8 +14,8 @@ export default function Form({
   vluchtnummer: string;
   setVluchtnummer: (value: string) => void;
 }) {
-  const pilootOptions = useGetPiloot();
-  const waarnemerOptions = useGetWaarnemers();
+  const pilootOptions = useConstSelectOptions("piloten");
+  const waarnemerOptions = useConstSelectOptions("waarnemers");
   const viewPlanState = useViewPlanState();
   const fields = pickFlightPlanFormFields(viewPlanState);
   const { user } = useAuth();

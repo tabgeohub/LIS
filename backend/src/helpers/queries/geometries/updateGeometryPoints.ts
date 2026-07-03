@@ -3,11 +3,12 @@ import type { PointCorePayload } from "../points/pointFields";
 
 type PointPayload = PointCorePayload & { id?: number };
 
-export async function updateGeometryOwnedPoints(
-  client: PoolClient,
-  geometryId: number,
-  points: PointPayload[]
-): Promise<string | null> {
+export async function updateGeometryOwnedPoints(input: {
+  client: PoolClient;
+  geometryId: number;
+  points: PointPayload[];
+}): Promise<string | null> {
+  const { client, geometryId, points } = input;
   if (!points.length) return null;
 
   for (const raw of points) {

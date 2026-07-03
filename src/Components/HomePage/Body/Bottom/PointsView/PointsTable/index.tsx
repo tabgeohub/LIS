@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { EnrichedPointType } from "Types";
@@ -27,8 +27,8 @@ export default function PointsTable({
   containerHeight,
   containerWidth,
 }: any) {
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
 
   useOpenAllTable(); // kept if you need elsewhere
   const { pointsTable } = useOpenTable();

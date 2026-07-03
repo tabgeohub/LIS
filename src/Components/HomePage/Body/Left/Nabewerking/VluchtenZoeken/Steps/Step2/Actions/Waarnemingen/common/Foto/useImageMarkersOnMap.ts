@@ -1,19 +1,22 @@
 import { useEffect, useRef } from "react";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import MapView from "@arcgis/core/views/MapView";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { AttachmentType, FinishedPointType } from "Types/finished_plans";
 import {
   buildImageMarkerGraphics,
   sortAttachmentsWithLocation,
 } from "./buildImageMarkerGraphics";
 
-export function useImageMarkersOnMap(
-  attachmentPoint: FinishedPointType | null,
-  validAttachments: AttachmentType[],
-  mapView: MapView | null | undefined,
-  redGraphicsLayer: GraphicsLayer | null | undefined
-) {
+export type UseImageMarkersOnMapInput = {
+  attachmentPoint: FinishedPointType | null;
+  validAttachments: AttachmentType[];
+  mapView: MapView | null | undefined;
+  redGraphicsLayer: GraphicsLayer | null | undefined;
+};
+
+export function useImageMarkersOnMap(input: UseImageMarkersOnMapInput) {
   const imageMarkersRef = useRef<__esri.Graphic[]>([]);
+  const { attachmentPoint, validAttachments, mapView, redGraphicsLayer } = input;
 
   useEffect(() => {
     if (!attachmentPoint || !mapView || !redGraphicsLayer) return;

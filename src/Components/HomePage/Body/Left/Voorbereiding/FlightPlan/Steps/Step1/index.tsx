@@ -1,4 +1,4 @@
-import { useGetPiloot, useGetWaarnemers, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import Vluchtnummer from "./Vluchtnummer";
 import Buttons from "./Buttons";
@@ -8,9 +8,9 @@ import FlightPlanStandardFields, {
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
 
 export default function Step1() {
-  const pilootOptions = useGetPiloot();
-  const waarnemerOptions = useGetWaarnemers();
-  const typeLuchtvaartuigOptions = useGetLuchtvaartuig();
+  const pilootOptions = useConstSelectOptions("piloten");
+  const waarnemerOptions = useConstSelectOptions("waarnemers");
+  const typeLuchtvaartuigOptions = useConstSelectOptions("luchtvaartuig");
   const fields = pickFlightPlanFormFields(useFlightPlanState());
   const content = useContent();
 

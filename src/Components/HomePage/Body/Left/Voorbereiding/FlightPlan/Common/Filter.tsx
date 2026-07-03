@@ -1,4 +1,4 @@
-import { useGetActiviteiten } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import {
   PeriodType,
   usePointsFilterStore,
@@ -21,7 +21,7 @@ export default function Filter({
   setFilteredPoints: (value: EnrichedPointType[]) => void;
   setFilteredGeometries?: (value: Geometry[]) => void;
 }) {
-  const activities = useGetActiviteiten();
+  const activities = useConstSelectOptions("activiteiten");
 
   const content = useContent();
 

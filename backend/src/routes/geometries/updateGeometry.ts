@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import {
-  buildGeometryMetadataValues,
-  GEOMETRY_METADATA_UPDATE_SQL,
-} from "../../helpers/queries/geometries/geometryRouteHelpers";
-import { updateGeometryOwnedPoints } from "../../helpers/queries/geometries/updateGeometryPoints";
+import { runGeometryUpdateTransaction } from "../../helpers/queries/geometries/updateGeometryTransaction";
 
 export async function updateGeometry(req: Request, res: Response): Promise<void> {
   const { id } = req.params;
@@ -21,44 +17,22 @@ export async function updateGeometry(req: Request, res: Response): Promise<void>
   try {
     await client.query("BEGIN");
 
-    const exists = await client.query(`SELECT id FROM lis.geometries WHERE id = $1`, [
+    const outcome = await runGeometryUpdateTransaction({
+      client,
       geometryId,
-    ]);
+      metadata,
+      points,
+    });
 
-    if (exists.rowCount === 0) {
+    if (!outcome.ok) {
       await client.query("ROLLBACK");
-      res.status(404).json({ result: null, message: "Geometrie niet gevonden." });
+      res.status(outcome.status).json({ result: null, message: outcome.message });
       return;
     }
 
-    const geometryUpdate = await client.query(
-      GEOMETRY_METADATA_UPDATE_SQL,
-      buildGeometryMetadataValues(metadata, geometryId)
-    );
-
-    if (points && Array.isArray(points) && points.length > 0) {
-      const pointError = await updateGeometryOwnedPoints(
-        client,
-        geometryId,
-        points
-      );
-
-      if (pointError) {
-        await client.query("ROLLBACK");
-        res.status(400).json({ result: null, message: pointError });
-        return;
-      }
-    }
-
-    const pointsResult = await client.query(
-      `SELECT * FROM lis.points WHERE geometry_id = $1 ORDER BY id ASC`,
-      [geometryId]
-    );
-
     await client.query("COMMIT");
-
     res.status(200).json({
-      result: { ...geometryUpdate.rows[0], points: pointsResult.rows },
+      result: outcome.result,
       message: "Geometrie succesvol bijgewerkt",
     });
   } catch (err) {

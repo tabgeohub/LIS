@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
-import { finishedPlanKeys } from "lib/queryKeys";
+import { useDebouncedValue } from "utils/useDebouncedValue";
+import { finishedPlanKeys, emailKeys } from "lib/queryKeys";
+import { pointKeys } from "lib/queryKeys";
 import { FinishedFlightPlanType, AttachmentType } from "Types/finished_plans";
-import { appendRegioQuery } from "../flightPlans/regioQuery";
-import { PlanPathRow } from "./types";
+import { EnrichedPointType } from "Types";
+import { EmailType } from "Types";
+import { appendRegioQuery } from "./flightPlans/regioQuery";
+import { POINT_DEBOUNCE_MS } from "./points/constants";
+import { PlanPathRow } from "./finishedPlans/types";
 
 export function usePartialFinishedPlans(regioId: string | number | undefined) {
   return useQuery({
@@ -58,5 +63,31 @@ export function usePlanPointAttachments(
       planId > 0 &&
       pointId !== undefined &&
       pointId > 0,
+  });
+}
+
+export function useSearchedPoints(search: string) {
+  const debouncedSearch = useDebouncedValue(search, POINT_DEBOUNCE_MS);
+  return useQuery({
+    queryKey: pointKeys.searched(debouncedSearch),
+    queryFn: () =>
+      fetchApi<EnrichedPointType[]>(`/points/searchedPoints/${debouncedSearch}`),
+    enabled: debouncedSearch.length > 0,
+  });
+}
+
+export function useDuplicateOmschrijvingCount(omschrijving: string) {
+  const debounced = useDebouncedValue(omschrijving, POINT_DEBOUNCE_MS);
+  return useQuery({
+    queryKey: pointKeys.duplicateOmschrijving(debounced),
+    queryFn: () => fetchApi<number>(`/points/duplicatePoints/${debounced}`),
+    enabled: debounced.length > 0,
+  });
+}
+
+export function useEmailsList() {
+  return useQuery({
+    queryKey: emailKeys.list(),
+    queryFn: () => fetchApi<EmailType[]>("/emails"),
   });
 }

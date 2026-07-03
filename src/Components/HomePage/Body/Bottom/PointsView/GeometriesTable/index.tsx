@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import useGeometryListMapActions from "hooks/hover-click-handlers/useGeometryListMapActions";
@@ -32,8 +32,8 @@ export default function GeometriesTable({
   containerHeight,
   containerWidth,
 }: any) {
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
 
   const { geometriesTable } = useOpenTable();
 

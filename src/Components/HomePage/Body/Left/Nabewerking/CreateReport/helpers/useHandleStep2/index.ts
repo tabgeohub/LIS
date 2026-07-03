@@ -1,4 +1,4 @@
-import { useGetPiloot } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import JSZip from "jszip";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
@@ -41,7 +41,7 @@ export function useHandleStep2(input: UseHandleStep2Input) {
     organizations,
   } = input;
   const { mapView } = useMapViewState();
-  const pilootOptions = useGetPiloot();
+  const pilootOptions = useConstSelectOptions("piloten");
   const { selectedBasemap } = useSelectedBasemapState();
   const mapServerUrl = resolveMapServerUrl(selectedBasemap);
 

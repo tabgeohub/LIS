@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { EnrichedPointType } from "Types";
 import { FinishedPointType } from "Types/finished_plans";
@@ -27,8 +27,8 @@ export default function PointItemCheckBox({
   variant?: "default" | "compact";
   showAttachments?: boolean;
 }) {
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
 
   const organizationLabel = organizations.find(
     (org) => org.value === point.organisatie_id

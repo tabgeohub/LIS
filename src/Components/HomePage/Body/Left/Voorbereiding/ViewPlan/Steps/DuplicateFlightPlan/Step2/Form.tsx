@@ -1,4 +1,4 @@
-import { useGetPiloot, useGetWaarnemers, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
@@ -10,9 +10,9 @@ import FlightPlanStandardFields, {
 import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
 
 export default function Form() {
-  const pilootOptions = useGetPiloot();
-  const waarnemerOptions = useGetWaarnemers();
-  const typeLuchtvaartuigOptions = useGetLuchtvaartuig();
+  const pilootOptions = useConstSelectOptions("piloten");
+  const waarnemerOptions = useConstSelectOptions("waarnemers");
+  const typeLuchtvaartuigOptions = useConstSelectOptions("luchtvaartuig");
   const store = usePlanDuplicateState();
   const fields = pickFlightPlanFormFields(store);
 

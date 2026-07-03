@@ -33,26 +33,11 @@ export function useLookupQuery<T>(resource: LookupResource) {
   });
 }
 
-export function useActiviteitenQuery() {
-  return useLookupQuery<IdActiviteit[]>("activiteiten");
-}
-
-export function useRegiosQuery() {
-  return useLookupQuery<Regio[]>("regios");
-}
-
-export function usePilotenQuery() {
-  return useLookupQuery<IdNaam[]>("piloten");
-}
-
-export function useWaarnemersQuery() {
-  return useLookupQuery<IdNaam[]>("waarnemers");
-}
-
-export function useOrganisatiesQuery() {
-  return useLookupQuery<IdNaam[]>("organisaties");
-}
-
-export function useLuchtvaartuigQuery() {
-  return useLookupQuery<IdNaam[]>("luchtvaartuig");
-}
+export type LookupDataMap = {
+  activiteiten: IdActiviteit[];
+  regios: Regio[];
+  piloten: IdNaam[];
+  waarnemers: IdNaam[];
+  organisaties: IdNaam[];
+  luchtvaartuig: IdNaam[];
+};

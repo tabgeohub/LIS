@@ -46,11 +46,11 @@ export function useFinishedPlanMapHighlight(
     if (!boundingGraphic) return;
 
     graphicsLayer.add(boundingGraphic);
-    addFinishedPlanGeometryCentroidMarkers(
-      graphicsLayer,
+    addFinishedPlanGeometryCentroidMarkers({
+      layer: graphicsLayer,
       plan,
-      FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.selected
-    );
+      symbol: FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.selected,
+    });
   }
 
   function handleHover(plan: FinishedFlightPlanType) {
@@ -64,11 +64,11 @@ export function useFinishedPlanMapHighlight(
     if (!boundingGraphic) return;
 
     graphicsLayerHover.add(boundingGraphic);
-    addFinishedPlanGeometryCentroidMarkers(
-      graphicsLayerHover,
+    addFinishedPlanGeometryCentroidMarkers({
+      layer: graphicsLayerHover,
       plan,
-      FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.hover
-    );
+      symbol: FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.hover,
+    });
   }
 
   function handleMouseLeave() {

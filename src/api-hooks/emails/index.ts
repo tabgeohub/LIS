@@ -1,1 +1,1 @@
-export { useEmailsList } from "./useEmailsList";
+export { useEmailsList } from "../useEntityQuery";

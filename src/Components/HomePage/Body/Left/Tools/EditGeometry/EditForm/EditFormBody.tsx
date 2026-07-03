@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import type { GeometryEditDraft } from "./helpers/types";
 import {
@@ -16,8 +16,8 @@ export default function EditFormBody({
   draft: GeometryEditDraft;
   setDraft: React.Dispatch<React.SetStateAction<GeometryEditDraft>>;
 }) {
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
 
   const activiteitOptions = selectOptionsWithFallback(
     activities,

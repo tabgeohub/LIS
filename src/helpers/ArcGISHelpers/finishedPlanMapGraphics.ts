@@ -37,23 +37,23 @@ export function createFinishedPlanBoundingBoxGraphic(
   });
 }
 
-export function addFinishedPlanGeometryCentroidMarkers(
-  layer: __esri.GraphicsLayer,
-  plan: FinishedFlightPlanType,
-  symbol: SimpleMarkerSymbol
-) {
-  for (const geometry of plan.geometries || []) {
+export function addFinishedPlanGeometryCentroidMarkers(input: {
+  layer: __esri.GraphicsLayer;
+  plan: FinishedFlightPlanType;
+  symbol: SimpleMarkerSymbol;
+}) {
+  for (const geometry of input.plan.geometries || []) {
     const centroid = geometryCentroid(geometry);
     if (!centroid) continue;
 
-    layer.add(
+    input.layer.add(
       new Graphic({
         geometry: new Point({
           longitude: centroid.lon,
           latitude: centroid.lat,
           spatialReference: { wkid: 4326 },
         }),
-        symbol,
+        symbol: input.symbol,
         attributes: { kind: "geometry-centroid" },
       })
     );

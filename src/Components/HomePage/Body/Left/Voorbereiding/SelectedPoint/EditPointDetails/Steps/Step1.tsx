@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { Field, useFormikContext } from "formik";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -19,9 +19,9 @@ export default function Step1({
   setStep: (value: number) => void;
 }) {
   const logAction = useLogAction();
-  const organizations = useGetOrganisaties();
+  const organizations = useConstSelectOptions("organisaties");
 
-  const activities = useGetActiviteiten();
+  const activities = useConstSelectOptions("activiteiten");
 
   const { setSelectedTab } = useTabState();
   const { setSelectedBottomTab } = useSelectedBottomTabState();

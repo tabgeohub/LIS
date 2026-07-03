@@ -3,13 +3,23 @@ import MapView from "@arcgis/core/views/MapView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { AttachmentType } from "Types/finished_plans";
 
-export function useFotoMapClickHandler(
-  mapView: MapView | null | undefined,
-  redGraphicsLayer: GraphicsLayer | null | undefined,
-  validAttachments: AttachmentType[],
-  setActiveIndex: (index: number) => void,
-  setIsOpen: (open: boolean) => void
-) {
+export type UseFotoMapClickHandlerInput = {
+  mapView: MapView | null | undefined;
+  redGraphicsLayer: GraphicsLayer | null | undefined;
+  validAttachments: AttachmentType[];
+  setActiveIndex: (index: number) => void;
+  setIsOpen: (open: boolean) => void;
+};
+
+export function useFotoMapClickHandler(input: UseFotoMapClickHandlerInput) {
+  const {
+    mapView,
+    redGraphicsLayer,
+    validAttachments,
+    setActiveIndex,
+    setIsOpen,
+  } = input;
+
   useEffect(() => {
     if (!mapView || !redGraphicsLayer || validAttachments.length === 0) return;
 
@@ -32,19 +42,18 @@ export function useFotoMapClickHandler(
               graphic?.attributes?.type === "image-numbered-marker-label"
           );
 
-        if (clickedGraphic) {
-          const attachmentId = clickedGraphic.attributes?.attachmentId;
+        if (!clickedGraphic) return;
 
-          if (attachmentId !== undefined) {
-            const sortedIndex = [...validAttachments]
-              .sort((a, b) => a.taken_at - b.taken_at)
-              .findIndex((att) => att.id === attachmentId);
+        const attachmentId = clickedGraphic.attributes?.attachmentId;
+        if (attachmentId === undefined) return;
 
-            if (sortedIndex !== -1) {
-              setActiveIndex(sortedIndex);
-              setIsOpen(true);
-            }
-          }
+        const sortedIndex = [...validAttachments]
+          .sort((a, b) => a.taken_at - b.taken_at)
+          .findIndex((att) => att.id === attachmentId);
+
+        if (sortedIndex !== -1) {
+          setActiveIndex(sortedIndex);
+          setIsOpen(true);
         }
       } catch (error) {
         console.error("Error handling marker click:", error);
@@ -52,9 +61,6 @@ export function useFotoMapClickHandler(
     };
 
     const handle = mapView.on("click", handleMapClick);
-
-    return () => {
-      handle.remove();
-    };
+    return () => handle.remove();
   }, [mapView, validAttachments, redGraphicsLayer, setIsOpen, setActiveIndex]);
 }

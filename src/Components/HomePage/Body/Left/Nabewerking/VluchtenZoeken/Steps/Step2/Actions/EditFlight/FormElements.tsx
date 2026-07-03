@@ -1,4 +1,4 @@
-import { useGetPiloot, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
@@ -9,8 +9,8 @@ import FlightPlanStandardFields, {
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
 
 export default function FormElements() {
-  const pilootOptions = useGetPiloot();
-  const typeLuchtvaartuigOptions = useGetLuchtvaartuig();
+  const pilootOptions = useConstSelectOptions("piloten");
+  const typeLuchtvaartuigOptions = useConstSelectOptions("luchtvaartuig");
   const store = useFinishedPlansState();
   const fields = pickFlightPlanFormFields(store);
   const content = useContent();

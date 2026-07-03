@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleStep2 } from "../../helpers/useHandleStep2";
@@ -10,8 +10,8 @@ import { useContent } from "hooks/useContent";
 
 export default function Step2Buttons() {
     const logAction = useLogAction();
-    const activities = useGetActiviteiten();
-    const organizations = useGetOrganisaties();
+    const activities = useConstSelectOptions("activiteiten");
+    const organizations = useConstSelectOptions("organisaties");
 
     const { graphicsLayerHover, graphicsLayer, geometriesGraphicsLayer } =
         useMapViewState();

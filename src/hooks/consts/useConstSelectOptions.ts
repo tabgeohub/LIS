@@ -65,27 +65,3 @@ export function useConstSelectOptions(resource: ConstSelectResource): SelectOpti
 
   return [...config.prepend, ...formatted];
 }
-
-export function useGetRegios() {
-  return useConstSelectOptions("regios");
-}
-
-export function useGetPiloot() {
-  return useConstSelectOptions("piloten");
-}
-
-export function useGetWaarnemers() {
-  return useConstSelectOptions("waarnemers");
-}
-
-export function useGetOrganisaties() {
-  return useConstSelectOptions("organisaties");
-}
-
-export function useGetActiviteiten() {
-  return useConstSelectOptions("activiteiten");
-}
-
-export function useGetLuchtvaartuig() {
-  return useConstSelectOptions("luchtvaartuig");
-}

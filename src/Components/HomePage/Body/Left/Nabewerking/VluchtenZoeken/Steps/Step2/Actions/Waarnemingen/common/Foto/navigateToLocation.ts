@@ -4,11 +4,14 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import MapView from "@arcgis/core/views/MapView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 
-export function navigateToLocation(
-  location: string | null | undefined,
-  mapView: MapView | null | undefined,
-  redGraphicsLayer: GraphicsLayer | null | undefined
-) {
+export type NavigateToLocationInput = {
+  location: string | null | undefined;
+  mapView: MapView | null | undefined;
+  redGraphicsLayer: GraphicsLayer | null | undefined;
+};
+
+export function navigateToLocation(input: NavigateToLocationInput) {
+  const { location, mapView, redGraphicsLayer } = input;
   if (!location || !mapView) return;
 
   try {
@@ -21,39 +24,28 @@ export function navigateToLocation(
       spatialReference: { wkid: 4326 },
     });
 
-    mapView.goTo({
-      target: point,
-      zoom: 15,
-    });
+    mapView.goTo({ target: point, zoom: 15 });
 
-    if (redGraphicsLayer) {
-      const graphics = redGraphicsLayer.graphics.toArray();
-      graphics
-        .filter((g) => g.attributes?.type === "image-location-marker")
-        .forEach((g) => redGraphicsLayer.remove(g));
+    if (!redGraphicsLayer) return;
 
-      const markerSymbol = new SimpleMarkerSymbol({
+    const graphics = redGraphicsLayer.graphics.toArray();
+    graphics
+      .filter((g) => g.attributes?.type === "image-location-marker")
+      .forEach((g) => redGraphicsLayer.remove(g));
+
+    const markerGraphic = new Graphic({
+      geometry: point,
+      symbol: new SimpleMarkerSymbol({
         color: [255, 0, 0, 0.8],
         size: 16,
         style: "circle",
-        outline: {
-          color: [255, 255, 255, 1],
-          width: 2,
-        },
-      });
+        outline: { color: [255, 255, 255, 1], width: 2 },
+      }),
+      attributes: { type: "image-location-marker" },
+    });
 
-      const markerGraphic = new Graphic({
-        geometry: point,
-        symbol: markerSymbol,
-        attributes: { type: "image-location-marker" },
-      });
-
-      redGraphicsLayer.add(markerGraphic);
-
-      setTimeout(() => {
-        redGraphicsLayer.remove(markerGraphic);
-      }, 5000);
-    }
+    redGraphicsLayer.add(markerGraphic);
+    setTimeout(() => redGraphicsLayer.remove(markerGraphic), 5000);
   } catch (error) {
     console.error("Error parsing location:", error);
   }

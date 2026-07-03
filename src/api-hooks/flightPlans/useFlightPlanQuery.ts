@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { useDebouncedValue } from "utils/useDebouncedValue";
 import { flightPlanKeys } from "lib/queryKeys";
+import { templateFlightKeys } from "lib/queryKeys";
 import { FlightPlanType } from "Types";
+import { Template } from "../templateFlights/types";
 import { FLIGHT_PLAN_DEBOUNCE_MS } from "./constants";
 import { enabledForRegio } from "./enabled";
 import { appendRegioQuery } from "./regioQuery";
@@ -108,5 +110,28 @@ export function usePointFlightPlans(pointId: number | undefined) {
     queryFn: () =>
       fetchApi<FlightPlanType[]>(`/points/flightPlans/${pointId}`),
     enabled: pointId !== undefined && pointId > 0,
+  });
+}
+
+export type UseTemplateFlightsInput = {
+  regioId: string | number | undefined;
+  userId: number | undefined;
+  enabled?: boolean;
+};
+
+/** Template flight plans for a region */
+export function useTemplateFlights(input: UseTemplateFlightsInput) {
+  const { regioId, userId, enabled = true } = input;
+
+  return useQuery({
+    queryKey: templateFlightKeys.list(regioId ?? ""),
+    queryFn: () =>
+      fetchApi<Template[]>(appendRegioQuery("/templateFlight", regioId)),
+    enabled:
+      enabled &&
+      regioId !== undefined &&
+      regioId !== "" &&
+      userId !== undefined &&
+      userId !== 0,
   });
 }

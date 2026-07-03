@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties, useGetRegios } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import TabHeader from "../TabHeader";
 import PeriodeComp from "./PeriodeComp";
@@ -14,8 +14,8 @@ import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export default function FiltersSection() {
   const { setSelectedTab } = useTabState();
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
   const { fetchPoints } = usePointsStore();
   const { resetFeatures } = useResetFeatures();
 
@@ -36,7 +36,7 @@ export default function FiltersSection() {
     setRegio,
   } = useFilterState();
 
-  const regios = useGetRegios();
+  const regios = useConstSelectOptions("regios");
 
   const content = useContent();
 

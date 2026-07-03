@@ -1,4 +1,4 @@
-import { useGetRegios } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,7 @@ export default function UserList({
   const logAction = useLogAction();
 
   const { user } = useAuth();
-  const regios = useGetRegios();
+  const regios = useConstSelectOptions("regios");
 
   const userListRef = useRef<HTMLDivElement>(null);
   const location = useLocation();

@@ -184,7 +184,7 @@ export function formatTemplatePlansWithGeometries(
     const points = (plan.points as RawPoint[] | null) ?? [];
     const { standalonePoints, geometries } = splitPointsByGeometry(points, {
       createGeometryGroup: (point, geometryId) =>
-        buildTemplateGeometryGroup(point, geometryId, geometryDataMap),
+        buildTemplateGeometryGroup({ point, geometryId, geometryDataMap }),
       addPointToGeometry: () => {},
     });
 

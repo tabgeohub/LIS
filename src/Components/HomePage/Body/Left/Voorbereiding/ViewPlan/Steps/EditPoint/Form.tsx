@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
@@ -44,9 +44,9 @@ export default function Form({
   const { clickedPoint } = useViewPlanState();
   const { pointsTable } = useOpenTable();
 
-  const organizations = useGetOrganisaties();
+  const organizations = useConstSelectOptions("organisaties");
 
-  const activities = useGetActiviteiten();
+  const activities = useConstSelectOptions("activiteiten");
 
   return (
     <div className="py-4 px-2 space-y-4 max-h-[87%] overflow-y-scroll thin-scrollbar">

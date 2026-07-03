@@ -1,4 +1,4 @@
-import { useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
@@ -28,7 +28,7 @@ type BulkImportResponse = {
 
 export default function ImportVluchtPlan() {
   const [showExcel, setShowExcel] = useState(false);
-  const organizations = useGetOrganisaties();
+  const organizations = useConstSelectOptions("organisaties");
   const { setSelectedPoints, setSelectedPoints2 } = useFlightPlanState();
   const { resetFeatures } = useResetFeatures();
   const { user } = useAuth();

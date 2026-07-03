@@ -1,4 +1,4 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import {
   initialPointState,
   usePopUpState,
@@ -11,9 +11,9 @@ import { useContent } from "hooks/useContent";
 
 export default function SelectedPointDetails() {
   const logAction = useLogAction();
-  const organizations = useGetOrganisaties();
+  const organizations = useConstSelectOptions("organisaties");
 
-  const activities = useGetActiviteiten();
+  const activities = useConstSelectOptions("activiteiten");
 
   const { setClickedPointId, clickedPoint, setClickedPoint } = usePopUpState();
   const { setSelectedTab } = useTabState();

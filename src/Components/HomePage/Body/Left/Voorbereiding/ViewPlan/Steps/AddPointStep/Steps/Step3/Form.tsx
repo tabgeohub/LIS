@@ -1,12 +1,12 @@
-import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 
 export default function Form() {
-  const activities = useGetActiviteiten();
-  const organizations = useGetOrganisaties();
+  const activities = useConstSelectOptions("activiteiten");
+  const organizations = useConstSelectOptions("organisaties");
 
   const {
     vertrouwelijk,

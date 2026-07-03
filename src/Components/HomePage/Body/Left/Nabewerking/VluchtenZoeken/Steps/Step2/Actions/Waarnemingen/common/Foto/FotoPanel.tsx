@@ -47,23 +47,23 @@ export default function FotoPanel({
 
   const validAttachments = filterValidAttachments(attachmentPoint?.attachments);
 
-  useFotoMapClickHandler(
+  useFotoMapClickHandler({
     mapView,
     redGraphicsLayer,
     validAttachments,
     setActiveIndex,
-    setIsOpen
-  );
+    setIsOpen,
+  });
 
-  useImageMarkersOnMap(
+  useImageMarkersOnMap({
     attachmentPoint,
     validAttachments,
     mapView,
-    redGraphicsLayer
-  );
+    redGraphicsLayer,
+  });
 
   const handleNavigateToLocation = (location: string | null | undefined) => {
-    navigateToLocation(location, mapView, redGraphicsLayer);
+    navigateToLocation({ location, mapView, redGraphicsLayer });
   };
 
   async function deleteImage(attachmentId: number) {
