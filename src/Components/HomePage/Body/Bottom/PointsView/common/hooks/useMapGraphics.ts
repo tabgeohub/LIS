@@ -2,13 +2,9 @@ import { useEffect, RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
-import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
-import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { addPlanStarGraphic } from "hooks/hover-click-handlers/usePlanStarGraphic";
+import { syncTableTabGraphics } from "./syncTableTabGraphics";
 
-interface UseMapGraphicsParams {
+export type UseMapGraphicsInput = {
   tab: string;
   pointsTable: EnrichedPointType[];
   geometriesTable: Geometry[];
@@ -16,87 +12,42 @@ interface UseMapGraphicsParams {
   starredPoints: EnrichedPointType[];
   starredGeometries: Geometry[];
   starredPlans: FlightPlanType[];
-  graphicsLayer: any;
-  graphicsLayerHover: any;
-  yellowGraphicsLayer: any;
-  mapView: any;
+  graphicsLayer: __esri.GraphicsLayer | null;
+  graphicsLayerHover: __esri.GraphicsLayer | null;
+  yellowGraphicsLayer: __esri.GraphicsLayer | null;
+  mapView: __esri.MapView | null;
   originalGraphicsMap: RefObject<Map<number, Graphic>>;
-}
-
-export const useMapGraphics = ({
-  tab,
-  pointsTable,
-  geometriesTable,
-  flightPlans,
-  starredPoints,
-  starredGeometries,
-  starredPlans,
-  graphicsLayer,
-  graphicsLayerHover,
-  yellowGraphicsLayer,
-  mapView,
-  originalGraphicsMap,
-}: UseMapGraphicsParams) => {
-  useEffect(() => {
-    graphicsLayer?.removeAll();
-    yellowGraphicsLayer?.graphics.removeAll();
-
-    if (tab === "points") {
-      if (!validateMapView(mapView, yellowGraphicsLayer)) return;
-
-      syncPointsTableMapGraphics({
-        points: pointsTable,
-        starredPoints,
-        yellowGraphicsLayer,
-        graphicsLayer,
-      });
-    }
-
-    if (tab === "geometries") {
-      if (!mapView || !yellowGraphicsLayer || !geometriesTable) return;
-
-      syncGeometriesTableMapGraphics({
-        geometries: geometriesTable,
-        starredGeometries,
-        yellowGraphicsLayer,
-        graphicsLayer,
-      });
-    }
-
-    if (tab === "flightPlans") {
-      if (mapView && graphicsLayer) {
-        graphicsLayer.removeAll();
-        flightPlans?.forEach((plan) => {
-          plan?.points.forEach(() => {
-            const quadrantGraphic = createQuadrantGraphic(plan.points);
-            quadrantGraphic.attributes = { id: plan.id };
-            graphicsLayer.add(quadrantGraphic);
-            originalGraphicsMap.current?.set(plan.id, quadrantGraphic);
-          });
-
-          const alreadyStarred = starredPlans.find((p) => p.id === plan.id);
-          if (alreadyStarred) {
-            const oldGraphic = originalGraphicsMap.current?.get(plan.id);
-            if (oldGraphic) graphicsLayer?.remove(oldGraphic);
-
-            addPlanStarGraphic(plan, graphicsLayer, "table");
-          }
-        });
-      }
-    }
-  }, [
-    tab,
-    pointsTable,
-    geometriesTable,
-    flightPlans,
-    starredPoints,
-    starredGeometries,
-    starredPlans,
-    graphicsLayer,
-    graphicsLayerHover,
-    yellowGraphicsLayer,
-    mapView,
-    originalGraphicsMap,
-  ]);
 };
 
+export const useMapGraphics = (input: UseMapGraphicsInput) => {
+  useEffect(() => {
+    syncTableTabGraphics({
+      tab: input.tab,
+      ctx: {
+        graphicsLayer: input.graphicsLayer,
+        yellowGraphicsLayer: input.yellowGraphicsLayer,
+        mapView: input.mapView,
+        originalGraphicsMap: input.originalGraphicsMap,
+      },
+      pointsTable: input.pointsTable,
+      geometriesTable: input.geometriesTable,
+      flightPlans: input.flightPlans,
+      starredPoints: input.starredPoints,
+      starredGeometries: input.starredGeometries,
+      starredPlans: input.starredPlans,
+    });
+  }, [
+    input.tab,
+    input.pointsTable,
+    input.geometriesTable,
+    input.flightPlans,
+    input.starredPoints,
+    input.starredGeometries,
+    input.starredPlans,
+    input.graphicsLayer,
+    input.graphicsLayerHover,
+    input.yellowGraphicsLayer,
+    input.mapView,
+    input.originalGraphicsMap,
+  ]);
+};

@@ -2,9 +2,7 @@ import { useCallback } from "react";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { MdOutlineZoomOutMap, MdTableChart } from "react-icons/md";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { EnrichedPointType, FlightPlanType } from "Types";
-import { saveAs } from "file-saver";
-import * as XLSX from "@e965/xlsx";
+import { EnrichedPointType } from "Types";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -12,55 +10,47 @@ import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import JSZip from "jszip";
-import shpwrite from "@mapbox/shp-write";
-import { FeatureCollection, Point as pt } from "geojson";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import {
+  exportPointsPlansCsv,
+  exportPointsPlansXlsx,
+  exportPointsShapefile,
+} from "@helpers/tableExports/pointsPlansTableExport";
 
 export default function PointsList() {
   const logAction = useLogAction();
-
   const { pointsTable, setOpenTable, flightPlans } = useOpenTable();
   const { mapView } = useMapViewState();
-
   const { setOpenResultTab } = useOpenResultTab();
   const { setOpenSearchedTab } = useOpenSearchedTab();
-
   const { setOpenAllTable } = useOpenAllTable();
   const { setOpenSideBar } = useOpeSideBarState();
-
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const { selectedTab } = useTabState();
+  const content = useContent();
 
   const zoomToPoints = useCallback(() => {
     if (!validateMapView(mapView) || !pointsTable || pointsTable.length === 0) return;
 
     const lats = pointsTable.map((p) => p.latitude);
     const lons = pointsTable.map((p) => p.longitude);
-
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLon = Math.min(...lons);
-    const maxLon = Math.max(...lons);
-
     const polygon = new Polygon({
       rings: [
         [
-          [minLon, maxLat],
-          [maxLon, maxLat],
-          [maxLon, minLat],
-          [minLon, minLat],
-          [minLon, maxLat],
+          [Math.min(...lons), Math.max(...lats)],
+          [Math.max(...lons), Math.max(...lats)],
+          [Math.max(...lons), Math.min(...lats)],
+          [Math.min(...lons), Math.min(...lats)],
+          [Math.min(...lons), Math.max(...lats)],
         ],
       ],
       spatialReference: { wkid: 4326 },
     });
 
     mapView.goTo(polygon);
-
     logAction({
       message: "User clicked 'Zoom to all points' button",
       step: "Clicked table functions",
@@ -78,7 +68,6 @@ export default function PointsList() {
     setOpenSideBar(true);
     setOpenAllTable(false);
     setOpenTable(false);
-
     logAction({
       message: "User clicked 'List view' button",
       step: "Clicked table functions",
@@ -94,181 +83,28 @@ export default function PointsList() {
     logAction,
   ]);
 
-  const exportCsv = useCallback(async () => {
-    if (pointsTable.length > 0 && flightPlans.length > 0) {
-      const zip = new JSZip();
+  const exportCsv = useCallback(
+    () =>
+      exportPointsPlansCsv({
+        points: pointsTable as EnrichedPointType[],
+        plans: flightPlans,
+      }),
+    [pointsTable, flightPlans]
+  );
 
-      const points = pointsTable as EnrichedPointType[];
-      const headersPoints = Object.keys(points[0]);
-      const csvPoints = [
-        headersPoints.join(","),
-        ...points.map((p) =>
-          headersPoints
-            .map((h) => `"${p[h as keyof EnrichedPointType]}"`)
-            .join(",")
-        ),
-      ].join("\n");
+  const exportXlsx = useCallback(
+    () =>
+      exportPointsPlansXlsx({
+        points: pointsTable as EnrichedPointType[],
+        plans: flightPlans,
+      }),
+    [pointsTable, flightPlans]
+  );
 
-      zip.file("points_export.csv", csvPoints);
-
-      const plans = flightPlans as FlightPlanType[];
-
-      const headersPlans = Object.keys(plans[0]).filter(
-        (key) => key !== "points"
-      );
-
-      const csvPlans = [
-        headersPlans.join(","),
-        ...plans.map((p) =>
-          headersPlans
-            .map((h) => `"${p[h as keyof FlightPlanType] ?? ""}"`)
-            .join(",")
-        ),
-      ].join("\n");
-
-      zip.file("plans_export.csv", csvPlans);
-
-      const zipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(zipBlob, "exports.zip");
-    } else if (pointsTable.length > 0 && flightPlans.length === 0) {
-      const points = pointsTable as EnrichedPointType[];
-      const headers = Object.keys(points[0]);
-      const csv = [
-        headers.join(","),
-        ...points.map((p) =>
-          headers.map((h) => `"${p[h as keyof EnrichedPointType]}"`).join(",")
-        ),
-      ].join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, "points_export.csv");
-    } else if (pointsTable.length === 0 && flightPlans.length > 0) {
-      const plans = flightPlans as FlightPlanType[];
-      const headersPlans = Object.keys(plans[0]).filter(
-        (key) => key !== "points"
-      );
-
-      const csvPlans = [
-        headersPlans.join(","),
-        ...plans.map((p) =>
-          headersPlans
-            .map((h) => `"${p[h as keyof FlightPlanType] ?? ""}"`)
-            .join(",")
-        ),
-      ].join("\n");
-
-      const blob = new Blob([csvPlans], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, "plans_export.csv");
-    }
-  }, [pointsTable, flightPlans]);
-
-  const exportXlsx = useCallback(async () => {
-    if (pointsTable.length > 0 && flightPlans.length > 0) {
-      const zip = new JSZip();
-
-      // ===== 1. Points Excel =====
-      const points = pointsTable as EnrichedPointType[];
-      const wsPoints = XLSX.utils.json_to_sheet(points);
-      const wbPoints = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbPoints, wsPoints, "Points");
-      const pointsBuffer = XLSX.write(wbPoints, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      zip.file("points_export.xlsx", pointsBuffer);
-
-      // ===== 2. Plans Excel (excluding "points" field) =====
-      const plans = flightPlans as FlightPlanType[];
-      const cleanedPlans = plans.map(({ points, ...rest }) => rest); // exclude "points"
-      const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-      const wbPlans = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-      const plansBuffer = XLSX.write(wbPlans, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      zip.file("plans_export.xlsx", plansBuffer);
-
-      // Generate zip blob
-      const zipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(zipBlob, "exports_xlsx.zip");
-    } else if (pointsTable.length > 0 && flightPlans.length === 0) {
-      const points = pointsTable as EnrichedPointType[];
-      const wsPoints = XLSX.utils.json_to_sheet(points);
-      const wbPoints = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbPoints, wsPoints, "Points");
-      const pointsBuffer = XLSX.write(wbPoints, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      const blob = new Blob([pointsBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, "points_export.xlsx");
-    } else if (pointsTable.length === 0 && flightPlans.length > 0) {
-      const plans = flightPlans as FlightPlanType[];
-      const cleanedPlans = plans.map(({ points, ...rest }) => rest); // exclude "points"
-      const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-      const wbPlans = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-      const plansBuffer = XLSX.write(wbPlans, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      const blob = new Blob([plansBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, "plans_export.xlsx");
-    }
-  }, [pointsTable, flightPlans]);
-
-  const exportShp = useCallback(async () => {
-    const zip = new JSZip();
-
-    // ===== 1. Points (as Shapefile) =====
-    const points = pointsTable;
-    if (!points || points.length === 0) {
-      alert("No points to export.");
-      return;
-    }
-
-    const geojsonPoints: FeatureCollection<pt> = {
-      type: "FeatureCollection",
-      features: points.map((p) => ({
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [p.longitude, p.latitude],
-        },
-        properties: {
-          id: p.id,
-          omschrijving: p.omschrijving,
-          regio_id: p.regio_id,
-          datum: p.datum,
-          vertrouwelijk: p.vertrouwelijk,
-          order: p.order,
-          region: p.region,
-        },
-      })),
-    };
-
-    const pointsShp = shpwrite.zip(geojsonPoints, {
-      compression: "DEFLATE",
-      outputType: "blob",
-    });
-
-    zip.file("points.zip", pointsShp);
-
-    // ===== 3. Final Combined ZIP =====
-    const finalZipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(finalZipBlob, "exports_shapefiles.zip");
-  }, [pointsTable]);
-
-  const content = useContent();
+  const exportShp = useCallback(
+    () => exportPointsShapefile(pointsTable as EnrichedPointType[]),
+    [pointsTable]
+  );
 
   return (
     <div>

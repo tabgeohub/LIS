@@ -1,17 +1,19 @@
-export const useTableLayout = (
-  containerHeight: number,
-  headerHeight: number,
-  tableScrollWidth: number,
-  containerWidth: number
-) => {
+export type UseTableLayoutInput = {
+  containerHeight: number;
+  headerHeight: number;
+  tableScrollWidth: number;
+  containerWidth: number;
+};
+
+export const useTableLayout = (input: UseTableLayoutInput) => {
   const availableHeight =
-    containerHeight > 0
-      ? Math.max(containerHeight - headerHeight, 0)
+    input.containerHeight > 0
+      ? Math.max(input.containerHeight - input.headerHeight, 0)
       : undefined;
   const needsHorizontalScroll =
-    tableScrollWidth > 0 &&
-    containerWidth > 0 &&
-    tableScrollWidth > containerWidth;
+    input.tableScrollWidth > 0 &&
+    input.containerWidth > 0 &&
+    input.tableScrollWidth > input.containerWidth;
   const horizontalScrollbarHeight = needsHorizontalScroll ? 18 : 0;
   const scrollAreaHeight =
     typeof availableHeight === "number"
@@ -25,4 +27,3 @@ export const useTableLayout = (
     scrollAreaHeight,
   };
 };
-

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiLogIn } from "react-icons/fi";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useContent } from "hooks/useContent";
+import { resolveLoginBannerTheme } from "./notLoggedInBannerTheme";
 
 type BannerKind = "notLoggedIn" | "noRole" | null;
 
@@ -12,6 +13,7 @@ export default function NotLoggedInWarning() {
   const { user, setUser } = useAuth();
   const [show, setShow] = useState(true);
   const primaryBtnRef = useRef<HTMLButtonElement | null>(null);
+  const content = useContent();
 
   const kind: BannerKind = useMemo(() => {
     if (user.user_id === 0) return "notLoggedIn";
@@ -40,25 +42,30 @@ export default function NotLoggedInWarning() {
   useEffect(() => {
     const shouldShow = !!kind;
     setShow(shouldShow);
+    if (!shouldShow) return;
 
-    // Lock scroll while overlay is shown
-    if (shouldShow) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = prev;
-      };
-    }
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [kind]);
 
   useEffect(() => {
     if (!show) return;
-    // focus primary action button when visible
-    const id = requestAnimationFrame(() => {
-      primaryBtnRef.current?.focus();
-    });
+    const id = requestAnimationFrame(() => primaryBtnRef.current?.focus());
     return () => cancelAnimationFrame(id);
   }, [show]);
+
+  const theme = useMemo(() => {
+    if (!kind) return null;
+    return resolveLoginBannerTheme({
+      kind,
+      content,
+      onLogin: login,
+      onLogout: logout,
+    });
+  }, [kind, content]);
 
   const overlayVariants = {
     initial: { opacity: 0 },
@@ -66,43 +73,9 @@ export default function NotLoggedInWarning() {
     exit: { opacity: 0, transition: { duration: 0.4 } },
   };
 
-  const content = useContent();
-
-  // theme per kind
-  const theme = useMemo(() => {
-    if (kind === "notLoggedIn") {
-      return {
-        accent: "",
-        ring: "ring-red-100",
-        icon: "text-red-600",
-        button:
-          "bg-primary hover:bg-primary/90 focus-visible:ring-primary/50 text-white",
-        chip: "bg-red-50 text-red-700",
-        bar: "bg-red-600",
-        title: content.layout.login.notLoggedInWarning.title,
-        body: content.layout.login.notLoggedInWarning.body,
-        cta: content.layout.login.notLoggedInWarning.cta,
-        onClick: login,
-      };
-    }
-    return {
-      accent: "",
-      ring: "ring-amber-100",
-      icon: "text-red-600",
-      button:
-        "bg-red-600 hover:bg-red-700 focus-visible:ring-red-300 text-white",
-      chip: "bg-amber-50 text-amber-800",
-      bar: "bg-red-600",
-      title: content.layout.login.noRoleWarning.title,
-      body: content.layout.login.noRoleWarning.body,
-      cta: content.layout.login.noRoleWarning.cta,
-      onClick: logout,
-    };
-  }, [kind]);
-
   return (
     <AnimatePresence>
-      {show && kind && (
+      {show && kind && theme && (
         <motion.div
           role="dialog"
           aria-modal="true"
@@ -114,9 +87,6 @@ export default function NotLoggedInWarning() {
           variants={overlayVariants}
         >
           <div className="absolute inset-0 bg-white/65 backdrop-blur-xl" />
-          <div
-            className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${theme.accent} mix-blend-multiply`}
-          />
           <div className="absolute inset-0 bg-[radial-gradient(1000px_600px_at_50%_-10%,rgba(255,255,255,0.6),transparent_70%)]" />
 
           <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
@@ -128,19 +98,16 @@ export default function NotLoggedInWarning() {
               className={`w-full max-w-md rounded-2xl bg-white/90 shadow-xl ring-1 ${theme.ring} backdrop-blur-sm`}
             >
               <div className={`h-1.5 w-full rounded-t-2xl ${theme.bar}`} />
-
               <div className="px-6 py-6">
                 <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-inner">
                   <FiLogIn className={`h-6 w-6 ${theme.icon}`} />
                 </div>
-
                 <h2 className="text-center text-lg font-semibold text-gray-900">
                   {theme.title}
                 </h2>
                 <p className="mt-2 text-center text-sm leading-6 text-gray-600">
                   {theme.body}
                 </p>
-
                 <div className="mt-6 flex flex-col gap-2">
                   <button
                     ref={primaryBtnRef}

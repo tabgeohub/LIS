@@ -73,12 +73,12 @@ export default function PointsView({
     starredGeometriesLength: starredGeometries.length,
   });
   const { availableHeight, needsHorizontalScroll, scrollAreaHeight } =
-    useTableLayout(
+    useTableLayout({
       containerHeight,
       headerHeight,
       tableScrollWidth,
-      scrollContainerWidth
-    );
+      containerWidth: scrollContainerWidth,
+    });
 
   useMapGraphics({
     tab,

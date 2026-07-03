@@ -1,51 +1,24 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import type { PointFormState } from "../helpers/pointForm";
-import { parseFinite } from "./coords";
+import { resolveDebouncedPointWgs84 } from "./resolveDebouncedPointWgs84";
 
-/**
- * Draws a red point from coordinate inputs after a short typing delay.
- * Supports either direct WGS84 values or RD converted to WGS84.
- */
-export default function useDebouncedRedPointFromInputs({
-  form,
-  delayMs = 500,
-}: {
+export default function useDebouncedRedPointFromInputs(input: {
   form: PointFormState;
   delayMs?: number;
 }) {
   const { mapView, redGraphicsLayer } = useMapViewState();
+  const { form, delayMs = 500 } = input;
 
   useEffect(() => {
     if (!mapView) return;
 
     const timeout = setTimeout(() => {
-      const lon = parseFinite(form.longitude);
-      const lat = parseFinite(form.latitude);
+      const coords = resolveDebouncedPointWgs84(form);
+      if (!coords) return;
 
-      let targetLon: number | null = null;
-      let targetLat: number | null = null;
-
-      if (lon != null && lat != null) {
-        targetLon = lon;
-        targetLat = lat;
-      } else {
-        const x = parseFinite(form.xcoordinaat_rd);
-        const y = parseFinite(form.ycoordinaat_rd);
-        if (x != null && y != null) {
-          const transformed = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: x, y: y });
-          if (Number.isFinite(transformed.x) && Number.isFinite(transformed.y)) {
-            targetLon = transformed.x;
-            targetLat = transformed.y;
-          }
-        }
-      }
-
-      if (targetLon == null || targetLat == null) return;
-
-      const pointGraphic = createPoint(targetLon, targetLat);
+      const pointGraphic = createPoint(coords.longitude, coords.latitude);
       redGraphicsLayer?.removeAll();
       if (redGraphicsLayer) {
         redGraphicsLayer.add(pointGraphic);
@@ -54,9 +27,7 @@ export default function useDebouncedRedPointFromInputs({
       }
     }, delayMs);
 
-    return () => {
-      clearTimeout(timeout);
-    };
+    return () => clearTimeout(timeout);
   }, [
     mapView,
     redGraphicsLayer,

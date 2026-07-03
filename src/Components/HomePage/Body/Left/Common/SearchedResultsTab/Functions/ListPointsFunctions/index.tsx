@@ -2,12 +2,9 @@ import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottom
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { EnrichedPointType, FlightPlanType } from "Types";
-import { saveAs } from "file-saver";
-import * as XLSX from "@e965/xlsx";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import JSZip from "jszip";
 import {
   MdDonutLarge,
   MdFolderOpen,
@@ -17,6 +14,11 @@ import {
   MdTableChart,
 } from "react-icons/md";
 import { useContent } from "hooks/useContent";
+import {
+  exportPointsPlansCsv,
+  exportPointsPlansGeoJsonZip,
+  exportPointsPlansXlsx,
+} from "@helpers/tableExports/pointsPlansTableExport";
 
 export default function ListPointFunctions({
   setFase,
@@ -47,125 +49,28 @@ export default function ListPointFunctions({
   };
 
   const exportCsv = async () => {
-    const zip = new JSZip();
-
-    const points = pointsData as EnrichedPointType[];
-    const headersPoints = Object.keys(points[0]);
-    const csvPoints = [
-      headersPoints.join(","),
-      ...points.map((p) =>
-        headersPoints
-          .map((h) => `"${p[h as keyof EnrichedPointType]}"`)
-          .join(",")
-      ),
-    ].join("\n");
-
-    zip.file("points_export.csv", csvPoints);
-
-    const plans = flightPlansData as FlightPlanType[];
-
-    const headersPlans = Object.keys(plans[0]).filter(
-      (key) => key !== "points"
-    );
-
-    const csvPlans = [
-      headersPlans.join(","),
-      ...plans.map((p) =>
-        headersPlans
-          .map((h) => `"${p[h as keyof FlightPlanType] ?? ""}"`)
-          .join(",")
-      ),
-    ].join("\n");
-
-    zip.file("plans_export.csv", csvPlans);
-
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "exports.zip");
+    await exportPointsPlansCsv({
+      points: pointsData as EnrichedPointType[],
+      plans: flightPlansData as FlightPlanType[],
+    });
   };
 
   const exportXlsx = async () => {
-    const zip = new JSZip();
-
-    // ===== 1. Points Excel =====
-    const points = pointsData as EnrichedPointType[];
-    const wsPoints = XLSX.utils.json_to_sheet(points);
-    const wbPoints = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPoints, wsPoints, "Points");
-    const pointsBuffer = XLSX.write(wbPoints, {
-      bookType: "xlsx",
-      type: "array",
+    await exportPointsPlansXlsx({
+      points: pointsData as EnrichedPointType[],
+      plans: flightPlansData as FlightPlanType[],
     });
-
-    zip.file("points_export.xlsx", pointsBuffer);
-
-    // ===== 2. Plans Excel (excluding "points" field) =====
-    const plans = flightPlansData as FlightPlanType[];
-
-    const cleanedPlans = plans.map(({ points, ...rest }) => rest);
-    const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-    const wbPlans = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-    const plansBuffer = XLSX.write(wbPlans, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    zip.file("plans_export.xlsx", plansBuffer);
-
-    // ===== Generate and download ZIP =====
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "exports_xlsx.zip");
   };
 
   const exportShp = async () => {
-    const zip = new JSZip();
-
-    const points = pointsData;
-
-    if (!points || points.length === 0) {
+    if (!pointsData?.length) {
       alert("No points to export.");
       return;
     }
-
-    // ===== 1. Points GeoJSON =====
-    const geojsonPoints = {
-      type: "FeatureCollection",
-      features: points.map((p) => ({
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [p.longitude, p.latitude],
-        },
-        properties: {
-          id: p.id,
-          omschrijving: p.omschrijving,
-          regio_id: p.regio_id,
-          datum: p.datum,
-          vertrouwelijk: p.vertrouwelijk,
-          order: p.order,
-          region: p.region,
-        },
-      })),
-    };
-
-    zip.file("points.geojson", JSON.stringify(geojsonPoints, null, 2));
-
-    // ===== 2. Plans GeoJSON (if applicable) =====
-    const plans = flightPlansData as FlightPlanType[];
-
-    const geojsonPlans = {
-      type: "FeatureCollection",
-      features: plans.map(({ points, ...rest }) => ({
-        type: "Feature",
-        geometry: null,
-        properties: rest,
-      })),
-    };
-
-    zip.file("plans.geojson", JSON.stringify(geojsonPlans, null, 2));
-
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "exports_geojson.zip");
+    await exportPointsPlansGeoJsonZip({
+      points: pointsData,
+      plans: flightPlansData as FlightPlanType[],
+    });
   };
 
   const content = useContent();
