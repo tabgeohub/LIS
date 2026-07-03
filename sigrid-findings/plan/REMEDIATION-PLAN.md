@@ -1,20 +1,20 @@
 # Sigrid Remediation Plan — Code only
 
-**Source:** `exported-findings-6` · **Generated:** 2026-07-04
+**Source:** `exported-findings-7` · **Generated:** 2026-07-04
 
 Application code, dependencies, and maintainability. **DevOps (Docker) is in [`devops/`](./devops/) — out of scope for code sprints.**
 
-## Current state (`exported-findings-6`)
+## Current state (`exported-findings-7`)
 
 | Metric | Value |
 |--------|------:|
-| Security + Reliability (code) RAW | **1** |
+| Security + Reliability (code) RAW | **2** |
 | Security + Reliability FIXED (code) | 48 |
-| Maintainability RAW | 1085 |
-| Duplication RAW | 209 |
+| Maintainability RAW | 1082 |
+| Duplication RAW | 191 |
 
-**Dashboard (export 6):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.1** (+0.2) · Architecture **2.19** (−0.03)
-_(export 5 → 6: maint+arch plan-mapped **1052 → 1081** (+29); CSV **1058 → 1086** (+28 net); HIGH **128 → 79** — star moved. See [ANALYSIS-export-5-to-6.md](./Maintainability-Architecture/ANALYSIS-export-5-to-6.md).)_
+**Dashboard (export 7):** Security 4.1 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.2** (+0.1) · Architecture **2.3** (+0.1)
+_(export 6 → 7: maint+arch plan-mapped **1081 → 1078** (-3); CSV **1086 → 1083** (−3); HIGH **79 → 73**; dup **209 → 191** — both stars moved. See [ANALYSIS-export-6-to-7.md](./Maintainability-Architecture/ANALYSIS-export-6-to-7.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -34,7 +34,7 @@ _(export 5 → 6: maint+arch plan-mapped **1052 → 1081** (+29); CSV **1058 →
 ## Principles
 
 1. **Each execution step clears ≥100 findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…08.
-2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update export folder names).
+2. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
 4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
@@ -43,22 +43,23 @@ _(export 5 → 6: maint+arch plan-mapped **1052 → 1081** (+29); CSV **1058 →
 ```
 Prep  → WP-07 Sigrid remark on callbackHandler (1 code RAW; not a full step)
 STEP-01 → DUP-01 wizard buttons + A1 interfacing sweep (254 RAW)
-STEP-02 → Voorbereiding complexity (MAINT-03) (188 RAW)
+STEP-02 → Voorbereiding complexity (MAINT-03) (189 RAW)
 STEP-03 → Backend complexity + size (MAINT-01) (245 RAW)
-STEP-04 → Architecture — api-hooks factory (ARCH-03) (94 RAW)
+STEP-04 → Architecture — api-hooks factory (ARCH-03) (96 RAW)
 STEP-05 → Nabewerking + Timeslider (MAINT-02 + MAINT-07) (156 RAW)
-STEP-06 → Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (153 RAW)
-STEP-07 → Frontend catch-all remainder (MAINT-08a/b/f) (144 RAW)
-STEP-08 → ArcGIS + remaining duplication + admin + arch tail (148 RAW)
+STEP-06 → Map hooks + api-hooks slice (MAINT-08c + 08d + 08e) (152 RAW)
+STEP-07 → Frontend catch-all remainder (MAINT-08a/b/f) (149 RAW)
+STEP-08 → ArcGIS + remaining duplication + admin + arch tail (120 RAW)
 ```
 
 Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
 
-## Open security/reliability (1 RAW)
+## Open security/reliability (2 RAW)
 
 | WP | Severity | File | Issue |
 |----|----------|------|-------|
 | WP-07 | MEDIUM | `backend/src/routes/auth/authKeycloak/callbackHandler.ts` | Untrusted user input in redirect() can result in Open Redirect vulnerability |
+|  | MEDIUM | `src/helpers/tableExports/pointsPlansTableExport.ts` | User controlled data in a HTML string may result in XSS |
 
 ## Work packages (status)
 
@@ -77,9 +78,9 @@ Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintaina
 | DUP-03 | DONE | 4 - Duplication | useFilterPlans duplicate | — | — |
 | DUP-04 | PARTIAL | 4 - Duplication | PointsBuffer internal dup | — | 1 |
 | DUP-05 | PARTIAL | 4 - Duplication | PeriodFilter components | — | 1 |
-| DUP-06 | PARTIAL | 4 - Duplication | Dashboard user forms | — | 3 |
+| DUP-06 | PARTIAL | 4 - Duplication | Dashboard user forms | — | 2 |
 | DUP-07 | PARTIAL | 4 - Duplication | Zustand plan state | — | 5 |
-| DUP-08 | PARTIAL | 4 - Duplication | PointsList variants | — | 30 |
+| DUP-08 | PARTIAL | 4 - Duplication | PointsList variants | — | 13 |
 
 ## Duplication clusters (open RAW per cluster)
 
@@ -90,15 +91,15 @@ Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintaina
 | DUP-03 | 0 | src/hooks/filters/useFilterPlans.ts + Nabewerking copy  (DONE) |
 | DUP-04 | 1 | PointsBuffer.tsx internal duplication (PARTIAL) |
 | DUP-05 | 1 | Three PeriodFilter copies (PARTIAL) |
-| DUP-06 | 3 | AllRoles / AddUser / EditUser (PARTIAL) |
+| DUP-06 | 2 | AllRoles / AddUser / EditUser (PARTIAL) |
 | DUP-07 | 5 | Finished/reuse/view/duplicate plan state hooks (PARTIAL) |
-| DUP-08 | 30 | PointsList.tsx / PointsListEdit.tsx (PARTIAL) |
+| DUP-08 | 13 | PointsList.tsx / PointsListEdit.tsx (PARTIAL) |
 
 ## Suggested next work
 
 1. **WP-07** — Sigrid remark (parallel, small)
 2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep (254 findings)
-3. **STEP-02 — Voorbereiding complexity (MAINT-03) (188 findings)** — after STEP-01 deploy + re-export
+3. **STEP-02 — Voorbereiding complexity (MAINT-03) (189 findings)** — after STEP-01 deploy + re-export
 
 ## Files
 
@@ -109,4 +110,4 @@ Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintaina
 | `plan-01-cleared-security-reliability.csv` | FIXED sec/reliability (archive) |
 | `plan-03-duplication-mapping.csv` | All duplication findings |
 | `plan-04-false-positives-remarks.csv` | Remark text for WP-07 |
-| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages (1081 RAW) |
+| [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages (1078 RAW) |

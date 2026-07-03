@@ -27,10 +27,10 @@ Every `&&`, `||`, `??`, `?.`, ternary, `if`, `case`, `catch`, `for` adds 1.
 > Reference implementations (post-fix): `backend/src/helpers/finished-plans/createFinishedPlanDb.ts`, `points/createPointFromImportDb.ts`, `routes/auth/authKeycloak/buildMeResponse.ts`, `services/arcgisTokenConfig.ts`.
 
 ## Reality check on effort
-- **~1,058** maint+arch findings remaining (export 5).
-- Rough expectation: **2.9 → 3.5** likely needs **300–500** findings cleared; **2.2 → 3.0** architecture needs structural change (B2), not unit edits.
-- **Export 4 → 5:** −33 maint/arch RAW, stars unchanged — confirms small batches are too slow.
-- Therefore: **each execution step must clear ≥100 findings** (see `MAINT-ARCH-PLAN.md` STEP-01…08), using pattern sweeps not file-by-file heroics.
+- **~1,078** maint+arch findings remaining (export 7 plan-mapped).
+- **Export 6 → 7:** Maint **3.1 → 3.2** (+0.1), Arch **+0.1**, maint+arch RAW **−3**, HIGH **−6**, dup **−18** — both stars moved with contained extraction cost (+4 unit size only).
+- **Export 5 → 6:** +28 net RAW but HIGH −49 moved Maint **2.9 → 3.1** — severity matters more than raw count.
+- STEPS 01–08 are **complete**. Next: target **73 remaining HIGH** + DUP-02/07/08 tail in pattern sweeps (≥50 findings per batch).
 
 ---
 

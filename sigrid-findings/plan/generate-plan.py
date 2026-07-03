@@ -8,11 +8,11 @@ FINDINGS = os.path.join(ROOT, "sigrid-findings")
 # Latest Sigrid export folder (override with SIGRID_EXPORT_DIR env var)
 EXPORT_DIR = os.environ.get(
     "SIGRID_EXPORT_DIR",
-    os.path.join(FINDINGS, "exported-findings-6"),
+    os.path.join(FINDINGS, "exported-findings-7"),
 )
 PREV_EXPORT_DIR = os.environ.get(
     "SIGRID_PREV_EXPORT_DIR",
-    os.path.join(FINDINGS, "exported-findings-5"),
+    os.path.join(FINDINGS, "exported-findings-6"),
 )
 
 # Each execution step must clear at least this many RAW findings (maint + arch + dup).
@@ -960,9 +960,11 @@ def build_maint_arch_markdown(
     export_label: str,
     today: str,
     maint_raw: int,
-    prev_export_label: str = "exported-findings-5",
+    prev_export_label: str = "exported-findings-6",
     prev_maint_raw: int | None = None,
     maint08_slices: dict[str, int] | None = None,
+    dashboard_maint_delta: str = "+0.1",
+    dashboard_arch_delta: str = "+0.1",
 ) -> str:
     raw_by_wp = raw_count_by_wp(mapping)
     cat_by_wp: dict[str, dict[str, int]] = {}
@@ -981,22 +983,25 @@ def build_maint_arch_markdown(
         delta_line = (
             f"\n**Delta vs `{prev_export_label}`:** {delta:+d} maint+arch RAW "
             f"({prev_maint_raw} → {maint_raw}). "
-            f"Dashboard: Maintainability **2.9 → 3.1** (+0.2) despite net RAW increase — "
-            f"see [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md).\n"
+            f"Dashboard: Maintainability **3.1 → 3.2** ({dashboard_maint_delta}), "
+            f"Architecture **~2.2 → 2.3** ({dashboard_arch_delta}) — "
+            f"see [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md).\n"
         )
         star_line = (
-            "\n## Progress (STEPS 01–06 deployed)\n\n"
-            "| Step | Status | E5→E6 outcome |\n"
+            "\n## Progress (STEPS 01–08 deployed — E7 confirmed)\n\n"
+            "| Step | Status | E6→E7 outcome |\n"
             "|------|--------|---------------|\n"
-            "| STEP-01 | ✅ Done | WizardButtonBar + A1 interfacing; interfacing −8 |\n"
-            "| STEP-02 | ✅ Done | SelectFromSource / ImportVluchtPlan / GeometriesList / DrawingTool |\n"
-            "| STEP-03 | ✅ Done | Backend routes/services A2 extractions |\n"
-            "| STEP-04 | ✅ Done | api-hooks factory; component independence −19 |\n"
-            "| STEP-05 | ✅ Done | EditPointCoordinates, generatePdfReport, Timeslider splits |\n"
-            "| STEP-06 | ✅ Done | Map hooks + popUpModal + regio hook options |\n"
-            "| **STEP-07** | **Next** | Tools, Bottom lists, misc Common UI |\n\n"
-            "**Key metric:** HIGH severity maint+arch **128 → 79** (−49). "
-            "Extraction trade-off: +51 unit size from new helper files — avoid unnecessary splits.\n"
+            "| STEP-01 | ✅ Done | WizardButtonBar + A1 interfacing |\n"
+            "| STEP-02 | ✅ Done | Voorbereiding complexity sweeps |\n"
+            "| STEP-03 | ✅ Done | Backend routes/services |\n"
+            "| STEP-04 | ✅ Done | api-hooks factory |\n"
+            "| STEP-05 | ✅ Done | Nabewerking + Timeslider |\n"
+            "| STEP-06 | ✅ Done | Map hooks + popUpModal |\n"
+            "| STEP-07 | ✅ Done | Tools, Bottom lists, table exports; dup −18 |\n"
+            "| STEP-08 | ✅ Done | ArcGIS, admin, MapComp; complexity −11 |\n\n"
+            "**E6→E7:** HIGH **79 → 73** (−6) · maint+arch RAW **−3** · duplication **209 → 191** (−18). "
+            "Extraction cost contained: unit size **+4** only.\n\n"
+            "> **Next phase:** target remaining **73 HIGH** units + DUP-02/07 — see analysis doc.\n"
         )
 
     md = f"""# Maintainability & Architecture Plan
@@ -1005,7 +1010,7 @@ def build_maint_arch_markdown(
 
 **{maint_raw} RAW** maintainability + architecture findings in `{export_label}`.{delta_line}
 {star_line}
-> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md) · [ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)
 
 ## Finding counts (code only)
 
@@ -1023,9 +1028,9 @@ def build_maint_arch_markdown(
 
 **Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
 
-> **Note:** Step RAW counts are **scopes at `{export_label}`**. STEPS 01–06 are deployed; continue from **STEP-07**.
+> **Note:** Step RAW counts are **scopes at `{export_label}`**. STEPS 01–08 are **complete** (E7 confirmed). Next work: remaining HIGH units + duplication tail.
 
-| Step | Name | Open RAW (E6) | Size | Primary tactic |
+| Step | Name | Open RAW (E7) | Size | Primary tactic |
 |------|------|--------------:|:----:|----------------|
 """
     for s in execution_steps:
@@ -1097,7 +1102,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
 1. **One step = ≥{MIN_STEP_FINDINGS} findings cleared** — not one file, not one MAINT package slice.
 2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
 3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
-4. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update folder names).
+4. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update folder names).
 
 ## Files
 
@@ -1234,8 +1239,8 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | Maintainability RAW | {maint_raw} |
 | Duplication RAW | {dup_raw_total} |
 
-**Dashboard (export 6):** Security 4.3 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.1** (+0.2) · Architecture **2.19** (−0.03)
-_(export 5 → 6: maint+arch plan-mapped **1052 → {maint_arch_raw}** (+{maint_arch_raw - (prev_maint_raw or maint_arch_raw)}); CSV **1058 → 1086** (+28 net); HIGH **128 → 79** — star moved. See [ANALYSIS-export-5-to-6.md](./Maintainability-Architecture/ANALYSIS-export-5-to-6.md).)_
+**Dashboard (export 7):** Security 4.1 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.2** (+0.1) · Architecture **2.3** (+0.1)
+_(export 6 → 7: maint+arch plan-mapped **{prev_maint_raw or maint_arch_raw} → {maint_arch_raw}** ({maint_arch_raw - (prev_maint_raw or maint_arch_raw):+d}); CSV **1086 → 1083** (−3); HIGH **79 → 73**; dup **209 → 191** — both stars moved. See [ANALYSIS-export-6-to-7.md](./Maintainability-Architecture/ANALYSIS-export-6-to-7.md).)_
 
 ## Completed (no open code security/reliability RAW)
 
@@ -1255,7 +1260,7 @@ _(export 5 → 6: maint+arch plan-mapped **1052 → {maint_arch_raw}** (+{maint_
 ## Principles
 
 1. **Each execution step clears ≥{MIN_STEP_FINDINGS} findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…{n_exec_steps:02d}.
-2. **Re-export Sigrid after each step** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-5-vs-6.py` (update export folder names).
+2. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update export folder names).
 3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
 4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
 
@@ -1405,18 +1410,19 @@ with open(os.path.join(MAINT_ARCH, "MAINT-ARCH-PLAN.md"), "w", encoding="utf-8")
 
 maint_arch_readme = f"""# Maintainability & Architecture
 
-**{maint_arch_raw} RAW** · **{n_exec_steps} execution steps** (each ≥{MIN_STEP_FINDINGS} findings) — see **`maint-arch-EXECUTION-STEPS.csv`**
+**{maint_arch_raw} RAW** · **{n_exec_steps} execution steps** (STEPS 01–08 complete) — see **`maint-arch-EXECUTION-STEPS.csv`**
 
 ## Read these first
-1. **[ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)** — E5→E6: star **2.9 → 3.1**, HIGH −49, net RAW +28
-2. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + ≥100 finding steps
-3. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5 baseline
+1. **[ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md)** — E6→E7: Maint **3.1 → 3.2**, Arch **+0.1**, HIGH −6, dup −18
+2. **[ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)** — E5→E6: star **2.9 → 3.1**, HIGH −49
+3. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + pattern sweeps
+4. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5 baseline
 
 ## Work breakdown
-4. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — **STEP-01…{n_exec_steps:02d}** (primary execution order)
-5. **`maint-arch-EXECUTION-STEPS.csv`** — step scope and open RAW counts
-6. **`maint-arch-MASTER-action-items.csv`** — HIGH severity units inside the current step
-7. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
+5. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — **STEP-01…{n_exec_steps:02d}** (all complete; use for scope reference)
+6. **`maint-arch-EXECUTION-STEPS.csv`** — step scope and open RAW counts
+7. **`maint-arch-MASTER-action-items.csv`** — HIGH severity units for next phase
+8. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
 
 > `ANALYSIS-*.md` and `STRATEGY.md` are hand-maintained. CSVs and `MAINT-ARCH-PLAN.md` are regenerated.
 
