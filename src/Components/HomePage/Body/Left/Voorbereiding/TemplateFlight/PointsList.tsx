@@ -39,7 +39,7 @@ export default function PointsList({
       .filter((g) => g.attributes?.label === "hovered-point")
       .forEach((g) => mapView.graphics.remove(g));
 
-    createPin(point, mapView, "hovered-point");
+    createPin({ point: point, mapView: mapView, label: "hovered-point" });
   }
 
   function handleRemoveHoverePoint() {

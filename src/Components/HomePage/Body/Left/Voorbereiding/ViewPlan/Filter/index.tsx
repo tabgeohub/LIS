@@ -67,14 +67,14 @@ export default function Filter({ plans }: { plans: FlightPlanType[] }) {
           onClick={() => {
             setOpenFilter(false);
 
-            filterPlans(
+            filterPlans({
               setFilteredPlans,
               plans,
               filterText,
               dateFrom,
               dateTo,
-              periodFilter
-            );
+              periodFilter,
+            });
           }}
           className="gray-button"
         >

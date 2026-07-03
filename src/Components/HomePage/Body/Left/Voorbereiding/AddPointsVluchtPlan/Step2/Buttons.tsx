@@ -1,81 +1,39 @@
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
-import { useContent } from "hooks/useContent";
-import useLogAction from "hooks/useLogAction";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {
   const { resetFeatures } = useResetFeatures();
-  const logAction = useLogAction();
-
   const { setOpenFilter, clear, setStep } = useAddPointStates();
   const handleCancel = useHandleCancel();
-
-  function handleNext() {
-    setStep(3);
-  }
-
-  const content = useContent();
+  const { withLog, labels } = useWizardButtons("Second step");
 
   return (
-    <div className="flex justify-end gap-x-1 text-[12px]">
-      <button
-        onClick={() => {
-          setStep(1);
-
-          logAction({
-            message: "User clicked 'Previous' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}
-      </button>
-
-      <button
-        onClick={() => {
-          setOpenFilter(true);
-          logAction({
-            message: "User clicked 'Filter' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.filteren}
-      </button>
-
-      <button
-        onClick={() => {
-          handleNext();
-
-          logAction({
-            message: "User clicked 'Next' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.volgende}
-      </button>
-
-      <button
-        onClick={() => {
-          resetFeatures();
-
-          handleCancel();
-          clear();
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.annuleren}
-      </button>
-    </div>
+    <WizardButtonBar
+      className="flex justify-end gap-x-1 text-[12px]"
+      buttons={[
+        {
+          label: labels.vorige,
+          onClick: withLog("User clicked 'Previous' button", () => setStep(1)),
+        },
+        {
+          label: labels.filteren,
+          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+        },
+        {
+          label: labels.volgende,
+          onClick: withLog("User clicked 'Next' button", () => setStep(3)),
+        },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", () =>
+            runWizardCleanup([resetFeatures, handleCancel, clear])
+          ),
+        },
+      ]}
+    />
   );
 }

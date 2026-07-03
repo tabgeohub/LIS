@@ -33,9 +33,12 @@ export function useWizardButtons(step: string) {
     withLog,
     labels: {
       vorige: content.common.vorige,
+      volgende: content.common.volgende,
       opslaan: content.common.opslaan,
       annuleren: content.common.annuleren,
       filteren: content.common.filteren,
+      update: content.common.update,
+      toevoegen: content.common.toevoegen,
     },
     content,
   };

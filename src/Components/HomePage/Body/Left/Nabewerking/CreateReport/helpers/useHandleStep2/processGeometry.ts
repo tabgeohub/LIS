@@ -122,14 +122,14 @@ export async function processGeometry(
     }
   }
 
-  const pdfData = await generatePdfReport(
-    geometryData,
+  const pdfData = await generatePdfReport({
+    pointData: geometryData,
     overviewImage,
     detailImage,
     pilootOptions,
     attachments,
-    logoDataUrl || undefined
-  );
+    preloadedLogoDataUrl: logoDataUrl || undefined,
+  });
   const arrayBuffer = await pdfData.arrayBuffer();
 
   return {

@@ -49,12 +49,8 @@ export default function NextBtn() {
 
       if (!longitude || !latitude) return;
 
-      const transformed = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
+      const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+       });
 
       setXCoord(transformed.x);
       setYCoord(transformed.y);

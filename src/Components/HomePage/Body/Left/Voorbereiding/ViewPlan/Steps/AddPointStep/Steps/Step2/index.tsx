@@ -41,12 +41,8 @@ export default function Step2({
     let drawLat = latitude;
 
     if (coordinateSystem === "RD") {
-      const { x: lonWgs84, y: latWgs84 } = getTransformedCoordinates(
-        "RD",
-        "WGS84",
-        xCoord,
-        yCoord
-      );
+      const { x: lonWgs84, y: latWgs84 } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xCoord, y: yCoord
+       });
 
       setLongitude(lonWgs84);
       setLatitude(latWgs84);
@@ -54,12 +50,8 @@ export default function Step2({
       drawLon = lonWgs84;
       drawLat = latWgs84;
     } else if (coordinateSystem === "WGS84") {
-      const { x: rdX, y: rdY } = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
+      const { x: rdX, y: rdY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+       });
 
       setXCoord(rdX);
       setYCoord(rdY);

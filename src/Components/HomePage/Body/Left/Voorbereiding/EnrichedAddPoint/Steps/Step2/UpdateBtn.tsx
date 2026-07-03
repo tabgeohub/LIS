@@ -28,22 +28,14 @@ export default function UpdateBtn() {
   function handleUpdate() {
     if (redGraphicsLayer) {
       if (coordinateSystem === "RD") {
-        const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          xCoord,
-          yCoord
-        );
+        const { x: transformedX, y: transformedY } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xCoord, y: yCoord
+         });
 
         setLongitude(transformedX);
         setLatitude(transformedY);
       } else if (coordinateSystem === "WGS84") {
-        const { x: transformedX, y: transformedY } = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          longitude,
-          latitude
-        );
+        const { x: transformedX, y: transformedY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+         });
 
         setXCoord(transformedX);
         setYCoord(transformedY);

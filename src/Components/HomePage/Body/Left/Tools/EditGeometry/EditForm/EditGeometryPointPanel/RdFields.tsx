@@ -25,12 +25,8 @@ export default function RdFields({
               const yNum = parseFinite(form.ycoordinaat_rd);
 
               if (xNum != null && yNum != null) {
-                const { x: lon, y: lat } = getTransformedCoordinates(
-                  "RD",
-                  "WGS84",
-                  xNum,
-                  yNum
-                );
+                const { x: lon, y: lat } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xNum, y: yNum
+                 });
                 patch({
                   xcoordinaat_rd: nextX,
                   longitude: toStr(lon),
@@ -56,12 +52,8 @@ export default function RdFields({
               const yNum = parseFinite(nextY);
 
               if (xNum != null && yNum != null) {
-                const { x: lon, y: lat } = getTransformedCoordinates(
-                  "RD",
-                  "WGS84",
-                  xNum,
-                  yNum
-                );
+                const { x: lon, y: lat } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xNum, y: yNum
+                 });
                 patch({
                   ycoordinaat_rd: nextY,
                   longitude: toStr(lon),

@@ -31,17 +31,26 @@ function fitToBox(
   return { w: imgW * ratio, h: imgH * ratio };
 }
 
+export type GeneratePdfReportInput = {
+  pointData: PDFPointDataType;
+  overviewImage: ImageData;
+  detailImage: ImageData;
+  pilootOptions: { label: string; value: string }[];
+  attachments?: { name: string; blob: Blob; taken_at?: number }[];
+  preloadedLogoDataUrl?: string;
+};
+
 export async function generatePdfReport(
-  pointData: PDFPointDataType,
-  overviewImage: ImageData,
-  detailImage: ImageData,
-  pilootOptions: {
-    label: string;
-    value: string;
-  }[],
-  attachments?: { name: string; blob: Blob; taken_at?: number }[],
-  preloadedLogoDataUrl?: string
+  input: GeneratePdfReportInput
 ): Promise<Blob> {
+  const {
+    pointData,
+    overviewImage,
+    detailImage,
+    pilootOptions,
+    attachments,
+    preloadedLogoDataUrl,
+  } = input;
   const doc = new jsPDF();
 
   doc.setFillColor(255, 255, 255);

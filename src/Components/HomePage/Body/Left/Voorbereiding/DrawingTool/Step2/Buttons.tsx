@@ -94,12 +94,8 @@ export default function Buttons() {
         }
 
         // Transform WGS84 to RD coordinates
-        const rdCoords = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          longitude,
-          latitude
-        );
+        const rdCoords = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+         });
 
         pointsArray.push({
           omschrijving: `${omschrijving}_point_${pointOrder}`,

@@ -16,7 +16,7 @@ export default function usePointHover() {
       .filter((graphic) => graphic.attributes?.label === "hovered-point")
       .forEach((graphic) => mapView.graphics.remove(graphic));
 
-    createPin(point, mapView!, "hovered-point");
+    createPin({ point: point, mapView: mapView!, label: "hovered-point" });
     setHovered({
       id: point.id,
       label: point.omschrijving ?? `Punt ${point.id}`,

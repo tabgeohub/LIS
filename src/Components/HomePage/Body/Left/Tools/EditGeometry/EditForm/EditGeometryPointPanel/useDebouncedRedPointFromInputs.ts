@@ -35,7 +35,7 @@ export default function useDebouncedRedPointFromInputs({
         const x = parseFinite(form.xcoordinaat_rd);
         const y = parseFinite(form.ycoordinaat_rd);
         if (x != null && y != null) {
-          const transformed = getTransformedCoordinates("RD", "WGS84", x, y);
+          const transformed = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: x, y: y });
           if (Number.isFinite(transformed.x) && Number.isFinite(transformed.y)) {
             targetLon = transformed.x;
             targetLat = transformed.y;

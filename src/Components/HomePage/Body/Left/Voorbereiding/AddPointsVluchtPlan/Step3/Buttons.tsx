@@ -1,15 +1,14 @@
 import { useUpdateData } from "utils/useUpdateData";
-import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import { useAddPointStates } from "hooks/zustand/useAddPointStates";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 
 export default function Buttons() {
   const { resetFeatures } = useResetFeatures();
-  const logAction = useLogAction();
-
   const {
     selectedPoints,
     setFilteredPoints,
@@ -23,8 +22,8 @@ export default function Buttons() {
   } = useAddPointStates();
 
   const handleCancel = useHandleCancel();
-
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans/points`);
+  const { logStep, withLog, labels } = useWizardButtons("Third step");
 
   function handleSubmit() {
     update(
@@ -44,78 +43,32 @@ export default function Buttons() {
         clear();
       }
     );
+    logStep("User clicked 'Save' button");
   }
-
-  const content = useContent();
 
   return (
     <>
-      <div className="flex justify-end gap-x-1 text-[12px]">
-        <button
-          onClick={() => {
-            setStep(2);
-
-            logAction({
-              message: "User clicked 'Next' button",
-              step: "Third step",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.vorige}
-        </button>
-
-        <button
-          onClick={() => {
-            setOpenFilter(true);
-
-            logAction({
-              message: "User clicked 'Filter' button",
-              step: "Third step",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.filteren}
-        </button>
-
-        <button
-          onClick={() => {
-            handleSubmit();
-
-            logAction({
-              message: "User clicked 'Save' button",
-              step: "Third step",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.toevoegen}
-        </button>
-
-        <button
-          onClick={() => {
-            resetFeatures();
-
-            handleCancel();
-            clear();
-
-            logAction({
-              message: "User clicked 'Cancel' button",
-              step: "Third step",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.annuleren}
-        </button>
-      </div>
-
-      {loading && (
-        <div className="absolute inset-0 bg-gray-100 opacity-50 z-10 flex justify-center items-center">
-          <LoadingBars />
-        </div>
-      )}
+      <WizardButtonBar
+        className="flex justify-end gap-x-1 text-[12px]"
+        buttons={[
+          {
+            label: labels.vorige,
+            onClick: withLog("User clicked 'Next' button", () => setStep(2)),
+          },
+          {
+            label: labels.filteren,
+            onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+          },
+          { label: labels.toevoegen, onClick: handleSubmit },
+          {
+            label: labels.annuleren,
+            onClick: withLog("User clicked 'Cancel' button", () =>
+              runWizardCleanup([resetFeatures, handleCancel, clear])
+            ),
+          },
+        ]}
+      />
+      <WizardLoadingOverlay show={loading} />
     </>
   );
 }

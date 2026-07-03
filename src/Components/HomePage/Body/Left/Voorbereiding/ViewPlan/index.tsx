@@ -78,7 +78,7 @@ export default function ViewPlan({
     if (!initialPlans.length && !flightPlans.length) return;
 
     setFilteredPlans(
-      filterPlans(initialPlans, filterInput, dateVan, dateTot)
+      filterPlans({ initialPlans, filterInput, dateVan, dateTot })
     );
   }, [dateVan, dateTot, filterInput, initialPlans, flightPlans.length, setFilteredPlans]);
 

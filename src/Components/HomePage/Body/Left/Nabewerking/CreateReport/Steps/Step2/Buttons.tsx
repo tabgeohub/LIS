@@ -35,15 +35,15 @@ export default function Step2Buttons() {
         clear,
     } = useCreateReportState();
 
-    const handleStep2 = useHandleStep2(
-        selectedPlan!,
-        selectedPoints!,
-        selectedGeometries!,
+    const handleStep2 = useHandleStep2({
+        selectedPlan: selectedPlan!,
+        selectedPoints: selectedPoints!,
+        selectedGeometries: selectedGeometries!,
         setZipFile,
         setZippingStatus,
         activities,
-        organizations
-    );
+        organizations,
+    });
 
     const content = useContent();
 

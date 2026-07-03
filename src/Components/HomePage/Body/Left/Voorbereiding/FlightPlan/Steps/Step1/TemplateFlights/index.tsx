@@ -10,6 +10,7 @@ import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";
 import Fase3 from "./Fase3";
 import toast from "react-hot-toast";
+import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
 import { Geometry } from "hooks/features/useGeometriesStore";
 
 export interface FlightPlanTemplate {
@@ -85,24 +86,25 @@ export default function TemplateFlight({
     // Remove duplicates
     const uniquePointIds = Array.from(new Set(allPointIds));
 
-    const attributes = {
-      vluchtnummer,
-      omschrijving,
-      waarnemer,
-      piloot,
-      datum,
-      vliegduur: geplandeVliegduur,
-      luchtvaartuig: typeLuchtvaartuig,
-      passagiers: aantalPassagiers,
-      hoofdthema: doelEnHoofdthema,
-      aanvullende: aanvullendeInfo,
+    const attributes = buildFlightPlanCreateAttributes({
+      fields: {
+        vluchtnummer,
+        omschrijving,
+        waarnemer,
+        piloot,
+        datum,
+        geplandeVliegduur,
+        typeLuchtvaartuig,
+        aantalPassagiers,
+        doelEnHoofdthema,
+        aanvullendeInfo,
+      },
       points: uniquePointIds,
       basemap: basemapString,
       layers: selectedLayers.join(","),
-      user_id: user?.user_id,
-      status: "pre-prepared",
-      regio_id: user.role,
-    };
+      userId: user?.user_id,
+      regioId: user.role,
+    });
 
     create(attributes, () => {
       setTimeout(() => {

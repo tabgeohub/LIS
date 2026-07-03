@@ -55,7 +55,7 @@ export default function RemoveFlightPlan() {
   useEffect(() => {
     if (!plans) return;
 
-    filterPlans(setFilteredPlans, plans, filterTerm);
+    filterPlans({ setFilteredPlans, plans, filterText: filterTerm });
   }, [filterTerm]);
 
   useEffect(() => {

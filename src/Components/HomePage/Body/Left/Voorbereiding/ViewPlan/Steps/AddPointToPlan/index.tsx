@@ -109,7 +109,7 @@ export default function AddPointToPlan() {
     // Add pins for newly selected
     dbPoints.forEach((pt) => {
       if (!currentIds.has(pt.id) || pinRefs.current.has(pt.id)) return;
-      const res = createPin(pt as any, mapView as any, pt.omschrijving);
+      const res = createPin({ point: pt as any, mapView: mapView as any, label: pt.omschrijving });
       pinRefs.current.set(pt.id, res);
     });
   }, [selectedPointIds, mapView, dbPoints]);

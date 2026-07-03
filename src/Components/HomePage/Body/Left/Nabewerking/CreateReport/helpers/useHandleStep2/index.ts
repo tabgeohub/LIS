@@ -16,15 +16,26 @@ import type {
 } from "./types";
 import { ATTACHMENTS_FEATURE_LAYER_URL } from "@helpers/arcgis/deleteArcgisAttachment";
 
-export function useHandleStep2(
-  selectedPlan: FinishedFlightPlanType,
-  selectedPoints: number[],
-  selectedGeometries: number[],
-  setZipFile: (zipFile: Blob) => void,
-  setZippingStatus: (status: string) => void,
-  activities: any,
-  organizations: any
-) {
+export type UseHandleStep2Input = {
+  selectedPlan: FinishedFlightPlanType;
+  selectedPoints: number[];
+  selectedGeometries: number[];
+  setZipFile: (zipFile: Blob) => void;
+  setZippingStatus: (status: string) => void;
+  activities: any;
+  organizations: any;
+};
+
+export function useHandleStep2(input: UseHandleStep2Input) {
+  const {
+    selectedPlan,
+    selectedPoints,
+    selectedGeometries,
+    setZipFile,
+    setZippingStatus,
+    activities,
+    organizations,
+  } = input;
   const { graphicsLayer, mapView } = useMapViewState();
   const pilootOptions = useGetPiloot();
   const { selectedBasemap } = useSelectedBasemapState();

@@ -31,14 +31,14 @@ export default function ChangeFlightPlanStatus() {
   useEffect(() => {
     if (!preparedFlightPlans) return;
 
-    filterPlans(
+    filterPlans({
       setFilteredPlans,
-      preparedFlightPlans,
-      filterTerm,
+      plans: preparedFlightPlans,
+      filterText: filterTerm,
       dateFrom,
       dateTo,
-      periode
-    );
+      periodFilter: periode,
+    });
   }, [preparedFlightPlans, filterTerm, periode]);
 
   return (

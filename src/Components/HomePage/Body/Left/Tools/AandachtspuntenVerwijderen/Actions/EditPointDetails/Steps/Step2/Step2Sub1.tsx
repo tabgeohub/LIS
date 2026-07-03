@@ -77,12 +77,8 @@ export default function Step2Sub1({
               mapView.graphics.remove(graphicToUpdate);
             }
 
-            const transformed = getTransformedCoordinates(
-              "WGS84",
-              "RD",
-              event.mapPoint.longitude,
-              event.mapPoint.latitude
-            );
+            const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: event.mapPoint.longitude, y: event.mapPoint.latitude
+             });
 
             setXCoordinaat_rd(transformed.x);
             setYCoordinaat_rd(transformed.y);
@@ -96,12 +92,8 @@ export default function Step2Sub1({
 
             redGraphicsLayer.add(newPointGraphic);
           } else {
-            const transformed = getTransformedCoordinates(
-              "WGS84",
-              "RD",
-              event.mapPoint.longitude,
-              event.mapPoint.latitude
-            );
+            const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: event.mapPoint.longitude, y: event.mapPoint.latitude
+             });
 
             setXCoordinaat_rd(transformed.x);
             setYCoordinaat_rd(transformed.y);

@@ -59,15 +59,15 @@ export default function AddPointStep() {
           y: event.mapPoint.latitude,
         });
 
-        createNewPointEvent(
+        createNewPointEvent({
           event,
           redGraphicsLayer,
           setXCoord,
           setYCoord,
           setLatitude,
           setLongitude,
-          setCurrentPoint
-        );
+          setCurrentPoint,
+        });
         if (addPointStep === 1) {
           setAddPointStep(3);
         }

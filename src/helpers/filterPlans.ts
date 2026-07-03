@@ -1,11 +1,14 @@
 import { FlightPlanType } from "Types";
 
-export function filterPlans(
-  initialPlans: FlightPlanType[],
-  filterInput: string,
-  dateVan: string,
-  dateTot: string
-) {
+export type FilterPlansByDateInput = {
+  initialPlans: FlightPlanType[];
+  filterInput: string;
+  dateVan: string;
+  dateTot: string;
+};
+
+export function filterPlans(input: FilterPlansByDateInput) {
+  const { initialPlans, filterInput, dateVan, dateTot } = input;
   const lowerCaseFilterInput = filterInput.toLowerCase();
   const filtered = initialPlans.filter((plan) => {
     const withinDateRange =

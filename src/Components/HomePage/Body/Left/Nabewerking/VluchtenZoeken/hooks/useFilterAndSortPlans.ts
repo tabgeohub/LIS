@@ -26,14 +26,14 @@ export function useFilterAndSortPlans(
       a.datum > b.datum ? -1 : 1
     );
 
-    filterPlans(
+    filterPlans({
       setFilteredPlans,
-      sortedPlansByCreatedAt,
-      filterTerm,
+      plans: sortedPlansByCreatedAt,
+      filterText: filterTerm,
       dateFrom,
       dateTo,
-      periode
-    );
+      periodFilter: periode,
+    });
   }, [plans, filterTerm, dateFrom, dateTo, periode]);
 }
 

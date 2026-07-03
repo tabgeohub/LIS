@@ -3,13 +3,18 @@ export type PlanWithDatumAndVluchtnummer = {
   vluchtnummer: string;
 };
 
+export type FilterPlansByPeriodInput<T extends PlanWithDatumAndVluchtnummer> = {
+  plans: T[];
+  filterText?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  periodFilter?: string;
+};
+
 export function filterPlansByPeriod<T extends PlanWithDatumAndVluchtnummer>(
-  plans: T[],
-  filterText?: string,
-  dateFrom?: string,
-  dateTo?: string,
-  periodFilter?: string
+  input: FilterPlansByPeriodInput<T>
 ): T[] {
+  const { plans, filterText, dateFrom, dateTo, periodFilter } = input;
   const now = new Date();
 
   if (periodFilter === "Alle" || periodFilter === "alle") {

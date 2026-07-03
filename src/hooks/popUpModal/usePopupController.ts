@@ -52,15 +52,15 @@ export default function usePopupController(
       return;
     }
 
-    const cleanup = setupClickListener(
+    const cleanup = setupClickListener({
       mapView,
       setClickedPointId,
       setClickedPoint,
       selectedPointGraphicsLayer,
       createNewPoint,
       pointsGraphicsLayer,
-      () => blockedTabs.has(selectedTabRef.current) // Pass function to check if tab is blocked
-    );
+      isTabBlocked: () => blockedTabs.has(selectedTabRef.current),
+    });
 
     return () => {
       cleanup?.();

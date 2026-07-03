@@ -91,14 +91,14 @@ export default function PeriodFilterPanel({
         <button
           onClick={() => {
             setOpenFilter(false);
-            filterPlans(
+            filterPlans({
               setFilteredPlans,
-              filteredPlans,
-              filterTerm,
+              plans: filteredPlans,
+              filterText: filterTerm,
               dateFrom,
               dateTo,
-              periode
-            );
+              periodFilter: periode,
+            });
           }}
           className="gray-button"
         >

@@ -5,11 +5,14 @@ import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { FinishedPointType } from "Types/finished_plans";
 
-export function createPin(
-  point: EnrichedPointType | FinishedPointType,
-  mapView: __esri.MapView,
-  label?: string
-) {
+export type CreatePinInput = {
+  point: EnrichedPointType | FinishedPointType;
+  mapView: __esri.MapView;
+  label?: string;
+};
+
+export function createPin(input: CreatePinInput) {
+  const { point, mapView, label } = input;
   const { longitude, latitude } = point;
 
   const geometry = new Point({

@@ -10,24 +10,7 @@ import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
-import type Graphic from "@arcgis/core/Graphic";
-import type MapView from "@arcgis/core/views/MapView";
-
-function clearTemplateSelectionGraphics(
-  mapView: MapView | null,
-  selectedGraphics: Graphic[],
-  setSelectedGraphics: (graphics: Graphic[]) => void,
-  hoveredGraphic: Graphic | null,
-  setHoveredGraphic: (graphic: Graphic | null) => void
-) {
-  selectedGraphics.forEach((graphic) => mapView?.graphics.remove(graphic));
-  setSelectedGraphics([]);
-
-  if (hoveredGraphic) {
-    mapView?.graphics.remove(hoveredGraphic);
-    setHoveredGraphic(null);
-  }
-}
+import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
 
 export default function Buttons({
   setOpenFilter,
@@ -60,13 +43,13 @@ export default function Buttons({
   const { dbGeometries } = useGeometriesStore();
 
   const clearSelectionGraphics = () =>
-    clearTemplateSelectionGraphics(
+    clearMapSelectionGraphics({
       mapView,
       selectedGraphics,
       setSelectedGraphics,
       hoveredGraphic,
-      setHoveredGraphic
-    );
+      setHoveredGraphic,
+    });
 
   const handleSubmit = () => {
     const safeSelectedGeometries = Array.isArray(selectedGeometries)

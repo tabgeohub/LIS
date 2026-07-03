@@ -28,7 +28,7 @@ export function useRenderPoints(
       selectedPlan.points_data
         .filter((point) => selectedPoints.includes(point.id))
         .forEach((point) => {
-          createPin(point, mapView);
+          createPin({ point: point, mapView: mapView });
         });
     }
 

@@ -70,12 +70,8 @@ export default function Step2Sub1({
           mapView.map.reorder(redGraphicsLayer, mapView.map.layers.length - 1);
         }
 
-        const transformed = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          event.mapPoint.longitude,
-          event.mapPoint.latitude
-        );
+        const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: event.mapPoint.longitude, y: event.mapPoint.latitude
+         });
 
         setValues({
           ...values,

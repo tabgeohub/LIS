@@ -2,9 +2,10 @@ import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons({
   setOpenFilter,
@@ -23,94 +24,68 @@ export default function Buttons({
     setSelectedGeometries,
   } = useTemplateFlightState();
 
-  const logAction = useLogAction();
-
-  const { mapView, yellowGraphicsLayer, geometriesGraphicsLayer, clearGraphics } = useMapViewState();
+  const { mapView, yellowGraphicsLayer, clearGraphics } = useMapViewState();
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
   const { resetFeatures } = useResetFeatures();
+  const { withLog, labels } = useWizardButtons("Second step");
 
-  const content = useContent();
+  const removeGraphics = () => {
+    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
+    setSelectedGraphics([]);
+
+    if (hoveredGraphic) {
+      mapView?.graphics.remove(hoveredGraphic);
+      setHoveredGraphic(null);
+    }
+  };
 
   const handleNext = () => {
     setStep(step + 1);
     resetFilters();
-
-    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
-    setSelectedGraphics([]);
-
-    logAction({
-      message: "User clicked 'Next' button",
-      step: "Second step",
-    });
-
-    if (hoveredGraphic) {
-      mapView?.graphics.remove(hoveredGraphic);
-      setHoveredGraphic(null);
-    }
-
+    removeGraphics();
     yellowGraphicsLayer?.graphics.removeAll();
   };
 
-  const handlePrevious = () => {
-    setStep(1);
-    resetFilters();
-    setSelectedPoints([]);
-    setSelectedGeometries([]);
+  const handlePrevious = () =>
+    runWizardCleanup([
+      () => setStep(1),
+      resetFilters,
+      () => setSelectedPoints([]),
+      () => setSelectedGeometries([]),
+      resetFeatures,
+      clearGraphics,
+      removeGraphics,
+    ]);
 
-    // Reset features back to initial DB state
-    resetFeatures();
-
-    clearGraphics();
-
-    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
-    setSelectedGraphics([]);
-
-    if (hoveredGraphic) {
-      mapView?.graphics.remove(hoveredGraphic);
-      setHoveredGraphic(null);
-    }
-  };
-
-  const handleCancelClick = () => {
-    // Reset features back to initial DB state
-    resetFeatures();
-
-    clear();
-    setSelectedGeometries([]);
-    handleCancel();
-    resetFilters();
-    clearGraphics();
-
-    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
-    setSelectedGraphics([]);
-
-    if (hoveredGraphic) {
-      mapView?.graphics.remove(hoveredGraphic);
-      setHoveredGraphic(null);
-    }
-  };
+  const handleCancelClick = () =>
+    runWizardCleanup([
+      resetFeatures,
+      clear,
+      () => setSelectedGeometries([]),
+      handleCancel,
+      resetFilters,
+      clearGraphics,
+      removeGraphics,
+    ]);
 
   return (
-    <>
-      <button onClick={handlePrevious} className="gray-button">
-        {content.common.vorige}
-      </button>
-
-      <button onClick={() => setOpenFilter(true)} className="gray-button">
-        {content.common.filteren}
-      </button>
-
-      <button onClick={handleNext} className="gray-button">
-        {content.common.volgende}
-      </button>
-
-      <button
-        onClick={handleCancelClick}
-        className="gray-button"
-      >
-        {content.common.annuleren}
-      </button>
-    </>
+    <WizardButtonBar
+      buttons={[
+        {
+          label: labels.vorige,
+          onClick: withLog("User clicked 'Previous' button", handlePrevious),
+        },
+        {
+          label: labels.filteren,
+          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+        },
+        { label: labels.volgende, onClick: withLog("User clicked 'Next' button", handleNext) },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", handleCancelClick),
+        },
+      ]}
+    />
   );
 }

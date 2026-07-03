@@ -84,15 +84,15 @@ export default function EnrichedAddPoint() {
 
         setMapClickedNotify(mapClickedNotify + 1);
 
-        createNewPointEvent(
+        createNewPointEvent({
           event,
           redGraphicsLayer,
           setXCoord,
           setYCoord,
           setLatitude,
           setLongitude,
-          setCurrentPoint
-        );
+          setCurrentPoint,
+        });
 
         logAction({
           message: "User clicked on map to add point",

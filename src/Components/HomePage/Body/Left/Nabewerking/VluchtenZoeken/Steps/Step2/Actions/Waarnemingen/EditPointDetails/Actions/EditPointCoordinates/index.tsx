@@ -79,24 +79,16 @@ export default function EditPointCoordinates({
     if (coordinateSystem === "RD") {
       // Convert RD to WGS84 for display
       if (xcoordinaat_rd && ycoordinaat_rd) {
-        const transformed = getTransformedCoordinates(
-          "RD",
-          "WGS84",
-          xcoordinaat_rd,
-          ycoordinaat_rd
-        );
+        const transformed = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xcoordinaat_rd, y: ycoordinaat_rd
+         });
         setLongitude(transformed.x);
         setLatitude(transformed.y);
       }
     } else if (coordinateSystem === "WGS84") {
       // Convert WGS84 to RD for display
       if (longitude && latitude) {
-        const transformed = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          longitude,
-          latitude
-        );
+        const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+         });
         setXCoordinaat_rd(transformed.x);
         setYCoordinaat_rd(transformed.y);
       }
@@ -123,21 +115,13 @@ export default function EditPointCoordinates({
         setLongitude(clickedLon);
         setLatitude(clickedLat);
 
-        const transformed = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          clickedLon,
-          clickedLat
-        );
+        const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: clickedLon, y: clickedLat
+         });
         setXCoordinaat_rd(transformed.x);
         setYCoordinaat_rd(transformed.y);
       } else {
-        const transformed = getTransformedCoordinates(
-          "WGS84",
-          "RD",
-          clickedLon,
-          clickedLat
-        );
+        const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: clickedLon, y: clickedLat
+         });
         setXCoordinaat_rd(transformed.x);
         setYCoordinaat_rd(transformed.y);
 
@@ -249,22 +233,14 @@ export default function EditPointCoordinates({
 
     if (coordinateSystem === "RD") {
       // Convert RD to WGS84
-      const transformed = getTransformedCoordinates(
-        "RD",
-        "WGS84",
-        xcoordinaat_rd,
-        ycoordinaat_rd
-      );
+      const transformed = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xcoordinaat_rd, y: ycoordinaat_rd
+       });
       finalLongitude = transformed.x;
       finalLatitude = transformed.y;
     } else if (coordinateSystem === "WGS84") {
       // Convert WGS84 to RD
-      const transformed = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
+      const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+       });
       finalXCoord = transformed.x;
       finalYCoord = transformed.y;
     }

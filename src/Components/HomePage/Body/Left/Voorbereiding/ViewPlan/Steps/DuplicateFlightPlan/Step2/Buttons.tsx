@@ -5,6 +5,7 @@ import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -38,24 +39,25 @@ export default function Buttons({
   const { labels } = useWizardButtons("View plan - Duplicate Step 2");
 
   const submitStep2 = () => {
-    const attributes = {
-      vluchtnummer,
-      omschrijving,
-      waarnemer,
-      piloot,
-      datum,
-      vliegduur: geplandeVliegduur,
-      luchtvaartuig: typeLuchtvaartuig,
-      passagiers: aantalPassagiers,
-      hoofdthema: doelEnHoofdthema,
-      aanvullende: aanvullendeInfo,
-      points: duplicatedFlightPlan?.points.flatMap((point) => point.id),
-      regio_id: user.role,
+    const attributes = buildFlightPlanCreateAttributes({
+      fields: {
+        vluchtnummer,
+        omschrijving,
+        waarnemer,
+        piloot,
+        datum,
+        geplandeVliegduur,
+        typeLuchtvaartuig,
+        aantalPassagiers,
+        doelEnHoofdthema,
+        aanvullendeInfo,
+      },
+      points: duplicatedFlightPlan?.points.flatMap((point) => point.id) ?? [],
       basemap: selectedBasemap,
       layers: selectedLayers.join(","),
-      user_id: user?.user_id,
-      status: "pre-prepared",
-    };
+      userId: user?.user_id,
+      regioId: user.role,
+    });
 
     create(attributes, () => {
       refetch();

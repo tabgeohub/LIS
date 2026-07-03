@@ -109,14 +109,14 @@ export async function processPoint(
     }
   }
 
-  const pdfData = await generatePdfReport(
+  const pdfData = await generatePdfReport({
     pointData,
     overviewImage,
     detailImage,
     pilootOptions,
     attachments,
-    logoDataUrl || undefined
-  );
+    preloadedLogoDataUrl: logoDataUrl || undefined,
+  });
   const arrayBuffer = await pdfData.arrayBuffer();
 
   return {

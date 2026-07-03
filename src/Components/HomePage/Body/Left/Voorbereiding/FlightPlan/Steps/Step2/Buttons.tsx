@@ -2,18 +2,18 @@ import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
-import useLogAction from "hooks/useLogAction";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons({
   setOpenFilter,
 }: {
   setOpenFilter: (value: boolean) => void;
 }) {
-  const logAction = useLogAction();
-
   const { resetFeatures } = useResetFeatures();
-
+  const { withLog, labels } = useWizardButtons("Second step");
   const {
     step,
     setStep,
@@ -25,7 +25,8 @@ export default function Buttons({
     clear,
   } = useFlightPlanState();
 
-  const { mapView, yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } = useMapViewState();
+  const { mapView, yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } =
+    useMapViewState();
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
 
@@ -41,51 +42,35 @@ export default function Buttons({
       setHoveredGraphic(null);
     }
 
-    logAction({
-      message: "User clicked 'Next' button",
-      step: "Second step",
-    });
-
     yellowGraphicsLayer?.graphics.removeAll();
     yellowGeometriesGraphicsLayer?.graphics.removeAll();
   };
 
-  const handleBack = () => {
-    setStep(2);
-    resetFilters();
-    setSelectedPoints([]);
-
-    resetFeatures();
-
-    clearGraphics();
-  };
+  const handleBack = () =>
+    runWizardCleanup([
+      () => setStep(2),
+      resetFilters,
+      () => setSelectedPoints([]),
+      resetFeatures,
+      clearGraphics,
+    ]);
 
   return (
-    <>
-      <button onClick={handleBack} className="gray-button">
-        Vorige
-      </button>
-
-      <button onClick={() => setOpenFilter(true)} className="gray-button">
-        Filteren
-      </button>
-
-      <button onClick={handleNext} className="gray-button">
-        Volgende
-      </button>
-
-      <button
-        onClick={() => {
-          resetFeatures();
-
-          clear();
-          handleCancel();
-          resetFilters();
-        }}
-        className="gray-button"
-      >
-        Annuleren
-      </button>
-    </>
+    <WizardButtonBar
+      buttons={[
+        { label: labels.vorige, onClick: withLog("User clicked 'Back' button", handleBack) },
+        {
+          label: labels.filteren,
+          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+        },
+        { label: labels.volgende, onClick: withLog("User clicked 'Next' button", handleNext) },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", () =>
+            runWizardCleanup([resetFeatures, clear, handleCancel, resetFilters])
+          ),
+        },
+      ]}
+    />
   );
 }

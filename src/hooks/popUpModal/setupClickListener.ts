@@ -1,15 +1,27 @@
 import { initialPointState } from "@helpers/ZustandStates/popUpState";
 import { EnrichedPointType } from "Types";
 
-export const setupClickListener = (
-  mapView: __esri.MapView,
-  setClickedPointId: (value: number) => void,
-  setClickedPoint: (value: EnrichedPointType) => void,
-  selectedPointGraphicsLayer: __esri.GraphicsLayer,
-  createNewPoint: boolean,
-  pointsGraphicsLayer?: __esri.GraphicsLayer | null,
-  isTabBlocked?: () => boolean
-) => {
+export type SetupClickListenerInput = {
+  mapView: __esri.MapView;
+  setClickedPointId: (value: number) => void;
+  setClickedPoint: (value: EnrichedPointType) => void;
+  selectedPointGraphicsLayer: __esri.GraphicsLayer;
+  createNewPoint: boolean;
+  pointsGraphicsLayer?: __esri.GraphicsLayer | null;
+  isTabBlocked?: () => boolean;
+};
+
+export const setupClickListener = (input: SetupClickListenerInput) => {
+  const {
+    mapView,
+    setClickedPointId,
+    setClickedPoint,
+    selectedPointGraphicsLayer,
+    createNewPoint,
+    pointsGraphicsLayer,
+    isTabBlocked,
+  } = input;
+
   if (!mapView) {
     return;
   }

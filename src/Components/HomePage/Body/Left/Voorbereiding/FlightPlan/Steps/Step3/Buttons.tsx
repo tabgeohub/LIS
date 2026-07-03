@@ -8,6 +8,7 @@ import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import toast from "react-hot-toast";
+import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -83,24 +84,25 @@ export default function Buttons({
     ];
     const uniquePointIds = Array.from(new Set(allPointIds));
 
-    const attributes = {
-      vluchtnummer,
-      omschrijving,
-      waarnemer,
-      piloot,
-      datum,
-      vliegduur: geplandeVliegduur,
-      luchtvaartuig: typeLuchtvaartuig,
-      passagiers: aantalPassagiers,
-      hoofdthema: doelEnHoofdthema,
-      aanvullende: aanvullendeInfo,
+    const attributes = buildFlightPlanCreateAttributes({
+      fields: {
+        vluchtnummer,
+        omschrijving,
+        waarnemer,
+        piloot,
+        datum,
+        geplandeVliegduur,
+        typeLuchtvaartuig,
+        aantalPassagiers,
+        doelEnHoofdthema,
+        aanvullendeInfo,
+      },
       points: uniquePointIds,
-      regio_id: user?.role,
       basemap: basemapString,
       layers: selectedLayers.join(","),
-      user_id: user?.user_id,
-      status: "pre-prepared",
-    };
+      userId: user?.user_id,
+      regioId: user?.role ?? "",
+    });
 
     logStep("User clicked 'Save' button to save flight plan data", {
       ...attributes,

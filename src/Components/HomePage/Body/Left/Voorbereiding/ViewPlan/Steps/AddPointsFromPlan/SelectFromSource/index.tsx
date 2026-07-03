@@ -237,7 +237,7 @@ export default function SelectFromSource({ source }: { source: Source }) {
           longitude: coords.longitude,
           latitude: coords.latitude,
         };
-        const res = createPin(fakePoint, mapView, fullPoint.omschrijving);
+        const res = createPin({ point: fakePoint, mapView: mapView, label: fullPoint.omschrijving });
         pinRefs.current.set(fullPoint.id, res);
       }
     });

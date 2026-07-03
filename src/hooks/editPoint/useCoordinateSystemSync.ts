@@ -28,19 +28,15 @@ export function useCoordinateSystemSync({
   useEffect(() => {
     if (coordinateSystem === "RD") {
       const { x: transformedLongitude, y: transformedLatitude } =
-        getTransformedCoordinates("RD", "WGS84", rdX, rdY);
+        getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: rdX, y: rdY });
 
       patchCoords({
         longitude: transformedLongitude,
         latitude: transformedLatitude,
       });
     } else if (coordinateSystem === "WGS84") {
-      const { x: transformedRdX, y: transformedRdY } = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        longitude,
-        latitude
-      );
+      const { x: transformedRdX, y: transformedRdY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
+       });
 
       patchCoords({
         rdX: transformedRdX,

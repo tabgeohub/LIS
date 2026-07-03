@@ -67,12 +67,8 @@ export function getPointCoordinates(
     typeof point.xcoordinaat_rd === "number" &&
     typeof point.ycoordinaat_rd === "number"
   ) {
-    const wgs = getTransformedCoordinates(
-      "RD",
-      "WGS84",
-      point.xcoordinaat_rd,
-      point.ycoordinaat_rd
-    );
+    const wgs = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: point.xcoordinaat_rd, y: point.ycoordinaat_rd
+     });
     longitude = wgs.x;
     latitude = wgs.y;
   }

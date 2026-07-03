@@ -27,14 +27,14 @@ export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
       a.datum > b.datum ? -1 : 1
     );
 
-    filterPlans(
+    filterPlans({
       setFilteredPlans,
-      sortedPlansByCreatedAt,
-      filterTerm,
+      plans: sortedPlansByCreatedAt,
+      filterText: filterTerm,
       dateFrom,
       dateTo,
-      periode
-    );
+      periodFilter: periode,
+    });
   }, [plans, filterTerm, periode]);
 
   const content = useContent();

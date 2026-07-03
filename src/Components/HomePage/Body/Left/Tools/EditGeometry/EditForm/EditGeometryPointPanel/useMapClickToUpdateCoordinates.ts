@@ -30,12 +30,8 @@ export default function useMapClickToUpdateCoordinates({
         return;
       }
 
-      const transformed = getTransformedCoordinates(
-        "WGS84",
-        "RD",
-        lonVal,
-        latVal
-      );
+      const transformed = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: lonVal, y: latVal
+       });
 
       const pointGraphic = createPoint(lonVal, latVal);
       redGraphicsLayer?.removeAll();

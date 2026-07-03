@@ -29,12 +29,8 @@ export default function Wgs84Fields({
               const latNum = parseFinite(nextLatitude);
 
               if (lonNum != null && latNum != null) {
-                const { x, y } = getTransformedCoordinates(
-                  "WGS84",
-                  "RD",
-                  lonNum,
-                  latNum
-                );
+                const { x, y } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: lonNum, y: latNum
+                 });
                 patch({
                   latitude: nextLatitude,
                   xcoordinaat_rd: toStr(x),
@@ -62,12 +58,8 @@ export default function Wgs84Fields({
               const latNum = parseFinite(form.latitude);
 
               if (lonNum != null && latNum != null) {
-                const { x, y } = getTransformedCoordinates(
-                  "WGS84",
-                  "RD",
-                  lonNum,
-                  latNum
-                );
+                const { x, y } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: lonNum, y: latNum
+                 });
                 patch({
                   longitude: nextLongitude,
                   xcoordinaat_rd: toStr(x),
