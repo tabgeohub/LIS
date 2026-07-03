@@ -17,3 +17,13 @@ export function useSearchedPoints(search: string) {
     enabled: debouncedSearch.length > 0,
   });
 }
+
+export function useDuplicateOmschrijvingCount(omschrijving: string) {
+  const debounced = useDebouncedValue(omschrijving, POINT_DEBOUNCE_MS);
+
+  return useQuery({
+    queryKey: pointKeys.duplicateOmschrijving(debounced),
+    queryFn: () => fetchApi<number>(`/points/duplicatePoints/${debounced}`),
+    enabled: debounced.length > 0,
+  });
+}

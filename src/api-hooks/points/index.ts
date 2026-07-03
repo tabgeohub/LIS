@@ -1,2 +1,1 @@
-export { useSearchedPoints } from "./useSearchedPoints";
-export { useDuplicateOmschrijvingCount } from "./useDuplicateOmschrijvingCount";
+export { useSearchedPoints, useDuplicateOmschrijvingCount } from "./usePointQuery";

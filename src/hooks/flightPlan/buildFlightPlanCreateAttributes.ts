@@ -30,6 +30,7 @@ export function buildFlightPlanCreateAttributes(
   } = input;
 
   return {
+    vluchtnummer: fields.vluchtnummer,
     ...buildFlightPlanPayloadFields(fields),
     points,
     basemap,

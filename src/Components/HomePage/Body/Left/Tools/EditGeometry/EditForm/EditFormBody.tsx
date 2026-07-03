@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import type { GeometryEditDraft } from "./helpers/types";
 import {
@@ -5,8 +6,6 @@ import {
   selectOptionsWithFallback,
 } from "./helpers/labels";
 import EditFormHeader from "./EditFormHeader";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 
 export default function EditFormBody({
   geometry,

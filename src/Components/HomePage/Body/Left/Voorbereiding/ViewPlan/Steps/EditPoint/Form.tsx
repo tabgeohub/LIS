@@ -1,11 +1,10 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 
 export default function Form({
   omschrijving,

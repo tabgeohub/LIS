@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import useGeometryListMapActions from "hooks/hover-click-handlers/useGeometryListMapActions";
@@ -8,8 +9,6 @@ import { IoClose } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { TbPolygon, TbLine } from "react-icons/tb";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 
 const allColumnsGeometries = [
   "omschrijving",

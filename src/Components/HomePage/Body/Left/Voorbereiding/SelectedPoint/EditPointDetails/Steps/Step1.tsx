@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { Field, useFormikContext } from "formik";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -10,8 +11,6 @@ import { useUpdateData } from "utils/useUpdateData";
 import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 
 export default function Step1({

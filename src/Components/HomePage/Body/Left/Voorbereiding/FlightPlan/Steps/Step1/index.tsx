@@ -1,12 +1,10 @@
+import { useGetPiloot, useGetWaarnemers, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
 import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
 import Vluchtnummer from "./Vluchtnummer";
 import Buttons from "./Buttons";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import useGetPiloot from "hooks/consts/useGetPiloot";
-import useGetWaarnemers from "hooks/consts/useGetWaarnemers";
-import useGetLuchtvaartuig from "hooks/consts/useGetLuchtvaartuig";
 import { useContent } from "hooks/useContent";
 
 export default function Step1() {

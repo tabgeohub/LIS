@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties, useGetRegios } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import TabHeader from "../TabHeader";
 import PeriodeComp from "./PeriodeComp";
@@ -5,9 +6,6 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useFilterState } from "@helpers/ZustandStates/filterState";
 import { FilterInput } from "./FilterInput";
 import FilterSelect from "./FilterSelect";
-import useGetRegios from "hooks/consts/useGetRegios";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useContent } from "hooks/useContent";
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";

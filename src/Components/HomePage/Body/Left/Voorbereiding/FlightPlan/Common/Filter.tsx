@@ -1,3 +1,4 @@
+import { useGetActiviteiten } from "hooks/consts/useConstSelectOptions";
 import {
   PeriodType,
   usePointsFilterStore,
@@ -7,7 +8,6 @@ import { useFilterPoints } from "hooks/filters/useFilterPoints";
 import { useFilterGeometries } from "hooks/filters/useFilterGeometries";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import SelectComp from "../../../Common/FormComponents/SelectComp";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 import { useContent } from "hooks/useContent";
 
 export default function Filter({

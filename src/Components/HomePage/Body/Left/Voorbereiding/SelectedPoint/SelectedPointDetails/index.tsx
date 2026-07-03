@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import {
   initialPointState,
   usePopUpState,
@@ -6,8 +7,6 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { CgClose } from "react-icons/cg";
 import useLogAction from "hooks/useLogAction";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useContent } from "hooks/useContent";
 
 export default function SelectedPointDetails() {

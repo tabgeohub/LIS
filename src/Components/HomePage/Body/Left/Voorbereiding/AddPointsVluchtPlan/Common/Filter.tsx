@@ -1,3 +1,4 @@
+import { useGetActiviteiten } from "hooks/consts/useConstSelectOptions";
 import {
   PeriodType,
   usePointsFilterStore,
@@ -5,7 +6,6 @@ import {
 import { EnrichedPointType } from "Types";
 import { useFilterPoints } from "hooks/filters/useFilterPoints";
 import SelectComp from "../../../Common/FormComponents/SelectComp";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
 
 export default function Filter({
   setOpenFilter,

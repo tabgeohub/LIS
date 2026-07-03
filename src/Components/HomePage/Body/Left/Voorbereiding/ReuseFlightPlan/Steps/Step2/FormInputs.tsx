@@ -1,3 +1,4 @@
+import { useGetPiloot, useGetWaarnemers, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
@@ -5,9 +6,6 @@ import Vluchtnummer from "./Vluchtnummer";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import useGetPiloot from "hooks/consts/useGetPiloot";
-import useGetWaarnemers from "hooks/consts/useGetWaarnemers";
-import useGetLuchtvaartuig from "hooks/consts/useGetLuchtvaartuig";
 
 export default function FormInputs() {
   const pilootOptions = useGetPiloot();

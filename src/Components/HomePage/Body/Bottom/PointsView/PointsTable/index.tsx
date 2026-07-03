@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { EnrichedPointType } from "Types";
@@ -8,8 +9,6 @@ import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 
 import { POINT_CORE_DISPLAY_COLUMNS } from "@helpers/points/pointColumnKeys";

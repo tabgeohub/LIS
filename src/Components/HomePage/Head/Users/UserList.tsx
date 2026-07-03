@@ -1,10 +1,10 @@
+import { useGetRegios } from "hooks/consts/useConstSelectOptions";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import LogoutModal from "./LogoutModal";
 import { useLocation } from "react-router-dom";
 import useLogAction from "hooks/useLogAction";
-import useGetRegios from "hooks/consts/useGetRegios";
 
 export default function UserList({
   isOpen,

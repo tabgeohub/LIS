@@ -1,10 +1,9 @@
+import { useGetPiloot, useGetLuchtvaartuig } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
-import useGetLuchtvaartuig from "hooks/consts/useGetLuchtvaartuig";
-import useGetPiloot from "hooks/consts/useGetPiloot";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
 import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";

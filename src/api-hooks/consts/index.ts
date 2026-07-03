@@ -1,6 +1,11 @@
-export { useRegiosQuery } from "./useRegiosQuery";
-export { usePilotenQuery } from "./usePilotenQuery";
-export { useWaarnemersQuery } from "./useWaarnemersQuery";
-export { useOrganisatiesQuery } from "./useOrganisatiesQuery";
-export { useActiviteitenQuery } from "./useActiviteitenQuery";
-export { useLuchtvaartuigQuery } from "./useLuchtvaartuigQuery";
+export {
+  useLookupQuery,
+  useActiviteitenQuery,
+  useRegiosQuery,
+  usePilotenQuery,
+  useWaarnemersQuery,
+  useOrganisatiesQuery,
+  useLuchtvaartuigQuery,
+} from "./useLookupQuery";
+export type { LookupResource } from "./useLookupQuery";
+export type { IdActiviteit, IdNaam, Regio } from "./types";

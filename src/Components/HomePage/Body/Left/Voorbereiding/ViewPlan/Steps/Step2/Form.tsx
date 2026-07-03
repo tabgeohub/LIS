@@ -1,9 +1,8 @@
+import { useGetPiloot, useGetWaarnemers } from "hooks/consts/useConstSelectOptions";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import useGetPiloot from "hooks/consts/useGetPiloot";
-import useGetWaarnemers from "hooks/consts/useGetWaarnemers";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 

@@ -1,3 +1,4 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleStep2 } from "../../helpers/useHandleStep2";
@@ -5,8 +6,6 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 import { useContent } from "hooks/useContent";
 
 export default function Step2Buttons() {

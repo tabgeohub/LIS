@@ -1,9 +1,8 @@
+import { useGetActiviteiten, useGetOrganisaties } from "hooks/consts/useConstSelectOptions";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { EnrichedPointType } from "Types";
 import { FinishedPointType } from "Types/finished_plans";
 import { IoMdImage } from "react-icons/io";
-import useGetActiviteiten from "hooks/consts/useGetActiviteis";
-import useGetOrganisaties from "hooks/consts/useGetOrganisaties";
 
 type PointType = EnrichedPointType | FinishedPointType;
 
