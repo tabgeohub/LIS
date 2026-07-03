@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
@@ -9,28 +9,20 @@ import { useContent } from "hooks/useContent";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import PlansList from "./PlansList";
 import PointsList from "./PointsList";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useUpdateData } from "utils/useUpdateData";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import {
   buildPlanPointIdSet,
   filterPointsNotInPlan,
   mapSourceToItems,
   SelectFromSourceItem,
 } from "./helpers/mapSourceItems";
-import {
-  buildSubmitSelectedPointsResult,
-  findHoverableGraphic,
-  PinRefMap,
-  removeAllPins,
-  removeBlueGraphics,
-  syncPinsForSelection,
-} from "./helpers/selectFromSourceGraphics";
+import { buildSubmitSelectedPointsResult } from "./helpers/selectFromSourceGraphics";
+import { useSelectFromSourceMapEffects } from "./useSelectFromSourceMapEffects";
 
 type Source = "flightPlans" | "templates";
 
@@ -50,8 +42,10 @@ export default function SelectFromSource({ source }: { source: Source }) {
     enabled: source === "templates",
   });
 
-  const data = source === "flightPlans" ? flightPlansData ?? EMPTY_FLIGHT_PLANS : templateData;
-  const dataLoading = source === "flightPlans" ? flightPlansPending : templatePending;
+  const data =
+    source === "flightPlans" ? flightPlansData ?? EMPTY_FLIGHT_PLANS : templateData;
+  const dataLoading =
+    source === "flightPlans" ? flightPlansPending : templatePending;
 
   const items = useMemo(() => mapSourceToItems(source, data), [data, source]);
   const planPointIds = useMemo(
@@ -72,98 +66,12 @@ export default function SelectFromSource({ source }: { source: Source }) {
     );
   }, [selectedItem, planPointIds]);
 
-  const { pointsGraphicsLayer, mapView } = useMapViewState();
-  const pinRefs = useRef<PinRefMap>(new Map());
-  const blueGraphicsRef = useRef<__esri.Graphic[]>([]);
-
-  useEffect(() => {
-    return () => {
-      try {
-        pointsGraphicsLayer?.removeAll();
-      } catch {
-        /* ignore */
-      }
-      blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
-      removeAllPins(mapView, pinRefs.current);
-      useHoveredGraphicState.getState().setHovered(null);
-    };
-  }, [mapView, pointsGraphicsLayer]);
-
-  useEffect(() => {
-    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
-    pointsGraphicsLayer?.removeAll();
-    removeAllPins(mapView, pinRefs.current);
-  }, [selectedItem, mapView, pointsGraphicsLayer]);
-
-  useEffect(() => {
-    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
-    pointsGraphicsLayer?.removeAll();
-    if (!selectedItem) return;
-
-    const uncommonPoints = filterPointsNotInPlan(selectedItem.points, planPointIds);
-    const graphics = createPointGraphics(uncommonPoints, {
-      symbolOptions: {
-        color: "blue",
-        size: 10,
-        style: "circle",
-        outlineColor: "white",
-        outlineWidth: 1,
-      },
-      transformCoordinates: true,
-    });
-
-    if (!graphics.length) return;
-
-    if (pointsGraphicsLayer) {
-      pointsGraphicsLayer.addMany(graphics as __esri.Graphic[]);
-      return;
-    }
-
-    if (mapView) {
-      mapView.graphics.addMany(graphics as __esri.Graphic[]);
-      blueGraphicsRef.current = graphics;
-    }
-  }, [selectedItem, planPointIds, pointsGraphicsLayer, mapView]);
-
-  useEffect(() => {
-    if (!mapView || !selectedItem) return;
-    syncPinsForSelection({
-      mapView,
-      selectedPointIds,
-      itemPoints: selectedItem.points,
-      dbPoints,
-      pinRefs: pinRefs.current,
-    });
-  }, [selectedPointIds, selectedItem, mapView, dbPoints]);
-
-  useEffect(() => {
-    if (!mapView || !selectedItem) return;
-
-    const handle = mapView.on("pointer-move", async (event) => {
-      const hit = await mapView.hitTest(event);
-      const graphic = findHoverableGraphic({
-        hitResults: hit.results,
-        pinRefs: pinRefs.current,
-        pointsGraphicsLayer,
-      });
-
-      const { setHovered } = useHoveredGraphicState.getState();
-      if (!graphic) {
-        setHovered(null);
-        return;
-      }
-
-      setHovered({
-        id: graphic.attributes.id,
-        label: graphic.attributes.label || graphic.attributes.omschrijving || "",
-      });
-    });
-
-    return () => {
-      handle.remove();
-      useHoveredGraphicState.getState().setHovered(null);
-    };
-  }, [mapView, selectedItem, pointsGraphicsLayer]);
+  useSelectFromSourceMapEffects({
+    selectedItem,
+    selectedPointIds,
+    planPointIds,
+    dbPoints,
+  });
 
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans/points`);
 

@@ -5,11 +5,14 @@ import {
 } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { calculateGeometryCentroid } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { generatePdfReport } from "../generatePdfReport";
-import { PDFPointDataType } from "Types";
-import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
-import { getStaticMapImage } from "./mapImage";
-import { safeFetchPointAttachments } from "./attachments";
+import { FinishedPointType } from "Types/finished_plans";
 import { ProcessGeometryParams, ProcessedItem } from "./types";
+import {
+  buildPdfPointData,
+  fetchOverviewDetailImages,
+  resolveReportAttachments,
+  toSafeReportName,
+} from "./reportPdfCommon";
 
 export async function processGeometry(
   params: ProcessGeometryParams
@@ -38,89 +41,43 @@ export async function processGeometry(
     }'`
   );
 
-  // Get first point for data (attachments, comment, etc.)
   const firstPoint = geometry.points?.[0];
-  if (!firstPoint) {
-    throw new Error("Geometry has no points");
-  }
+  if (!firstPoint) throw new Error("Geometry has no points");
 
-  // Calculate centroid for map image centering
   const centroid = calculateGeometryCentroid(geometry as BaseGeometryData);
-  if (!centroid) {
-    throw new Error("Could not calculate geometry centroid");
-  }
+  if (!centroid) throw new Error("Could not calculate geometry centroid");
 
   const geometryGraphic = createGeometryGraphic(geometry as BaseGeometryData, {
     symbolOptions: GEOMETRY_REPORT_SYMBOL,
   });
-
   if (geometryGraphic) {
     tempLayer.removeAll();
     tempLayer.add(geometryGraphic);
   }
 
-  // Parallelize map image fetching centered on centroid
-  const [overviewImage, detailImage] = await Promise.all([
-    getStaticMapImage(
-      centroid.longitude,
-      centroid.latitude,
-      10,
-      1600,
-      900,
-      mapServerUrl
-    ),
-    getStaticMapImage(
-      centroid.longitude,
-      centroid.latitude,
-      17,
-      1600,
-      900,
-      mapServerUrl
-    ),
-  ]);
+  const [overviewImage, detailImage] = await fetchOverviewDetailImages({
+    longitude: centroid.longitude,
+    latitude: centroid.latitude,
+    mapServerUrl,
+  });
 
-  // Use first point's data for the report
-  const geometryData: PDFPointDataType = {
-    datum: selectedPlan.datum,
-    piloot: selectedPlan.piloot,
-    waarnemer: selectedPlan.waarnemer,
-    luchtvaartuig: selectedPlan.luchtvaartuig,
-    hoofdthema: selectedPlan.hoofdthema,
-    organisatie:
-      organizations.find((org: any) => org.value === firstPoint.organisatie_id)
-        ?.label || "",
-    activiteit:
-      activities.find((act: any) => act.value === firstPoint.activiteit_id)
-        ?.label || "",
-    regio: firstPoint.regio_id,
+  const geometryData = buildPdfPointData({
+    selectedPlan,
+    point: firstPoint,
+    activities,
+    organizations,
     omschrijving: geometry.geometry_omschrijving || `Geometrie ${geometry.id}`,
     aanvullende: geometry.id,
-    rdX: firstPoint.xcoordinaat_rd,
-    rdY: firstPoint.ycoordinaat_rd,
-    long: centroid.longitude,
-    lat: centroid.latitude,
-  };
+    longitude: centroid.longitude,
+    latitude: centroid.latitude,
+  });
 
-  const safeName = geometryData.omschrijving
-    .replace(/[^\w\s\-]/g, "_")
-    .replace(/\s+/g, "_");
-
-  // Get attachments from preloaded data or fetch if needed
-  let attachments = attachmentsByGeometry.get(geometry.id) || [];
-  if (
-    (!attachments || attachments.length === 0) &&
-    firstPoint.attachments &&
-    firstPoint.attachments.length > 0
-  ) {
-    try {
-      attachments = await safeFetchPointAttachments(
-        featureLayerUrl,
-        firstPoint as FinishedPointType
-      );
-    } catch {
-      attachments = [];
-    }
-  }
+  const safeName = toSafeReportName(geometryData.omschrijving);
+  const attachments = await resolveReportAttachments({
+    cached: attachmentsByGeometry.get(geometry.id),
+    featureLayerUrl,
+    point: firstPoint as FinishedPointType,
+  });
 
   const pdfData = await generatePdfReport({
     pointData: geometryData,
@@ -130,11 +87,10 @@ export async function processGeometry(
     attachments,
     preloadedLogoDataUrl: logoDataUrl || undefined,
   });
-  const arrayBuffer = await pdfData.arrayBuffer();
 
   return {
     filename: `Waarnemingsrapport_Geometry_${safeName}.pdf`,
-    pdfData: arrayBuffer,
+    pdfData: await pdfData.arrayBuffer(),
     attachments,
     pointName: safeName,
   };

@@ -9,11 +9,17 @@ import {
   createPlanListFilterSetters,
   emptyFlightPlanFormFields,
   emptyPlanListFilter,
+  FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,
+  PlanListFilterSetters,
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
 
-interface FinishedPlansState extends FlightPlanFormFieldValues, PlanListFilterValues {
+interface FinishedPlansState
+  extends FlightPlanFormFieldValues,
+    PlanListFilterValues,
+    FlightPlanFormFieldSetters,
+    PlanListFilterSetters {
   step: number;
   setStep: (value: number) => void;
 
@@ -40,18 +46,6 @@ interface FinishedPlansState extends FlightPlanFormFieldValues, PlanListFilterVa
 
   selectedGeometry: FinishedGeometryType | null;
   setSelectedGeometry: (value: FinishedGeometryType | null) => void;
-
-  setOmschrijving: (value: string) => void;
-  setWaarnemer: (value: string) => void;
-  setPiloot: (value: string) => void;
-  setDatum: (value: string) => void;
-  setGeplandeVliegduur: (value: string) => void;
-  setTypeLuchtvaartuig: (value: string) => void;
-  setAantalPassagiers: (value: number | null | undefined) => void;
-  setDoelEnHoofdthema: (value: string) => void;
-  setAanvullendeInfo: (value: string) => void;
-  setOpenFilter: (value: boolean) => void;
-  setFilterTerm: (value: string) => void;
 
   clear: () => void;
 }

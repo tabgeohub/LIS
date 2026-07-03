@@ -12,6 +12,12 @@ import GeometriesList from "../../FlightPlan/Common/GeometriesList";
 import Header from "../Common/Header";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
 import Filter from "../Common/Filter";
+import {
+  filterDisplayedGeometries,
+  filterDisplayedPoints,
+  filterPointsForStepContent,
+  matchesHerhalenValue,
+} from "./stepContentFilters";
 
 interface StepContentProps {
   herhalen: boolean;
@@ -43,73 +49,51 @@ export default function StepContent({
   const [filterTerm, setFilterTerm] = useState("");
   const [selectedGeometries, setSelectedGeometries] = useState<number[]>([]);
   const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
-
   const blueGraphicsRef = useRef<__esri.Graphic[]>([]);
+
+  const selectedPlanPointIds = useMemo(
+    () => selectedPlan?.points?.map((p: { id: number }) => p.id) ?? [],
+    [selectedPlan?.points]
+  );
 
   const displayedPoints = useMemo(
     () =>
-      filteredPoints
-        .filter((point) =>
-          point.omschrijving.toLowerCase().includes(filterTerm.toLowerCase())
-        )
-        .filter(
-          (point) =>
-            !selectedPlan?.points.flatMap((p) => p.id).includes(point.id)
-        ),
-    [filteredPoints, filterTerm, selectedPlan]
+      filterDisplayedPoints({
+        points: filteredPoints,
+        filterTerm,
+        selectedPlanPointIds,
+      }),
+    [filteredPoints, filterTerm, selectedPlanPointIds]
   );
 
   const displayedGeometries = useMemo(
-    () =>
-      filteredGeometries
-        .filter((geometry) =>
-          geometry.omschrijving.toLowerCase().includes(filterTerm.toLowerCase())
-        ),
+    () => filterDisplayedGeometries(filteredGeometries, filterTerm),
     [filteredGeometries, filterTerm]
   );
 
   useEffect(() => {
-    const herhalenValue = herhalen ? 1 : 0;
-
-    setPoints(
-      dbPoints
-        .filter((point) => point.herhalen === herhalenValue)
-        .filter(
-          (point) =>
-            !selectedPlan?.points.flatMap((p) => p.id).includes(point.id)
-        )
-    );
-
-    setFilteredPoints(
-      dbPoints
-        .filter((point) => point.herhalen === herhalenValue)
-        .filter(
-          (point) =>
-            !selectedPlan?.points.flatMap((p) => p.id).includes(point.id)
-        )
-    );
-
-    const filteredGeometries = dbGeometries.filter((geometry) => {
-      const geometryHerhalen =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === herhalenValue
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === String(herhalenValue)
-            : geometry.herhalen === herhalen;
-      return geometryHerhalen;
+    const availablePoints = filterPointsForStepContent({
+      dbPoints,
+      herhalen,
+      selectedPlanPointIds,
     });
+    setPoints(availablePoints);
+    setFilteredPoints(availablePoints);
 
-    setGeometries(filteredGeometries);
-    setFilteredGeometries(filteredGeometries);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const nextGeometries = dbGeometries.filter((geometry) =>
+      matchesHerhalenValue(geometry.herhalen, herhalen)
+    );
+    setGeometries(nextGeometries);
+    setFilteredGeometries(nextGeometries);
   }, []);
 
-  // Draw blue points for filtered list
   useEffect(() => {
     if (mapView && blueGraphicsRef.current.length) {
       try {
         mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch { }
+      } catch {
+        /* ignore */
+      }
       blueGraphicsRef.current = [];
     }
     pointsGraphicsLayer?.removeAll();
@@ -127,34 +111,31 @@ export default function StepContent({
       transformCoordinates: true,
     });
 
-    if (graphics.length) {
-      if (pointsGraphicsLayer) {
-        pointsGraphicsLayer.addMany(graphics as any);
-      } else if (mapView) {
-        mapView.graphics.addMany(graphics as any);
-        blueGraphicsRef.current = graphics;
-      }
+    if (!graphics.length) return;
+
+    if (pointsGraphicsLayer) {
+      pointsGraphicsLayer.addMany(graphics as __esri.Graphic[]);
+    } else if (mapView) {
+      mapView.graphics.addMany(graphics as __esri.Graphic[]);
+      blueGraphicsRef.current = graphics;
     }
   }, [displayedPoints, mapView, pointsGraphicsLayer]);
 
-  // Render geometries on the map
   useRenderLocalGeometries(displayedGeometries);
-
-  // Hover handler for blue points and geometries on map only
   useHoverPointsAndGeometries({ checkMapContainer: true });
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       pointsGraphicsLayer?.removeAll();
       if (mapView && blueGraphicsRef.current.length) {
         try {
           mapView.graphics.removeMany(blueGraphicsRef.current);
-        } catch { }
+        } catch {
+          /* ignore */
+        }
         blueGraphicsRef.current = [];
       }
-      const { setHovered } = useHoveredGraphicState.getState();
-      setHovered(null);
+      useHoveredGraphicState.getState().setHovered(null);
     };
   }, [mapView, pointsGraphicsLayer]);
 
@@ -196,4 +177,3 @@ export default function StepContent({
     </div>
   );
 }
-
