@@ -1,7 +1,4 @@
 import { TbLine, TbPolygon } from "react-icons/tb";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { useEffect } from "react";
@@ -9,8 +6,11 @@ import { motion } from "framer-motion";
 import MapView from "@arcgis/core/views/MapView";
 import { classNames } from "@helpers/classNames";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { CURRENTLY_DRAWING_ATTRIBUTE } from "../helpers/drawingToolMapCleanup";
 import { destroySketchViewModel } from "../helpers/resetSketchSession";
+import {
+  attachSketchCreateHandler,
+  geometryTypeForTool,
+} from "../helpers/drawingToolSketch";
 
 interface OptionsProps {
   selectedTool: "line" | "polygon" | null;
@@ -23,6 +23,22 @@ interface OptionsProps {
   handleClear: () => void;
 }
 
+function ensureGraphicsLayer(
+  mapView: MapView,
+  graphicsLayer: GraphicsLayer | null,
+  setGraphicsLayer: (layer: GraphicsLayer | null) => void
+): GraphicsLayer {
+  if (graphicsLayer) return graphicsLayer;
+
+  const layer = new GraphicsLayer({
+    title: "Tekeninglaag",
+    listMode: "hide",
+  });
+  mapView.map.add(layer);
+  setGraphicsLayer(layer);
+  return layer;
+}
+
 export default function Options({
   selectedTool,
   setSelectedTool,
@@ -31,126 +47,51 @@ export default function Options({
   sketchViewModel,
   setSketchViewModel,
   mapView,
-  handleClear,
 }: OptionsProps) {
-  // Cleanup function
   const cleanup = () => {
     destroySketchViewModel(sketchViewModel, setSketchViewModel, mapView);
   };
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      cleanup();
-      // Note: Don't remove graphics layer on unmount, let it persist
-    };
-  }, [sketchViewModel, mapView]);
+  useEffect(() => cleanup, [sketchViewModel, mapView]);
 
-  // Enables drawing on the map according to the tool selected
+  function startDrawingSession(tool: string) {
+    if (!validateMapView(mapView) || !mapView) return;
+
+    const layer = ensureGraphicsLayer(mapView, graphicsLayer, setGraphicsLayer);
+    const sketch = new SketchViewModel({
+      view: mapView,
+      layer,
+      defaultCreateOptions: { mode: "click" },
+    });
+
+    setSketchViewModel(sketch);
+    if (mapView.container) mapView.container.style.cursor = "crosshair";
+
+    attachSketchCreateHandler(sketch, tool);
+
+    const geometryType = geometryTypeForTool(tool);
+    if (!geometryType) return;
+
+    sketch.create(geometryType);
+    setSelectedTool(tool as "line" | "polygon");
+  }
+
   function handleDrawingTool(tool: string) {
     if (!validateMapView(mapView) || !mapView) return;
 
-    // If same tool clicked, cancel drawing
     if (selectedTool === tool) {
       cleanup();
       setSelectedTool(null);
       return;
     }
 
-    // Cleanup previous drawing session
     cleanup();
-
-    // Get or create graphics layer
-    let currentGraphicsLayer = graphicsLayer;
-    if (!currentGraphicsLayer) {
-      currentGraphicsLayer = new GraphicsLayer({
-        title: "Tekeninglaag",
-        listMode: "hide",
-      });
-      mapView.map.add(currentGraphicsLayer);
-      setGraphicsLayer(currentGraphicsLayer);
-    }
-
-    // Create SketchViewModel
-    const newSketchViewModel = new SketchViewModel({
-      view: mapView,
-      layer: currentGraphicsLayer,
-      defaultCreateOptions: {
-        mode: "click",
-      },
-    });
-
-    setSketchViewModel(newSketchViewModel);
-
-    if (mapView.container) {
-      mapView.container.style.cursor = "crosshair";
-    }
-
-    // Handle geometry creation
-    newSketchViewModel.on("create", (event) => {
-      if (event.state === "complete") {
-        const geometry = event.graphic.geometry;
-
-        // Mark this graphic as "currently-drawing" so we can easily find and delete it later
-        event.graphic.attributes = {
-          ...event.graphic.attributes,
-          [CURRENTLY_DRAWING_ATTRIBUTE]: true,
-        };
-
-        // Apply appropriate symbol based on geometry type
-        let symbol;
-        if (tool === "point") {
-          symbol = new SimpleMarkerSymbol({
-            color: [226, 119, 40],
-            outline: { color: [255, 255, 255], width: 2 },
-            size: 12,
-          });
-        } else if (tool === "line") {
-          symbol = new SimpleLineSymbol({
-            color: [0, 0, 255, 1], // Blue
-            width: 3,
-          });
-        } else if (tool === "polygon") {
-          symbol = new SimpleFillSymbol({
-            color: [0, 0, 0, 0], // Empty inside (fully transparent)
-            outline: { color: [0, 0, 255, 1], width: 2 }, // Blue outline
-          });
-        }
-
-        if (symbol) {
-          event.graphic.symbol = symbol;
-        }
-      }
-    });
-
-    // Start drawing based on tool type
-    let geometryType: "polyline" | "polygon";
-
-    if (tool === "line") {
-      geometryType = "polyline";
-    } else if (tool === "polygon") {
-      geometryType = "polygon";
-    } else {
-      return;
-    }
-
-    // Start drawing
-    newSketchViewModel.create(geometryType);
-
-    setSelectedTool(tool);
+    startDrawingSession(tool);
   }
 
   const tools = [
-    {
-      id: "line",
-      label: "Lijn",
-      icon: TbLine,
-    },
-    {
-      id: "polygon",
-      label: "Veelhoek",
-      icon: TbPolygon,
-    },
+    { id: "line", label: "Lijn", icon: TbLine },
+    { id: "polygon", label: "Veelhoek", icon: TbPolygon },
   ];
 
   return (
@@ -176,7 +117,6 @@ export default function Options({
                 : "bg-white border-gray-200 text-gray-700 hover:border-primary/50 hover:bg-primary/5"
             )}
           >
-            {/* Selected indicator */}
             {isSelected && (
               <motion.div
                 initial={{ scale: 0 }}
@@ -185,14 +125,11 @@ export default function Options({
               />
             )}
 
-            {/* Icon */}
             <div
               className={classNames(
                 "flex items-center justify-center w-8 h-8 rounded-lg",
                 "transition-colors duration-200",
-                isSelected
-                  ? "bg-white/20"
-                  : "bg-gray-100 group-hover:bg-primary/10"
+                isSelected ? "bg-white/20" : "bg-gray-100 group-hover:bg-primary/10"
               )}
             >
               <Icon
@@ -203,7 +140,6 @@ export default function Options({
               />
             </div>
 
-            {/* Label */}
             <span
               className={classNames(
                 "text-xs font-semibold",

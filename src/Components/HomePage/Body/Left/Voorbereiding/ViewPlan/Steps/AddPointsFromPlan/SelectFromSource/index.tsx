@@ -9,101 +9,53 @@ import { useContent } from "hooks/useContent";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import PlansList from "./PlansList";
 import PointsList from "./PointsList";
-import { FlightPlanType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useUpdateData } from "utils/useUpdateData";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import Point from "@arcgis/core/geometry/Point";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import Graphic from "@arcgis/core/Graphic";
+import {
+  buildPlanPointIdSet,
+  filterPointsNotInPlan,
+  mapSourceToItems,
+  SelectFromSourceItem,
+} from "./helpers/mapSourceItems";
+import {
+  buildSubmitSelectedPointsResult,
+  findHoverableGraphic,
+  PinRefMap,
+  removeAllPins,
+  removeBlueGraphics,
+  syncPinsForSelection,
+} from "./helpers/selectFromSourceGraphics";
 
 type Source = "flightPlans" | "templates";
 
-type ItemPoint = {
-  id: number;
-  omschrijving: string;
-  longitude?: number;
-  latitude?: number;
-  xcoordinaat_rd?: number;
-  ycoordinaat_rd?: number;
-};
-type ItemModel = { id: number; title: string; points: ItemPoint[] };
-
-type TemplatePoint = { id: number; omschrijving: string };
-type Template = { id: number; name: string; points: TemplatePoint[] };
-
 export default function SelectFromSource({ source }: { source: Source }) {
   const { user } = useAuth();
-
   const { selectedPlan } = useViewPlanState();
   const { dbPoints } = usePointsStore();
   const { data: flightPlansData, isPending: flightPlansPending } =
     useFlightPlansList(user.role, user.user_id, source === "flightPlans");
-
-  const flightPlans = flightPlansData ?? EMPTY_FLIGHT_PLANS;
-
   const { data: templateData, isPending: templatePending } = useTemplateFlights(
     user.role,
     user.user_id,
     source === "templates"
   );
 
-  const data =
-    source === "flightPlans"
-      ? (flightPlans as FlightPlanType[] | Template[])
-      : templateData;
-  const dataLoading =
-    source === "flightPlans" ? flightPlansPending : templatePending;
+  const data = source === "flightPlans" ? flightPlansData ?? EMPTY_FLIGHT_PLANS : templateData;
+  const dataLoading = source === "flightPlans" ? flightPlansPending : templatePending;
 
-  const items: ItemModel[] = useMemo(() => {
-    if (!data) return [];
-    if (source === "flightPlans") {
-      const list = data as FlightPlanType[];
+  const items = useMemo(() => mapSourceToItems(source, data), [data, source]);
+  const planPointIds = useMemo(
+    () => buildPlanPointIdSet(selectedPlan?.points),
+    [selectedPlan?.points]
+  );
 
-      return list.map((p) => ({
-        id: p.id,
-        title: p.vluchtnummer,
-        points:
-          (p.pointsObjects?.length ? p.pointsObjects : p.points)?.map((pt) => ({
-            id: pt.id,
-            omschrijving: pt.omschrijving,
-            longitude: pt.longitude,
-            latitude: pt.latitude,
-            xcoordinaat_rd: pt.xcoordinaat_rd,
-            ycoordinaat_rd: pt.ycoordinaat_rd,
-          })) || [],
-      }));
-    }
-    const list = data as Template[];
-    return list.map((t) => ({
-      id: t.id,
-      title: t.name,
-      points:
-        (t.points || []).map((pt) => ({
-          id: pt.id,
-          omschrijving: pt.omschrijving,
-          // templates may not include WGS84; RD may be available in some contexts
-          // keep as-is; we'll transform if RD present
-          // @ts-ignore optional fields
-          xcoordinaat_rd: (pt as any).xcoordinaat_rd,
-          // @ts-ignore
-          ycoordinaat_rd: (pt as any).ycoordinaat_rd,
-          // @ts-ignore
-          longitude: (pt as any).longitude,
-          // @ts-ignore
-          latitude: (pt as any).latitude,
-        })) || [],
-    }));
-  }, [data, source]);
-
-  const [selectedItem, setSelectedItem] = useState<ItemModel | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectFromSourceItem | null>(null);
   const [selectedPointIds, setSelectedPointIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -111,83 +63,40 @@ export default function SelectFromSource({ source }: { source: Source }) {
       setSelectedPointIds([]);
       return;
     }
-
-    const uncommonPoints = selectedItem.points.filter(
-      (pt) => !selectedPlan?.points.some((p) => p.id === pt.id)
+    setSelectedPointIds(
+      filterPointsNotInPlan(selectedItem.points, planPointIds).map((p) => p.id)
     );
-
-    setSelectedPointIds(uncommonPoints.map((p) => p.id));
-  }, [selectedItem, selectedPlan?.points]);
+  }, [selectedItem, planPointIds]);
 
   const { pointsGraphicsLayer, mapView } = useMapViewState();
-
-  const pinRefs = useRef<
-    Map<number, { outerGraphic: __esri.Graphic; pinGraphic: __esri.Graphic }>
-  >(new Map());
+  const pinRefs = useRef<PinRefMap>(new Map());
   const blueGraphicsRef = useRef<__esri.Graphic[]>([]);
 
-  // Global cleanup on unmount (e.g., when changing tabs)
   useEffect(() => {
     return () => {
       try {
         pointsGraphicsLayer?.removeAll();
-      } catch { }
-      const blueToRemove = [...blueGraphicsRef.current];
-      if (mapView && blueToRemove.length) {
-        try {
-          mapView.graphics.removeMany(blueToRemove);
-        } catch { }
-        blueGraphicsRef.current = [];
+      } catch {
+        /* ignore */
       }
-      const pinSnapshot = new Map(pinRefs.current);
-      if (mapView && pinSnapshot.size) {
-        try {
-          pinSnapshot.forEach(({ outerGraphic, pinGraphic }) => {
-            mapView.graphics.removeMany([outerGraphic, pinGraphic]);
-          });
-        } catch { }
-        pinRefs.current.clear();
-      }
-      const { setHovered } = useHoveredGraphicState.getState();
-      setHovered(null);
+      blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
+      removeAllPins(mapView, pinRefs.current);
+      useHoveredGraphicState.getState().setHovered(null);
     };
   }, [mapView, pointsGraphicsLayer]);
 
-  // Clear layer and all existing pins when changing selection or going back
   useEffect(() => {
-    // remove previously drawn blue point graphics (from either target)
-    if (mapView && blueGraphicsRef.current.length) {
-      try {
-        mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch { }
-      blueGraphicsRef.current = [];
-    }
+    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
     pointsGraphicsLayer?.removeAll();
-    if (!mapView) return;
-    // remove any existing pins
-    pinRefs.current.forEach(({ outerGraphic, pinGraphic }) => {
-      mapView.graphics.removeMany([outerGraphic, pinGraphic]);
-    });
-    pinRefs.current.clear();
+    removeAllPins(mapView, pinRefs.current);
   }, [selectedItem, mapView, pointsGraphicsLayer]);
 
-  // Draw blue points for current selected item
   useEffect(() => {
-    // clear previous blue points
-    if (mapView && blueGraphicsRef.current.length) {
-      try {
-        mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch { }
-      blueGraphicsRef.current = [];
-    }
+    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
     pointsGraphicsLayer?.removeAll();
-
     if (!selectedItem) return;
 
-    const uncommonPoints = selectedItem.points.filter(
-      (pt) => !selectedPlan?.points.some((p) => p.id === pt.id)
-    );
-
+    const uncommonPoints = filterPointsNotInPlan(selectedItem.points, planPointIds);
     const graphics = createPointGraphics(uncommonPoints, {
       symbolOptions: {
         color: "blue",
@@ -199,85 +108,56 @@ export default function SelectFromSource({ source }: { source: Source }) {
       transformCoordinates: true,
     });
 
-    if (graphics.length) {
-      if (pointsGraphicsLayer) {
-        pointsGraphicsLayer.addMany(graphics as any);
-      } else if (mapView) {
-        mapView.graphics.addMany(graphics as any);
-        blueGraphicsRef.current = graphics;
-      }
-    }
-  }, [selectedItem, pointsGraphicsLayer, mapView]);
+    if (!graphics.length) return;
 
-  // Sync pins with selected checkboxes
+    if (pointsGraphicsLayer) {
+      pointsGraphicsLayer.addMany(graphics as __esri.Graphic[]);
+      return;
+    }
+
+    if (mapView) {
+      mapView.graphics.addMany(graphics as __esri.Graphic[]);
+      blueGraphicsRef.current = graphics;
+    }
+  }, [selectedItem, planPointIds, pointsGraphicsLayer, mapView]);
+
   useEffect(() => {
     if (!mapView || !selectedItem) return;
-
-    const currentIds = new Set(selectedPointIds);
-    // remove pins that are no longer selected
-    pinRefs.current.forEach((value, key) => {
-      if (!currentIds.has(key)) {
-        mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
-        pinRefs.current.delete(key);
-      }
-    });
-
-    // add pins for newly selected - enrich with full point data from dbPoints
-    selectedItem.points.forEach((pt) => {
-      if (!currentIds.has(pt.id) || pinRefs.current.has(pt.id)) return;
-
-      // Get full point data from dbPoints to ensure we have coordinates
-      const fullPoint = dbPoints.find((dbPt) => dbPt.id === pt.id);
-      if (!fullPoint) return;
-
-      const coords = getPointCoordinates(fullPoint);
-      if (coords) {
-        const fakePoint: any = {
-          id: fullPoint.id,
-          longitude: coords.longitude,
-          latitude: coords.latitude,
-        };
-        const res = createPin({ point: fakePoint, mapView: mapView, label: fullPoint.omschrijving });
-        pinRefs.current.set(fullPoint.id, res);
-      }
+    syncPinsForSelection({
+      mapView,
+      selectedPointIds,
+      itemPoints: selectedItem.points,
+      dbPoints,
+      pinRefs: pinRefs.current,
     });
   }, [selectedPointIds, selectedItem, mapView, dbPoints]);
 
-  // Hover listener to show point name (custom popup)
   useEffect(() => {
     if (!mapView || !selectedItem) return;
 
-    const { setHovered } = useHoveredGraphicState.getState();
-
     const handle = mapView.on("pointer-move", async (event) => {
-      const hit: any = await mapView.hitTest(event);
+      const hit = await mapView.hitTest(event);
+      const graphic = findHoverableGraphic({
+        hitResults: hit.results,
+        pinRefs: pinRefs.current,
+        pointsGraphicsLayer,
+      });
 
-      const res: any[] = hit?.results || [];
-
-      const g: any = res.find((r: any) => {
-        const gr = r?.graphic;
-        if (!gr?.attributes) return false;
-        const id = gr.attributes.id;
-        const isPin = typeof id === "number" && pinRefs.current.has(id);
-        const isBluePoint =
-          !!pointsGraphicsLayer && gr.layer === pointsGraphicsLayer;
-        return isPin || isBluePoint;
-      })?.graphic;
-
-      if (g) {
-        setHovered({
-          id: g.attributes.id,
-          label: g.attributes.label || g.attributes.omschrijving || "",
-        });
-      } else {
+      const { setHovered } = useHoveredGraphicState.getState();
+      if (!graphic) {
         setHovered(null);
+        return;
       }
+
+      setHovered({
+        id: graphic.attributes.id,
+        label: graphic.attributes.label || graphic.attributes.omschrijving || "",
+      });
     });
 
     return () => {
       handle.remove();
-      const { setHovered } = useHoveredGraphicState.getState();
-      setHovered(null);
+      useHoveredGraphicState.getState().setHovered(null);
     };
   }, [mapView, selectedItem, pointsGraphicsLayer]);
 
@@ -302,18 +182,13 @@ export default function SelectFromSource({ source }: { source: Source }) {
         <PlansList
           items={items}
           onSelect={(id) => {
-            const item = items.find((i) => i.id === id) || null;
-
+            const item = items.find((i) => i.id === id);
             if (!item) return;
 
-            const uncommonPoints = item.points.filter(
-              (pt) => !selectedPlan?.points.some((p) => p.id === pt.id)
-            );
-
             setSelectedItem({
-              id: item?.id || 0,
-              title: item?.title || "",
-              points: uncommonPoints,
+              id: item.id,
+              title: item.title,
+              points: filterPointsNotInPlan(item.points, planPointIds),
             });
           }}
         />
@@ -338,10 +213,10 @@ function Buttons({
   update,
 }: {
   loading: boolean;
-  selectedItem: ItemModel | null;
-  setSelectedItem: (item: ItemModel | null) => void;
+  selectedItem: SelectFromSourceItem | null;
+  setSelectedItem: (item: SelectFromSourceItem | null) => void;
   selectedPointIds: number[];
-  update: any;
+  update: ReturnType<typeof useUpdateData>["update"];
 }) {
   const content = useContent();
   const {
@@ -356,96 +231,37 @@ function Buttons({
   const { setPointsTable, setGeometriesTable } = useOpenTable();
 
   function handleSubmit() {
-    if (!selectedPlan) return;
+    if (!selectedPlan || !selectedItem) return;
 
-    const checkedPoints = selectedItem?.points.filter((pt) =>
+    const checkedPoints = selectedItem.points.filter((pt) =>
       selectedPointIds.includes(pt.id)
     );
 
-    const mergedPointsIds = [
-      ...(selectedPlan.points.flatMap((p) => p.id) || []),
-      ...(checkedPoints?.flatMap((p) => p.id) || []),
-    ];
-    const uniqueIds = Array.from(new Set(mergedPointsIds));
+    const result = buildSubmitSelectedPointsResult({
+      selectedPlan,
+      checkedPoints,
+      dbPoints,
+      filteredPlans,
+      yellowGraphicsLayer,
+    });
 
-    update(
-      {
-        points: uniqueIds,
-        id: selectedPlan?.id,
-      },
-      () => {
-        const updatedPoints = dbPoints.filter((p) => uniqueIds.includes(p.id));
-
-        setSelectedPlan({
-          ...selectedPlan,
-          points: updatedPoints,
-          pointsObjects: updatedPoints,
-        });
-
-        setPointsTable(updatedPoints);
-        setGeometriesTable(selectedPlan.geometries || []);
-
-        // Add yellow points to the map from checkedPoints array
-        checkedPoints?.forEach((selectedPoint) => {
-          const yellow = new SimpleMarkerSymbol({
-            color: "yellow",
-            size: 12,
-            style: "circle",
-            outline: {
-              color: "white",
-              width: 1,
-            },
-          });
-
-          // Prefer WGS84 if available; otherwise convert RD -> WGS84
-          const coords = getPointCoordinates(selectedPoint as any);
-          if (!coords) return;
-
-          const geometry = new Point({
-            longitude: coords.longitude,
-            latitude: coords.latitude,
-            spatialReference: { wkid: 4326 },
-          });
-
-          const graphic = new Graphic({
-            geometry,
-            symbol: yellow,
-            attributes: selectedPoint,
-          });
-
-          yellowGraphicsLayer?.add(graphic);
-        });
-
-        // Update only plan with id === selectedPlan?.id inside filteredPlans
-        setFilteredPlans(
-          filteredPlans.map((p) => ({
-            ...p,
-            points: p.id === selectedPlan?.id ? updatedPoints : p.points,
-            pointsObjects:
-              p.id === selectedPlan?.id ? updatedPoints : p.pointsObjects,
-          }))
-        );
-
-        setSelectedItem(null);
-        setStep(2);
-      }
-    );
+    update(result.payload, () => {
+      setSelectedPlan(result.updatedPlan);
+      setPointsTable(result.updatedPoints);
+      setGeometriesTable(selectedPlan.geometries || []);
+      setFilteredPlans(result.updatedFilteredPlans);
+      setSelectedItem(null);
+      setStep(2);
+    });
   }
 
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
 
   if (!selectedItem) {
     return (
       <WizardButtonBar
         className=""
-        buttons={[
-          {
-            label: content.common.vorige,
-            onClick: () => setStep(2),
-          },
-        ]}
+        buttons={[{ label: content.common.vorige, onClick: () => setStep(2) }]}
       />
     );
   }
@@ -454,14 +270,8 @@ function Buttons({
     <WizardButtonBar
       className=""
       buttons={[
-        {
-          label: content.common.vorige,
-          onClick: () => setSelectedItem(null),
-        },
-        {
-          label: content.common.opslaan,
-          onClick: handleSubmit,
-        },
+        { label: content.common.vorige, onClick: () => setSelectedItem(null) },
+        { label: content.common.opslaan, onClick: handleSubmit },
       ]}
     />
   );

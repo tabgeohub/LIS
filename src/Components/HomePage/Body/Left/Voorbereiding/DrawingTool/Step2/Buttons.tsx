@@ -2,9 +2,6 @@ import { useDrawingStore } from "hooks/zustand/useDrawingStore";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
-import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
-import Point from "@arcgis/core/geometry/Point";
 import { useCreateData } from "utils/useCreateData";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import {
@@ -12,6 +9,10 @@ import {
   clearCurrentlyDrawingGraphics,
 } from "../helpers/drawingToolMapCleanup";
 import { useOmschrijvingExists } from "../helpers/useOmschrijvingExists";
+import {
+  buildGeometryPointsFromDrawn,
+  resolveCombinedGeometryType,
+} from "../helpers/buildGeometryPointsFromDrawn";
 
 export default function Buttons() {
   const {
@@ -29,7 +30,6 @@ export default function Buttons() {
   const content = useContent();
   const { create, loading } = useCreateData("/geometries");
   const { fetchGeometries } = useGeometriesStore();
-
   const omschrijvingExists = useOmschrijvingExists(omschrijving);
 
   function handleLeaveStep2() {
@@ -38,95 +38,24 @@ export default function Buttons() {
   }
 
   async function handleSubmit() {
-    if (!graphicsDrawn || graphicsDrawn.length === 0) {
-      return;
-    }
+    if (!graphicsDrawn?.length) return;
 
-    // Create array of points
-    const pointsArray: Array<{
-      omschrijving: string;
-      regio_id: string | undefined;
-      xcoordinaat_rd: number;
-      ycoordinaat_rd: number;
-      longitude: number;
-      latitude: number;
-      user_id: number | undefined;
-      herhalen: number;
-      organisatie: string;
-      omschrijving_original: string;
-      vertrouwelijk: number;
-      activiteit: string;
-      specifiekLettenOp: string;
-      geometry_type: string;
-    }> = [];
-
-    let pointOrder = 1;
-
-    // Iterate through all drawn shapes
-    graphicsDrawn.forEach((shape) => {
-      // Iterate through all points in the shape
-      shape.points.forEach((point) => {
-        const [x, y] = point;
-
-        // Coordinates are in Web Mercator (EPSG:3857), convert to WGS84 first
-        const webMercatorPoint = new Point({
-          x: x,
-          y: y,
-          spatialReference: { wkid: 3857 }, // Web Mercator
-        });
-
-        // Convert Web Mercator to WGS84 (geographic)
-        const wgs84Point = webMercatorUtils.webMercatorToGeographic(
-          webMercatorPoint
-        ) as Point;
-
-        const longitude = wgs84Point.longitude;
-        const latitude = wgs84Point.latitude;
-
-        // Skip if coordinates are invalid
-        if (
-          typeof longitude !== "number" ||
-          typeof latitude !== "number" ||
-          !isFinite(longitude) ||
-          !isFinite(latitude)
-        ) {
-          return;
-        }
-
-        // Transform WGS84 to RD coordinates
-        const rdCoords = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
-         });
-
-        pointsArray.push({
-          omschrijving: `${omschrijving}_point_${pointOrder}`,
-          regio_id: user?.role,
-          xcoordinaat_rd: rdCoords.x,
-          ycoordinaat_rd: rdCoords.y,
-          longitude: longitude,
-          latitude: latitude,
-          user_id: user?.user_id,
-          herhalen: herhalen ? 1 : 0,
-          organisatie: organisatie,
-          omschrijving_original: omschrijving,
-          vertrouwelijk: vertrouwelijk ? 1 : 0,
-          activiteit: activiteit,
-          specifiekLettenOp: specifiekLettenOp,
-          geometry_type: shape.type,
-        });
-
-        pointOrder++;
-      });
+    const pointsArray = buildGeometryPointsFromDrawn({
+      graphicsDrawn,
+      omschrijving,
+      userRole: user?.role,
+      userId: user?.user_id,
+      herhalen,
+      organisatie,
+      vertrouwelijk,
+      activiteit,
+      specifiekLettenOp,
     });
 
-    // Get unique geometry types (or use the first one if all are the same)
-    const geometryTypes = graphicsDrawn.map((shape) => shape.type);
-    const uniqueGeometryTypes = Array.from(new Set(geometryTypes));
-    // Use the first geometry type, or combine them if multiple
-    const geometryType = uniqueGeometryTypes.length === 1
-      ? uniqueGeometryTypes[0]
-      : uniqueGeometryTypes.join(", ");
+    const geometryType = resolveCombinedGeometryType(
+      graphicsDrawn.map((shape) => shape.type)
+    );
 
-    // Call API to create geometry and points
     const result = await create(
       {
         omschrijving,
@@ -142,19 +71,14 @@ export default function Buttons() {
       async () => {
         clearCurrentlyDrawingGraphics(mapView);
         clear();
-
-        // Refetch geometries to update the map immediately
         await fetchGeometries({
           regio: user?.role && user.role !== "admin" ? user.role : undefined,
         });
       }
     );
 
-    // Only clear if creation was successful (result is not null)
     if (result !== null) {
-      // Success toast is already shown by useCreateData hook
-      // Graphics cleared in success callback above
-      // Geometries refetched in success callback above
+      // Success handled in create callback
     }
   }
 
