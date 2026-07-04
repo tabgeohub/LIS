@@ -118,7 +118,7 @@ export default function EditForm({
     const base = pointsDraft.find((p) => p.id === pointForm.id);
     if (!base) return;
     const updated = formToPointRow(base, pointForm);
-    updatePoint(updated, (responseData) => {
+    updatePoint({ data: updated, onSuccess: (responseData) => {
       if (!responseData?.result) return;
 
       const nextUpdatedPoint = {
@@ -135,6 +135,7 @@ export default function EditForm({
       });
 
       setPointForm(pointToForm(nextUpdatedPoint));
+    },
     });
   }
 

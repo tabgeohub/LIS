@@ -2,6 +2,7 @@ import type {
   FinishedFlightPlanType,
   FinishedPointType,
 } from "Types/finished_plans";
+import type { UpdateInput } from "utils/useUpdateData";
 import { finalizeCoordinateValues } from "./coordinateFinalize";
 import { updateSavedGraphics } from "./pointMapGraphics";
 
@@ -13,7 +14,7 @@ type SubmitPointCoordinatesInput = {
   latitude: number;
   xcoordinaat_rd: number;
   ycoordinaat_rd: number;
-  update: (payload: unknown, onSuccess?: (data: { result?: boolean }) => void) => void;
+  update: (input: UpdateInput<unknown>) => Promise<void>;
   setSelectedPoint: (point: FinishedPointType) => void;
   setSelectedPlan: (plan: FinishedFlightPlanType) => void;
   mapView: __esri.MapView | null;
@@ -50,7 +51,9 @@ export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) 
     id: input.selectedPoint.id,
   };
 
-  input.update(payload, (responseData) => {
+  input.update({
+    data: payload,
+    onSuccess: (responseData) => {
     if (!responseData.result || !input.selectedPlan) return;
 
     const updatedPoint = { ...input.selectedPoint, ...finalCoords };
@@ -83,6 +86,7 @@ export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) 
     }
 
     input.setAction("form");
+    },
   });
 
   input.logAction({

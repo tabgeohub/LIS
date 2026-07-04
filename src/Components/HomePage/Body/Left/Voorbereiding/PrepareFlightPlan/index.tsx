@@ -18,17 +18,17 @@ export default function PrepareFlightPlan() {
     setOpenModal(false);
     setIsPreparing(true);
 
-    update(
-      {
+    update({
+      data: {
         id: selectedPlan?.id,
         status: "prepared",
       },
-      () => {
+      onSuccess: () => {
         setSelectedPlan(null);
         setOpenModal(false);
         setIsPreparing(false);
-      }
-    );
+      },
+    });
   }
 
   return (

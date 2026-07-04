@@ -18,7 +18,12 @@ export default function useLogAction() {
       if (queue.length === 0) return;
       const batch = queue.splice(0, queue.length);
       try {
-        await create({ logs: batch }, () => {}, false, true);
+        await create({
+          data: { logs: batch },
+          onSuccess: () => {},
+          disableErrorMessage: true,
+          disableSuccessMessage: true,
+        });
       } catch (e) {
         queue.unshift(...batch);
         console.error("Error sending logs to server:", e);

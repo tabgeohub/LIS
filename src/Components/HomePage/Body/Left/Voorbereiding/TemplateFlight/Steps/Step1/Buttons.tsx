@@ -13,9 +13,9 @@ export default function Buttons({ name }: { name: string }) {
   const content = useContent();
 
   const handleNext = () => {
-    create(
-      { name },
-      () => {
+    create({
+      data: { name },
+      onSuccess: () => {
         setStep(step + 1);
 
         logAction({
@@ -24,9 +24,9 @@ export default function Buttons({ name }: { name: string }) {
           newData: { name },
         });
       },
-      false,
-      true
-    );
+      disableErrorMessage: true,
+      disableSuccessMessage: true,
+    });
   };
 
   return (

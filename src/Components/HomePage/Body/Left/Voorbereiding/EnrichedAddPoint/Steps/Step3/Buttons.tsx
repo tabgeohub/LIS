@@ -38,18 +38,20 @@ export default function Buttons({
 
   async function handleSubmit() {
     await create({
-      omschrijving: omschrijving,
-      regio_id: user?.role,
-      xcoordinaat_rd: xCoord,
-      ycoordinaat_rd: yCoord,
-      latitude: latitude,
-      longitude: longitude,
-      vertrouwelijk: vertrouwelijk ? 1 : 0,
-      herhalen: herhalen ? 1 : 0,
-      user_id: user?.user_id,
-      activiteit_id: activiteit,
-      organisatie_id: organisatie,
-      specifiek_letten_op: specifiekLettenOp,
+      data: {
+        omschrijving: omschrijving,
+        regio_id: user?.role,
+        xcoordinaat_rd: xCoord,
+        ycoordinaat_rd: yCoord,
+        latitude: latitude,
+        longitude: longitude,
+        vertrouwelijk: vertrouwelijk ? 1 : 0,
+        herhalen: herhalen ? 1 : 0,
+        user_id: user?.user_id,
+        activiteit_id: activiteit,
+        organisatie_id: organisatie,
+        specifiek_letten_op: specifiekLettenOp,
+      },
     });
 
     fetchInitialFeatures(user?.role);

@@ -44,7 +44,7 @@ export default function Step2({
       created_at: selectedPoint.created_at,
     });
 
-    update(newPoint, (responseData) => {
+    update({ data: newPoint, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
       const updatedPoints = points.map((point) =>
@@ -64,7 +64,7 @@ export default function Step2({
         step: "Edit point details - Step 2",
         newData: pickPointCoreLogData(selectedPoint),
       });
-    });
+    },});
   }
 
   return (

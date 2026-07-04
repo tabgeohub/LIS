@@ -27,10 +27,10 @@ export default function AddEmail({
 
   function handleCreate() {
     if (isValidEmail(emailToAdd)) {
-      create({ email: emailToAdd, regio: user.role }, () => {
+      create({ data: { email: emailToAdd, regio: user.role }, onSuccess: () => {
         setStep("list");
         refetch();
-      });
+      },});
 
       logAction({
         message: "User clicked 'Save' button to add email",

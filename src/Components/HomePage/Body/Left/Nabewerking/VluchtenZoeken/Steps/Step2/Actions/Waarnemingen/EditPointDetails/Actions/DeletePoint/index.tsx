@@ -32,7 +32,7 @@ export default function DeletePoint({
       attachments,
     });
 
-    deleteData(data, undefined, () => {
+    deleteData({ id: data, onSuccess: () => {
       setSelectedPlan({
         ...selectedPlan,
         // @ts-ignore
@@ -45,7 +45,7 @@ export default function DeletePoint({
 
       setSelectedPoint(null);
       setOpen(false);
-    });
+    },});
 
     logAction({
       message: "User clicked 'Delete' button",

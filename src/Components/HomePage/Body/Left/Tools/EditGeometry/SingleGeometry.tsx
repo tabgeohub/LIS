@@ -1,6 +1,6 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { TbPolygon, TbLine } from "react-icons/tb";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 import ActionButtons from "./ActionButtons";
 import { geometryDisplayName, geometryTypeDutchLabel } from "./EditForm/helpers/labels";
 
@@ -14,7 +14,7 @@ export default function SingleGeometry({
   onDeleteClick: (geometry: Geometry) => void;
 }) {
   const { handleHoveredGeometry, handleRemoveHoveredGeometry } =
-    useGeometryHover();
+    useGeometryListHover();
   const geometryTypeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
 
   return (

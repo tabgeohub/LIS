@@ -27,12 +27,12 @@ export default function EditEmail({
 
   function handleUpdate() {
     if (isValidEmail(emailToEdit.email)) {
-      update({ id: selectedEmail.id, email: emailToEdit.email }, () => {
+      update({ data: { id: selectedEmail.id, email: emailToEdit.email }, onSuccess: () => {
         setStep("list");
         setSelectedEmail(null);
         toast.success(content.tools.emailijst.edit.successToast);
         refetch();
-      });
+      },});
 
       logAction({
         message: "User clicked 'Save' button",

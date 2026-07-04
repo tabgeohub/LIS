@@ -56,12 +56,12 @@ export default function ChangePoint({
       id: selectedPoint.id,
     };
 
-    update(newUpdatedPoint, (responseData) => {
+    update({ data: newUpdatedPoint, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
       resetFeatures();
       setAction("form");
-    });
+    },});
 
     logAction({
       message: "User clicked 'Submit' button to change point",

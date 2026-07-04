@@ -28,8 +28,8 @@ export default function Submit({
 
     if (!pointToUpdate) return;
 
-    updatePoint(
-      {
+    updatePoint({
+      data: {
         omschrijving: omschrijving,
         regio_id: pointToUpdate.regio_id,
         xcoordinaat_rd: pointToUpdate.xcoordinaat_rd,
@@ -44,10 +44,10 @@ export default function Submit({
         specifiek_letten_op: specifiekLettenOp,
         id: pointToUpdate.id,
       },
-      () => {
+      onSuccess: () => {
         setStep(2);
-      }
-    );
+      },
+    });
   }
 
   const content = useContent();

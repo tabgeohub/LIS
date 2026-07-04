@@ -52,7 +52,7 @@ export default function Step2({
       id: values.id,
     };
 
-    update(attributes, async (responseData) => {
+    update({ data: attributes, onSuccess: async (responseData) => {
       if (!responseData.result) return;
       // Remove temp red point
       redGraphicsLayer?.removeAll();
@@ -64,7 +64,7 @@ export default function Step2({
       // Exit geometry-edit mode and go back to details
       setCreateNewPoint(false);
       setSelectedBottomTab("viewSelectedPointDetails");
-    });
+    },});
   }
 
   return (

@@ -37,7 +37,7 @@ export default function Buttons({
       created_at: selectedPoint.created_at,
     });
 
-    update(newPoint, (responseData) => {
+    update({ data: newPoint, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
       const updatedPoints = points.map((point) =>
@@ -52,7 +52,7 @@ export default function Buttons({
       yellowGraphicsLayer?.removeAll();
 
       setMainStep("main");
-    });
+    },});
 
     logAction({
       message: "User clicked 'Save' button",

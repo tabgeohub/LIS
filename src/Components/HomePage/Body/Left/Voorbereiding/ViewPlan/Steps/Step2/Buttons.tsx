@@ -82,14 +82,14 @@ export default function Buttons({
       geometriesTable,
     });
 
-    update(payload, async () => {
+    update({ data: payload, onSuccess: async () => {
       setFilteredPlans(replacePlanInList(filteredPlans, updatedPlan));
       setInitialPlans(replacePlanInList(initialPlans, updatedPlan));
       setSelectedPlan(updatedPlan);
       await refetch();
       setStep(1);
       logStep("User clicked 'Save' button", payload);
-    });
+    },});
   };
 
   const resetViewPlanStep = () =>

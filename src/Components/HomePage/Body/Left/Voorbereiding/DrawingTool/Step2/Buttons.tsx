@@ -56,8 +56,8 @@ export default function Buttons() {
       graphicsDrawn.map((shape) => shape.type)
     );
 
-    const result = await create(
-      {
+    const result = await create({
+      data: {
         omschrijving,
         organisatie,
         vertrouwelijk,
@@ -68,14 +68,14 @@ export default function Buttons() {
         regio_id: user?.role,
         points: pointsArray,
       },
-      async () => {
+      onSuccess: async () => {
         clearCurrentlyDrawingGraphics(mapView);
         clear();
         await fetchGeometries({
           regio: user?.role && user.role !== "admin" ? user.role : undefined,
         });
-      }
-    );
+      },
+    });
 
     if (result !== null) {
       // Success handled in create callback

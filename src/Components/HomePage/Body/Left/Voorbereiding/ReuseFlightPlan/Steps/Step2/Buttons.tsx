@@ -73,10 +73,10 @@ export default function Buttons() {
       copiedFrom: selectedPlan?.id,
     });
 
-    create(newPlan, () => {
+    create({ data: newPlan, onSuccess: () => {
       graphicsLayer?.graphics.removeAll();
       clear();
-    });
+    },});
 
     logStep("User clicked 'Save' button to save copied flight plan data", {
       ...newPlan,

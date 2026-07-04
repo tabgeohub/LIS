@@ -3,7 +3,7 @@ import { IoMdImage } from "react-icons/io";
 import { FinishedGeometryType } from "Types/finished_plans";
 import useLogAction from "hooks/useLogAction";
 import useGeometryClick from "hooks/hover-click-handlers/useGeometryClick";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 
 export default function SingleGeometry({
   geometry,
@@ -15,7 +15,7 @@ export default function SingleGeometry({
   setSelectedGeometry: (value: FinishedGeometryType) => void;
 }) {
   const { handleHoveredGeometry, handleRemoveHoveredGeometry } =
-    useGeometryHover();
+    useGeometryListHover();
 
   useGeometryClick({ selectedGeometry });
 

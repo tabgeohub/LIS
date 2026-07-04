@@ -49,10 +49,10 @@ export default function DeleteEmailModal({
 
           <button
             onClick={() => {
-              deleteData(selectedEmail.id, undefined, () => {
+              deleteData({ id: selectedEmail.id, onSuccess: () => {
                 setOpen(false);
                 refetch();
-              });
+              },});
 
               logAction({
                 message: "User clicked 'Delete' button",

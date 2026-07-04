@@ -67,8 +67,8 @@ export default function CreateImageBtn({
         return;
       }
 
-      create(
-        {
+      create({
+        data: {
           url: first.url,
           pointId: attachmentPoint.id,
           attachmentId: first.objectId,
@@ -76,7 +76,7 @@ export default function CreateImageBtn({
           long: attachmentPoint.longitude,
           lat: attachmentPoint.latitude,
         },
-        (responseData) => {
+        onSuccess: (responseData) => {
           const uploadedAttachment = buildAttachmentFromUploadResponse({
             objectId: first.objectId,
             responseId: responseData.result.id,
@@ -105,16 +105,18 @@ export default function CreateImageBtn({
               ];
 
           update({
-            point_id: attachmentPoint.id,
-            plan_id: selectedPlan.id,
-            attachments_id: attachmentsIds,
+            data: {
+              point_id: attachmentPoint.id,
+              plan_id: selectedPlan.id,
+              attachments_id: attachmentsIds,
+            },
           });
 
           onAttachmentsUpdated(newAttachments);
           setLoading(false);
           setNewImage(null);
         }
-      );
+      });
     };
 
     uploadAttachment();

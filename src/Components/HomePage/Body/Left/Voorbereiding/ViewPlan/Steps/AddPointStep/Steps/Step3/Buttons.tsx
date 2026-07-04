@@ -46,8 +46,8 @@ export default function Buttons({
   const { pointsTable, setPointsTable, geometriesTable, setGeometriesTable } = useOpenTable();
 
   async function handleSubmit() {
-    await create(
-      {
+    await create({
+      data: {
         omschrijving: omschrijving,
         regio_id: user?.role,
         xcoordinaat_rd: xCoord,
@@ -61,7 +61,7 @@ export default function Buttons({
         organisatie_id: organisatie,
         specifiek_letten_op: specifiekLettenOp,
       },
-      (response) => {
+      onSuccess: (response) => {
         // @ts-ignore
         const newPoint: EnrichedPointType = response.point;
 
@@ -74,7 +74,7 @@ export default function Buttons({
           id: selectedPlan?.id,
         };
 
-        update(payload, () => {
+        update({ data: payload, onSuccess: () => {
           const oldPoints: EnrichedPointType[] = selectedPlan?.points || [];
 
           // @ts-ignore
@@ -89,11 +89,13 @@ export default function Buttons({
 
           setStep(2);
           resetFormAndState();
+        },
+
         });
 
         redGraphicsLayer?.removeAll();
-      }
-    );
+      },
+    });
   }
 
   function handleBack() {

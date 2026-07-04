@@ -97,19 +97,19 @@ export default function FotoPanel({
       setIsOpen(false);
     }
 
-    update(
-      {
+    update({
+      data: {
         point_id: attachmentPoint.id,
         plan_id: selectedPlan.id,
         attachments_id: newAttachments.flatMap((attachment) => attachment.id),
       },
-      () => {
+      onSuccess: () => {
         setActiveIndex(newIndex);
         onAttachmentsUpdated(newAttachments);
         setLoading(false);
       },
-      () => setLoading(false)
-    );
+      onError: () => setLoading(false),
+    });
   }
 
   if (!attachmentPoint) {

@@ -60,7 +60,7 @@ function ClickedPointFunctions({
   const removePoint = useCallback(() => {
     if (!clickedPoint) return;
 
-    deleteData(clickedPoint.id, undefined, () => {
+    deleteData({ id: clickedPoint.id, onSuccess: () => {
       const filteredPoints = pointsTable?.filter((p) => p.id !== clickedPoint?.id);
       setPointsTable(filteredPoints);
       setPoints(filteredPoints);
@@ -69,6 +69,8 @@ function ClickedPointFunctions({
         message: `User clicked on 'Verwijderen uit resultaten'`,
         step: "BottomTabs - ClickedPointFunctions",
       });
+    },
+
     });
   }, [clickedPoint, pointsTable, deleteData, setPointsTable, setPoints, logAction]);
 

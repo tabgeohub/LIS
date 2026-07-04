@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import usePointHover from "hooks/hover-click-handlers/usePointHover";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
 import useDrawYellowGeometries from "hooks/hover-click-handlers/useDrawYellowGeometries";
 import { useContent } from "hooks/useContent";
@@ -22,7 +22,7 @@ export default function Fase3({
   const { clearGraphics } = useMapViewState();
 
   const { handleHoveredPoint, handleRemoveHoverePoint } = usePointHover();
-  const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryHover();
+  const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryListHover();
 
   useDrawYellowMarkers({
     selectedPointIds: selectedTemplate?.points?.map((p: any) => p.id) || [],

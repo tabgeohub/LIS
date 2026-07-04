@@ -36,7 +36,7 @@ export default function Buttons() {
 
       for (const point of selectedPoints) {
         try {
-          await deleteData(point.id, undefined, undefined, undefined);
+          await deleteData({ id: point.id });
           deletedIds.push(point.id);
         } catch (error) {
           console.error(`Error deleting point ${point.id}:`, error);

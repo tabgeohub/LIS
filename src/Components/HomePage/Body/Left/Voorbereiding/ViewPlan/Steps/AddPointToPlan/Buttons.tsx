@@ -69,12 +69,12 @@ export default function Buttons({
       (p) => selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
     );
 
-    update(
-      {
+    update({
+      data: {
         points: uniquePointIds,
         id: selectedPlan.id,
       },
-      () => {
+      onSuccess: () => {
         const updatedPlan: FlightPlanType = {
           ...selectedPlan,
           points: standalonePoints,
@@ -117,8 +117,8 @@ export default function Buttons({
         });
 
         setStep(2);
-      }
-    );
+            },
+    });
   }
 
   return (

@@ -57,7 +57,7 @@ export default function DropDown({
   const { deleteData } = useDeleteData("/flightPlans");
 
   function handleDeletePlan() {
-    deleteData(String(flightPlan?.id));
+    deleteData({ id: String(flightPlan?.id) });
   }
 
   const content = useContent();

@@ -109,18 +109,19 @@ export default function TemplateFlight({
       regioId: user.role,
     });
 
-    create(attributes, () => {
+    create({ data: attributes, onSuccess: () => {
       setTimeout(() => {
         toast(
           "Ga naar “Vluchtplan-informatie” om je vlucht te controleren of bij te werken.",
           {
             duration: 5000,
-          }
+          },
         );
       }, 1000);
 
       clear();
       clearGraphics();
+    },
     });
   };
 

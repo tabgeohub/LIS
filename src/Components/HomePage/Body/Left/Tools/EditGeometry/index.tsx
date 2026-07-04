@@ -11,7 +11,8 @@ import { useDeleteData } from "utils/useDeleteData";
 import { useUpdateData } from "utils/useUpdateData";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import useLogAction from "hooks/useLogAction";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
+import useGeometryEditHighlight from "hooks/hover-click-handlers/useGeometryEditHighlight";
 import { geometryDisplayName } from "./EditForm/helpers/labels";
 import {
   buildGeometrySavePayload,
@@ -26,11 +27,9 @@ export default function EditGeometry() {
   const { user } = useAuth();
   const { mapView, geometriesGraphicsLayer, yellowGraphicsLayer, pointsGraphicsLayer } =
     useMapViewState();
-  const {
-    handleRemoveHoveredGeometry,
-    addEditGeometryHighlight,
-    removeEditGeometryHighlight,
-  } = useGeometryHover();
+  const { handleRemoveHoveredGeometry } = useGeometryListHover();
+  const { addEditGeometryHighlight, removeEditGeometryHighlight } =
+    useGeometryEditHighlight();
   const [filterTerm, setFilterTerm] = useState("");
   const [selectedGeometry, setSelectedGeometry] = useState<Geometry | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -82,7 +81,9 @@ export default function EditGeometry() {
     if (!editingGeometry) return;
 
     const payload = buildGeometrySavePayload({ editingGeometry, draft, points });
-    updateGeometry(payload, (responseData) => {
+    updateGeometry({
+      data: payload,
+      onSuccess: (responseData) => {
       const result = responseData?.result;
       const updatedGeometry: Geometry = {
         ...editingGeometry,
@@ -108,6 +109,7 @@ export default function EditGeometry() {
       });
       removeEditGeometryHighlight();
       setEditingGeometry(null);
+      },
     });
   };
 
@@ -147,7 +149,7 @@ export default function EditGeometry() {
     setIsDeleting(true);
 
     try {
-      await deleteData(selectedGeometry.id, undefined, () => {
+      await deleteData({ id: selectedGeometry.id, onSuccess: () => {
         const updatedGeometries = dbGeometries.filter(
           (g) => g.id !== selectedGeometry.id
         );
@@ -163,6 +165,8 @@ export default function EditGeometry() {
           step: "Edit Geometry",
           newData: { geometry: geometryDisplayName(selectedGeometry) },
         });
+      },
+
       });
     } catch (error) {
       console.error("Error deleting geometry:", error);

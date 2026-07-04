@@ -45,7 +45,7 @@ export default function RemovePoint() {
         id: selectedPlan.id,
       };
 
-      updatePlans(attributes, (responseData) => {
+      updatePlans({ data: attributes, onSuccess: (responseData) => {
         pointsGraphicsLayer?.removeAll();
         yellowGraphicsLayer?.removeAll();
 
@@ -112,7 +112,7 @@ export default function RemovePoint() {
           });
 
         pointsGraphicsLayer?.addMany(graphics);
-      });
+      },});
     }
   };
 

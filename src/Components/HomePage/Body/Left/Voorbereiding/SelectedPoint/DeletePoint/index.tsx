@@ -32,11 +32,11 @@ export default function DeletePoint() {
   function handleSubmit() {
     if (!mapView) return;
 
-    update({ id: clickedPointId, status: "inactief" }, () => {
+    update({ data: { id: clickedPointId, status: "inactief" }, onSuccess: () => {
       fetchInitialFeatures(user?.role);
 
       setSelectedBottomTab("viewSelectedPointDetails");
-    });
+    },});
 
     logAction({
       message: "User clicked 'Delete' button to delete a point",

@@ -19,9 +19,11 @@ export default function CongfirmationModal({
   const { deleteData, loading } = useDeleteData("/flightPlans");
 
   function handleDeletePlan() {
-    deleteData(String(selectedPlan?.id), undefined, () => {
+    deleteData({ id: String(selectedPlan?.id), onSuccess: () => {
       refetch();
       setOpenDeleteModal(false);
+    },
+
     });
 
     logAction({

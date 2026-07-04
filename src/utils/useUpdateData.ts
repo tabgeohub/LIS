@@ -1,77 +1,59 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { invalidateAfterMutation } from "lib/invalidateAfterMutation";
+import {
+  apiPatch,
+  apiUrl,
+  useApiMutation,
+} from "./apiMutation/useApiMutation";
+
+type UpdateVariables<T> = {
+  data: T;
+  disableErrorMessage?: boolean;
+};
+
+export type UpdateInput<T> = {
+  data: T;
+  onSuccess?: (responseData: any) => void;
+  onError?: () => void;
+  disableErrorMessage?: boolean;
+};
 
 type UseUpdateDataResult<T> = {
-  update: (
-    data: T,
-    onCallbackSuccess?: (responseData: any) => void,
-    onError?: () => void
-  ) => Promise<void>;
+  update: (input: UpdateInput<T>) => Promise<void>;
   loading: boolean;
   error: string | null;
   success: boolean;
 };
 
 export function useUpdateData<T>(path: string): UseUpdateDataResult<T> {
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (data: T) => {
-      const response = await axios.patch(
-        `${getBackEndUrl()}/api${path}`,
-        data,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      return response.data;
-    },
-    onSuccess: async (responseData) => {
-      const message = responseData?.message;
-      toast.success(message || "Flightplan updated successfully");
-      await invalidateAfterMutation(queryClient, path);
-    },
+  const mutation = useApiMutation<UpdateVariables<T>, { message?: string }>({
+    path,
+    method: "patch",
+    defaultSuccessMessage: "Flightplan updated successfully",
+    buildUrl: (apiPath) => apiUrl(apiPath),
+    request: (url, variables) => apiPatch(url, variables.data),
+    getSuccessMessage: (result) => result.message,
   });
 
-  async function update(
-    data: T,
-    onCallbackSuccess?: (responseData: any) => void,
-    onError?: () => void
-  ) {
+  async function update(input: UpdateInput<T>) {
     mutation.reset();
     try {
-      const responseData = await mutation.mutateAsync(data);
-      if (onCallbackSuccess) onCallbackSuccess(responseData);
+      const responseData = await mutation.mutateAsync({
+        data: input.data,
+        disableErrorMessage: input.disableErrorMessage,
+      });
+      input.onSuccess?.(responseData);
     } catch (err) {
-      const error = err as AxiosError<{ message?: string; error?: string }>;
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Unknown error";
-
-      toast.error(message);
-      onError?.();
+      if (!input.disableErrorMessage) {
+        toast.error(mutation.getMutationErrorMessage(err));
+      }
+      input.onError?.();
     }
   }
 
-  const lastError = mutation.error as AxiosError<{
-    message?: string;
-    error?: string;
-  }> | null;
-
   return {
     update,
-    loading: mutation.isPending,
-    error:
-      lastError?.response?.data?.message ||
-      lastError?.response?.data?.error ||
-      lastError?.message ||
-      null,
-    success: mutation.isSuccess,
+    loading: mutation.loading,
+    error: mutation.error,
+    success: mutation.success,
   };
 }

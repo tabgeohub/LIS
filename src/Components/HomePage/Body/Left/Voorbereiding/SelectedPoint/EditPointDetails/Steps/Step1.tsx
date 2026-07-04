@@ -63,14 +63,14 @@ export default function Step1({
       id: values.id,
     };
 
-    update(attributes, (responseData) => {
+    update({ data: attributes, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
       fetchInitialFeatures(user?.role);
 
       resetFeatures();
       setSelectedBottomTab("viewSelectedPointDetails");
-    });
+    },});
 
     logAction({
       message: "User clicked 'Save' button to edit a point",

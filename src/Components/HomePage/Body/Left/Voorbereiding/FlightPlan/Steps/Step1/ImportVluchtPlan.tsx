@@ -63,9 +63,9 @@ export default function ImportVluchtPlan() {
     }
 
     try {
-      await create(
-        { rows: pointObjects },
-        (resp) => {
+      await create({
+        data: { rows: pointObjects },
+        onSuccess: (resp) => {
           if (resp.points.length === 0) return;
 
           if (!resp.ok) {
@@ -86,9 +86,9 @@ export default function ImportVluchtPlan() {
           setSelectedPoints(herhalen);
           setSelectedPoints2(nietHerhalen);
         },
-        false,
-        true
-      );
+        disableErrorMessage: true,
+        disableSuccessMessage: true,
+      });
       resetFeatures();
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : undefined;

@@ -20,13 +20,13 @@ export default function DeletePoint() {
   function handleSubmit() {
     if (!selectedPoint || !mapView) return;
 
-    deleteData(selectedPoint.id, undefined, () => {
+    deleteData({ id: selectedPoint.id, onSuccess: () => {
       setPoints(points.filter((p) => p.id !== selectedPoint.id));
       setSelectedPoint(null);
       mapView?.graphics.removeAll();
       redGraphicsLayer?.removeAll();
       setMainStep("main");
-    });
+    },});
 
     logAction({
       message: "User clicked 'Delete' button",

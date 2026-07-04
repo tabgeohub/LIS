@@ -80,17 +80,17 @@ export default function Buttons({
       geometries: uniqueSelectedGeometryIds,
     });
 
-    create(
-      {
+    create({
+      data: {
         points: uniquePointIds,
         name,
         regio_id: user.role,
       },
-      () => {
+      onSuccess: () => {
         clear();
         clearGraphics();
-      }
-    );
+      },
+    });
   };
 
   const handlePrevious = () =>

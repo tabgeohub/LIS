@@ -59,10 +59,10 @@ export default function Buttons({
       regioId: user.role,
     });
 
-    create(attributes, () => {
+    create({ data: attributes, onSuccess: () => {
       refetch();
       setStep(1);
-    });
+    },});
   };
 
   return (

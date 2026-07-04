@@ -48,14 +48,14 @@ export default function SelectFromSourceButtons({
       yellowGraphicsLayer,
     });
 
-    update(result.payload, () => {
+    update({ data: result.payload, onSuccess: () => {
       setSelectedPlan(result.updatedPlan);
       setPointsTable(result.updatedPoints);
       setGeometriesTable(selectedPlan.geometries || []);
       setFilteredPlans(result.updatedFilteredPlans);
       setSelectedItem(null);
       setStep(2);
-    });
+    },});
   }
 
   if (loading) return null;

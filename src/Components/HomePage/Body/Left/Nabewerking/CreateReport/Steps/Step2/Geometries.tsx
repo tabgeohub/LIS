@@ -1,6 +1,6 @@
 import { FinishedGeometryType } from "Types/finished_plans";
 import { TbLine, TbPolygon } from "react-icons/tb";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 
 interface GeometriesProps {
   geometries: FinishedGeometryType[];
@@ -18,7 +18,7 @@ export default function Geometries({
   const {
     handleHoveredGeometry,
     handleRemoveHoveredGeometry,
-  } = useGeometryHover();
+  } = useGeometryListHover();
 
   return (
     <>

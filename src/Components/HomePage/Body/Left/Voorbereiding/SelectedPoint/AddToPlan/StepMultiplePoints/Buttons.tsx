@@ -31,15 +31,15 @@ export default function Buttons({
 
     const mergedIds = Array.from(new Set([...selectedIds, ...newIds]));
 
-    update(
-      {
+    update({
+      data: {
         id: selectedPlan.id,
         points: mergedIds,
       },
-      () => {
+      onSuccess: () => {
         setSelectedBottomTab("Kaartlagenlijst");
-      }
-    );
+      },
+    });
 
     yellowGraphicsLayer?.removeAll();
     setPolygonPoints([]);

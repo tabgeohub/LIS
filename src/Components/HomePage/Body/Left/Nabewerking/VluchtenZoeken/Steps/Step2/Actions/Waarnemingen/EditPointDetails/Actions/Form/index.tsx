@@ -66,7 +66,7 @@ export default function Form({
       id: selectedPoint.id,
     };
 
-    update(payload, (responseData) => {
+    update({ data: payload, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
       if (!selectedPlan) return;
@@ -85,7 +85,7 @@ export default function Form({
           updatedPoint,
         ],
       });
-    });
+    },});
 
     logAction({
       message: "User clicked 'Update' button",

@@ -22,16 +22,16 @@ export default function ConfirmModal({
   const { selectedPlan, setSelectedPlan } = useChangePlanStatusState();
 
   function handleSubmit() {
-    update(
-      {
+    update({
+      data: {
         id: selectedPlan?.id,
         status: "finished",
       },
-      () => {
+      onSuccess: () => {
         setSelectedPlan(null);
         setOpen(false);
-      }
-    );
+      },
+    });
 
     logAction({
       message: "User clicked 'Wijzigen' button",

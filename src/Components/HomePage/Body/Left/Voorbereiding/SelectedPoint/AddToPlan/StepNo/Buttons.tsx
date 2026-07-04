@@ -27,18 +27,18 @@ export default function Buttons({
 
     setSubStep(2);
 
-    update(
-      {
+    update({
+      data: {
         id: selectedPlan.id,
         points: [
           ...selectedPlan.points.flatMap((point) => point.id),
           clickedPoint?.id,
         ],
       },
-      () => {
+      onSuccess: () => {
         setSelectedBottomTab("Kaartlagenlijst");
-      }
-    );
+      },
+    });
 
     logAction({
       message: "User clicked 'Add' button",

@@ -21,18 +21,18 @@ export default function Buttons({
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
   function handleSubmit() {
-    update(
-      {
+    update({
+      data: {
         id: selectedPlan.id,
         points: [
           ...selectedPlan.points.flatMap((point) => point.id),
           selectedPoint?.id,
         ],
       },
-      () => {
+      onSuccess: () => {
         setSubStep(2);
-      }
-    );
+      },
+    });
 
     logAction({
       message: "User clicked 'Save' button",

@@ -26,8 +26,8 @@ export default function Buttons() {
   const { logStep, withLog, labels } = useWizardButtons("Third step");
 
   function handleSubmit() {
-    update(
-      {
+    update({
+      data: {
         points: [
           ...selectedPlan?.points.flatMap((p) => p.id)!,
           ...selectedPoints,
@@ -35,14 +35,14 @@ export default function Buttons() {
         ],
         id: selectedPlan?.id,
       },
-      () => {
+      onSuccess: () => {
         setStep(1);
         setSelectedPoints2([]);
         setSelectedPoints([]);
         setFilteredPoints([]);
         clear();
-      }
-    );
+      },
+    });
     logStep("User clicked 'Save' button");
   }
 

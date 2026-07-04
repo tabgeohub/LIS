@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import useLogAction from "hooks/useLogAction";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { Geometry, useGeometriesStore } from "hooks/features/useGeometriesStore";
-import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
+import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 import {
   getHerhalenFilterFromGeometries,
   sortGeometriesForSelection,
@@ -24,7 +24,7 @@ export default function GeometriesList({
   const logAction = useLogAction();
   const { mapView, redGraphicsLayer, geometriesGraphicsLayer } = useMapViewState();
   const { dbGeometries } = useGeometriesStore();
-  const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryHover();
+  const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryListHover();
 
   const safeSelectedGeometries = useGeometryListInteractions({
     geometries,

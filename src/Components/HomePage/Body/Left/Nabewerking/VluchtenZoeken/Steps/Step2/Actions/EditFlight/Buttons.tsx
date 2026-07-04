@@ -51,7 +51,7 @@ export default function Buttons({
       id: selectedPlan.id,
     };
 
-    update(attributes, (responseData) => {
+    update({ data: attributes, onSuccess: (responseData) => {
       setSelectedPlan({
         ...selectedPlan,
         omschrijving: responseData.result.omschrijving,
@@ -65,7 +65,7 @@ export default function Buttons({
         aanvullende: responseData.result.aanvullende,
       });
       setAction("none");
-    });
+    },});
 
     logStep("User clicked 'Save' button to edit flight plan data", {
       omschrijving: selectedPlan.omschrijving,

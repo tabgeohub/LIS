@@ -20,16 +20,16 @@ export default function Buttons({
 
     const mergedIds = Array.from(new Set([...selectedIds, ...dataIds]));
 
-    update(
-      {
+    update({
+      data: {
         points: mergedIds,
         id: selectedPlan?.id,
       },
-      () => {
+      onSuccess: () => {
         setStep(1);
         setFase("all");
-      }
-    );
+      },
+    });
   }
   return (
     <div className="flex justify-end mt-4 gap-x-2 px-2">
