@@ -1,15 +1,13 @@
 import { useStarredAll } from "@helpers/ZustandStates/starredAll";
 import { EnrichedPointType, FlightPlanType } from "Types";
-import { saveAs } from "file-saver";
 import * as XLSX from "@e965/xlsx";
-import shpwrite from "@mapbox/shp-write";
+import { saveAs } from "file-saver";
 import {
-  FeatureCollection,
-  Point as pt,
-  Feature,
-  Polygon as pl,
-} from "geojson";
-import JSZip from "jszip";
+  downloadCsvFromRows,
+  downloadEnrichedPointsShapefile,
+  downloadXlsxFromRows,
+  exportFlightPlansShapefile,
+} from "@helpers/tableExports/pointsPlansTableExport";
 import { FaListAlt, FaSave, FaFolderOpen } from "react-icons/fa";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { MdDeleteOutline } from "react-icons/md";
@@ -17,18 +15,14 @@ import { PiSelectionForegroundThin } from "react-icons/pi";
 import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
 
 export default function GroupFunctions({
   setFase,
   target,
   pointsData,
   flightPlansData,
-}: {
-  setFase: (value: string) => void;
-  target: string;
-  pointsData: EnrichedPointType[];
-  flightPlansData: FlightPlanType[];
-}) {
+}: SearchedResultsTargetProps) {
   const logAction = useLogAction();
 
   const { setStarredAll } = useStarredAll();
@@ -44,17 +38,7 @@ export default function GroupFunctions({
 
   const exportCsv = () => {
     if (target === "points") {
-      const points = pointsData as EnrichedPointType[];
-      const headers = Object.keys(points[0]);
-      const csv = [
-        headers.join(","),
-        ...points.map((p) =>
-          headers.map((h) => `${p[h as keyof EnrichedPointType]}`).join(",")
-        ),
-      ].join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, "points_export.csv");
+      downloadCsvFromRows({ rows: pointsData, filename: "points_export.csv" });
 
       logAction({
         message: "User exported points to CSV",
@@ -100,14 +84,11 @@ export default function GroupFunctions({
 
   const exportXlsx = () => {
     if (target === "points") {
-      const points = pointsData as EnrichedPointType[];
-      const worksheet = XLSX.utils.json_to_sheet(points);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Points");
-
-      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], { type: "application/octet-stream" });
-      saveAs(blob, "points_export.xlsx");
+      downloadXlsxFromRows({
+        rows: pointsData,
+        filename: "points_export.xlsx",
+        sheetName: "Points",
+      });
 
       logAction({
         message: "User exported points to XLSX",
@@ -147,99 +128,16 @@ export default function GroupFunctions({
     }
   };
 
-  function getBboxPolygon(coords: [number, number][]): pl {
-    const lons = coords.map((c) => c[0]);
-    const lats = coords.map((c) => c[1]);
-
-    const minX = Math.min(...lons);
-    const maxX = Math.max(...lons);
-    const minY = Math.min(...lats);
-    const maxY = Math.max(...lats);
-
-    const polygon: pl = {
-      type: "Polygon",
-      coordinates: [
-        [
-          [minX, minY],
-          [maxX, minY],
-          [maxX, maxY],
-          [minX, maxY],
-          [minX, minY],
-        ],
-      ],
-    };
-
-    logAction({
-      message: "User created a quadrant polygon",
-      step: `Searched results - ${target} drop down`,
-    });
-
-    return polygon;
-  }
-
   const exportShp = async () => {
     if (target === "points") {
-      const plans = pointsData as EnrichedPointType[];
-
-      const geojsonPlans: FeatureCollection<pt> = {
-        type: "FeatureCollection",
-        features: plans.map((point) => {
-          const feature: Feature<pt> = {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [point.longitude, point.latitude],
-            },
-            properties: { ...point },
-          };
-          return feature;
-        }),
-      };
-
-      shpwrite.download(geojsonPlans, {
-        compression: "DEFLATE",
-        outputType: "blob",
-      });
+      downloadEnrichedPointsShapefile(pointsData);
 
       logAction({
         message: "User exported flight plans to shapefile",
         step: `Searched results - ${target} drop down`,
       });
     } else {
-      const zip = new JSZip();
-      const plans = flightPlansData as FlightPlanType[];
-
-      const geojsonPlans: FeatureCollection<pl> = {
-        type: "FeatureCollection",
-        features: plans.map((plan) => {
-          const coords: [number, number][] = plan.points.map((pt) => [
-            pt.longitude,
-            pt.latitude,
-          ]);
-
-          const polygon = getBboxPolygon(coords);
-
-          return {
-            type: "Feature",
-            geometry: polygon,
-            properties: {
-              id: plan.id,
-              name: plan.vluchtnummer,
-              date: plan.datum,
-            },
-          };
-        }),
-      };
-
-      const plansZip = shpwrite.zip(geojsonPlans, {
-        compression: "DEFLATE",
-        outputType: "blob",
-      });
-
-      zip.file("plans.zip", plansZip);
-
-      const finalZipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(finalZipBlob, "exports_shapefiles.zip");
+      await exportFlightPlansShapefile(flightPlansData);
 
       logAction({
         message: "User exported flight plans to shapefile",

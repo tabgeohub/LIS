@@ -1,10 +1,14 @@
 import { useEffect, RefObject } from "react";
 
-export const useClickOutside = (
-  popupRef: RefObject<HTMLDivElement>,
-  setClickedPoint: (point: undefined) => void,
-  setClickedPointPosition: (position: null) => void
-) => {
+type UseClickOutsideInput = {
+  popupRef: RefObject<HTMLDivElement>;
+  setClickedPoint: (point: undefined) => void;
+  setClickedPointPosition: (position: null) => void;
+};
+
+export const useClickOutside = (input: UseClickOutsideInput) => {
+  const { popupRef, setClickedPoint, setClickedPointPosition } = input;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -22,4 +26,3 @@ export const useClickOutside = (
     };
   }, [popupRef, setClickedPoint, setClickedPointPosition]);
 };
-

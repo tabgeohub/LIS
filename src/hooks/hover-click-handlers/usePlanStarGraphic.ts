@@ -16,18 +16,19 @@ function getStarSymbolOptions(
     : PLAN_BOUNDING_BOX_SYMBOLS.starTable;
 }
 
-export function addPlanStarGraphic(
-  plan: FlightPlanType,
-  layer: __esri.GraphicsLayer,
-  variant: PlanStarGraphicVariant = "search"
-) {
-  const graphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
+export function addPlanStarGraphic(input: {
+  plan: FlightPlanType;
+  layer: __esri.GraphicsLayer;
+  variant?: PlanStarGraphicVariant;
+}) {
+  const variant = input.variant ?? "search";
+  const graphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(input.plan), {
     symbolOptions: getStarSymbolOptions(variant),
-    attributes: { id: plan.id },
+    attributes: { id: input.plan.id },
   });
 
   if (graphic) {
-    layer.graphics.add(graphic);
+    input.layer.graphics.add(graphic);
   }
 }
 
@@ -40,12 +41,14 @@ export function removePlanStarGraphics(
   );
 }
 
-export function addPlanStarGraphics(
-  plans: FlightPlanType[],
-  layer: __esri.GraphicsLayer,
-  variant: PlanStarGraphicVariant = "search"
-) {
-  plans.forEach((plan) => addPlanStarGraphic(plan, layer, variant));
+export function addPlanStarGraphics(input: {
+  plans: FlightPlanType[];
+  layer: __esri.GraphicsLayer;
+  variant?: PlanStarGraphicVariant;
+}) {
+  input.plans.forEach((plan) =>
+    addPlanStarGraphic({ plan, layer: input.layer, variant: input.variant })
+  );
 }
 
 export function usePlanStarGraphic() {

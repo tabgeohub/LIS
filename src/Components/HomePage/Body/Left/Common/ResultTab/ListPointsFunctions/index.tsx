@@ -12,17 +12,18 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType } from "Types";
 import { PiSelectionForegroundThin } from "react-icons/pi";
-import { saveAs } from "file-saver";
-import * as XLSX from "@e965/xlsx";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { FaFolderOpen } from "react-icons/fa6";
 import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
-import shpwrite from "@mapbox/shp-write";
-import { FeatureCollection, Point as pt, Feature } from "geojson";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import {
+  downloadCsvFromRows,
+  downloadEnrichedPointsShapefile,
+  downloadXlsxFromRows,
+} from "@helpers/tableExports/pointsPlansTableExport";
 
 export default function ListPointFunctions({
   starredPoints,
@@ -96,16 +97,7 @@ export default function ListPointFunctions({
 
   const exportCsv = () => {
     const points = pointsTable as EnrichedPointType[];
-    const headers = Object.keys(points[0]);
-    const csv = [
-      headers.join(","),
-      ...points.map((p) =>
-        headers.map((h) => `"${p[h as keyof EnrichedPointType]}"`).join(",")
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "points_export.csv");
+    downloadCsvFromRows({ rows: points, filename: "points_export.csv" });
 
     logAction({
       message: `User clicked 'Exporteer naar CSV'`,
@@ -115,13 +107,11 @@ export default function ListPointFunctions({
 
   const exportXlsx = () => {
     const points = pointsTable as EnrichedPointType[];
-    const worksheet = XLSX.utils.json_to_sheet(points);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Points");
-
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([wbout], { type: "application/octet-stream" });
-    saveAs(blob, "points_export.xlsx");
+    downloadXlsxFromRows({
+      rows: points,
+      filename: "points_export.xlsx",
+      sheetName: "Points",
+    });
 
     logAction({
       message: `User clicked 'Exporteer naar XLSX'`,
@@ -130,27 +120,8 @@ export default function ListPointFunctions({
   };
 
   const exportShp = async () => {
-    const plans = pointsTable as EnrichedPointType[];
-
-    const geojsonPlans: FeatureCollection<pt> = {
-      type: "FeatureCollection",
-      features: plans.map((point) => {
-        const feature: Feature<pt> = {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [point.longitude, point.latitude],
-          },
-          properties: { ...point },
-        };
-        return feature;
-      }),
-    };
-
-    shpwrite.download(geojsonPlans, {
-      compression: "DEFLATE",
-      outputType: "blob",
-    });
+    const points = pointsTable as EnrichedPointType[];
+    downloadEnrichedPointsShapefile(points);
 
     logAction({
       message: `User clicked 'Exporteer naar shapefile'`,

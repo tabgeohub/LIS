@@ -6,26 +6,26 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
 import Loading from "./Loading";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
 import {
   buildPointUpdatePayload,
   pickPointCoreLogData,
 } from "@helpers/points/buildPointUpdatePayload";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setStep,
 }: {
   setStep: (value: number) => void;
 }) {
-  const logAction = useLogAction();
-
+  const { withLog, logStep, labels, content } = useWizardButtons(
+    "Edit point details - Step 1"
+  );
   const { points, setPoints } = usePointsStore();
   const { mapView, redGraphicsLayer, yellowGraphicsLayer } = useMapViewState();
-
   const formFields = useDeletePointState(pickDeletePointFormFields);
   const { setMainStep, selectedPoint, clear } = useDeletePointState();
-
   const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
 
   function handleSubmit() {
@@ -37,87 +37,54 @@ export default function Buttons({
       created_at: selectedPoint.created_at,
     });
 
-    update({ data: newPoint, onSuccess: (responseData) => {
-      if (!responseData.result) return;
+    update({
+      data: newPoint,
+      onSuccess: (responseData) => {
+        if (!responseData.result) return;
 
-      const updatedPoints = points.map((point) =>
-        point.id === responseData.result.id
-          ? { ...point, ...responseData.result }
-          : point
-      );
+        const updatedPoints = points.map((point) =>
+          point.id === responseData.result.id
+            ? { ...point, ...responseData.result }
+            : point
+        );
 
-      setPoints(updatedPoints);
-      mapView?.graphics.removeAll();
-      redGraphicsLayer?.removeAll();
-      yellowGraphicsLayer?.removeAll();
-
-      setMainStep("main");
-    },});
-
-    logAction({
-      message: "User clicked 'Save' button",
-      step: "Edit point details - Step 1",
-      newData: pickPointCoreLogData(selectedPoint),
+        setPoints(updatedPoints);
+        mapView?.graphics.removeAll();
+        redGraphicsLayer?.removeAll();
+        yellowGraphicsLayer?.removeAll();
+        setMainStep("main");
+      },
     });
+
+    logStep("User clicked 'Save' button", pickPointCoreLogData(selectedPoint));
   }
 
-  const content = useContent();
+  const geometrieLabel =
+    content.tools.aandachtspuntenVerwijderen.editPoint.geometrieAanpassen;
 
   return (
     <>
-      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-        <button
-          onClick={() => {
-            clear();
-            setMainStep("main");
-
-            logAction({
-              message: "User clicked 'Back' button",
-              step: "Edit point details - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
-          {content.common.verwijderen}
-        </button>
-
-        <button
-          onClick={() => {
-            setStep(2);
-
-            logAction({
-              message: "User clicked 'Edit geometry' button",
-              step: "Edit point details - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
+      <WizardButtonBar
+        className={WIZARD_BUTTON_BAR_CLASS}
+        buttons={[
           {
-            content.tools.aandachtspuntenVerwijderen.editPoint
-              .geometrieAanpassen
-          }
-        </button>
-
-        <button onClick={handleSubmit} className="gray-button">
-          {content.common.opslaan}
-        </button>
-
-        <button
-          className="gray-button"
-          type="button"
-          onClick={() => {
-            setMainStep("main");
-
-            logAction({
-              message: "User clicked 'Cancel' button",
-              step: "Edit point details - Step 1",
-            });
-          }}
-        >
-          {content.common.annuleren}
-        </button>
-      </div>
-
+            label: content.common.verwijderen,
+            onClick: withLog("User clicked 'Back' button", () => {
+              clear();
+              setMainStep("main");
+            }),
+          },
+          {
+            label: geometrieLabel,
+            onClick: withLog("User clicked 'Edit geometry' button", () => setStep(2)),
+          },
+          { label: labels.opslaan, onClick: handleSubmit },
+          {
+            label: labels.annuleren,
+            onClick: withLog("User clicked 'Cancel' button", () => setMainStep("main")),
+          },
+        ]}
+      />
       {loading && <Loading />}
     </>
   );

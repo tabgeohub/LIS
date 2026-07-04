@@ -56,17 +56,17 @@ export function resetSketchSession({
 }
 
 /** Destroy-only sketch cleanup (e.g. when switching tools in Options). */
-export function destroySketchViewModel(
-  sketchViewModel: SketchViewModel | null,
-  setSketchViewModel?: (value: SketchViewModel | null) => void,
-  mapView?: MapView | null
-) {
-  if (mapView) {
-    resetMapCursor(mapView);
+export function destroySketchViewModel(input: {
+  sketchViewModel: SketchViewModel | null;
+  setSketchViewModel?: (value: SketchViewModel | null) => void;
+  mapView?: MapView | null;
+}) {
+  if (input.mapView) {
+    resetMapCursor(input.mapView);
   }
 
-  if (!sketchViewModel) return;
+  if (!input.sketchViewModel) return;
 
-  sketchViewModel.destroy();
-  setSketchViewModel?.(null);
+  input.sketchViewModel.destroy();
+  input.setSketchViewModel?.(null);
 }

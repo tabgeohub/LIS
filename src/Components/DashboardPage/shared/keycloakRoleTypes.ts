@@ -22,6 +22,10 @@ export function isUnwantedRole(role: string): boolean {
   return unwantedRoles.some((unwanted) => role.includes(unwanted));
 }
 
+export function filterUnwantedRoleNames(roles: string[]): string[] {
+  return roles.filter((role) => !isUnwantedRole(role));
+}
+
 export function filterRealmRoles(roles: AvailableRole[]): AvailableRole[] {
   return roles.filter((role) => !isUnwantedRole(role.name));
 }

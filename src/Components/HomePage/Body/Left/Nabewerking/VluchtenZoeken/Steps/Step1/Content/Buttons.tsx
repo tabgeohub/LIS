@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import {
@@ -8,14 +7,12 @@ import {
   collectPointsForCenterAndZoom,
 } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import useLogAction from "hooks/useLogAction";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
-  const { step, setStep, selectedPlan, setOpenFilter } =
-    useFinishedPlansState();
-
-  const logAction = useLogAction();
-
+  const { withLog, labels } = useWizardButtons("First step");
+  const { step, setStep, selectedPlan, setOpenFilter } = useFinishedPlansState();
   const { setSelectedTab } = useTabState();
   const { graphicsLayer, graphicsLayerHover, redGraphicsLayer, mapView } =
     useMapViewState();
@@ -35,7 +32,6 @@ export default function Buttons() {
     graphicsLayerHover?.removeAll();
 
     const points = collectPointsForCenterAndZoom(selectedPlan);
-
     if (points.length > 0) {
       const { center, zoom } = calculateCenterAndZoom(points);
       if (
@@ -50,57 +46,37 @@ export default function Buttons() {
               y: center.latitude,
             },
           },
-          zoom: zoom,
+          zoom,
         });
       }
     }
+  }
 
-    logAction({
-      message: "User clicked 'Next' button",
-      step: "First step",
-    });
+  function handleCancel() {
+    graphicsLayer?.removeAll();
+    graphicsLayerHover?.removeAll();
+    redGraphicsLayer?.removeAll();
+    setSelectedTab("none");
   }
 
   return (
-    <>
-      <button
-        onClick={() => {
-          setOpenFilter(true);
-          logAction({
-            message: "User clicked 'Filter' button",
-            step: "First step",
-          });
-        }}
-        className="gray-button"
-      >
-        Filteren
-      </button>
-
-      <button
-        disabled={!selectedPlan}
-        onClick={handleNext}
-        className="gray-button"
-      >
-        Volgende
-      </button>
-
-      <button
-        onClick={() => {
-          graphicsLayer?.removeAll();
-          graphicsLayerHover?.removeAll();
-          redGraphicsLayer?.removeAll();
-
-          setSelectedTab("none");
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "First step",
-          });
-        }}
-        className="gray-button"
-      >
-        Annuleren
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: labels.filteren,
+          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+        },
+        {
+          label: labels.volgende,
+          onClick: withLog("User clicked 'Next' button", handleNext),
+          disabled: !selectedPlan,
+        },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", handleCancel),
+        },
+      ]}
+    />
   );
 }

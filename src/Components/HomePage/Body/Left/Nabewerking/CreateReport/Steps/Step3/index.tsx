@@ -18,12 +18,12 @@ export default function Step3() {
     fail,
   } = useUploadZip();
 
-  const { handleCopyLink } = useCopyLink(downloadInfo, setErrorMsg, fail);
-  const { handleDirectDownload, isDownloading } = useDirectDownload(
+  const { handleCopyLink } = useCopyLink({ downloadInfo, setErrorMsg, fail });
+  const { handleDirectDownload, isDownloading } = useDirectDownload({
     downloadInfo,
     setErrorMsg,
-    fail
-  );
+    fail,
+  });
 
   // Show "preparing link" only when zipping is done, we started uploading, and no link yet
   const isPreparingLink =

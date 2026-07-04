@@ -47,7 +47,7 @@ export async function generatePdfReport(
   addGeneralInfoTable({ doc, pointData, pilootOptions });
   addCoordinatesTable(doc, pointData);
   addDetailTable(doc, pointData);
-  await addMapPages(doc, overviewImage, detailImage);
+  await addMapPages({ doc, overviewImage, detailImage });
 
   if (attachments && attachments.length > 0) {
     await addAttachmentPages(doc, attachments);

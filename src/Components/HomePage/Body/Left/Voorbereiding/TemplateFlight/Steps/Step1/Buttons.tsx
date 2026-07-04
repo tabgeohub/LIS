@@ -1,28 +1,19 @@
-import useLogAction from "hooks/useLogAction";
 import { useTemplateFlightState } from "../../templateFlightStates";
-import { useContent } from "hooks/useContent";
 import { useCreateData } from "utils/useCreateData";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({ name }: { name: string }) {
+  const { logStep, labels } = useWizardButtons("First step");
   const { step, setStep } = useTemplateFlightState();
-
-  const logAction = useLogAction();
-
   const { create } = useCreateData("/templateFlight/templateName");
-
-  const content = useContent();
 
   const handleNext = () => {
     create({
       data: { name },
       onSuccess: () => {
         setStep(step + 1);
-
-        logAction({
-          message: "User clicked 'Next' button to create a flight template",
-          step: "First step",
-          newData: { name },
-        });
+        logStep("User clicked 'Next' button to create a flight template", { name });
       },
       disableErrorMessage: true,
       disableSuccessMessage: true,
@@ -30,14 +21,11 @@ export default function Buttons({ name }: { name: string }) {
   };
 
   return (
-    <div className="pt-2 flex justify-end">
-      <button
-        disabled={name === ""}
-        onClick={handleNext}
-        className="gray-button"
-      >
-        {content.common.volgende}
-      </button>
-    </div>
+    <WizardButtonBar
+      className="pt-2 flex justify-end"
+      buttons={[
+        { label: labels.volgende, onClick: handleNext, disabled: name === "" },
+      ]}
+    />
   );
 }

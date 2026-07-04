@@ -96,7 +96,7 @@ export default function List({
       });
     } else {
       setStarredPlans((prev) => [...prev, plan]);
-      addPlanStarGraphic(plan, redGraphicsLayer, "search");
+      addPlanStarGraphic({ plan, layer: redGraphicsLayer, variant: "search" });
 
       logAction({
         message: "User starred a flight plan",

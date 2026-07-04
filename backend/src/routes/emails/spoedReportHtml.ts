@@ -79,11 +79,12 @@ const PDF_HEAD_STYLES =
   ".img-block img { width:100%; border:2px solid black; margin-bottom:12px; }" +
   "</style>";
 
-export function buildSpoedPdfHtml(
-  fields: SpoedReportFields,
-  screenshotTags: string,
-  imageTags: string
-): string {
+export function buildSpoedPdfHtml(input: {
+  fields: SpoedReportFields;
+  screenshotTags: string;
+  imageTags: string;
+}): string {
+  const { fields, screenshotTags, imageTags } = input;
   const body =
     "<h3>Waarneming</h3>" +
     htmlLabeledValue("Vlucht:", fields.flightNumber) +

@@ -3,11 +3,14 @@ import toast from "react-hot-toast";
 import { useContent } from "hooks/useContent";
 import type { DownloadInfo } from "../types";
 
-export function useDirectDownload(
-  downloadInfo: DownloadInfo | null,
-  setErrorMsg: (msg: string | null) => void,
-  fail: (msg: string) => void
-) {
+type UseDirectDownloadInput = {
+  downloadInfo: DownloadInfo | null;
+  setErrorMsg: (msg: string | null) => void;
+  fail: (msg: string) => void;
+};
+
+export function useDirectDownload(input: UseDirectDownloadInput) {
+  const { downloadInfo, setErrorMsg, fail } = input;
   const content = useContent();
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -55,6 +58,3 @@ export function useDirectDownload(
 
   return { handleDirectDownload, isDownloading };
 }
-
-
-

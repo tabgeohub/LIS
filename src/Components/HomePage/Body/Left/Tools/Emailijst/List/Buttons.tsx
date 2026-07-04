@@ -1,8 +1,8 @@
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { EmailListStepType } from "..";
 import { EmailType } from "Types";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setStep,
@@ -13,71 +13,36 @@ export default function Buttons({
   selectedEmail: EmailType | null;
   setOpenDeleteModal: (value: boolean) => void;
 }) {
-  const logAction = useLogAction();
-
+  const { withLog, labels, content } = useWizardButtons("Emailijst - List");
   const { setSelectedTab } = useTabState();
 
-  const content = useContent();
-
   return (
-    <>
-      <button
-        onClick={() => {
-          setStep("add");
-
-          logAction({
-            message: "User clicked 'Add' button",
-            step: "Emailijst - List",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.toevoegen}
-      </button>
-
-      <button
-        disabled={selectedEmail === null}
-        onClick={() => {
-          setStep("edit");
-
-          logAction({
-            message: "User clicked 'Change' button",
-            step: "Emailijst - List",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.wijzigen}
-      </button>
-
-      <button
-        onClick={() => {
-          setOpenDeleteModal(true);
-
-          logAction({
-            message: "User clicked 'Delete' button",
-            step: "Emailijst - List",
-          });
-        }}
-        disabled={selectedEmail === null}
-        className="gray-button"
-      >
-        {content.common.verwijderen}
-      </button>
-
-      <button
-        onClick={() => {
-          setSelectedTab("none");
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "Emailijst - List",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.annuleren}
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: labels.toevoegen,
+          onClick: withLog("User clicked 'Add' button", () => setStep("add")),
+        },
+        {
+          label: content.common.wijzigen,
+          onClick: withLog("User clicked 'Change' button", () => setStep("edit")),
+          disabled: selectedEmail === null,
+        },
+        {
+          label: content.common.verwijderen,
+          onClick: withLog("User clicked 'Delete' button", () =>
+            setOpenDeleteModal(true)
+          ),
+          disabled: selectedEmail === null,
+        },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", () =>
+            setSelectedTab("none")
+          ),
+        },
+      ]}
+    />
   );
 }

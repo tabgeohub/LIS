@@ -95,7 +95,7 @@ export default function FlightPlansTable({
       }
 
       graphicsLayerHover?.removeAll();
-      addPlanStarGraphic(plan, graphicsLayer, "table");
+      addPlanStarGraphic({ plan, layer: graphicsLayer, variant: "table" });
     }
   };
 

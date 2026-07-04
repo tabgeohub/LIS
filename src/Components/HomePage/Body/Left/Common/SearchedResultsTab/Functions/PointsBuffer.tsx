@@ -1,22 +1,19 @@
 import { useState } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { EnrichedPointType, FlightPlanType } from "Types";
 import {
   bufferFlightPlansOnLayer,
   bufferPointsOnLayer,
 } from "@helpers/ArcGISHelpers/bufferGraphics";
+import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
+
+import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
 
 export default function PointsBuffer({
   setFase,
   target,
   pointsData,
   flightPlansData,
-}: {
-  setFase: (value: string) => void;
-  target: string;
-  pointsData: EnrichedPointType[];
-  flightPlansData: FlightPlanType[];
-}) {
+}: SearchedResultsTargetProps) {
   const { mapView, graphicsLayer } = useMapViewState();
 
   const [distance, setDistance] = useState<number>(0);

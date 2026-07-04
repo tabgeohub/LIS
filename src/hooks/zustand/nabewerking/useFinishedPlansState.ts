@@ -15,12 +15,20 @@ import {
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
 import { createPlanWizardCoreSetters } from "hooks/zustand/shared/planWizardCore";
+import {
+  createPeriodFilterSetters,
+  emptyPeriodFilter,
+  PeriodFilterSetters,
+  PeriodFilterValues,
+} from "hooks/zustand/shared/periodFilterState";
 
 interface FinishedPlansState
   extends FlightPlanFormFieldValues,
     PlanListFilterValues,
+    PeriodFilterValues,
     FlightPlanFormFieldSetters,
-    PlanListFilterSetters {
+    PlanListFilterSetters,
+    PeriodFilterSetters {
   step: number;
   setStep: (value: number) => void;
 
@@ -32,15 +40,6 @@ interface FinishedPlansState
 
   filteredPlans: FinishedFlightPlanType[];
   setFilteredPlans: (value: FinishedFlightPlanType[]) => void;
-
-  periode: string;
-  setPeriode: (value: string) => void;
-
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-
-  dateTo: string;
-  setDateTo: (value: string) => void;
 
   selectedPoint: FinishedPointType | null;
   setSelectedPoint: (value: FinishedPointType | null) => void;
@@ -56,9 +55,8 @@ const initialState = {
   selectedPlan: null as FinishedFlightPlanType | null,
   filteredPoints: [] as FinishedPointType[],
   filteredPlans: [] as FinishedFlightPlanType[],
+  ...emptyPeriodFilter,
   periode: "Alle",
-  dateFrom: "",
-  dateTo: "",
   selectedPoint: null as FinishedPointType | null,
   selectedGeometry: null as FinishedGeometryType | null,
   ...emptyPlanListFilter,
@@ -76,9 +74,7 @@ const clearState = {
 export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
   ...initialState,
   ...createPlanWizardCoreSetters(set),
-  setPeriode: (value) => set({ periode: value }),
-  setDateFrom: (value) => set({ dateFrom: value }),
-  setDateTo: (value) => set({ dateTo: value }),
+  ...createPeriodFilterSetters(set),
   setSelectedPoint: (value) => set({ selectedPoint: value }),
   setSelectedGeometry: (value) => set({ selectedGeometry: value }),
   ...createFlightPlanFormFieldSetters(set),

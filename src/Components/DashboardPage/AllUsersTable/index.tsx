@@ -5,21 +5,10 @@ import Table from "./Table";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
-
-const unwantedRoles = [
-  "default-roles-",
-  "offline_access",
-  "uma_authorization",
-  "manage-account",
-  "manage-account-links",
-  "view-profile",
-  "manage-realm",
-];
+import { filterUnwantedRoleNames } from "../shared/keycloakRoleTypes";
 
 function filterUnwantedRoles(roles: string[]): string[] {
-  return roles.filter(
-    (role) => !unwantedRoles.some((unwanted) => role.includes(unwanted))
-  );
+  return filterUnwantedRoleNames(roles);
 }
 
 function mapKeycloakUserToUser(keycloakUser: KeycloakUser): KeycloakUser {

@@ -46,7 +46,7 @@ export const sendEmail: RequestHandler = async (req, res) => {
     }
 
     const emailHtml = buildSpoedEmailHtml(fields);
-    const pdfHtml = buildSpoedPdfHtml(fields, screenshotTags, imageTags);
+    const pdfHtml = buildSpoedPdfHtml({ fields, screenshotTags, imageTags });
     const pdfBuffer = await renderHtmlToPdfBuffer(pdfHtml);
 
     await sendSpoedReportMail({

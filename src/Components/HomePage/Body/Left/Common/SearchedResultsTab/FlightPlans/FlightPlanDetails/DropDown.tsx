@@ -11,8 +11,11 @@ import {
 } from "react-icons/md";
 import { FlightPlanType } from "Types";
 import { useDeleteData } from "utils/useDeleteData";
-import { computeFlightPlanCentroid } from "@helpers/ArcGISHelpers/computeFlightPlanCentroid";
-import { getFlightPlanPoints } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import {
+  panMapToFlightPlan,
+  zoomMapToFlightPlan,
+} from "@helpers/ArcGISHelpers/flightPlanMapActions";
+import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
 
 export default function DropDown({
   flightPlan,
@@ -33,26 +36,8 @@ export default function DropDown({
     setOpenSideBar(false);
   };
 
-  const getPlanCenter = () =>
-    computeFlightPlanCentroid(getFlightPlanPoints(flightPlan));
-
-  const zoomToPoint = () => {
-    if (mapView && flightPlan) {
-      const center = getPlanCenter();
-      if (center) {
-        mapView.goTo({ target: center, zoom: 8 });
-      }
-    }
-  };
-
-  const goToPoint = () => {
-    if (mapView && flightPlan) {
-      const center = getPlanCenter();
-      if (center) {
-        mapView.goTo(center);
-      }
-    }
-  };
+  const zoomToPoint = () => zoomMapToFlightPlan(mapView, flightPlan);
+  const goToPoint = () => panMapToFlightPlan(mapView, flightPlan);
 
   const { deleteData } = useDeleteData("/flightPlans");
 
@@ -99,29 +84,6 @@ export default function DropDown({
         }
         onClick={handleDeletePlan}
       />
-    </div>
-  );
-}
-
-interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  onClick: () => void;
-}
-
-function MenuItem({ icon, title, description, onClick }: MenuItemProps) {
-  return (
-    <div
-      className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-      onClick={onClick}
-    >
-      <div>{icon}</div>
-
-      <div>
-        <p className="text-[14px] font-semibold text-gray-800">{title}</p>
-        <p className="text-[12px] text-gray-500">{description}</p>
-      </div>
     </div>
   );
 }

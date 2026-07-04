@@ -1,5 +1,7 @@
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setStep,
@@ -12,33 +14,30 @@ export default function Buttons({
   selectedPlan: FlightPlanType;
   pointsData: EnrichedPointType[];
 }) {
+  const { labels } = useWizardButtons("Searched results - Add point");
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
   function handleSubmit() {
     const selectedIds = selectedPlan?.points?.map((p) => p.id) || [];
     const dataIds = pointsData.map((p) => p.id);
-
     const mergedIds = Array.from(new Set([...selectedIds, ...dataIds]));
 
     update({
-      data: {
-        points: mergedIds,
-        id: selectedPlan?.id,
-      },
+      data: { points: mergedIds, id: selectedPlan?.id },
       onSuccess: () => {
         setStep(1);
         setFase("all");
       },
     });
   }
+
   return (
-    <div className="flex justify-end mt-4 gap-x-2 px-2">
-      <button className="gray-button" onClick={handleSubmit}>
-        Toevoegen
-      </button>
-      <button className="gray-button" onClick={() => setFase("all")}>
-        Annuleren
-      </button>
-    </div>
+    <WizardButtonBar
+      className="flex justify-end mt-4 gap-x-2 px-2"
+      buttons={[
+        { label: labels.toevoegen, onClick: handleSubmit },
+        { label: labels.annuleren, onClick: () => setFase("all") },
+      ]}
+    />
   );
 }

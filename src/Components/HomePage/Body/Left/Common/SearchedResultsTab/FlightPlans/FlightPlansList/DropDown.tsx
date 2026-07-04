@@ -20,15 +20,14 @@ import {
   MdTableChart,
 } from "react-icons/md";
 
-import { saveAs } from "file-saver";
-import JSZip from "jszip";
-
-import shpwrite from "@mapbox/shp-write";
-import { FeatureCollection, Polygon as pl } from "geojson";
-import * as XLSX from "@e965/xlsx";
-
 import { useContent } from "hooks/useContent";
 import { addPlanStarGraphics } from "hooks/hover-click-handlers/usePlanStarGraphic";
+import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
+import {
+  downloadCsvFromRows,
+  downloadXlsxFromRows,
+  exportFlightPlansShapefile,
+} from "@helpers/tableExports/pointsPlansTableExport";
 
 export default function DropDown({
   starredPlans,
@@ -75,106 +74,32 @@ export default function DropDown({
     const unique = Array.from(new Map(combined.map((p) => [p.id, p])).values());
     setStarredPlans(unique);
 
-    addPlanStarGraphics(newStars, redGraphicsLayer, "search");
+    addPlanStarGraphics({
+      plans: newStars,
+      layer: redGraphicsLayer,
+      variant: "search",
+    });
   };
 
   const exportCsv = async () => {
-    const plans = flightPlansData as FlightPlanType[];
-
-    const headersPlans = Object.keys(plans[0]).filter(
-      (key) => key !== "points"
-    );
-
-    const csvPlans = [
-      headersPlans.join(","),
-      ...plans.map((p) =>
-        headersPlans
-          .map((h) => `"${p[h as keyof FlightPlanType] ?? ""}"`)
-          .join(",")
-      ),
-    ].join("\n");
-
-    const blobPlans = new Blob([csvPlans], { type: "text/csv;charset=utf-8;" });
-    saveAs(blobPlans, "plans_export.csv");
+    downloadCsvFromRows({
+      rows: flightPlansData,
+      filename: "plans_export.csv",
+      excludeKeys: ["points"],
+    });
   };
 
   const exportXlsx = async () => {
-    const plans = flightPlansData as FlightPlanType[];
-
-    const cleanedPlans = plans.map(({ points, ...rest }) => rest);
-    const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-    const wbPlans = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-    const plansBuffer = XLSX.write(wbPlans, {
-      bookType: "xlsx",
-      type: "array",
+    const cleanedPlans = flightPlansData.map(({ points, ...rest }) => rest);
+    downloadXlsxFromRows({
+      rows: cleanedPlans,
+      filename: "exports_xlsx.xlsx",
+      sheetName: "FlightPlans",
     });
-
-    const blob = new Blob([plansBuffer], { type: "application/octet-stream" });
-
-    saveAs(blob, "exports_xlsx.xlsx");
   };
 
-  function getBboxPolygon(coords: [number, number][]): pl {
-    const lons = coords.map((c) => c[0]);
-    const lats = coords.map((c) => c[1]);
-
-    const minX = Math.min(...lons);
-    const maxX = Math.max(...lons);
-    const minY = Math.min(...lats);
-    const maxY = Math.max(...lats);
-
-    const polygon: pl = {
-      type: "Polygon",
-      coordinates: [
-        [
-          [minX, minY],
-          [maxX, minY],
-          [maxX, maxY],
-          [minX, maxY],
-          [minX, minY],
-        ],
-      ],
-    };
-
-    return polygon;
-  }
-
   const exportShp = async () => {
-    const zip = new JSZip();
-    const plans = flightPlansData as FlightPlanType[];
-
-    const geojsonPlans: FeatureCollection<pl> = {
-      type: "FeatureCollection",
-      features: plans.map((plan) => {
-        const coords: [number, number][] = plan.points.map((pt) => [
-          pt.longitude,
-          pt.latitude,
-        ]);
-
-        const polygon = getBboxPolygon(coords);
-
-        return {
-          type: "Feature",
-          geometry: polygon,
-          properties: {
-            id: plan.id,
-            name: plan.vluchtnummer,
-            date: plan.datum,
-          },
-        };
-      }),
-    };
-
-    const plansZip = shpwrite.zip(geojsonPlans, {
-      compression: "DEFLATE",
-      outputType: "blob",
-    });
-
-    zip.file("plans.zip", plansZip);
-
-    const finalZipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(finalZipBlob, "exports_shapefiles.zip");
+    await exportFlightPlansShapefile(flightPlansData);
   };
 
   const content = useContent();
@@ -295,29 +220,6 @@ export default function DropDown({
             .subtitle
         }
       />
-    </div>
-  );
-}
-
-interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  onClick: () => void;
-}
-
-function MenuItem({ icon, title, description, onClick }: MenuItemProps) {
-  return (
-    <div
-      className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-      onClick={onClick}
-    >
-      <div>{icon}</div>
-
-      <div>
-        <p className="text-[14px] font-semibold text-gray-800">{title}</p>
-        <p className="text-[12px] text-gray-500">{description}</p>
-      </div>
     </div>
   );
 }

@@ -1,15 +1,17 @@
-import { useState } from "react";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import type { DownloadInfo } from "../types";
 
-export function useCopyLink(
-  downloadInfo: DownloadInfo | null,
-  setErrorMsg: (msg: string | null) => void,
-  fail: (msg: string) => void
-) {
+type UseCopyLinkInput = {
+  downloadInfo: DownloadInfo | null;
+  setErrorMsg: (msg: string | null) => void;
+  fail: (msg: string) => void;
+};
+
+export function useCopyLink(input: UseCopyLinkInput) {
+  const { downloadInfo, setErrorMsg, fail } = input;
   const content = useContent();
   const logAction = useLogAction();
 
@@ -34,7 +36,6 @@ export function useCopyLink(
     try {
       setErrorMsg(null);
 
-      // Extract filename from url: /api/file-download/:filename
       const url = new URL(downloadInfo.url, getBackEndUrl());
       const parts = url.pathname.split("/");
       const filename = parts[parts.length - 1];
@@ -74,6 +75,3 @@ export function useCopyLink(
 
   return { handleCopyLink };
 }
-
-
-

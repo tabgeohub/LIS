@@ -91,7 +91,7 @@ export function mapImportRowsToPoints(input: {
 
       headers.forEach((key, index) => {
         const value = row[index];
-        applyImportColumn(obj, key, value, resolveOrgValue);
+        applyImportColumn({ obj, key, value, resolveOrgValue });
       });
 
       return obj;
@@ -99,12 +99,13 @@ export function mapImportRowsToPoints(input: {
     .filter((p) => p.omschrijving !== "");
 }
 
-function applyImportColumn(
-  obj: PointImportRow,
-  key: string,
-  value: unknown,
-  resolveOrgValue: (label: string) => string
-) {
+function applyImportColumn(input: {
+  obj: PointImportRow;
+  key: string;
+  value: unknown;
+  resolveOrgValue: (label: string) => string;
+}) {
+  const { obj, key, value, resolveOrgValue } = input;
   if (key === "omschrijving") {
     obj.omschrijving = String(value || "").trim();
     return;

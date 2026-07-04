@@ -1,8 +1,14 @@
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
 import { create } from "zustand";
+import {
+  createPeriodFilterSetters,
+  emptyPeriodFilter,
+  PeriodFilterSetters,
+  PeriodFilterValues,
+} from "hooks/zustand/shared/periodFilterState";
 
-interface CreateReportState {
+interface CreateReportState extends PeriodFilterValues, PeriodFilterSetters {
   step: number;
   setStep: (value: number) => void;
 
@@ -30,15 +36,6 @@ interface CreateReportState {
   zippingStatus: string;
   setZippingStatus: (value: string) => void;
 
-  periode: string;
-  setPeriode: (value: string) => void;
-
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-
-  dateTo: string;
-  setDateTo: (value: string) => void;
-
   clear: () => void;
 }
 
@@ -52,9 +49,7 @@ const initialState = {
   filterTerm: "",
   zipFile: null as Blob | null,
   zippingStatus: "",
-  periode: "alle",
-  dateFrom: "",
-  dateTo: "",
+  ...emptyPeriodFilter,
 };
 
 /** Subset reset when leaving the wizard (preserves filteredPlans, filterTerm, zip). */
@@ -80,8 +75,6 @@ export const useCreateReportState = create<CreateReportState>((set) => ({
   setFilterTerm: (value) => set({ filterTerm: value }),
   setZipFile: (value) => set({ zipFile: value }),
   setZippingStatus: (value) => set({ zippingStatus: value }),
-  setPeriode: (value) => set({ periode: value }),
-  setDateFrom: (value) => set({ dateFrom: value }),
-  setDateTo: (value) => set({ dateTo: value }),
+  ...createPeriodFilterSetters(set),
   clear: () => set(clearState),
 }));

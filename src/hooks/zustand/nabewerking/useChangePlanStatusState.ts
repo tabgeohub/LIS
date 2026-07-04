@@ -1,8 +1,14 @@
 import { FlightPlanType } from "Types";
 
 import { create } from "zustand";
+import {
+  createPeriodFilterSetters,
+  emptyPeriodFilter,
+  PeriodFilterSetters,
+  PeriodFilterValues,
+} from "hooks/zustand/shared/periodFilterState";
 
-interface ChangePlanStatusState {
+interface ChangePlanStatusState extends PeriodFilterValues, PeriodFilterSetters {
   step: number;
   setStep: (value: number) => void;
 
@@ -21,15 +27,6 @@ interface ChangePlanStatusState {
   filterTerm: string;
   setFilterTerm: (value: string) => void;
 
-  periode: string;
-  setPeriode: (value: string) => void;
-
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-
-  dateTo: string;
-  setDateTo: (value: string) => void;
-
   clear: () => void;
 }
 
@@ -40,9 +37,7 @@ const initialState = {
   filteredPlans: [] as FlightPlanType[],
   openFilter: false,
   filterTerm: "",
-  periode: "alle",
-  dateFrom: "",
-  dateTo: "",
+  ...emptyPeriodFilter,
 };
 
 /** Subset reset when leaving the wizard (preserves filteredPlans, filterTerm). */
@@ -64,8 +59,6 @@ export const useChangePlanStatusState = create<ChangePlanStatusState>((set) => (
   setFilteredPlans: (value) => set({ filteredPlans: value }),
   setOpenFilter: (value) => set({ openFilter: value }),
   setFilterTerm: (value) => set({ filterTerm: value }),
-  setPeriode: (value) => set({ periode: value }),
-  setDateFrom: (value) => set({ dateFrom: value }),
-  setDateTo: (value) => set({ dateTo: value }),
+  ...createPeriodFilterSetters(set),
   clear: () => set(clearState),
 }));

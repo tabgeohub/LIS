@@ -1,18 +1,23 @@
-import {
-  BaseGeometryData,
-  createGeometryGraphic,
-  GEOMETRY_REPORT_SYMBOL,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { calculateGeometryCentroid } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
-import { generatePdfReport } from "../generatePdfReport";
-import { FinishedPointType } from "Types/finished_plans";
+import { BaseGeometryData } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { ProcessGeometryParams, ProcessedItem } from "./types";
-import {
-  buildPdfPointData,
-  fetchOverviewDetailImages,
-  resolveReportAttachments,
-  toSafeReportName,
-} from "./reportPdfCommon";
+import { addGeometryReportGraphic } from "./addGeometryReportGraphic";
+import { runReportGenerationPipeline } from "./reportGenerationPipeline";
+
+export function resolveGeometryReportContext(
+  geometry: ProcessGeometryParams["geometry"]
+) {
+  const firstPoint = geometry.points?.[0];
+  if (!firstPoint) throw new Error("Geometry has no points");
+
+  const centroid = calculateGeometryCentroid(geometry as BaseGeometryData);
+  if (!centroid) throw new Error("Could not calculate geometry centroid");
+
+  const description =
+    geometry.geometry_omschrijving || `Geometrie ${geometry.id}`;
+
+  return { firstPoint, centroid, description };
+}
 
 export async function processGeometry(
   params: ProcessGeometryParams
@@ -34,64 +39,27 @@ export async function processGeometry(
     setZippingStatus,
   } = params;
 
+  const { firstPoint, centroid, description } =
+    resolveGeometryReportContext(geometry);
   const currentIndex = pointsOffset + index + 1;
-  setZippingStatus(
-    `Rapport ${currentIndex} van ${totalItems} wordt gegenereerd: '${
-      geometry.geometry_omschrijving || `Geometrie ${geometry.id}`
-    }'`
-  );
 
-  const firstPoint = geometry.points?.[0];
-  if (!firstPoint) throw new Error("Geometry has no points");
-
-  const centroid = calculateGeometryCentroid(geometry as BaseGeometryData);
-  if (!centroid) throw new Error("Could not calculate geometry centroid");
-
-  const geometryGraphic = createGeometryGraphic(geometry as BaseGeometryData, {
-    symbolOptions: GEOMETRY_REPORT_SYMBOL,
-  });
-  if (geometryGraphic) {
-    tempLayer.removeAll();
-    tempLayer.add(geometryGraphic);
-  }
-
-  const [overviewImage, detailImage] = await fetchOverviewDetailImages({
-    longitude: centroid.longitude,
-    latitude: centroid.latitude,
-    mapServerUrl,
-  });
-
-  const geometryData = buildPdfPointData({
+  return runReportGenerationPipeline({
+    setZippingStatus,
+    statusMessage: `Rapport ${currentIndex} van ${totalItems} wordt gegenereerd: '${description}'`,
+    filenamePrefix: "Geometry",
+    renderOnMap: () => addGeometryReportGraphic(tempLayer, geometry),
     selectedPlan,
     point: firstPoint,
     activities,
     organizations,
-    omschrijving: geometry.geometry_omschrijving || `Geometrie ${geometry.id}`,
+    omschrijving: description,
     aanvullende: geometry.id,
     longitude: centroid.longitude,
     latitude: centroid.latitude,
-  });
-
-  const safeName = toSafeReportName(geometryData.omschrijving);
-  const attachments = await resolveReportAttachments({
-    cached: attachmentsByGeometry.get(geometry.id),
+    cachedAttachments: attachmentsByGeometry.get(geometry.id),
     featureLayerUrl,
-    point: firstPoint as FinishedPointType,
-  });
-
-  const pdfData = await generatePdfReport({
-    pointData: geometryData,
-    overviewImage,
-    detailImage,
+    mapServerUrl,
     pilootOptions,
-    attachments,
-    preloadedLogoDataUrl: logoDataUrl || undefined,
+    logoDataUrl,
   });
-
-  return {
-    filename: `Waarnemingsrapport_Geometry_${safeName}.pdf`,
-    pdfData: await pdfData.arrayBuffer(),
-    attachments,
-    pointName: safeName,
-  };
 }

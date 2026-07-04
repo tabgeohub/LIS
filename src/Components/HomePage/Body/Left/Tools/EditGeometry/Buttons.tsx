@@ -1,20 +1,17 @@
-import { useContent } from "hooks/useContent";
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
-  const content = useContent();
+  const { labels } = useWizardButtons("Edit geometry");
   const { setSelectedTab } = useTabState();
 
-  function handleCancel() {
-    setSelectedTab("none");
-  }
-
   return (
-    <>
-      <button onClick={handleCancel} className="gray-button">
-        {content.common.annuleren}
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        { label: labels.annuleren, onClick: () => setSelectedTab("none") },
+      ]}
+    />
   );
 }
-

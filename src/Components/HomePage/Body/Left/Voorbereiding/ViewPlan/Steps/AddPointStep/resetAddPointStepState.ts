@@ -7,21 +7,21 @@ export function removeAddPointMapGraphics(input: {
   yCoord: number;
 }) {
   if (input.currentPoint.x !== 0 && input.currentPoint.y !== 0) {
-    const currentGraphicToRemove = findSpecificPoint(
-      input.mapView,
-      input.currentPoint.x,
-      input.currentPoint.y
-    );
+    const currentGraphicToRemove = findSpecificPoint({
+      mapView: input.mapView,
+      x: input.currentPoint.x,
+      y: input.currentPoint.y,
+    });
     if (currentGraphicToRemove) {
       input.mapView?.graphics.remove(currentGraphicToRemove);
     }
   }
 
-  const graphicToRemove = findSpecificPoint(
-    input.mapView,
-    input.xCoord,
-    input.yCoord
-  );
+  const graphicToRemove = findSpecificPoint({
+    mapView: input.mapView,
+    x: input.xCoord,
+    y: input.yCoord,
+  });
   if (graphicToRemove) {
     input.mapView?.graphics.remove(graphicToRemove);
   }

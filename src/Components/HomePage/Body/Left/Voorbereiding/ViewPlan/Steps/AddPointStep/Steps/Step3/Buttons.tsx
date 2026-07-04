@@ -87,15 +87,15 @@ export default function Buttons({
 
   function handleBack() {
     if (currentPoint.x !== 0 && currentPoint.y !== 0) {
-      const currentGraphicToRemove = findSpecificPoint(
+      const currentGraphicToRemove = findSpecificPoint({
         mapView,
-        currentPoint.x,
-        currentPoint.y
-      );
+        x: currentPoint.x,
+        y: currentPoint.y,
+      });
       if (currentGraphicToRemove) mapView?.graphics.remove(currentGraphicToRemove);
     }
 
-    const graphicToRemove = findSpecificPoint(mapView, xCoord, yCoord);
+    const graphicToRemove = findSpecificPoint({ mapView, x: xCoord, y: yCoord });
     if (graphicToRemove) mapView?.graphics.remove(graphicToRemove);
     resetFormAndState();
   }

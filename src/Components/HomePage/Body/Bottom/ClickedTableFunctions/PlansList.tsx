@@ -15,8 +15,10 @@ import {
 } from "react-icons/md";
 import { useDeleteData } from "utils/useDeleteData";
 import MenuItem from "../common/MenuItem";
-import { computeFlightPlanCentroid } from "@helpers/ArcGISHelpers/computeFlightPlanCentroid";
-import { getFlightPlanPoints } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import {
+  panMapToFlightPlan,
+  zoomMapToFlightPlan,
+} from "@helpers/ArcGISHelpers/flightPlanMapActions";
 
 export default function PlansList() {
   const { mapView } = useMapViewState();
@@ -32,24 +34,15 @@ export default function PlansList() {
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const { selectedTab } = useTabState();
 
-  const getPlanCenter = () =>
-    flightPlan ? computeFlightPlanCentroid(getFlightPlanPoints(flightPlan)) : null;
-
   const zoomToPoint = () => {
-    if (mapView && flightPlan) {
-      const center = getPlanCenter();
-      if (center) {
-        mapView.goTo({ target: center, zoom: 8 });
-      }
+    if (flightPlan) {
+      zoomMapToFlightPlan(mapView, flightPlan);
     }
   };
 
   const goToPoint = () => {
-    if (mapView && flightPlan) {
-      const center = getPlanCenter();
-      if (center) {
-        mapView.goTo(center);
-      }
+    if (flightPlan) {
+      panMapToFlightPlan(mapView, flightPlan);
     }
   };
 

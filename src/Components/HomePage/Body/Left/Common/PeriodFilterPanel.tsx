@@ -1,18 +1,15 @@
 import { useContent } from "hooks/useContent";
 import { useFilterPlans } from "hooks/filters/useFilterPlans";
+import type { PeriodFilterSetters, PeriodFilterValues } from "hooks/zustand/shared/periodFilterState";
+import type { PlanListFilterSetters, PlanListFilterValues } from "hooks/zustand/shared/flightPlanFormFields";
 
-export type PeriodFilterStoreSlice = {
-  periode: string;
-  setPeriode: (value: string) => void;
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-  dateTo: string;
-  setDateTo: (value: string) => void;
-  setOpenFilter: (value: boolean) => void;
-  filteredPlans: { datum: string; vluchtnummer: string }[];
-  setFilteredPlans: (value: { datum: string; vluchtnummer: string }[]) => void;
-  filterTerm: string;
-};
+export type PeriodFilterStoreSlice = PeriodFilterValues &
+  PeriodFilterSetters &
+  Pick<PlanListFilterValues, "filterTerm"> &
+  Pick<PlanListFilterSetters, "setOpenFilter"> & {
+    filteredPlans: { datum: string; vluchtnummer: string }[];
+    setFilteredPlans: (value: { datum: string; vluchtnummer: string }[]) => void;
+  };
 
 export default function PeriodFilterPanel({
   store,

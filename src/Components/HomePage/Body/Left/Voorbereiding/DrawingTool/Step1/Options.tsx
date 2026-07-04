@@ -23,19 +23,19 @@ interface OptionsProps {
   handleClear: () => void;
 }
 
-function ensureGraphicsLayer(
-  mapView: MapView,
-  graphicsLayer: GraphicsLayer | null,
-  setGraphicsLayer: (layer: GraphicsLayer | null) => void
-): GraphicsLayer {
-  if (graphicsLayer) return graphicsLayer;
+function ensureGraphicsLayer(input: {
+  mapView: MapView;
+  graphicsLayer: GraphicsLayer | null;
+  setGraphicsLayer: (layer: GraphicsLayer | null) => void;
+}): GraphicsLayer {
+  if (input.graphicsLayer) return input.graphicsLayer;
 
   const layer = new GraphicsLayer({
     title: "Tekeninglaag",
     listMode: "hide",
   });
-  mapView.map.add(layer);
-  setGraphicsLayer(layer);
+  input.mapView.map.add(layer);
+  input.setGraphicsLayer(layer);
   return layer;
 }
 
@@ -49,7 +49,11 @@ export default function Options({
   mapView,
 }: OptionsProps) {
   const cleanup = () => {
-    destroySketchViewModel(sketchViewModel, setSketchViewModel, mapView);
+    destroySketchViewModel({
+      sketchViewModel,
+      setSketchViewModel,
+      mapView,
+    });
   };
 
   useEffect(() => cleanup, [sketchViewModel, mapView]);
@@ -57,7 +61,11 @@ export default function Options({
   function startDrawingSession(tool: string) {
     if (!validateMapView(mapView) || !mapView) return;
 
-    const layer = ensureGraphicsLayer(mapView, graphicsLayer, setGraphicsLayer);
+    const layer = ensureGraphicsLayer({
+      mapView,
+      graphicsLayer,
+      setGraphicsLayer,
+    });
     const sketch = new SketchViewModel({
       view: mapView,
       layer,

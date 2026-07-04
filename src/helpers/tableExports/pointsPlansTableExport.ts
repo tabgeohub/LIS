@@ -2,10 +2,11 @@ import { saveAs } from "file-saver";
 import * as XLSX from "@e965/xlsx";
 import JSZip from "jszip";
 import shpwrite from "@mapbox/shp-write";
-import type { FeatureCollection, Point as GeoPoint } from "geojson";
+import type { Feature, FeatureCollection, Point as GeoPoint, Polygon } from "geojson";
 import type { EnrichedPointType, FlightPlanType } from "Types";
+import { getBboxPolygon } from "@helpers/geo/bboxPolygon";
 
-function buildCsvFromRows<T extends object>(rows: T[], excludeKeys: string[] = []) {
+export function buildCsvFromRows<T extends object>(rows: T[], excludeKeys: string[] = []) {
   if (rows.length === 0) return "";
   const headers = Object.keys(rows[0]).filter((key) => !excludeKeys.includes(key));
   return [
@@ -14,6 +15,89 @@ function buildCsvFromRows<T extends object>(rows: T[], excludeKeys: string[] = [
       headers.map((h) => `"${(row as Record<string, unknown>)[h] ?? ""}"`).join(",")
     ),
   ].join("\n");
+}
+
+export function downloadCsvFromRows<T extends object>(input: {
+  rows: T[];
+  filename: string;
+  excludeKeys?: string[];
+}) {
+  const blob = new Blob([buildCsvFromRows(input.rows, input.excludeKeys ?? [])], {
+    type: "text/csv;charset=utf-8;",
+  });
+  saveAs(blob, input.filename);
+}
+
+export function downloadXlsxFromRows<T extends object>(input: {
+  rows: T[];
+  filename: string;
+  sheetName: string;
+}) {
+  const worksheet = XLSX.utils.json_to_sheet(input.rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, input.sheetName);
+  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  saveAs(
+    new Blob([buffer], { type: "application/octet-stream" }),
+    input.filename
+  );
+}
+
+export function enrichedPointsToFeatureCollection(
+  points: EnrichedPointType[]
+): FeatureCollection<GeoPoint> {
+  return {
+    type: "FeatureCollection",
+    features: points.map((point) => {
+      const feature: Feature<GeoPoint> = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [point.longitude, point.latitude],
+        },
+        properties: { ...point },
+      };
+      return feature;
+    }),
+  };
+}
+
+export function downloadEnrichedPointsShapefile(points: EnrichedPointType[]) {
+  shpwrite.download(enrichedPointsToFeatureCollection(points), {
+    compression: "DEFLATE",
+    outputType: "blob",
+  });
+}
+
+export async function exportFlightPlansShapefile(plans: FlightPlanType[]) {
+  const zip = new JSZip();
+
+  const geojsonPlans: FeatureCollection<Polygon> = {
+    type: "FeatureCollection",
+    features: plans.map((plan) => {
+      const coords: [number, number][] = plan.points.map((pt) => [
+        pt.longitude,
+        pt.latitude,
+      ]);
+      return {
+        type: "Feature",
+        geometry: getBboxPolygon(coords),
+        properties: {
+          id: plan.id,
+          name: plan.vluchtnummer,
+          date: plan.datum,
+        },
+      };
+    }),
+  };
+
+  const plansZip = shpwrite.zip(geojsonPlans, {
+    compression: "DEFLATE",
+    outputType: "blob",
+  });
+
+  zip.file("plans.zip", plansZip);
+  saveAs(await zip.generateAsync({ type: "blob" }), "exports_shapefiles.zip");
 }
 
 function buildPointsPlansZipCsv(input: {

@@ -1,8 +1,8 @@
-import { useContent } from "hooks/useContent";
-import useLogAction from "hooks/useLogAction";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { FlightPlanType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setSubStep,
@@ -11,13 +11,8 @@ export default function Buttons({
   setSubStep: (step: number) => void;
   selectedPlan: FlightPlanType;
 }) {
-  const logAction = useLogAction();
-
-  const content = useContent();
-
-  const { setSelectedPoint, setMainStep, selectedPoint } =
-    useDeletePointState();
-
+  const { withLog, logStep, labels } = useWizardButtons("Add to plan - Step no");
+  const { setSelectedPoint, setMainStep, selectedPoint } = useDeletePointState();
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
   function handleSubmit() {
@@ -29,44 +24,29 @@ export default function Buttons({
           selectedPoint?.id,
         ],
       },
-      onSuccess: () => {
-        setSubStep(2);
-      },
+      onSuccess: () => setSubStep(2),
     });
 
-    logAction({
-      message: "User clicked 'Save' button",
-      step: "Add to plan - Step no",
-      newData: {
-        point: selectedPoint?.omschrijving,
-      },
-    });
+    logStep("User clicked 'Save' button", { point: selectedPoint?.omschrijving });
   }
 
   return (
-    <div className="flex justify-end gap-x-1 text-[12px] mr-4 mb-0">
-      <button
-        disabled={selectedPlan === null}
-        onClick={handleSubmit}
-        className="gray-button"
-      >
-        {content.common.volgende}
-      </button>
-
-      <button
-        onClick={() => {
-          setMainStep("main");
-          setSelectedPoint(null);
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "Add to plan - Step no",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.annuleren}
-      </button>
-    </div>
+    <WizardButtonBar
+      className="flex justify-end gap-x-1 text-[12px] mr-4 mb-0"
+      buttons={[
+        {
+          label: labels.volgende,
+          onClick: handleSubmit,
+          disabled: selectedPlan === null,
+        },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", () => {
+            setMainStep("main");
+            setSelectedPoint(null);
+          }),
+        },
+      ]}
+    />
   );
 }

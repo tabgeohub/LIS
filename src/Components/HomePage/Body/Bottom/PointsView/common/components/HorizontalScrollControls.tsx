@@ -35,7 +35,9 @@ export default function HorizontalScrollControls({
     <div className="flex items-center gap-2 mb-1 min-w-0 max-w-full shrink-0">
       <button
         type="button"
-        onClick={() => scrollHorizontally("left", tableScrollRef, topScrollRef)}
+        onClick={() =>
+          scrollHorizontally({ direction: "left", tableScrollRef, topScrollRef })
+        }
         className="px-2 py-1 text-xs border rounded hover:bg-gray-100"
       >
         ←
@@ -55,7 +57,7 @@ export default function HorizontalScrollControls({
       <button
         type="button"
         onClick={() =>
-          scrollHorizontally("right", tableScrollRef, topScrollRef)
+          scrollHorizontally({ direction: "right", tableScrollRef, topScrollRef })
         }
         className="px-2 py-1 text-xs border rounded hover:bg-gray-100"
       >

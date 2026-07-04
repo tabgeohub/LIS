@@ -12,18 +12,20 @@ import {
   MdLayers,
   MdDelete,
 } from "react-icons/md";
-import { saveAs } from "file-saver";
 import { EnrichedPointType } from "Types";
-import * as XLSX from "@e965/xlsx";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
-import shpwrite from "@mapbox/shp-write";
-
-import { FeatureCollection, Point as pt, Feature } from "geojson";
 import { useContent } from "hooks/useContent";
+import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
+import {
+  downloadCsvFromRows,
+  downloadEnrichedPointsShapefile,
+  downloadXlsxFromRows,
+} from "@helpers/tableExports/pointsPlansTableExport";
+
 export default function DropDown({
   starredPoints,
   setStarredPoints,
@@ -70,63 +72,19 @@ export default function DropDown({
   const func = () => {};
 
   const exportCsv = async () => {
-    const plans = pointsData as EnrichedPointType[];
-
-    const headersPlans = Object.keys(plans[0]).filter(
-      (key) => key !== "points"
-    );
-
-    const csvPlans = [
-      headersPlans.join(","),
-      ...plans.map((p) =>
-        headersPlans
-          .map((h) => `"${p[h as keyof EnrichedPointType] ?? ""}"`)
-          .join(",")
-      ),
-    ].join("\n");
-
-    const blobPlans = new Blob([csvPlans], { type: "text/csv;charset=utf-8;" });
-    saveAs(blobPlans, "plans_export.csv");
+    downloadCsvFromRows({ rows: pointsData, filename: "plans_export.csv" });
   };
 
   const exportXlsx = async () => {
-    const plans = pointsData as EnrichedPointType[];
-
-    const wsPlans = XLSX.utils.json_to_sheet(plans);
-    const wbPlans = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-    const plansBuffer = XLSX.write(wbPlans, {
-      bookType: "xlsx",
-      type: "array",
+    downloadXlsxFromRows({
+      rows: pointsData,
+      filename: "exports_xlsx.xlsx",
+      sheetName: "FlightPlans",
     });
-
-    const blob = new Blob([plansBuffer], { type: "application/octet-stream" });
-
-    saveAs(blob, "exports_xlsx.xlsx");
   };
 
   const exportShp = async () => {
-    const plans = pointsData as EnrichedPointType[];
-
-    const geojsonPlans: FeatureCollection<pt> = {
-      type: "FeatureCollection",
-      features: plans.map((point) => {
-        const feature: Feature<pt> = {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [point.longitude, point.latitude],
-          },
-          properties: { ...point },
-        };
-        return feature;
-      }),
-    };
-
-    shpwrite.download(geojsonPlans, {
-      compression: "DEFLATE",
-      outputType: "blob",
-    });
+    downloadEnrichedPointsShapefile(pointsData);
   };
 
   const content = useContent();
@@ -247,29 +205,6 @@ export default function DropDown({
         }
         onClick={func}
       />
-    </div>
-  );
-}
-
-interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  onClick: () => void;
-}
-
-function MenuItem({ icon, title, description, onClick }: MenuItemProps) {
-  return (
-    <div
-      className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-      onClick={onClick}
-    >
-      <div>{icon}</div>
-
-      <div>
-        <p className="text-[14px] font-semibold text-gray-800">{title}</p>
-        <p className="text-[12px] text-gray-500">{description}</p>
-      </div>
     </div>
   );
 }

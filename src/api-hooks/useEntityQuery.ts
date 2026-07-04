@@ -46,11 +46,12 @@ export function useFinishedPlanPath(planId: number | undefined) {
   });
 }
 
-export function usePlanPointAttachments(
-  planId: number | undefined,
-  pointId: number | undefined,
-  isFinished: boolean
-) {
+export function usePlanPointAttachments(input: {
+  planId: number | undefined;
+  pointId: number | undefined;
+  isFinished: boolean;
+}) {
+  const { planId, pointId, isFinished } = input;
   return useQuery({
     queryKey: finishedPlanKeys.attachments(planId ?? 0, pointId ?? 0),
     queryFn: () =>

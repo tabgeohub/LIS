@@ -1,5 +1,6 @@
 import { useContent } from "hooks/useContent";
-import useLogAction from "hooks/useLogAction";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setAction,
@@ -8,53 +9,30 @@ export default function Buttons({
 }: {
   setAction: (value: string) => void;
   setOpenFilter: (value: boolean) => void;
-  handleSubmit;
+  handleSubmit: () => void;
 }) {
-  const logAction = useLogAction();
-
+  const { withLog, labels } = useWizardButtons("Second step - Change point");
   const content = useContent();
+  const details =
+    content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails;
 
   return (
-    <div className="flex gap-x-2 justify-end mt-2">
-      <button
-        onClick={() => {
-          setAction("form");
-
-          logAction({
-            message: "User clicked 'Previous' button",
-            step: "Second step - Change point",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}
-      </button>
-
-      <button
-        onClick={() => {
-          setOpenFilter(true);
-
-          logAction({
-            message: "User clicked 'Filter' button",
-            step: "Second step - Change point",
-          });
-        }}
-        className="gray-button"
-      >
+    <WizardButtonBar
+      className="flex gap-x-2 justify-end mt-2"
+      buttons={[
         {
-          content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails
-            .kaartfilter
-        }
-      </button>
-
-      <button
-        onClick={() => {
-          handleSubmit();
-        }}
-        className="gray-button"
-      >
-        {content.common.volgende}
-      </button>
-    </div>
+          label: labels.vorige,
+          onClick: withLog("User clicked 'Previous' button", () => setAction("form")),
+        },
+        {
+          label: details.kaartfilter,
+          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
+        },
+        {
+          label: labels.volgende,
+          onClick: handleSubmit,
+        },
+      ]}
+    />
   );
 }

@@ -1,18 +1,18 @@
 import { useTabState } from "@helpers/ZustandStates/tabState";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
-  const submitStep1 = () => { };
+  const { labels } = useWizardButtons("Toevoegen kaartlagen - Step 1");
   const { setSelectedTab } = useTabState();
 
   return (
-    <div className="flex justify-end gap-x-1 p-2">
-      <button className="gray-button" onClick={submitStep1}>
-        Zoeken
-      </button>
-
-      <button className="gray-button" onClick={() => setSelectedTab("none")}>
-        Annuleren
-      </button>
-    </div>
+    <WizardButtonBar
+      className="flex justify-end gap-x-1 p-2"
+      buttons={[
+        { label: "Zoeken", onClick: () => {} },
+        { label: labels.annuleren, onClick: () => setSelectedTab("none") },
+      ]}
+    />
   );
 }

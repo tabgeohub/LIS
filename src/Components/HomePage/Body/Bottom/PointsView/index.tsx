@@ -55,11 +55,11 @@ export default function PointsView({
   const originalGraphicsMap = useRef<Map<number, Graphic>>(new Map());
 
   // Custom hooks
-  useClickOutside(
+  useClickOutside({
     popupRef,
     setClickedPoint,
-    setClickedPointPosition
-  );
+    setClickedPointPosition,
+  });
   useScrollOrResize(setClickedPointPosition);
   const headerHeight = useHeaderHeight(headerRef);
   const { tableScrollWidth, scrollContainerWidth } = useTableScrollWidth({

@@ -1,16 +1,15 @@
+import { useState } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useContent } from "hooks/useContent";
-import useLogAction from "hooks/useLogAction";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useDeleteData } from "utils/useDeleteData";
-import { useState } from "react";
 import ConfirmationModal from "./ConfirmationModal";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
-  const logAction = useLogAction();
-
+  const { withLog, logStep, labels, content } = useWizardButtons("Main step");
   const { setMainStep, clear, selectedPoints, setSelectedPoints } =
     useDeletePointState();
   const { setSelectedTab } = useTabState();
@@ -21,17 +20,12 @@ export default function Buttons() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const content = useContent();
-
   async function handleDelete() {
-    if (selectedPoints.length === 0) {
-      return;
-    }
+    if (selectedPoints.length === 0) return;
 
     setIsDeleting(true);
 
     try {
-      // Delete all selected points sequentially
       const deletedIds: number[] = [];
 
       for (const point of selectedPoints) {
@@ -40,34 +34,25 @@ export default function Buttons() {
           deletedIds.push(point.id);
         } catch (error) {
           console.error(`Error deleting point ${point.id}:`, error);
-          // Continue with other points even if one fails
         }
       }
 
-      // Update points list by removing successfully deleted points
       if (deletedIds.length > 0) {
         setPoints(points.filter((p) => !deletedIds.includes(p.id)));
       }
 
-      // Clear selected points and graphics
       setSelectedPoints([]);
       yellowGraphicsLayer?.removeAll();
       graphicsLayer?.removeAll();
       graphicsLayerHover?.removeAll();
       mapView?.graphics.removeAll();
-
-      // Close modal after successful deletion
       setShowConfirmModal(false);
 
-      logAction({
-        message: "User clicked 'Delete' button to delete multiple points",
-        step: "Main step",
-        newData: {
-          deletedPoints: selectedPoints
-            .filter((p) => deletedIds.includes(p.id))
-            .map((p) => p.omschrijving),
-          count: deletedIds.length,
-        },
+      logStep("User clicked 'Delete' button to delete multiple points", {
+        deletedPoints: selectedPoints
+          .filter((p) => deletedIds.includes(p.id))
+          .map((p) => p.omschrijving),
+        count: deletedIds.length,
       });
     } catch (error) {
       console.error("Error deleting points:", error);
@@ -81,52 +66,35 @@ export default function Buttons() {
     yellowGraphicsLayer?.removeAll();
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
-
     setSelectedTab("none");
-
-    logAction({
-      message: "User clicked 'Cancel' button",
-      step: "Main step",
-    });
   }
 
   const selectedPoint = selectedPoints.length > 0 ? selectedPoints[0] : null;
 
   return (
     <>
-      <button
-        onClick={() => {
-          if (selectedPoints.length > 0) {
-            setShowConfirmModal(true);
-            logAction({
-              message: "User clicked 'Delete' button to open confirmation modal",
-              step: "Main step",
-            });
-          }
-        }}
-        disabled={selectedPoints.length === 0 || isDeleting}
-        className="gray-button disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {content.common.verwijderen}
-      </button>
-
-      <button
-        onClick={() => {
-          setMainStep("filter");
-
-          logAction({
-            message: "User clicked 'Filter' button",
-            step: "Main step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.kaartfilter}
-      </button>
-
-      <button onClick={handleCancel} className="gray-button">
-        {content.common.annuleren}
-      </button>
+      <WizardButtonBar
+        className=""
+        buttons={[
+          {
+            label: content.common.verwijderen,
+            onClick: () => {
+              if (selectedPoints.length === 0) return;
+              setShowConfirmModal(true);
+              logStep("User clicked 'Delete' button to open confirmation modal");
+            },
+            disabled: selectedPoints.length === 0 || isDeleting,
+          },
+          {
+            label: content.common.kaartfilter,
+            onClick: withLog("User clicked 'Filter' button", () => setMainStep("filter")),
+          },
+          {
+            label: labels.annuleren,
+            onClick: withLog("User clicked 'Cancel' button", handleCancel),
+          },
+        ]}
+      />
 
       <ConfirmationModal
         isOpen={showConfirmModal}

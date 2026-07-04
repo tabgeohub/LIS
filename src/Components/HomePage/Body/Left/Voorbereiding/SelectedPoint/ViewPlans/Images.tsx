@@ -14,11 +14,11 @@ export default function Images({
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const { data: attachments } = usePlanPointAttachments(
-    selectedPlan.id,
-    clickedPoint?.id,
-    Boolean(selectedPlan.is_finished && clickedPoint)
-  );
+  const { data: attachments } = usePlanPointAttachments({
+    planId: selectedPlan.id,
+    pointId: clickedPoint?.id,
+    isFinished: Boolean(selectedPlan.is_finished && clickedPoint),
+  });
 
   const token = localStorage.getItem("credential_token");
 

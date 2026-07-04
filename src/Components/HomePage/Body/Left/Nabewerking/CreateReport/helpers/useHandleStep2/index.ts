@@ -5,14 +5,12 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { runWithConcurrency } from "./utils";
-import { processPoint } from "./processPoint";
-import { processGeometry } from "./processGeometry";
-import type { ProcessGeometryParams, ProcessPointParams } from "./types";
 import { ATTACHMENTS_FEATURE_LAYER_URL } from "@helpers/arcgis/deleteArcgisAttachment";
 import {
   addProcessedItemsToZip,
   preloadReportAttachments,
 } from "./reportZipHelpers";
+import { buildReportProcessingTasks } from "./buildReportProcessingTasks";
 
 export type UseHandleStep2Input = {
   selectedPlan: FinishedFlightPlanType;
@@ -69,45 +67,25 @@ export function useHandleStep2(input: UseHandleStep2Input) {
           selectedGeometriesData,
         });
 
-      const pointTasks = selectedPointsData.map((point, index) => () =>
-        processPoint({
-          point,
-          index,
-          totalItems,
-          selectedPlan,
-          activities,
-          organizations,
-          attachmentsByPoint,
-          featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
-          tempLayer,
-          mapServerUrl,
-          pilootOptions,
-          logoDataUrl,
-          setZippingStatus,
-        } as ProcessPointParams)
-      );
-
-      const geometryTasks = selectedGeometriesData.map((geometry, index) => () =>
-        processGeometry({
-          geometry,
-          index,
-          totalItems,
-          pointsOffset: selectedPointsData.length,
-          selectedPlan,
-          activities,
-          organizations,
-          attachmentsByGeometry,
-          featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
-          tempLayer,
-          mapServerUrl,
-          pilootOptions,
-          logoDataUrl,
-          setZippingStatus,
-        } as ProcessGeometryParams)
-      );
+      const tasks = buildReportProcessingTasks({
+        selectedPlan,
+        selectedPointsData,
+        selectedGeometriesData,
+        totalItems,
+        activities,
+        organizations,
+        attachmentsByPoint,
+        attachmentsByGeometry,
+        featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
+        tempLayer,
+        mapServerUrl,
+        pilootOptions,
+        logoDataUrl,
+        setZippingStatus,
+      });
 
       const processedItems = await runWithConcurrency({
-        tasks: [...pointTasks, ...geometryTasks],
+        tasks,
         concurrency: 4,
       });
 

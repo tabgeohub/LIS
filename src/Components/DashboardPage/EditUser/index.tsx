@@ -9,6 +9,7 @@ import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementS
 import { IoIosArrowBack } from "react-icons/io";
 import RoleSelect from "../shared/RoleSelect";
 import { useKeycloakRoles } from "../shared/useKeycloakRoles";
+import NoUserSelectedPanel from "../shared/NoUserSelectedPanel";
 
 type FormData = {
   username: string;
@@ -86,11 +87,7 @@ export default function EditUser() {
   };
 
   if (!selectedUser) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <p className="text-gray-500">No user selected</p>
-      </div>
-    );
+    return <NoUserSelectedPanel />;
   }
 
   return (

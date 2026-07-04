@@ -23,7 +23,12 @@ async function loadScaledImage(rawUrl: string) {
   const img = new Image();
   return new Promise<{ w: number; h: number; dataUrl: string }>((resolve) => {
     img.onload = () => {
-      const target = fitImageToBox(img.width, img.height, 160, 220);
+      const target = fitImageToBox({
+        imgW: img.width,
+        imgH: img.height,
+        maxW: 160,
+        maxH: 220,
+      });
       const maxCanvasW = 1400;
       const scale = Math.min(1, maxCanvasW / img.width);
       const canvasW = Math.max(1, Math.round(img.width * scale));
@@ -39,11 +44,12 @@ async function loadScaledImage(rawUrl: string) {
   });
 }
 
-async function addImageAttachmentPage(
-  doc: jsPDF,
-  att: PdfAttachment,
-  index: number
-) {
+async function addImageAttachmentPage(input: {
+  doc: jsPDF;
+  att: PdfAttachment;
+  index: number;
+}) {
+  const { doc, att, index } = input;
   let rawUrl = "";
   try {
     rawUrl = await blobToDataUrl(att.blob);
@@ -105,7 +111,7 @@ export async function addAttachmentPages(
   const otherAtts = attachments.filter((a) => !a.blob.type?.startsWith("image/"));
 
   for (let i = 0; i < imageAtts.length; i++) {
-    await addImageAttachmentPage(doc, imageAtts[i], i);
+    await addImageAttachmentPage({ doc, att: imageAtts[i], index: i });
   }
 
   if (otherAtts.length > 0) {

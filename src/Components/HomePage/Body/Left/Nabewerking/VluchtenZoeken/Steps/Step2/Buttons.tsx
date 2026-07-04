@@ -3,19 +3,17 @@ import { ActionType } from ".";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFinishedPlan";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import useLogAction from "hooks/useLogAction";
-import { useContent } from "hooks/useContent";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setAction,
 }: {
   setAction: (value: ActionType) => void;
 }) {
+  const { withLog, labels, content } = useWizardButtons("Second step");
   const { setStep } = useFinishedPlansState();
   const { resetFeatures } = useResetFeatures();
-
-  const logAction = useLogAction();
-
   const {
     graphicsLayer,
     graphicsLayerHover,
@@ -23,109 +21,68 @@ export default function Buttons({
     geometriesGraphicsLayer,
     mapView,
   } = useMapViewState();
-
   const handleClear = useHandleClearFinishedPlan();
 
   async function handlePrevious() {
     if (!mapView) return;
 
     const layers = mapView.map?.layers.filter((l) => l.title === "PathPoints");
-
     if (layers && layers.length > 0) {
-      layers.forEach((layer) => {
-        mapView.map?.remove(layer);
-      });
+      layers.forEach((layer) => mapView.map?.remove(layer));
     }
 
     graphicsLayer?.removeAll();
     graphicsLayerHover?.removeAll();
     redGraphicsLayer?.removeAll();
-
-    // Clear geometries layer first to remove plan geometries, then reset features to restore all geometries
     geometriesGraphicsLayer?.removeAll();
     resetFeatures();
-
     handleClear();
     setStep(1);
   }
 
-  const content = useContent();
+  function handleCancel() {
+    setStep(1);
+    graphicsLayer?.removeAll();
+    graphicsLayerHover?.removeAll();
+    redGraphicsLayer?.removeAll();
+    geometriesGraphicsLayer?.removeAll();
+    resetFeatures();
+    handleClear();
+  }
+
+  const step2 = content.nabewerking.vluchtenZoeken.step2;
 
   return (
-    <div className="mt-10 text-xs flex flex-wrap text-[12px] justify-end gap-2">
-      <button
-        onClick={() => {
-          handlePrevious();
-
-          logAction({
-            message: "User clicked 'Previous' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}{" "}
-      </button>
-
-      <button
-        onClick={() => {
-          setAction("waarnemingen");
-
-          logAction({
-            message: "User clicked 'Waarnemingen' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.nabewerking.vluchtenZoeken.step2.waarnemingenBtn}
-      </button>
-
-      <button
-        onClick={() => {
-          setAction("vluchtBewerken");
-
-          logAction({
-            message: "User clicked 'Vlucht bewerken' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.nabewerking.vluchtenZoeken.step2.vluchtBewerken}
-      </button>
-
-      <button
-        onClick={() => {
-          setAction("vliegroute");
-
-          logAction({
-            message: "User clicked 'Vliegroute exporteren' button",
-            step: "Second step",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.nabewerking.vluchtenZoeken.step2.vliegrouteExporteren}
-      </button>
-
-      <button
-        onClick={() => {
-          setStep(1);
-          graphicsLayer?.removeAll();
-          graphicsLayerHover?.removeAll();
-          redGraphicsLayer?.removeAll();
-
-          // Clear geometries layer first to remove plan geometries, then reset features to restore all geometries
-          geometriesGraphicsLayer?.removeAll();
-          resetFeatures();
-
-          handleClear();
-        }}
-        className="gray-button"
-      >
-        {content.common.annuleren}
-      </button>
-    </div>
+    <WizardButtonBar
+      className="mt-10 text-xs flex flex-wrap text-[12px] justify-end gap-2"
+      buttons={[
+        {
+          label: labels.vorige,
+          onClick: withLog("User clicked 'Previous' button", handlePrevious),
+        },
+        {
+          label: step2.waarnemingenBtn,
+          onClick: withLog("User clicked 'Waarnemingen' button", () =>
+            setAction("waarnemingen")
+          ),
+        },
+        {
+          label: step2.vluchtBewerken,
+          onClick: withLog("User clicked 'Vlucht bewerken' button", () =>
+            setAction("vluchtBewerken")
+          ),
+        },
+        {
+          label: step2.vliegrouteExporteren,
+          onClick: withLog("User clicked 'Vliegroute exporteren' button", () =>
+            setAction("vliegroute")
+          ),
+        },
+        {
+          label: labels.annuleren,
+          onClick: handleCancel,
+        },
+      ]}
+    />
   );
 }

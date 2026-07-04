@@ -1,63 +1,40 @@
-import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import { FinishedGeometryType } from "Types/finished_plans";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setAction,
   setOpenEdit,
   handleUpdate,
-  selectedGeometry,
 }: {
   setAction: (value: string) => void;
   setOpenEdit: (value: boolean) => void;
   handleUpdate: () => void;
   selectedGeometry?: FinishedGeometryType;
 }) {
-  const logAction = useLogAction();
+  const { withLog, labels } = useWizardButtons("Second step - Edit geometry");
   const content = useContent();
+  const fotoLabel =
+    content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails.fotoBtn;
 
   return (
-    <div className="mt-6 flex gap-x-1 justify-end mr-2">
-      <button
-        onClick={() => {
-          setOpenEdit(false);
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "Second step - Edit geometry",
-          });
-        }}
-        className="gray-button"
-      >
-        {content.common.vorige}
-      </button>
-
-      <button
-        onClick={() => {
-          setAction("foto");
-
-          logAction({
-            message: "User clicked 'Foto's' button",
-            step: "Second step - Edit geometry",
-          });
-        }}
-        className="gray-button"
-      >
+    <WizardButtonBar
+      className="mt-6 flex gap-x-1 justify-end mr-2"
+      buttons={[
         {
-          content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails
-            .fotoBtn
-        }
-      </button>
-
-      <button
-        onClick={() => {
-          handleUpdate();
-        }}
-        className="gray-button"
-      >
-        {content.common.opslaan}
-      </button>
-    </div>
+          label: labels.vorige,
+          onClick: withLog("User clicked 'Cancel' button", () => setOpenEdit(false)),
+        },
+        {
+          label: fotoLabel,
+          onClick: withLog("User clicked 'Foto's' button", () => setAction("foto")),
+        },
+        {
+          label: labels.opslaan,
+          onClick: handleUpdate,
+        },
+      ]}
+    />
   );
 }
-

@@ -62,7 +62,11 @@ export function syncFlightPlansTabGraphics(input: {
     if (input.starredPlans.find((p) => p.id === plan.id)) {
       const oldGraphic = input.ctx.originalGraphicsMap.current?.get(plan.id);
       if (oldGraphic) input.ctx.graphicsLayer?.remove(oldGraphic);
-      addPlanStarGraphic(plan, input.ctx.graphicsLayer!, "table");
+      addPlanStarGraphic({
+        plan,
+        layer: input.ctx.graphicsLayer!,
+        variant: "table",
+      });
     }
   });
 }
