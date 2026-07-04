@@ -19,6 +19,7 @@ import {
   exportPointsPlansXlsx,
   exportPointsShapefile,
 } from "@helpers/tableExports/pointsPlansTableExport";
+import BottomTableActionItem from "./BottomTableActionItem";
 
 export default function PointsList() {
   const logAction = useLogAction();
@@ -106,82 +107,40 @@ export default function PointsList() {
     [pointsTable]
   );
 
+  const list = content.bottomSection.pointsList;
+
   return (
     <div>
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+      <BottomTableActionItem
+        icon={<MdTableChart />}
+        title={list.listView.title}
+        subtitle={list.listView.subtitle}
         onClick={listView}
-      >
-        <MdTableChart className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.bottomSection.pointsList.listView.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.bottomSection.pointsList.listView.subtitle}{" "}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+      />
+      <BottomTableActionItem
+        icon={<MdOutlineZoomOutMap />}
+        title={list.zoomToAll.title}
+        subtitle={list.zoomToAll.subtitle}
         onClick={zoomToPoints}
-      >
-        <MdOutlineZoomOutMap className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.bottomSection.pointsList.zoomToAll.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.bottomSection.pointsList.zoomToAll.subtitle}{" "}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+      />
+      <BottomTableActionItem
+        icon={<BsFiletypeCsv />}
+        title={list.exportCsv.title}
+        subtitle={list.exportCsv.subtitle}
         onClick={exportCsv}
-      >
-        <BsFiletypeCsv className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.bottomSection.pointsList.exportCsv.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.bottomSection.pointsList.exportCsv.subtitle}{" "}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+      />
+      <BottomTableActionItem
+        icon={<BsFiletypeXlsx />}
+        title={list.exportXlsx.title}
+        subtitle={list.exportXlsx.subtitle}
         onClick={exportXlsx}
-      >
-        <BsFiletypeXlsx className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.bottomSection.pointsList.exportXlsx.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.bottomSection.pointsList.exportXlsx.subtitle}{" "}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+      />
+      <BottomTableActionItem
+        icon={<BsFiletypeJson />}
+        title={list.exportShp.title}
+        subtitle={list.exportShp.subtitle}
         onClick={exportShp}
-      >
-        <BsFiletypeJson className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.bottomSection.pointsList.exportShp.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.bottomSection.pointsList.exportShp.subtitle}{" "}
-          </p>
-        </div>
-      </div>
+      />
     </div>
   );
 }

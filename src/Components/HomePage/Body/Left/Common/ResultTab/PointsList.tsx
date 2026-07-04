@@ -1,17 +1,14 @@
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useEffect, useRef, useState } from "react";
-import { BsTextParagraph } from "react-icons/bs";
 import { FaStar } from "react-icons/fa6";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { EnrichedPointType } from "Types";
-import ListPointFunctions from "./ListPointsFunctions";
-import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import ClickedPointFunctions from "Components/HomePage/Body/Bottom/ClickedPointFunctions";
-import useLogAction from "hooks/useLogAction";
+import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useResultTabStarredPointActions } from "hooks/resultTab/useResultTabStarredPointActions";
+import { useResultTabTableView } from "hooks/resultTab/useResultTabTableView";
+import ResultTabPointsHeader from "./ResultTabPointsHeader";
+import ResultTabPointsFooter from "./ResultTabPointsFooter";
 
 export default function PointsList({
   clickedPoint,
@@ -22,13 +19,9 @@ export default function PointsList({
   setFase: (value: string) => void;
   setClickedPoint: (value: EnrichedPointType | undefined) => void;
 }) {
-  const logAction = useLogAction();
-
   const [openListPointDiv, setOpenListPointDiv] = useState(false);
-  const { setOpenResultTab } = useOpenResultTab();
-  const { setSelectedTab } = useTabState();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { pointsTable, setOpenTable, setView } = useOpenTable();
+  const { pointsTable } = useOpenTable();
+  const tableView = useResultTabTableView();
   const {
     starredPoints,
     setStarredPoints,
@@ -57,9 +50,7 @@ export default function PointsList({
     };
 
     window.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      window.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => window.removeEventListener("mousedown", handleClickOutside);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -73,51 +64,18 @@ export default function PointsList({
     };
   }, []);
 
-  const tableView = () => {
-    setOpenResultTab(false);
-    setSelectedBottomTab("topTabs");
-    setView("points");
-    setSelectedTab("viewPlan");
-    setOpenTable(true);
-
-    logAction({
-      message: "User changed view to 'Points' in the 'ResultTab' component",
-      step: "ResultTab",
-    });
-  };
-
   return (
     <div>
-      <>
-        <div className="relative flex items-center justify-center my-2">
-          <button
-            className="bg-transparent text-gray-500 text-lg font-bold absolute left-2 -top-1"
-            onClick={tableView}
-          >
-            <IoIosArrowBack className="mt-2" />
-          </button>
+      <ResultTabPointsHeader
+        count={pointsTable.length}
+        onBack={tableView}
+        openListPointDiv={openListPointDiv}
+        setOpenListPointDiv={setOpenListPointDiv}
+        setFase={setFase}
+        starredPoints={starredPoints}
+        setStarredPoints={setStarredPoints}
+      />
 
-          <h4 className="text-md text-gray-400">
-            Resultaten ({pointsTable.length})
-          </h4>
-          <button
-            className="bg-transparent text-gray-500 text-lg font-bold absolute right-2 -top-1"
-            onClick={() => setOpenListPointDiv(!openListPointDiv)}
-          >
-            <BsTextParagraph className="mt-2" />
-          </button>
-          {openListPointDiv && (
-            <div className="absolute right-2 top-[130%] z-50 max-h-[400px] overflow-y-scroll">
-              <ListPointFunctions
-                setStarredPoints={setStarredPoints}
-                starredPoints={starredPoints}
-                setOpenListPointDiv={setOpenListPointDiv}
-                setFase={setFase}
-              />
-            </div>
-          )}
-        </div>
-      </>
       <div className="relative w-full border rounded shadow">
         {pointsTable.map((point) => {
           const isStarred = starredPoints.some((p) => p.id === point.id);
@@ -151,9 +109,7 @@ export default function PointsList({
                     }}
                   />
                 </span>
-                <span className="text-gray-500 my-auto text-xl font-bold">
-                  |
-                </span>
+                <span className="text-gray-500 my-auto text-xl font-bold">|</span>
                 <TfiMoreAlt
                   className="text-gray-500 my-auto"
                   onClick={(e) => {
@@ -169,6 +125,7 @@ export default function PointsList({
             </div>
           );
         })}
+
         {clickedPoint && clickedPointPosition && (
           <div
             ref={popupRef}
@@ -182,21 +139,11 @@ export default function PointsList({
           </div>
         )}
 
-        <div className="px-4 py-2 text-sm text-gray-700 flex justify-between items-center border-t">
-          <span>
-            Weergeven resultaat 1 - {pointsTable.length} (Totaal:{" "}
-            {pointsTable.length})
-          </span>
-          <div className="flex items-center gap-1">
-            <button className="text-gray-400 hover:text-gray-600">
-              &laquo;
-            </button>
-            <span>Pagina 1 van 1</span>
-            <button className="text-gray-400 hover:text-gray-600">
-              &raquo;
-            </button>
-          </div>
-        </div>
+        <ResultTabPointsFooter
+          total={pointsTable.length}
+          summaryText="Weergeven resultaat {start} - {end} (Totaal: {total})"
+          pageInfoText="Pagina {current} van {totalPages}"
+        />
       </div>
     </div>
   );

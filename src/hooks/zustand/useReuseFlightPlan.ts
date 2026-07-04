@@ -10,6 +10,7 @@ import {
   PlanListFilterSetters,
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import { createPlanWizardCoreSetters } from "hooks/zustand/shared/planWizardCore";
 
 interface ReUseFlightPlanState
   extends FlightPlanFormFieldValues,
@@ -62,14 +63,11 @@ const initialState = {
 
 export const useReuseFlightPlan = create<ReUseFlightPlanState>((set) => ({
   ...initialState,
-  setStep: (value) => set({ step: value }),
+  ...createPlanWizardCoreSetters(set),
   setCurrentPoints: (value) => set({ currentPoints: value }),
   setCurrentGeometries: (value) => set({ currentGeometries: value }),
   setNewPoints: (value) => set({ newPoints: value }),
   setNewGeometries: (value) => set({ newGeometries: value }),
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-  setFilteredPlans: (value) => set({ filteredPlans: value }),
-  setFilteredPoints: (value) => set({ filteredPoints: value }),
   setVluchtnummer: (value) => set({ vluchtnummer: value }),
   ...createFlightPlanFormFieldSetters(set),
   ...createPlanListFilterSetters(set),

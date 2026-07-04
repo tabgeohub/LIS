@@ -4,6 +4,8 @@ import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { usePlanDuplicateState } from "../../helpers/usePlanDuplicateState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   handleCancel,
@@ -12,8 +14,7 @@ export default function Buttons({
   handleCancel: () => void;
   setVluchtnummer: (vluchtnummer: string) => void;
 }) {
-  const logAction = useLogAction();
-
+  const { logStep, withLog, labels } = useWizardButtons("View plan");
   const {
     setOpenFilter,
     selectedPlan,
@@ -28,11 +29,8 @@ export default function Buttons({
     setDoelEnHoofdthema,
     setAanvullendeInfo,
   } = useViewPlanState();
-
   const { setDuplicatedFlightPlan } = usePlanDuplicateState();
-
   const { setPointsTable, setGeometriesTable, setView } = useOpenTable();
-
   const content = useContent();
 
   const submitStep1 = () => {
@@ -40,92 +38,66 @@ export default function Buttons({
       toast.error(
         content.voorbereiding.vluchtplanInformatie.step1.alreadyInProgressToast
       );
-
-      logAction({
-        message: "User tried to open a flight plan that is already in progress",
-        step: "View plan",
-      });
-    } else {
-      if (selectedPlan) {
-        const date = selectedPlan.datum.split("T")[0];
-        setStep(2);
-        setVluchtnummer(selectedPlan.vluchtnummer);
-        setOmschrijving(selectedPlan.omschrijving);
-        setWaarnemer(selectedPlan.waarnemer);
-        setPiloot(selectedPlan.piloot);
-        setDatum(date);
-        setGeplandeVliegduur(selectedPlan.vliegduur);
-        setTypeLuchtvaartuig(selectedPlan.luchtvaartuig);
-        setAantalPassagiers(Number(selectedPlan.passagiers));
-        setDoelEnHoofdthema(selectedPlan.hoofdthema);
-        setAanvullendeInfo(selectedPlan.aanvullende);
-        setPointsTable(selectedPlan.points);
-        setGeometriesTable(selectedPlan.geometries || []);
-        setView("points");
-      }
-
-      logAction({
-        message: "User clicked 'Next' button to open a flight plan",
-        step: "View plan",
-      });
+      logStep("User tried to open a flight plan that is already in progress");
+      return;
     }
+
+    if (selectedPlan) {
+      const date = selectedPlan.datum.split("T")[0];
+      setStep(2);
+      setVluchtnummer(selectedPlan.vluchtnummer);
+      setOmschrijving(selectedPlan.omschrijving);
+      setWaarnemer(selectedPlan.waarnemer);
+      setPiloot(selectedPlan.piloot);
+      setDatum(date);
+      setGeplandeVliegduur(selectedPlan.vliegduur);
+      setTypeLuchtvaartuig(selectedPlan.luchtvaartuig);
+      setAantalPassagiers(Number(selectedPlan.passagiers));
+      setDoelEnHoofdthema(selectedPlan.hoofdthema);
+      setAanvullendeInfo(selectedPlan.aanvullende);
+      setPointsTable(selectedPlan.points);
+      setGeometriesTable(selectedPlan.geometries || []);
+      setView("points");
+    }
+
+    logStep("User clicked 'Next' button to open a flight plan");
   };
 
   const duplicateFlightPlan = () => {
-    if (selectedPlan) {
-      const date = selectedPlan.datum.split("T")[0];
-
-      setDuplicatedFlightPlan({ ...selectedPlan, datum: date });
-
-      setStep(5);
-
-      logAction({
-        message: "User clicked 'Duplicate' button",
-        step: "View plan",
-      });
-    }
+    if (!selectedPlan) return;
+    const date = selectedPlan.datum.split("T")[0];
+    setDuplicatedFlightPlan({ ...selectedPlan, datum: date });
+    setStep(5);
+    logStep("User clicked 'Duplicate' button");
   };
 
   return (
-    <>
-      <button
-        className="gray-button"
-        onClick={duplicateFlightPlan}
-        disabled={selectedPlan?.status !== "pre-prepared"}
-      >
-        Duplicate
-      </button>
-
-      <button className="gray-button" onClick={() => setOpenFilter(true)}>
-        Filteren
-      </button>
-
-      <button
-        disabled={
-          !selectedPlan ||
-          selectedPlan.status === "finished" ||
-          selectedPlan.status === "in-progress" ||
-          selectedPlan.status === "canceled"
-        }
-        className="gray-button"
-        onClick={submitStep1}
-      >
-        Volgende
-      </button>
-
-      <button
-        className="gray-button"
-        onClick={() => {
-          handleCancel();
-
-          logAction({
-            message: "User clicked 'Cancel' button",
-            step: "View plan",
-          });
-        }}
-      >
-        Annuleren
-      </button>
-    </>
+    <WizardButtonBar
+      className=""
+      buttons={[
+        {
+          label: "Duplicate",
+          onClick: duplicateFlightPlan,
+          disabled: selectedPlan?.status !== "pre-prepared",
+        },
+        {
+          label: labels.filteren,
+          onClick: () => setOpenFilter(true),
+        },
+        {
+          label: labels.volgende,
+          onClick: submitStep1,
+          disabled:
+            !selectedPlan ||
+            selectedPlan.status === "finished" ||
+            selectedPlan.status === "in-progress" ||
+            selectedPlan.status === "canceled",
+        },
+        {
+          label: labels.annuleren,
+          onClick: withLog("User clicked 'Cancel' button", handleCancel),
+        },
+      ]}
+    />
   );
 }

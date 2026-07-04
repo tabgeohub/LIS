@@ -14,6 +14,7 @@ import {
   PlanListFilterSetters,
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import { createPlanWizardCoreSetters } from "hooks/zustand/shared/planWizardCore";
 
 interface FinishedPlansState
   extends FlightPlanFormFieldValues,
@@ -74,10 +75,7 @@ const clearState = {
 
 export const useFinishedPlansState = create<FinishedPlansState>((set) => ({
   ...initialState,
-  setStep: (value) => set({ step: value }),
-  setSelectedPlan: (value) => set({ selectedPlan: value }),
-  setFilteredPoints: (value) => set({ filteredPoints: value }),
-  setFilteredPlans: (value) => set({ filteredPlans: value }),
+  ...createPlanWizardCoreSetters(set),
   setPeriode: (value) => set({ periode: value }),
   setDateFrom: (value) => set({ dateFrom: value }),
   setDateTo: (value) => set({ dateTo: value }),

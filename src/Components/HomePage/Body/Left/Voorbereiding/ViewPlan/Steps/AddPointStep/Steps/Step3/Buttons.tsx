@@ -5,14 +5,15 @@ import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
-import { useContent } from "hooks/useContent";
 import { EnrichedPointType } from "Types";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 
 export default function Buttons({
   handleCancel,
   resetFormAndState,
-  setStepPoint,
   setStepAdd,
 }: {
   handleCancel: () => void;
@@ -22,7 +23,7 @@ export default function Buttons({
 }) {
   const { mapView, redGraphicsLayer } = useMapViewState();
   const { user } = useAuth();
-
+  const { labels } = useWizardButtons("View plan - Add point step 3");
   const {
     omschrijving,
     activiteit,
@@ -36,24 +37,21 @@ export default function Buttons({
     vertrouwelijk,
     herhalen,
   } = useEnrichedPointState();
-
   const { selectedPlan, setSelectedPlan, setStep } = useViewPlanState();
-
   const { create } = useCreateData("/points");
-
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
-
-  const { pointsTable, setPointsTable, geometriesTable, setGeometriesTable } = useOpenTable();
+  const { pointsTable, setPointsTable, geometriesTable, setGeometriesTable } =
+    useOpenTable();
 
   async function handleSubmit() {
     await create({
       data: {
-        omschrijving: omschrijving,
+        omschrijving,
         regio_id: user?.role,
         xcoordinaat_rd: xCoord,
         ycoordinaat_rd: yCoord,
-        latitude: latitude,
-        longitude: longitude,
+        latitude,
+        longitude,
         vertrouwelijk: vertrouwelijk ? 1 : 0,
         herhalen: herhalen ? 1 : 0,
         user_id: user?.user_id,
@@ -62,37 +60,26 @@ export default function Buttons({
         specifiek_letten_op: specifiekLettenOp,
       },
       onSuccess: (response) => {
-        // @ts-ignore
-        const newPoint: EnrichedPointType = response.point;
-
+        const newPoint: EnrichedPointType = (response as { point: EnrichedPointType })
+          .point;
         const pointIds = selectedPlan?.points.map((p) => Number(p.id));
-
         if (newPoint) pointIds?.push(newPoint.id);
 
-        const payload = {
-          points: pointIds,
-          id: selectedPlan?.id,
-        };
-
-        update({ data: payload, onSuccess: () => {
-          const oldPoints: EnrichedPointType[] = selectedPlan?.points || [];
-
-          // @ts-ignore
-          setSelectedPlan({
-            ...selectedPlan,
-            points: [...oldPoints, newPoint],
-          });
-
-          setPointsTable([...pointsTable, newPoint]);
-          // Preserve geometries when adding a point
-          setGeometriesTable(geometriesTable);
-
-          setStep(2);
-          resetFormAndState();
-        },
-
+        update({
+          data: { points: pointIds, id: selectedPlan?.id },
+          onSuccess: () => {
+            const oldPoints: EnrichedPointType[] = selectedPlan?.points || [];
+            // @ts-ignore
+            setSelectedPlan({
+              ...selectedPlan,
+              points: [...oldPoints, newPoint],
+            });
+            setPointsTable([...pointsTable, newPoint]);
+            setGeometriesTable(geometriesTable);
+            setStep(2);
+            resetFormAndState();
+          },
         });
-
         redGraphicsLayer?.removeAll();
       },
     });
@@ -105,49 +92,31 @@ export default function Buttons({
         currentPoint.x,
         currentPoint.y
       );
-
-      if (currentGraphicToRemove) {
-        mapView?.graphics.remove(currentGraphicToRemove);
-      }
+      if (currentGraphicToRemove) mapView?.graphics.remove(currentGraphicToRemove);
     }
 
     const graphicToRemove = findSpecificPoint(mapView, xCoord, yCoord);
-
-    if (graphicToRemove) {
-      mapView?.graphics.remove(graphicToRemove);
-    }
-
+    if (graphicToRemove) mapView?.graphics.remove(graphicToRemove);
     resetFormAndState();
   }
 
-  const content = useContent();
-
   return (
-    <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-      <button onClick={handleBack} className="gray-button">
-        {content.common.vorige}
-      </button>
-
-      <button onClick={() => setStepAdd(2)} className="gray-button">
-        {content.common.update}
-      </button>
-
-      <button
-        disabled={
-          omschrijving === "" ||
-          activiteit === "" ||
-          organisatie === "" ||
-          specifiekLettenOp === ""
-        }
-        onClick={handleSubmit}
-        className="gray-button"
-      >
-        {content.common.opslaan}
-      </button>
-
-      <button onClick={handleCancel} className="gray-button">
-        {content.common.annuleren}
-      </button>
-    </div>
+    <WizardButtonBar
+      className={WIZARD_BUTTON_BAR_CLASS}
+      buttons={[
+        { label: labels.vorige, onClick: handleBack },
+        { label: labels.update, onClick: () => setStepAdd(2) },
+        {
+          label: labels.opslaan,
+          onClick: handleSubmit,
+          disabled:
+            omschrijving === "" ||
+            activiteit === "" ||
+            organisatie === "" ||
+            specifiekLettenOp === "",
+        },
+        { label: labels.annuleren, onClick: handleCancel },
+      ]}
+    />
   );
 }
