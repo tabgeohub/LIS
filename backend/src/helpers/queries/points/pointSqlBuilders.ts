@@ -21,7 +21,7 @@ export type BuildPointInsertParamsInput = {
 
 export function buildPointInsertParams(input: BuildPointInsertParamsInput): unknown[] {
   const { source, extraValues, overrides = {} } = input;
-  return [...pointCoreValues(source, overrides), ...extraValues];
+  return [...pointCoreValues({ source, overrides }), ...extraValues];
 }
 
 const POINT_UPDATE_SQL = `
@@ -49,7 +49,7 @@ export function buildPointUpdateParams(
   source: PointCoreSource,
   id: unknown
 ): unknown[] {
-  const fields = normalizePointCoreFields(source);
+  const fields = normalizePointCoreFields({ source });
 
   return [
     fields.omschrijving,

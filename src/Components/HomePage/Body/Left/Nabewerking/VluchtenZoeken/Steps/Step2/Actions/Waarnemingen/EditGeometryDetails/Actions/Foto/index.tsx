@@ -20,12 +20,12 @@ export default function Foto({
   const handleAttachmentsUpdated = (newAttachments: AttachmentType[]) => {
     if (!firstPoint || !selectedGeometry || !selectedPlan) return;
 
-    const { updatedPlan, updatedGeometry } = syncGeometryAttachmentsInPlan(
+    const { updatedPlan, updatedGeometry } = syncGeometryAttachmentsInPlan({
       selectedPlan,
       selectedGeometry,
-      firstPoint.id,
-      newAttachments
-    );
+      pointId: firstPoint.id,
+      newAttachments,
+    });
 
     setSelectedPlan(updatedPlan);
     setSelectedGeometry(updatedGeometry);

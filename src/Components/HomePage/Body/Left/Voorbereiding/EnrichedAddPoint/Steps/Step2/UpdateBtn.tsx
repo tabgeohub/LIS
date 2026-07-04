@@ -43,7 +43,12 @@ export default function UpdateBtn() {
 
       redGraphicsLayer.removeAll();
 
-      createNewPoint(redGraphicsLayer, setCurrentPoint, longitude, latitude);
+      createNewPoint({
+        redGraphicsLayer,
+        setCurrentPoint,
+        xCoord: longitude,
+        yCoord: latitude,
+      });
 
       logAction({
         message: "User clicked 'Update' button",

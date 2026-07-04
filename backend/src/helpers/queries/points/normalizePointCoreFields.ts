@@ -5,6 +5,11 @@ import {
   PointCoreSource,
 } from "./pointCoreColumns";
 
+export type PointCoreNormalizeInput = {
+  source: PointCoreSource;
+  overrides?: Partial<Record<PointCoreColumn, unknown>>;
+};
+
 function firstDefinedSourceValue(
   source: PointCoreSource,
   keys: readonly string[]
@@ -17,35 +22,39 @@ function firstDefinedSourceValue(
   return undefined;
 }
 
-function resolvePointCoreColumn(
-  column: PointCoreColumn,
-  source: PointCoreSource,
-  overrides: Partial<Record<PointCoreColumn, unknown>>
-): unknown {
-  const overrideValue = overrides[column];
+function resolvePointCoreColumn(input: {
+  column: PointCoreColumn;
+  source: PointCoreSource;
+  overrides: Partial<Record<PointCoreColumn, unknown>>;
+}): unknown {
+  const overrideValue = input.overrides[input.column];
   if (overrideValue !== undefined) {
     return overrideValue;
   }
-  return firstDefinedSourceValue(source, POINT_FIELD_SOURCE_KEYS[column]);
+  return firstDefinedSourceValue(
+    input.source,
+    POINT_FIELD_SOURCE_KEYS[input.column]
+  );
 }
 
 export function normalizePointCoreFields(
-  source: PointCoreSource,
-  overrides: Partial<Record<PointCoreColumn, unknown>> = {}
+  input: PointCoreNormalizeInput
 ): Record<PointCoreColumn, unknown> {
+  const overrides = input.overrides ?? {};
   const fields = {} as Record<PointCoreColumn, unknown>;
 
   for (const column of POINT_CORE_COLUMNS) {
-    fields[column] = resolvePointCoreColumn(column, source, overrides);
+    fields[column] = resolvePointCoreColumn({
+      column,
+      source: input.source,
+      overrides,
+    });
   }
 
   return fields;
 }
 
-export function pointCoreValues(
-  source: PointCoreSource,
-  overrides: Partial<Record<PointCoreColumn, unknown>> = {}
-): unknown[] {
-  const fields = normalizePointCoreFields(source, overrides);
+export function pointCoreValues(input: PointCoreNormalizeInput): unknown[] {
+  const fields = normalizePointCoreFields(input);
   return POINT_CORE_COLUMNS.map((column) => fields[column]);
 }

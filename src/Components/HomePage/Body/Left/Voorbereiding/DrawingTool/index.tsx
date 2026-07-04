@@ -10,7 +10,12 @@ export default function DrawingTool() {
   const { mapView } = useMapViewState();
   const { selectedTab } = useTabState();
 
-  useDrawingToolRootLifecycle(mapView, selectedTab, clear, setStep);
+  useDrawingToolRootLifecycle({
+    mapView,
+    selectedTab,
+    clear,
+    setStep,
+  });
 
   return (
     <div>

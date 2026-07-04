@@ -77,15 +77,13 @@ export default function CreateImageBtn({
           lat: attachmentPoint.latitude,
         },
         (responseData) => {
-          const uploadedAttachment = buildAttachmentFromUploadResponse(
-            first.objectId,
-            // @ts-ignore
-            responseData.result.id,
-            // @ts-ignore
-            responseData.result.url,
-            attachmentPoint.id,
-            first.taken_at
-          );
+          const uploadedAttachment = buildAttachmentFromUploadResponse({
+            objectId: first.objectId,
+            responseId: responseData.result.id,
+            responseUrl: responseData.result.url,
+            pointId: attachmentPoint.id,
+            takenAt: first.taken_at,
+          });
 
           const isFirstAttachment =
             attachmentPoint.attachments?.at(0) === null ||

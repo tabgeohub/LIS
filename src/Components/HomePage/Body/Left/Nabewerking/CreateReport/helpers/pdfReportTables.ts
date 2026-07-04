@@ -3,13 +3,13 @@ import autoTable from "jspdf-autotable";
 import { PDFPointDataType } from "Types";
 import { wrapPdfSection } from "./pdfReportLayout";
 
-export function addGeneralInfoTable(
-  doc: jsPDF,
-  pointData: PDFPointDataType,
-  pilootOptions: { label: string; value: string }[]
-) {
+export function addGeneralInfoTable(input: {
+  doc: jsPDF;
+  pointData: PDFPointDataType;
+  pilootOptions: { label: string; value: string }[];
+}) {
   const generalStart = 55;
-  autoTable(doc, {
+  autoTable(input.doc, {
     startY: generalStart,
     margin: { left: 25 },
     styles: {
@@ -23,21 +23,25 @@ export function addGeneralInfoTable(
     body: [
       [
         { content: "Datum:", styles: { fontStyle: "bold" } },
-        new Date(pointData.datum).toLocaleDateString(),
+        new Date(input.pointData.datum).toLocaleDateString(),
         { content: "Piloot:", styles: { fontStyle: "bold" } },
-        pointData.piloot !== ""
-          ? pilootOptions.find((p) => p.value === pointData.piloot)?.label || "-"
+        input.pointData.piloot !== ""
+          ? input.pilootOptions.find((p) => p.value === input.pointData.piloot)?.label || "-"
           : "-",
       ],
       [
         { content: "Luchtvaartuig:", styles: { fontStyle: "bold" } },
-        pointData.luchtvaartuig || "-",
+        input.pointData.luchtvaartuig || "-",
         { content: "Waarnemer:", styles: { fontStyle: "bold" } },
-        pointData.waarnemer || "-",
+        input.pointData.waarnemer || "-",
       ],
     ],
   });
-  wrapPdfSection(doc, generalStart, doc.lastAutoTable.finalY - generalStart);
+  wrapPdfSection({
+    doc: input.doc,
+    startY: generalStart,
+    height: input.doc.lastAutoTable.finalY - generalStart,
+  });
 }
 
 export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
@@ -73,7 +77,11 @@ export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
       ],
     ],
   });
-  wrapPdfSection(doc, coordsStart, doc.lastAutoTable.finalY - coordsStart);
+  wrapPdfSection({
+    doc,
+    startY: coordsStart,
+    height: doc.lastAutoTable.finalY - coordsStart,
+  });
 }
 
 export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
@@ -111,5 +119,9 @@ export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
       ],
     ],
   });
-  wrapPdfSection(doc, detailStart, doc.lastAutoTable.finalY - detailStart);
+  wrapPdfSection({
+    doc,
+    startY: detailStart,
+    height: doc.lastAutoTable.finalY - detailStart,
+  });
 }

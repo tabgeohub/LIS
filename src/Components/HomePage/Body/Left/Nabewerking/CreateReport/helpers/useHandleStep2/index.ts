@@ -106,10 +106,10 @@ export function useHandleStep2(input: UseHandleStep2Input) {
         } as ProcessGeometryParams)
       );
 
-      const processedItems = await runWithConcurrency(
-        [...pointTasks, ...geometryTasks],
-        4
-      );
+      const processedItems = await runWithConcurrency({
+        tasks: [...pointTasks, ...geometryTasks],
+        concurrency: 4,
+      });
 
       addProcessedItemsToZip(zip, processedItems);
 

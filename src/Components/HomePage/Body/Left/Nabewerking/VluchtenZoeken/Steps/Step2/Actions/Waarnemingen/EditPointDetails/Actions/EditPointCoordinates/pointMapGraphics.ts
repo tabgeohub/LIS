@@ -26,15 +26,15 @@ export function reorderRedLayerOnTop(
   mapView.map.reorder(redGraphicsLayer, mapView.map.layers.length - 1);
 }
 
-export function showRedMarkerAt(
-  redGraphicsLayer: __esri.GraphicsLayer,
-  mapView: __esri.MapView,
-  longitude: number,
-  latitude: number
-) {
-  redGraphicsLayer.removeAll();
-  redGraphicsLayer.add(createPoint(longitude, latitude));
-  reorderRedLayerOnTop(mapView, redGraphicsLayer);
+export function showRedMarkerAt(input: {
+  redGraphicsLayer: __esri.GraphicsLayer;
+  mapView: __esri.MapView;
+  longitude: number;
+  latitude: number;
+}) {
+  input.redGraphicsLayer.removeAll();
+  input.redGraphicsLayer.add(createPoint(input.longitude, input.latitude));
+  reorderRedLayerOnTop(input.mapView, input.redGraphicsLayer);
 }
 
 function findGraphicByPointId(
@@ -46,20 +46,20 @@ function findGraphicByPointId(
     .find((g) => g.attributes?.id === pointId);
 }
 
-function createPointGraphic(
-  point: FinishedPointType,
-  longitude: number,
-  latitude: number,
-  symbol: SimpleMarkerSymbol
-) {
+function createPointGraphic(input: {
+  point: FinishedPointType;
+  longitude: number;
+  latitude: number;
+  symbol: SimpleMarkerSymbol;
+}) {
   return new Graphic({
     geometry: new Point({
-      longitude,
-      latitude,
+      longitude: input.longitude,
+      latitude: input.latitude,
       spatialReference: { wkid: 4326 },
     }),
-    symbol,
-    attributes: { ...point, longitude, latitude },
+    symbol: input.symbol,
+    attributes: { ...input.point, longitude: input.longitude, latitude: input.latitude },
   });
 }
 
@@ -74,12 +74,12 @@ export function replacePointGraphic(input: {
   if (existing) input.layer.remove(existing);
 
   input.layer.add(
-    createPointGraphic(
-      input.point,
-      input.longitude,
-      input.latitude,
-      input.symbol ?? BLUE_POINT_SYMBOL
-    )
+    createPointGraphic({
+      point: input.point,
+      longitude: input.longitude,
+      latitude: input.latitude,
+      symbol: input.symbol ?? BLUE_POINT_SYMBOL,
+    })
   );
 }
 
@@ -97,12 +97,12 @@ export function updatePreviewGraphics(input: {
     longitude: input.longitude,
     latitude: input.latitude,
   });
-  showRedMarkerAt(
-    input.redGraphicsLayer,
-    input.mapView,
-    input.longitude,
-    input.latitude
-  );
+  showRedMarkerAt({
+    redGraphicsLayer: input.redGraphicsLayer,
+    mapView: input.mapView,
+    longitude: input.longitude,
+    latitude: input.latitude,
+  });
 }
 
 export function updateSavedGraphics(input: {

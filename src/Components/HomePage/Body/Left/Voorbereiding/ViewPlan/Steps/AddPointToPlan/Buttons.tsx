@@ -45,24 +45,24 @@ export default function Buttons({
   function handleSubmit() {
     if (!selectedPlan) return;
 
-    const uniquePointIds = buildUniquePointIds(
-      selectedPlan,
+    const uniquePointIds = buildUniquePointIds({
+      plan: selectedPlan,
       selectedPointIds,
       selectedGeometryIds,
-      dbGeometries
-    );
+      dbGeometries,
+    });
 
-    const updatedGeometries = mergeGeometries(
-      selectedPlan.geometries,
-      selectedGeometryIds,
-      dbGeometries
-    );
+    const updatedGeometries = mergeGeometries({
+      existing: selectedPlan.geometries,
+      newlySelectedIds: selectedGeometryIds,
+      allGeometries: dbGeometries,
+    });
 
-    const standalonePoints = resolveStandalonePoints(
-      uniquePointIds,
+    const standalonePoints = resolveStandalonePoints({
+      allPointIds: uniquePointIds,
       dbPoints,
-      updatedGeometries
-    );
+      geometries: updatedGeometries,
+    });
 
     const vertexIds = getGeometryVertexIds(updatedGeometries);
     const newlySelectedStandalonePoints = dbPoints.filter(

@@ -12,7 +12,7 @@ async function fetchAttachmentsForPoint(
   const metaUrl = attachmentDisplayUrl(
     `${featureLayerUrl}/0/${objectId}/attachments?f=json`
   );
-  const metadataRes = await fetchWithRetry(metaUrl, proxyFetchInit);
+  const metadataRes = await fetchWithRetry({ url: metaUrl, options: proxyFetchInit });
   const metadata = await metadataRes.json();
 
   if (!metadata.attachmentInfos) return [];
@@ -22,7 +22,7 @@ async function fetchAttachmentsForPoint(
       const url = attachmentDisplayUrl(
         `${featureLayerUrl}/0/${objectId}/attachments/${att.id}`
       );
-      const fileRes = await fetchWithRetry(url, proxyFetchInit);
+      const fileRes = await fetchWithRetry({ url, options: proxyFetchInit });
       const blob = await fileRes.blob();
       const takenAt =
         att.uploadDate != null
@@ -69,10 +69,10 @@ export async function safeFetchPointAttachments(
         const fetchUrl = /arcgis\.com/i.test(rawUrl)
           ? attachmentDisplayUrl(rawUrl)
           : rawUrl;
-        const res = await fetchWithRetry(
-          fetchUrl,
-          /arcgis\.com/i.test(rawUrl) ? proxyFetchInit : {}
-        );
+        const res = await fetchWithRetry({
+          url: fetchUrl,
+          options: /arcgis\.com/i.test(rawUrl) ? proxyFetchInit : {},
+        });
         const blob = await res.blob();
         const nameFromUrl = (() => {
           try {

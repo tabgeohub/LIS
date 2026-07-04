@@ -28,21 +28,21 @@ export function useEditPointMapClick(input: {
       event.stopPropagation?.();
       if (!event.mapPoint?.longitude || !event.mapPoint?.latitude) return;
 
-      const next = coordsFromMapClick(
+      const next = coordsFromMapClick({
         coordinateSystem,
-        event.mapPoint.longitude,
-        event.mapPoint.latitude
-      );
+        clickedLon: event.mapPoint.longitude,
+        clickedLat: event.mapPoint.latitude,
+      });
       input.setLongitude(next.longitude);
       input.setLatitude(next.latitude);
       input.setXCoordinaat_rd(next.xcoordinaat_rd);
       input.setYCoordinaat_rd(next.ycoordinaat_rd);
-      showRedMarkerAt(
+      showRedMarkerAt({
         redGraphicsLayer,
         mapView,
-        next.longitude,
-        next.latitude
-      );
+        longitude: next.longitude,
+        latitude: next.latitude,
+      });
 
       logAction({
         message: "User clicked on map to update point coordinates",

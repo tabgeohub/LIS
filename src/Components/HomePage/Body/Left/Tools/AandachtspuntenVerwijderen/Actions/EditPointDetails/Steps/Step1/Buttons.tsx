@@ -31,11 +31,11 @@ export default function Buttons({
   function handleSubmit() {
     if (!selectedPoint) return;
 
-    const newPoint = buildPointUpdatePayload(
-      formFields,
-      selectedPoint.id,
-      selectedPoint.created_at
-    );
+    const newPoint = buildPointUpdatePayload({
+      fields: formFields,
+      id: selectedPoint.id,
+      created_at: selectedPoint.created_at,
+    });
 
     update(newPoint, (responseData) => {
       if (!responseData.result) return;

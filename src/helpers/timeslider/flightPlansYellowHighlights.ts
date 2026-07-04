@@ -25,10 +25,10 @@ export function removeTimesliderHighlights(layer: __esri.GraphicsLayer) {
     .forEach((g) => layer.remove(g));
 }
 
-export function drawSelectedPlansYellowHighlights(
-  layer: __esri.GraphicsLayer,
-  plans: FinishedFlightPlanType[],
-  selectedPlanIds: number[]
-) {
-  addPlanHighlightGraphics({ layer, plans, selectedPlanIds });
+export function drawSelectedPlansYellowHighlights(input: {
+  layer: __esri.GraphicsLayer;
+  plans: FinishedFlightPlanType[];
+  selectedPlanIds: number[];
+}) {
+  addPlanHighlightGraphics(input);
 }

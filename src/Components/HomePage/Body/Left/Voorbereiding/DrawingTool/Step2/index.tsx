@@ -10,7 +10,7 @@ export default function Step2() {
   const { selectedTab } = useTabState();
   const { step, clear } = useDrawingStore();
 
-  useDrawingToolStep2Lifecycle(mapView, selectedTab, step, clear);
+  useDrawingToolStep2Lifecycle({ mapView, selectedTab, step, clear });
 
   return (
     <div className="max-h-[97%] p-2 overflow-y-auto thin-scrollbar">

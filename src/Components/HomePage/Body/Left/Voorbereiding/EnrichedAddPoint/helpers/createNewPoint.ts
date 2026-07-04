@@ -1,17 +1,17 @@
 import createPoint from "@helpers/ArcGISHelpers/createPoint";
 
-export function createNewPoint(
-  redGraphicsLayer: __esri.GraphicsLayer,
-  setCurrentPoint: (value: { x: number; y: number }) => void,
-  xCoord: number,
-  yCoord: number
-) {
-  const pointGraphic = createPoint(xCoord, yCoord);
+export function createNewPoint(input: {
+  redGraphicsLayer: __esri.GraphicsLayer;
+  setCurrentPoint: (value: { x: number; y: number }) => void;
+  xCoord: number;
+  yCoord: number;
+}) {
+  const pointGraphic = createPoint(input.xCoord, input.yCoord);
 
-  setCurrentPoint({
-    x: xCoord,
-    y: yCoord,
+  input.setCurrentPoint({
+    x: input.xCoord,
+    y: input.yCoord,
   });
 
-  redGraphicsLayer.add(pointGraphic);
+  input.redGraphicsLayer.add(pointGraphic);
 }

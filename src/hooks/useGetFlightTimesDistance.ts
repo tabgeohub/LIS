@@ -33,12 +33,10 @@ export function useGetFlightTimesDistance(flightPlan: { id?: number }) {
       for (let i = 1; i < pathPoints.length; i++) {
         const p1 = pathPoints[i - 1];
         const p2 = pathPoints[i];
-        distanceSum += haversine(
-          p1.latitude,
-          p1.longitude,
-          p2.latitude,
-          p2.longitude
-        );
+        distanceSum += haversine({
+          from: { lat: p1.latitude, lon: p1.longitude },
+          to: { lat: p2.latitude, lon: p2.longitude },
+        });
       }
       setTotalDistance(distanceSum);
     } else {

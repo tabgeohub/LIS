@@ -57,7 +57,12 @@ export default function Step2({
       setYCoord(rdY);
     }
 
-    createNewPoint(redGraphicsLayer, setCurrentPoint, drawLon, drawLat);
+    createNewPoint({
+      redGraphicsLayer,
+      setCurrentPoint,
+      xCoord: drawLon,
+      yCoord: drawLat,
+    });
   }
 
   useCoordinateSystemSync({

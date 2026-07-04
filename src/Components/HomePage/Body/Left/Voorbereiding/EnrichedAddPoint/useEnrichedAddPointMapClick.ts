@@ -37,8 +37,10 @@ export function useEnrichedAddPointMapClick(input: {
         if (!lon || !lat) return;
 
         const isNear = input.points.some((p) =>
-          getDistanceInMeters(lat, lon, p.latitude, p.longitude) <
-          NEAR_POINT_THRESHOLD_METERS
+          getDistanceInMeters({
+            from: { lat, lon },
+            to: { lat: p.latitude, lon: p.longitude },
+          }) < NEAR_POINT_THRESHOLD_METERS
         );
 
         if (isNear) {

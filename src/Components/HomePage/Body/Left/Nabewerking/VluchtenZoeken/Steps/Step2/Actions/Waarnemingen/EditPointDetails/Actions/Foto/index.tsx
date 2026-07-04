@@ -14,11 +14,11 @@ export default function Foto({
   const handleAttachmentsUpdated = (newAttachments: AttachmentType[]) => {
     if (!selectedPoint || !selectedPlan) return;
 
-    const { updatedPlan, updatedPoint } = syncPointAttachmentsInPlan(
+    const { updatedPlan, updatedPoint } = syncPointAttachmentsInPlan({
       selectedPlan,
       selectedPoint,
-      newAttachments
-    );
+      newAttachments,
+    });
 
     setSelectedPlan(updatedPlan);
     setSelectedPoint(updatedPoint);

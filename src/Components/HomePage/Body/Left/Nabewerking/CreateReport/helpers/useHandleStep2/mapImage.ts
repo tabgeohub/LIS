@@ -34,44 +34,42 @@ function lonLatToWebMercator(lon: number, lat: number) {
   return { x, y };
 }
 
-export async function getStaticMapImage(
-  lon: number,
-  lat: number,
-  level: number,
-  width: number,
-  height: number,
-  mapserverUrl: string
-): Promise<ImageData> {
-  const res = RES_BY_LEVEL[level] || RES_BY_LEVEL[10];
-  const { x, y } = lonLatToWebMercator(lon, lat);
-  const halfW = (res * width) / 2;
-  const halfH = (res * height) / 2;
+export async function getStaticMapImage(input: {
+  lon: number;
+  lat: number;
+  level: number;
+  width: number;
+  height: number;
+  mapserverUrl: string;
+}): Promise<ImageData> {
+  const res = RES_BY_LEVEL[input.level] || RES_BY_LEVEL[10];
+  const { x, y } = lonLatToWebMercator(input.lon, input.lat);
+  const halfW = (res * input.width) / 2;
+  const halfH = (res * input.height) / 2;
   const xmin = x - halfW;
   const ymin = y - halfH;
   const xmax = x + halfW;
   const ymax = y + halfH;
 
-  const url = `${mapserverUrl}/export?bbox=${xmin},${ymin},${xmax},${ymax}&bboxSR=3857&size=${width},${height}&format=png32&dpi=96&f=image`;
-  const resp = await fetchWithRetry(url, {}, 2);
+  const url = `${input.mapserverUrl}/export?bbox=${xmin},${ymin},${xmax},${ymax}&bboxSR=3857&size=${input.width},${input.height}&format=png32&dpi=96&f=image`;
+  const resp = await fetchWithRetry({ url, maxRetries: 2 });
   const blob = await resp.blob();
 
   const bmp = await createImageBitmap(blob);
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = input.width;
+  canvas.height = input.height;
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(bmp, 0, 0, width, height);
-  // draw marker at center (higher contrast)
+  ctx.drawImage(bmp, 0, 0, input.width, input.height);
   ctx.fillStyle = "#ff8c00";
   ctx.strokeStyle = "#222";
   ctx.lineWidth = 3;
-  const cx = Math.round(width / 2);
-  const cy = Math.round(height / 2);
+  const cx = Math.round(input.width / 2);
+  const cy = Math.round(input.height / 2);
   ctx.beginPath();
   ctx.arc(cx, cy, 8, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
-  return ctx.getImageData(0, 0, width, height);
+  return ctx.getImageData(0, 0, input.width, input.height);
 }
-

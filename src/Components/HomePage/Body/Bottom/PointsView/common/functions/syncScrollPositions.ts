@@ -1,25 +1,24 @@
 import { RefObject } from "react";
 
-export const syncScrollPositions = (
-  source: "top" | "table",
-  topScrollRef: RefObject<HTMLDivElement>,
-  tableScrollRef: RefObject<HTMLDivElement>,
-  syncingRef: RefObject<boolean>
-) => {
-  if (!topScrollRef.current || !tableScrollRef.current) return;
-  if (syncingRef.current) return;
-  syncingRef.current = true;
+export const syncScrollPositions = (input: {
+  source: "top" | "table";
+  topScrollRef: RefObject<HTMLDivElement>;
+  tableScrollRef: RefObject<HTMLDivElement>;
+  syncingRef: RefObject<boolean>;
+}) => {
+  if (!input.topScrollRef.current || !input.tableScrollRef.current) return;
+  if (input.syncingRef.current) return;
+  input.syncingRef.current = true;
 
-  if (source === "top") {
-    tableScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+  if (input.source === "top") {
+    input.tableScrollRef.current.scrollLeft = input.topScrollRef.current.scrollLeft;
   } else {
-    topScrollRef.current.scrollLeft = tableScrollRef.current.scrollLeft;
+    input.topScrollRef.current.scrollLeft = input.tableScrollRef.current.scrollLeft;
   }
 
   window.requestAnimationFrame(() => {
-    if (syncingRef.current !== null) {
-      syncingRef.current = false;
+    if (input.syncingRef.current !== null) {
+      input.syncingRef.current = false;
     }
   });
 };
-

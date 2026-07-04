@@ -17,18 +17,18 @@ export function readImageFileAsBlob(
   reader.readAsDataURL(file);
 }
 
-export function buildAttachmentFromUploadResponse(
-  objectId: number,
-  responseId: number,
-  responseUrl: string,
-  pointId: number,
-  takenAt: number
-) {
+export function buildAttachmentFromUploadResponse(input: {
+  objectId: number;
+  responseId: number;
+  responseUrl: string;
+  pointId: number;
+  takenAt: number;
+}) {
   return {
-    attachmentid: Number(objectId),
-    id: Number(responseId),
-    point_id: Number(pointId),
-    taken_at: Number(takenAt),
-    url: responseUrl,
+    attachmentid: Number(input.objectId),
+    id: Number(input.responseId),
+    point_id: Number(input.pointId),
+    taken_at: Number(input.takenAt),
+    url: input.responseUrl,
   };
 }

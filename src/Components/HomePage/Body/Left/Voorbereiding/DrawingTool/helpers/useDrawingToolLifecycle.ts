@@ -12,63 +12,69 @@ import { DrawingToolType, resetSketchSession } from "./resetSketchSession";
 
 const DRAWING_TAB = "tekengereedschap";
 
-export function useDrawingToolRootLifecycle(
-  mapView: MapView | null,
-  selectedTab: string,
-  clear: () => void,
-  setStep: (value: number) => void
-) {
+export function useDrawingToolRootLifecycle(input: {
+  mapView: MapView | null;
+  selectedTab: string;
+  clear: () => void;
+  setStep: (value: number) => void;
+}) {
   useEffect(() => {
-    if (selectedTab !== DRAWING_TAB) {
-      cleanupDrawingToolMap(mapView);
-      clear();
-      setStep(1);
+    if (input.selectedTab !== DRAWING_TAB) {
+      cleanupDrawingToolMap(input.mapView);
+      input.clear();
+      input.setStep(1);
     }
 
     return () => {
-      cleanupDrawingToolMap(mapView);
-      clear();
-      setStep(1);
+      cleanupDrawingToolMap(input.mapView);
+      input.clear();
+      input.setStep(1);
     };
-  }, [mapView, selectedTab, clear, setStep]);
+  }, [input.mapView, input.selectedTab, input.clear, input.setStep]);
 }
 
-export function useDrawingToolStep1Lifecycle(
-  mapView: MapView | null,
-  selectedTab: string,
-  sketchViewModel: SketchViewModel | null,
-  setSketchViewModel: (value: SketchViewModel | null) => void,
-  setSelectedTool: (value: DrawingToolType) => void
-) {
+export function useDrawingToolStep1Lifecycle(input: {
+  mapView: MapView | null;
+  selectedTab: string;
+  sketchViewModel: SketchViewModel | null;
+  setSketchViewModel: (value: SketchViewModel | null) => void;
+  setSelectedTool: (value: DrawingToolType) => void;
+}) {
   useEffect(() => {
-    if (selectedTab !== DRAWING_TAB) {
-      clearCurrentlyDrawingGraphics(mapView);
+    if (input.selectedTab !== DRAWING_TAB) {
+      clearCurrentlyDrawingGraphics(input.mapView);
       resetSketchSession({
-        sketchViewModel,
-        mapView,
-        setSketchViewModel,
-        setSelectedTool,
+        sketchViewModel: input.sketchViewModel,
+        mapView: input.mapView,
+        setSketchViewModel: input.setSketchViewModel,
+        setSelectedTool: input.setSelectedTool,
         tolerant: true,
       });
     }
-  }, [selectedTab, mapView, sketchViewModel, setSketchViewModel, setSelectedTool]);
+  }, [
+    input.selectedTab,
+    input.mapView,
+    input.sketchViewModel,
+    input.setSketchViewModel,
+    input.setSelectedTool,
+  ]);
 
   useEffect(() => {
     return () => {
       resetSketchSession({
-        sketchViewModel,
-        mapView,
+        sketchViewModel: input.sketchViewModel,
+        mapView: input.mapView,
       });
     };
-  }, [mapView, sketchViewModel]);
+  }, [input.mapView, input.sketchViewModel]);
 }
 
-export function useDrawingToolStep2Lifecycle(
-  mapView: MapView | null,
-  selectedTab: string,
-  step: number,
-  clear: () => void
-) {
+export function useDrawingToolStep2Lifecycle(input: {
+  mapView: MapView | null;
+  selectedTab: string;
+  step: number;
+  clear: () => void;
+}) {
   const isFirstMount = useRef(true);
 
   useEffect(() => {
@@ -77,18 +83,18 @@ export function useDrawingToolStep2Lifecycle(
       return;
     }
 
-    if (selectedTab !== DRAWING_TAB) {
-      clearCurrentlyDrawingGraphics(mapView);
-      resetMapCursor(mapView);
-      clear();
+    if (input.selectedTab !== DRAWING_TAB) {
+      clearCurrentlyDrawingGraphics(input.mapView);
+      resetMapCursor(input.mapView);
+      input.clear();
       return;
     }
 
-    if (step === 1) {
-      clearCurrentlyDrawingGraphics(mapView);
-      resetMapCursor(mapView);
+    if (input.step === 1) {
+      clearCurrentlyDrawingGraphics(input.mapView);
+      resetMapCursor(input.mapView);
     }
-  }, [selectedTab, step, mapView, clear]);
+  }, [input.selectedTab, input.step, input.mapView, input.clear]);
 
   useEffect(() => {
     return () => {
@@ -96,10 +102,10 @@ export function useDrawingToolStep2Lifecycle(
       const { selectedTab: currentTab } = useTabState.getState();
 
       if (currentTab !== DRAWING_TAB || currentStep === 1) {
-        clearCurrentlyDrawingGraphics(mapView);
+        clearCurrentlyDrawingGraphics(input.mapView);
       }
 
-      resetMapCursor(mapView);
+      resetMapCursor(input.mapView);
     };
-  }, [mapView]);
+  }, [input.mapView]);
 }

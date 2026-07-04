@@ -15,26 +15,26 @@ export type PointUpdateFormFields = {
   specifiek_letten_op: string;
 };
 
-export function buildPointUpdatePayload(
-  fields: PointUpdateFormFields,
-  id: number,
-  created_at?: string
-) {
+export function buildPointUpdatePayload(input: {
+  fields: PointUpdateFormFields;
+  id: number;
+  created_at?: string;
+}) {
   return {
-    omschrijving: fields.omschrijving,
-    regio_id: fields.regio_id,
-    xcoordinaat_rd: fields.xcoordinaat_rd,
-    ycoordinaat_rd: fields.ycoordinaat_rd,
-    latitude: fields.latitude,
-    longitude: fields.longitude,
-    vertrouwelijk: fields.vertrouwelijk,
-    herhalen: fields.herhalen ? 1 : 0,
-    user_id: fields.user_id,
-    activiteit_id: fields.activiteit_id,
-    organisatie_id: fields.organisatie_id,
-    specifiek_letten_op: fields.specifiek_letten_op,
-    datum: created_at,
-    id,
+    omschrijving: input.fields.omschrijving,
+    regio_id: input.fields.regio_id,
+    xcoordinaat_rd: input.fields.xcoordinaat_rd,
+    ycoordinaat_rd: input.fields.ycoordinaat_rd,
+    latitude: input.fields.latitude,
+    longitude: input.fields.longitude,
+    vertrouwelijk: input.fields.vertrouwelijk,
+    herhalen: input.fields.herhalen ? 1 : 0,
+    user_id: input.fields.user_id,
+    activiteit_id: input.fields.activiteit_id,
+    organisatie_id: input.fields.organisatie_id,
+    specifiek_letten_op: input.fields.specifiek_letten_op,
+    datum: input.created_at,
+    id: input.id,
   };
 }
 

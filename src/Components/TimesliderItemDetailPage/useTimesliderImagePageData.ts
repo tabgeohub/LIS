@@ -40,7 +40,11 @@ export function useTimesliderImagePageData() {
   const filteredPlans = useMemo(
     () =>
       ok
-        ? filterFinishedPlansContainingItem(plansFetch.plans, kind, itemId)
+        ? filterFinishedPlansContainingItem({
+            plans: plansFetch.plans,
+            kind,
+            itemId,
+          })
         : [],
     [plansFetch.plans, ok, kind, itemId]
   );
@@ -53,11 +57,11 @@ export function useTimesliderImagePageData() {
   const displayTitle = useMemo(
     () =>
       ok
-        ? getItemDisplayTitle(
-            filteredPlans.length ? filteredPlans : plansFetch.plans,
+        ? getItemDisplayTitle({
+            plans: filteredPlans.length ? filteredPlans : plansFetch.plans,
             kind,
-            itemId
-          )
+            itemId,
+          })
         : "",
     [ok, filteredPlans, plansFetch.plans, kind, itemId]
   );

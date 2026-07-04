@@ -42,12 +42,10 @@ export default function useNearestPointClick({
       for (const point of points) {
         if (!point.latitude || !point.longitude) continue;
 
-        const distance = getDistanceMeters(
-          point.latitude,
-          point.longitude,
-          clickedLat,
-          clickedLon
-        );
+        const distance = getDistanceMeters({
+          from: { lat: point.latitude, lon: point.longitude },
+          to: { lat: clickedLat, lon: clickedLon },
+        });
 
         // Always track the nearest point, but only select if within maximum distance
         if (distance < minDistance) {

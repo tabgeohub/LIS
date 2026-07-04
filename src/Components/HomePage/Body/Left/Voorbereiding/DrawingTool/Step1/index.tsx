@@ -26,13 +26,13 @@ export default function Step1() {
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer | null>(null);
   const [hasGraphics, setHasGraphics] = useState(false);
 
-  useDrawingToolStep1Lifecycle(
+  useDrawingToolStep1Lifecycle({
     mapView,
     selectedTab,
     sketchViewModel,
     setSketchViewModel,
-    setSelectedTool
-  );
+    setSelectedTool,
+  });
 
   useEffect(() => {
     if (!graphicsLayer) {

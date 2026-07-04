@@ -39,7 +39,10 @@ export default function NextBtn() {
         const pLat = p.latitude;
         const pLon = p.longitude;
 
-        return getDistanceInMeters(lat, lon, pLat, pLon) < 50;
+        return getDistanceInMeters({
+          from: { lat, lon },
+          to: { lat: pLat, lon: pLon },
+        }) < 50;
       });
 
       if (isNear) {

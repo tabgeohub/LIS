@@ -22,7 +22,12 @@ export default function HorizontalScrollControls({
   if (!needsHorizontalScroll) return null;
 
   const handleTopScroll = () => {
-    syncScrollPositions("top", topScrollRef, tableScrollRef, syncingRef);
+    syncScrollPositions({
+      source: "top",
+      topScrollRef,
+      tableScrollRef,
+      syncingRef,
+    });
     if (onTopScroll) onTopScroll();
   };
 

@@ -57,11 +57,11 @@ export default function FlightPlansListCheckbox() {
 
     if (selectedPlanIds.length === 0 || plans.length === 0) return;
 
-    drawSelectedPlansYellowHighlights(
-      yellowGraphicsLayer,
+    drawSelectedPlansYellowHighlights({
+      layer: yellowGraphicsLayer,
       plans,
-      selectedPlanIds
-    );
+      selectedPlanIds,
+    });
   }, [plans, selectedPlanIds, yellowGraphicsLayer]);
 
   const hasRange = !!dateFrom && !!dateTo;

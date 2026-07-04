@@ -25,8 +25,12 @@ export function addPdfHeader(doc: jsPDF) {
   doc.text("Waarnemingsrapport", 20, 50);
 }
 
-export function wrapPdfSection(doc: jsPDF, startY: number, height: number) {
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.rect(20, startY - 2, 170, height + 4);
+export function wrapPdfSection(input: {
+  doc: jsPDF;
+  startY: number;
+  height: number;
+}) {
+  input.doc.setDrawColor(0, 0, 0);
+  input.doc.setLineWidth(0.2);
+  input.doc.rect(20, input.startY - 2, 170, input.height + 4);
 }

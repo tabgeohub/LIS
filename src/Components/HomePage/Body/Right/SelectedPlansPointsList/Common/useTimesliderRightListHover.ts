@@ -23,12 +23,12 @@ export function useTimesliderRightListHover() {
       clearRightListHover(graphicsLayerHover);
       const coords = getPointCoordinates(point, true);
       if (!coords) return;
-      drawHoverPin(
-        graphicsLayerHover,
-        coords.longitude,
-        coords.latitude,
-        point.id
-      );
+      drawHoverPin({
+        layer: graphicsLayerHover,
+        longitude: coords.longitude,
+        latitude: coords.latitude,
+        id: point.id,
+      });
     },
     [graphicsLayerHover]
   );

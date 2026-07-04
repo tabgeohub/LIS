@@ -45,8 +45,8 @@ export async function preloadReportAttachments(input: {
   );
 
   const [preloadedPoints, preloadedGeometries, logoDataUrl] = await Promise.all([
-    runWithConcurrency(pointPreloadTasks, 5),
-    runWithConcurrency(geometryPreloadTasks, 5),
+    runWithConcurrency({ tasks: pointPreloadTasks, concurrency: 5 }),
+    runWithConcurrency({ tasks: geometryPreloadTasks, concurrency: 5 }),
     preloadLogoDataUrl(),
   ]);
 

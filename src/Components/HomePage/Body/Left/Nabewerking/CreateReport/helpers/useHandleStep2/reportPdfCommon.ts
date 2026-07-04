@@ -50,22 +50,22 @@ export async function fetchOverviewDetailImages(input: {
   mapServerUrl: string;
 }) {
   return Promise.all([
-    getStaticMapImage(
-      input.longitude,
-      input.latitude,
-      10,
-      1600,
-      900,
-      input.mapServerUrl
-    ),
-    getStaticMapImage(
-      input.longitude,
-      input.latitude,
-      17,
-      1600,
-      900,
-      input.mapServerUrl
-    ),
+    getStaticMapImage({
+      lon: input.longitude,
+      lat: input.latitude,
+      level: 10,
+      width: 1600,
+      height: 900,
+      mapserverUrl: input.mapServerUrl,
+    }),
+    getStaticMapImage({
+      lon: input.longitude,
+      lat: input.latitude,
+      level: 17,
+      width: 1600,
+      height: 900,
+      mapserverUrl: input.mapServerUrl,
+    }),
   ]);
 }
 

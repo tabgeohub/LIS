@@ -42,21 +42,21 @@ export function finalizeCoordinateValues(
   return values;
 }
 
-export function coordsFromMapClick(
-  coordinateSystem: string,
-  clickedLon: number,
-  clickedLat: number
-): CoordinateValues {
+export function coordsFromMapClick(input: {
+  coordinateSystem: string;
+  clickedLon: number;
+  clickedLat: number;
+}): CoordinateValues {
   const transformed = getTransformedCoordinates({
     fromProjection: "WGS84",
     toProjection: "RD",
-    x: clickedLon,
-    y: clickedLat,
+    x: input.clickedLon,
+    y: input.clickedLat,
   });
 
   return {
-    longitude: clickedLon,
-    latitude: clickedLat,
+    longitude: input.clickedLon,
+    latitude: input.clickedLat,
     xcoordinaat_rd: transformed.x,
     ycoordinaat_rd: transformed.y,
   };

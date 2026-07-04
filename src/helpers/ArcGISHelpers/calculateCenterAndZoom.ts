@@ -57,25 +57,22 @@ export function collectPointsForCenterAndZoom(
   return out;
 }
 
-function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+function haversineDistance(input: {
+  from: { lat: number; lon: number };
+  to: { lat: number; lon: number };
+}): number {
   const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const dLat = ((input.to.lat - input.from.lat) * Math.PI) / 180;
+  const dLon = ((input.to.lon - input.from.lon) * Math.PI) / 180;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
+    Math.cos((input.from.lat * Math.PI) / 180) *
+      Math.cos((input.to.lat * Math.PI) / 180) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
-  return distance;
+  return R * c;
 }
 
 function calculateZoom(maxDistance: number): number {
@@ -123,12 +120,10 @@ export function calculateCenterAndZoom(
 
   let maxDistance = 0;
   for (const point of valid) {
-    const distance = haversineDistance(
-      centerLat,
-      centerLon,
-      point.latitude,
-      point.longitude
-    );
+    const distance = haversineDistance({
+      from: { lat: centerLat, lon: centerLon },
+      to: { lat: point.latitude, lon: point.longitude },
+    });
     if (distance > maxDistance) maxDistance = distance;
   }
 

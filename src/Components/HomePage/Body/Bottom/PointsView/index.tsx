@@ -106,14 +106,25 @@ export default function PointsView({
       targetCol: string,
       columns: string[],
       setFunction: (value: string[] | ((prev: string[]) => string[])) => void
-    ) => handleDrop(targetCol, draggingCol, columns, setFunction, setDraggingCol),
+    ) => handleDrop({
+      targetCol,
+      draggingCol,
+      columns,
+      setFunction,
+      setDraggingCol,
+    }),
     [draggingCol, setDraggingCol]
   );
 
   // Scroll sync handler - memoized to prevent unnecessary re-renders
   const handleScrollSync = useCallback(
     (source: "top" | "table") =>
-      syncScrollPositions(source, topScrollRef, tableScrollRef, syncingRef),
+      syncScrollPositions({
+        source,
+        topScrollRef,
+        tableScrollRef,
+        syncingRef,
+      }),
     [topScrollRef, tableScrollRef, syncingRef]
   );
 

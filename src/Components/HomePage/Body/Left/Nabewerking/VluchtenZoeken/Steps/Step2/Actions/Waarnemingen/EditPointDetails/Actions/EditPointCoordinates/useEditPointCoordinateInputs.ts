@@ -100,12 +100,12 @@ export function useInitialEditPointMarker(input: {
       selectedPoint.longitude &&
       selectedPoint.latitude
     ) {
-      showRedMarkerAt(
-        redGraphicsLayer!,
-        mapView!,
-        selectedPoint.longitude,
-        selectedPoint.latitude
-      );
+      showRedMarkerAt({
+        redGraphicsLayer: redGraphicsLayer!,
+        mapView: mapView!,
+        longitude: selectedPoint.longitude,
+        latitude: selectedPoint.latitude,
+      });
     }
   }, [input.selectedPoint, input.mapView, input.redGraphicsLayer]);
 }

@@ -16,19 +16,19 @@ export function collectExistingPlanPointIds(plan: FlightPlanType): number[] {
 }
 
 /** Merge existing plan geometries with newly selected ones from the database. */
-export function mergeGeometries(
-  existing: Geometry[] | undefined,
-  newlySelectedIds: number[],
-  allGeometries: Geometry[]
-): Geometry[] {
+export function mergeGeometries(input: {
+  existing: Geometry[] | undefined;
+  newlySelectedIds: number[];
+  allGeometries: Geometry[];
+}): Geometry[] {
   const byId = new Map<number, Geometry>();
 
-  for (const g of existing ?? []) {
+  for (const g of input.existing ?? []) {
     byId.set(g.id, g);
   }
 
-  for (const g of allGeometries) {
-    if (newlySelectedIds.includes(g.id)) {
+  for (const g of input.allGeometries) {
+    if (input.newlySelectedIds.includes(g.id)) {
       byId.set(g.id, g);
     }
   }
@@ -41,22 +41,22 @@ export function getGeometryVertexIds(geometries: Geometry[]): Set<number> {
   return new Set(geometries.flatMap((g) => g.points.map((p) => p.id)));
 }
 
-function resolvePointsByIds(
-  pointIds: number[],
-  dbPoints: EnrichedPointType[],
-  geometries: Geometry[]
-): EnrichedPointType[] {
-  const byId = new Map(dbPoints.map((p) => [p.id, p]));
+function resolvePointsByIds(input: {
+  pointIds: number[];
+  dbPoints: EnrichedPointType[];
+  geometries: Geometry[];
+}): EnrichedPointType[] {
+  const byId = new Map(input.dbPoints.map((p) => [p.id, p]));
 
-  for (const geometry of geometries) {
+  for (const geometry of input.geometries) {
     for (const pt of geometry.points) {
-      if (pointIds.includes(pt.id) && !byId.has(pt.id)) {
+      if (input.pointIds.includes(pt.id) && !byId.has(pt.id)) {
         byId.set(pt.id, pt as EnrichedPointType);
       }
     }
   }
 
-  return pointIds
+  return input.pointIds
     .map((id) => byId.get(id))
     .filter((p): p is EnrichedPointType => p !== undefined);
 }
@@ -65,31 +65,35 @@ function resolvePointsByIds(
  * Standalone aandachtspunten only — excludes vertices that belong to plan geometries.
  * Matches backend formatting in getAllFlightPlans.
  */
-export function resolveStandalonePoints(
-  allPointIds: number[],
-  dbPoints: EnrichedPointType[],
-  geometries: Geometry[]
-): EnrichedPointType[] {
-  const vertexIds = getGeometryVertexIds(geometries);
-  const standaloneIds = allPointIds.filter((id) => !vertexIds.has(id));
+export function resolveStandalonePoints(input: {
+  allPointIds: number[];
+  dbPoints: EnrichedPointType[];
+  geometries: Geometry[];
+}): EnrichedPointType[] {
+  const vertexIds = getGeometryVertexIds(input.geometries);
+  const standaloneIds = input.allPointIds.filter((id) => !vertexIds.has(id));
 
-  return resolvePointsByIds(standaloneIds, dbPoints, geometries);
+  return resolvePointsByIds({
+    pointIds: standaloneIds,
+    dbPoints: input.dbPoints,
+    geometries: input.geometries,
+  });
 }
 
-export function buildUniquePointIds(
-  plan: FlightPlanType,
-  selectedPointIds: number[],
-  selectedGeometryIds: number[],
-  dbGeometries: Geometry[]
-): number[] {
-  const pointIdsFromNewGeometries = dbGeometries
-    .filter((g) => selectedGeometryIds.includes(g.id))
+export function buildUniquePointIds(input: {
+  plan: FlightPlanType;
+  selectedPointIds: number[];
+  selectedGeometryIds: number[];
+  dbGeometries: Geometry[];
+}): number[] {
+  const pointIdsFromNewGeometries = input.dbGeometries
+    .filter((g) => input.selectedGeometryIds.includes(g.id))
     .flatMap((g) => g.points.map((p) => p.id));
 
   return Array.from(
     new Set([
-      ...collectExistingPlanPointIds(plan),
-      ...selectedPointIds,
+      ...collectExistingPlanPointIds(input.plan),
+      ...input.selectedPointIds,
       ...pointIdsFromNewGeometries,
     ])
   );

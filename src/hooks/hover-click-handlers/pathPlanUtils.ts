@@ -33,12 +33,10 @@ export function findNearestPathPoint(input: {
   let minDistance = Infinity;
 
   for (const point of input.planPath) {
-    const dist = getDistanceMeters(
-      point.latitude,
-      point.longitude,
-      input.latitude,
-      input.longitude
-    );
+    const dist = getDistanceMeters({
+      from: { lat: point.latitude, lon: point.longitude },
+      to: { lat: input.latitude, lon: input.longitude },
+    });
     if (dist < minDistance) {
       minDistance = dist;
       nearest = point;

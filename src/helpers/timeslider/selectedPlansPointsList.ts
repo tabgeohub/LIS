@@ -117,15 +117,15 @@ export function clearRightListHover(layer: __esri.GraphicsLayer) {
     .forEach((g) => layer.remove(g));
 }
 
-export function drawHoverPin(
-  layer: __esri.GraphicsLayer,
-  longitude: number,
-  latitude: number,
-  id?: number
-) {
+export function drawHoverPin(input: {
+  layer: __esri.GraphicsLayer;
+  longitude: number;
+  latitude: number;
+  id?: number;
+}) {
   const geometry = new Point({
-    longitude,
-    latitude,
+    longitude: input.longitude,
+    latitude: input.latitude,
     spatialReference: { wkid: 4326 },
   });
 
@@ -142,7 +142,7 @@ export function drawHoverPin(
     }),
     attributes: {
       label: TIMESLIDER_RIGHT_HOVER_LABEL,
-      id,
+      id: input.id,
       kind: "hover-pin",
     },
   });
@@ -157,12 +157,12 @@ export function drawHoverPin(
     }),
     attributes: {
       label: TIMESLIDER_RIGHT_HOVER_LABEL,
-      id,
+      id: input.id,
       kind: "hover-pin",
     },
   });
 
-  layer.addMany([outerGraphic, pinGraphic]);
+  input.layer.addMany([outerGraphic, pinGraphic]);
 }
 
 export function drawGeometryHoverSkyBlue(
