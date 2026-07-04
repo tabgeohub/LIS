@@ -1,33 +1,7 @@
 import type { Request } from "express";
 import { fetch } from "undici";
 import { getValidToken } from "../../services/arcgis";
-import { ALLOWED_ARCGIS_HOSTS } from "../../config/allowlist";
-import { decodeMaybeEncodedUrl, extractTargetUrlFromRequest } from "./proxyShared";
-
-export function resolvePostProxyTargetUrl(req: Request): string | null {
-  let targetUrl = extractTargetUrlFromRequest(req);
-
-  if (!targetUrl && Buffer.isBuffer(req.body) && req.body.length > 0) {
-    const contentType = req.headers["content-type"] || "";
-    if (contentType.includes("application/x-www-form-urlencoded")) {
-      const params = new URLSearchParams(req.body.toString("utf8"));
-      const urlParam = params.get("url");
-      if (urlParam) targetUrl = decodeMaybeEncodedUrl(urlParam);
-    }
-  }
-
-  return targetUrl;
-}
-
-export function assertAllowedArcgisHost(targetUrl: string): URL | null {
-  try {
-    const target = new URL(targetUrl);
-    if (!ALLOWED_ARCGIS_HOSTS.includes(target.hostname)) return null;
-    return target;
-  } catch {
-    return null;
-  }
-}
+import { validatePostProxyRequest } from "./postProxyTarget";
 
 async function postUrlencodedToArcgis(input: {
   targetUrl: string;
@@ -74,36 +48,31 @@ async function postBodyToArcgis(input: {
   });
 }
 
-export async function forwardArcgisPostRequest(req: Request) {
-  const targetUrl = resolvePostProxyTargetUrl(req);
-  if (!targetUrl) {
-    return { ok: false as const, status: 400, body: { error: "Missing url parameter" } };
-  }
+function hasUrlencodedBody(req: Request): boolean {
+  const contentType = req.headers["content-type"] || "";
+  return (
+    contentType.includes("application/x-www-form-urlencoded") &&
+    Buffer.isBuffer(req.body) &&
+    req.body.length > 0
+  );
+}
 
-  const target = assertAllowedArcgisHost(targetUrl);
-  if (!target) {
-    return {
-      ok: false as const,
-      status: 400,
-      body: { error: `Target host not allowed: ${new URL(targetUrl).hostname}` },
-    };
+export async function forwardArcgisPostRequest(req: Request) {
+  const validation = validatePostProxyRequest(req);
+  if (!validation.ok) {
+    return { ok: false as const, status: validation.status, body: validation.body };
   }
 
   const { access_token } = await getValidToken();
   const contentType = req.headers["content-type"] || "";
-  const hasUrlencodedBody =
-    contentType.includes("application/x-www-form-urlencoded") &&
-    Buffer.isBuffer(req.body) &&
-    req.body.length > 0;
-
-  const arcgisRes = hasUrlencodedBody
+  const arcgisRes = hasUrlencodedBody(req)
     ? await postUrlencodedToArcgis({
-        targetUrl,
+        targetUrl: validation.targetUrl,
         body: req.body as Buffer,
         accessToken: access_token,
       })
     : await postBodyToArcgis({
-        targetUrl,
+        targetUrl: validation.targetUrl,
         contentType,
         body:
           Buffer.isBuffer(req.body) && req.body.length > 0

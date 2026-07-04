@@ -11,53 +11,25 @@ import {
 } from "./spoedReportHtml";
 import { sendSpoedReportMail } from "./spoedReportMail";
 import { renderHtmlToPdfBuffer } from "./spoedReportPdf";
+import { validateSpoedReportRequest } from "./validateSpoedReportRequest";
 
 dayjs.locale("nl");
+
+const SMTP_NETWORK_ERROR =
+  /ETIMEDOUT|ECONNREFUSED|ENETUNREACH|ECONNRESET|EHOSTUNREACH/i;
 
 export const sendEmail: RequestHandler = async (req, res) => {
   const requestId = randomUUID();
 
   try {
-    const body = req.body as Record<string, string>;
-    const {
-      senderName,
-      senderEmail,
-      flightNumber,
-      omschrijving,
-      regio_id,
-      sendToEmail,
-    } = body;
-
-    if (!senderName || !senderEmail) {
-      res.status(400).json({ error: "Missing senderName or senderEmail" });
-      return;
-    }
-    if (!flightNumber || !omschrijving || !regio_id) {
-      res
-        .status(400)
-        .json({ error: "Missing flightNumber, omschrijving or regio_id" });
+    const validation = validateSpoedReportRequest(req);
+    if (!validation.ok) {
+      res.status(validation.status).json({ error: validation.error });
       return;
     }
 
-    const recipients = (sendToEmail || "")
-      .split(",")
-      .map((e) => e.trim())
-      .filter(Boolean);
-    if (recipients.length === 0) {
-      res.status(400).json({ error: "No recipients provided in sendToEmail" });
-      return;
-    }
-
-    const files = req.files as
-      | Record<string, Express.Multer.File[]>
-      | undefined;
-    const images = files?.images ?? [];
-    const screenshots = files?.screenshots ?? [];
-
-    if (images.length === 0) {
-      res.status(400).json({ error: "No images uploaded" });
-      return;
-    }
+    const { body, recipients, images, screenshots } = validation;
+    const { senderName, senderEmail, flightNumber } = body;
 
     const fields = escapeSpoedReportFields(
       body,
@@ -90,24 +62,14 @@ export const sendEmail: RequestHandler = async (req, res) => {
   } catch (err: unknown) {
     const payload = buildErrorPayload(err, requestId);
 
-    if (
-      /ETIMEDOUT|ECONNREFUSED|ENETUNREACH|ECONNRESET|EHOSTUNREACH/i.test(
-        payload.code || ""
-      )
-    ) {
+    if (SMTP_NETWORK_ERROR.test(payload.code || "")) {
       // @ts-ignore
       payload.hint =
         "SMTP relay unreachable. Check outbound firewall/egress, proxy, DNS, or relay allow-lists.";
     }
 
     console.error("[/emails/sendEmail] Error", { requestId, err });
-    const status =
-      /ETIMEDOUT|ECONNREFUSED|ENETUNREACH|ECONNRESET|EHOSTUNREACH/i.test(
-        payload.code || ""
-      )
-        ? 502
-        : 500;
-
+    const status = SMTP_NETWORK_ERROR.test(payload.code || "") ? 502 : 500;
     res.status(status).json({ error: payload });
   }
 };

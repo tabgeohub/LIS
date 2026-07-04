@@ -3,6 +3,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import { mapMulterError } from "../helpers/uploads/multerErrorMessage";
+import { buildReportUploadResponse } from "../helpers/uploads/reportUploadResponse";
 
 const router = express.Router();
 
@@ -21,18 +23,17 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (_req: any, file: any, cb: any) => {
+const fileFilter = (_req: express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const ext = (path.extname(file.originalname || "") || "").toLowerCase();
   if (ext === ".zip") return cb(null, true);
   cb(new Error("Only .zip files are allowed"));
 };
 
-// Enforce explicit limits to fail fast on oversize payloads (infra must match or exceed)
 const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: Number(process.env.MAX_UPLOAD_BYTES || 20 * 1024 * 1024 * 1024), // default 20GB
+    fileSize: Number(process.env.MAX_UPLOAD_BYTES || 20 * 1024 * 1024 * 1024),
     files: 1,
     parts: 2000,
   },
@@ -54,37 +55,16 @@ function sendError(input: SendErrorInput) {
   return res.status(status).json(body);
 }
 
-function mapMulterError(err: any) {
-  if (err instanceof multer.MulterError) {
-    switch (err.code) {
-      case "LIMIT_UNEXPECTED_FILE":
-        return "Unexpected file field.";
-      case "LIMIT_FILE_COUNT":
-        return "Too many files. Only one file is allowed.";
-      case "LIMIT_PART_COUNT":
-      case "LIMIT_FIELD_KEY":
-      case "LIMIT_FIELD_VALUE":
-      case "LIMIT_FIELD_COUNT":
-        return "Form fields exceeded limits.";
-      default:
-        return `Upload failed: ${err.code}`;
-    }
-  }
-  return err.message || "Upload failed";
-}
-
 router.post("/", (req, res, next) => {
-  // Allow slow networks for this route
   // @ts-ignore
-  res.setTimeout(3600000); // 1 hour
+  res.setTimeout(3600000);
   upload.single("report")(req, res, (err) => {
     if (err) {
-      const message = mapMulterError(err);
       return sendError({
         res,
         status: 400,
-        message,
-        extra: { code: err.code, stack: err.stack || "" },
+        message: mapMulterError(err),
+        extra: { code: (err as multer.MulterError).code, stack: (err as Error).stack || "" },
       });
     }
 
@@ -93,38 +73,24 @@ router.post("/", (req, res, next) => {
     }
 
     try {
-      const baseUrl =
-        process.env.PUBLIC_APP_BASE_URL ||
-        process.env.REACT_APP_EXTERNAL_BACKEND_URL ||
-        "http://localhost:5000";
-
-      const downloadUrl = `${baseUrl.replace(
-        /\/+$/,
-        ""
-      )}/api/file-download/${encodeURIComponent(req.file.filename)}`;
-
-      return res.json({
-        url: downloadUrl,
-        file: {
-          name: req.file.originalname,
-          savedAs: req.file.filename,
-          size: req.file.size,
-          mimetype: req.file.mimetype,
-        },
-      });
+      return res.json(buildReportUploadResponse(req.file));
     } catch (e) {
       return next(e);
     }
   });
 });
 
-export function uploadErrorHandler(err: any, _req: any, res: any, _next: any) {
+export function uploadErrorHandler(
+  err: unknown,
+  _req: express.Request,
+  res: express.Response,
+  _next: express.NextFunction
+) {
   if (err instanceof multer.MulterError) {
-    const message = mapMulterError(err);
     return sendError({
       res,
       status: 400,
-      message,
+      message: mapMulterError(err),
       extra: { code: err.code, stack: err.stack || "" },
     });
   }
@@ -132,7 +98,7 @@ export function uploadErrorHandler(err: any, _req: any, res: any, _next: any) {
     res,
     status: 500,
     message: "Failed to upload report",
-    extra: { stack: err.stack || "" },
+    extra: { stack: (err as Error).stack || "" },
   });
 }
 

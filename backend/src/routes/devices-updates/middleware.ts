@@ -1,30 +1,8 @@
 import type { RequestHandler } from "express";
-import { decodeJwtPayload } from "../auth/jwt";
 import { getDeviceByToken } from "./db";
+import { requireAdmin } from "../../helpers/auth/realmAdminAuth";
 
-type AccessClaims = {
-  realm_access?: {
-    roles?: string[];
-  };
-};
-
-export function getRealmRoles(req: Parameters<RequestHandler>[0]): string[] {
-  const token = req.session?.auth?.tokenSet?.access_token;
-  const claims = decodeJwtPayload<AccessClaims>(token);
-  return claims?.realm_access?.roles ?? [];
-}
-
-export function isAdmin(req: Parameters<RequestHandler>[0]): boolean {
-  return getRealmRoles(req).some((role) => role.toLowerCase().includes("admin"));
-}
-
-export const requireAdmin: RequestHandler = (req, res, next) => {
-  if (!isAdmin(req)) {
-    res.status(403).json({ error: "Admin role required" });
-    return;
-  }
-  next();
-};
+export { requireAdmin } from "../../helpers/auth/realmAdminAuth";
 
 export const requireDeviceToken: RequestHandler = async (req, res, next) => {
   const header = req.headers.authorization || "";

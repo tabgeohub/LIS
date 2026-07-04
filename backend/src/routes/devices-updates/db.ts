@@ -6,7 +6,8 @@ import type {
 } from "./types";
 import { upsertRegisteredDevice } from "./upsertRegisteredDevice";
 import { mapGetacDeviceRow } from "./mapGetacDeviceRow";
-import { resolveReportedDeviceStatus } from "./agent/parseAgentReport";
+import { buildApplyAgentReportQuery } from "./applyAgentReportSql";
+import { buildStaleCommandUpdateSql } from "./staleCommandSql";
 
 let schemaReady: Promise<void> | null = null;
 
@@ -94,39 +95,11 @@ export async function releaseStaleCommands(
 ): Promise<void> {
   await ensureDevicesUpdatesSchema();
 
-  if (deviceId) {
-    await pool.query(
-      `
-        UPDATE lis.getac_devices
-        SET
-          status = 'failed',
-          pending_command = NULL,
-          command_status = 'failed',
-          last_error = 'Command timed out. Click Check Status to try again.',
-          updated_at = NOW()
-        WHERE id = $1
-          AND command_status IN ('queued', 'in_progress')
-          AND updated_at < NOW() - ($2 * INTERVAL '1 minute');
-      `,
-      [deviceId, staleAfterMinutes]
-    );
-    return;
-  }
-
-  await pool.query(
-    `
-      UPDATE lis.getac_devices
-      SET
-        status = 'failed',
-        pending_command = NULL,
-        command_status = 'failed',
-        last_error = 'Command timed out. Click Check Status to try again.',
-        updated_at = NOW()
-      WHERE command_status IN ('queued', 'in_progress')
-        AND updated_at < NOW() - ($1 * INTERVAL '1 minute');
-    `,
-    [staleAfterMinutes]
-  );
+  const { query, params } = buildStaleCommandUpdateSql({
+    staleAfterMinutes,
+    deviceId,
+  });
+  await pool.query(query, params);
 }
 
 export async function resetDeviceCommand(id: string): Promise<GetacDevice | null> {
@@ -218,46 +191,9 @@ export type ApplyAgentReportInput = {
 export async function applyAgentReport(
   input: ApplyAgentReportInput
 ): Promise<GetacDevice | null> {
-  const { deviceId, report, completedCommand } = input;
   await ensureDevicesUpdatesSchema();
-
-  const status = resolveReportedDeviceStatus(report);
-
-  const clearCommand = report.command_completed === true;
-
-  const result = await pool.query(
-    `
-      UPDATE lis.getac_devices
-      SET
-        status = $2,
-        windows_version = COALESCE($3, windows_version),
-        os_build = COALESCE($4, os_build),
-        pending_update_count = COALESCE($5, pending_update_count),
-        last_error = $6,
-        last_seen_at = NOW(),
-        last_checked_at = CASE WHEN $7::text = 'CHECK_STATUS' THEN NOW() ELSE last_checked_at END,
-        last_updated_at = CASE WHEN $7::text = 'UPDATE' THEN NOW() ELSE last_updated_at END,
-        pending_command = CASE WHEN $8::boolean THEN NULL ELSE pending_command END,
-        command_status = CASE
-          WHEN $8::boolean THEN 'completed'
-          WHEN $6::text IS NOT NULL THEN 'failed'
-          ELSE command_status
-        END,
-        updated_at = NOW()
-      WHERE id = $1
-      RETURNING *;
-    `,
-    [
-      deviceId,
-      status,
-      report.windows_version ?? null,
-      report.os_build ?? null,
-      report.pending_update_count ?? null,
-      report.error ?? null,
-      completedCommand,
-      clearCommand,
-    ]
-  );
+  const { query, params } = buildApplyAgentReportQuery(input);
+  const result = await pool.query(query, params);
 
   if (!result.rows[0]) return null;
   return mapGetacDeviceRow(result.rows[0]);
