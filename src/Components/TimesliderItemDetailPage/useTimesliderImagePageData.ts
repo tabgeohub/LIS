@@ -5,8 +5,6 @@ import {
   filterFinishedPlansContainingItem,
   getItemDisplayTitle,
 } from "@helpers/timeslider";
-import { usePointPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/usePointPlanImages";
-import { useGeometryPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/useGeometryPlanImages";
 import { parseTimesliderImageQuery } from "./parseTimesliderImageQuery";
 import { useTimesliderPlansFetch } from "./useTimesliderPlansFetch";
 import {
@@ -14,6 +12,7 @@ import {
   useTimesliderSelectedPlan,
 } from "./useTimesliderSelection";
 import { buildTimesliderPageView } from "./buildTimesliderPageView";
+import { useTimesliderItemImages } from "./useTimesliderItemImages";
 
 export function useTimesliderImagePageData() {
   const [searchParams] = useSearchParams();
@@ -63,31 +62,20 @@ export function useTimesliderImagePageData() {
     [ok, filteredPlans, plansFetch.plans, kind, itemId]
   );
 
-  const pointResult = usePointPlanImages({
-    pointId: itemId,
-    planIds,
-    regioId,
-    enabled: ok && kind === "point" && !!regioId && planIds.length > 0,
-  });
-
-  const geometryResult = useGeometryPlanImages({
-    geometryId: itemId,
-    planIds,
-    regioId,
-    enabled: ok && kind === "geometry" && !!regioId && planIds.length > 0,
-  });
-
   const { selectedPlan, setSelectedPlan } = useTimesliderSelectedPlan({
     filteredPlans,
     planIdFromQuery,
   });
 
-  const rowsForSelectedPlan = useMemo(() => {
-    if (!selectedPlan) return [];
-    const imageRows =
-      kind === "point" ? pointResult.images : geometryResult.images;
-    return imageRows.filter((row) => row.plan_id === selectedPlan.id);
-  }, [selectedPlan, kind, pointResult.images, geometryResult.images]);
+  const { pointResult, geometryResult, rowsForSelectedPlan } =
+    useTimesliderItemImages({
+      ok,
+      kind,
+      itemId,
+      planIds,
+      regioId,
+      selectedPlan,
+    });
 
   const { selectedIndex, setSelectedIndex } = useClampedImageIndex(
     rowsForSelectedPlan.length

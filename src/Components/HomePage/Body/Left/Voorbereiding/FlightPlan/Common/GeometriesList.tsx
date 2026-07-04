@@ -2,11 +2,7 @@ import { useEffect, useMemo } from "react";
 import useLogAction from "hooks/useLogAction";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { Geometry, useGeometriesStore } from "hooks/features/useGeometriesStore";
-import Graphic from "@arcgis/core/Graphic";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import useGeometryHover from "hooks/hover-click-handlers/useGeometryHover";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 import {
   getHerhalenFilterFromGeometries,
   sortGeometriesForSelection,
@@ -14,6 +10,7 @@ import {
 } from "./geometryHerhalen";
 import { GeometryItemCheckBox } from "./GeometryItemCheckBox";
 import { useGeometryListInteractions } from "./useGeometryListMapClick";
+import { useGeometryListGraphics } from "./useGeometryListGraphics";
 
 export default function GeometriesList({
   selectedGeometries,
@@ -40,21 +37,12 @@ export default function GeometriesList({
 
   const herhalenFilter = getHerhalenFilterFromGeometries(geometries);
 
-  useEffect(() => {
-    if (!validateMapView(mapView, geometriesGraphicsLayer)) return;
-
-    if (!geometries.length) {
-      geometriesGraphicsLayer?.removeAll();
-      return;
-    }
-
-    const graphics = geometries
-      .filter((geometry) => !safeSelectedGeometries.includes(geometry.id))
-      .map((geometry) => createGeometryGraphic(geometry))
-      .filter((graphic): graphic is Graphic => graphic !== null);
-
-    replaceGraphics(geometriesGraphicsLayer!, graphics);
-  }, [geometries, safeSelectedGeometries, mapView, geometriesGraphicsLayer]);
+  useGeometryListGraphics({
+    mapView,
+    geometriesGraphicsLayer,
+    geometries,
+    selectedGeometryIds: safeSelectedGeometries,
+  });
 
   useEffect(() => {
     const step = herhalenFilter ? 2 : 3;

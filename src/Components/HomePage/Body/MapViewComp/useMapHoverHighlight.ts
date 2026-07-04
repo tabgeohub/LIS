@@ -2,12 +2,7 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
-import {
-  createMapHoverGraphic,
-  isMapHoverGraphicHit,
-  resolveMapHoverId,
-  resolveMapHoverLabel,
-} from "./mapHoverHighlight";
+import { createMapPointerHoverHandler } from "./mapPointerHoverHandler";
 
 export function useMapHoverHighlight() {
   const {
@@ -31,49 +26,19 @@ export function useMapHoverHighlight() {
 
     const { setHovered } = useHoveredGraphicState.getState();
 
-    const clearHover = () => {
-      graphicsLayerHover?.removeAll();
-      setHovered(null);
-    };
-
-    const pointerHandle = mapView.on("pointer-move", async (event) => {
-      if (mapView.interacting) {
-        clearHover();
-        return;
-      }
-
-      try {
-        const response = await mapView.hitTest(
-          event,
-          includeLayers.length > 0 ? { include: includeLayers } : undefined
-        );
-
-        const match = response.results.find(isMapHoverGraphicHit);
-        if (!match?.graphic?.geometry) {
-          clearHover();
-          return;
-        }
-
-        const attrs = match.graphic.attributes || {};
-        const geometryType = match.graphic.geometry.type;
-        setHovered({
-          id: Number(resolveMapHoverId(attrs)),
-          label: resolveMapHoverLabel({ geometryType, attributes: attrs }),
-          point: attrs,
-        });
-
-        graphicsLayerHover?.removeAll();
-        graphicsLayerHover?.add(
-          createMapHoverGraphic(match.graphic.geometry)
-        );
-      } catch {
-        clearHover();
-      }
+    const handlePointerMove = createMapPointerHoverHandler({
+      mapView,
+      includeLayers,
+      graphicsLayerHover,
+      setHovered,
     });
+
+    const pointerHandle = mapView.on("pointer-move", handlePointerMove);
 
     return () => {
       pointerHandle.remove();
-      clearHover();
+      graphicsLayerHover?.removeAll();
+      setHovered(null);
     };
   }, [
     mapView,

@@ -2,15 +2,8 @@ import useLogAction from "hooks/useLogAction";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useUpdateData } from "utils/useUpdateData";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import {
-  useEditPointCoordinateInputs,
-  useInitialEditPointMarker,
-} from "./useEditPointCoordinateInputs";
-import {
-  useEditPointCleanup,
-  useEditPointMapClick,
-  useEditPointPreviewGraphics,
-} from "./useEditPointMapEffects";
+import { useEditPointCoordinateInputs } from "./useEditPointCoordinateInputs";
+import { useEditPointCoordinateEffects } from "./useEditPointCoordinateEffects";
 import { submitPointCoordinateUpdate } from "./submitPointCoordinates";
 
 export function useEditPointCoordinates(setAction: (value: string) => void) {
@@ -27,34 +20,19 @@ export function useEditPointCoordinates(setAction: (value: string) => void) {
 
   const inputs = useEditPointCoordinateInputs(selectedPoint);
 
-  useInitialEditPointMarker({ selectedPoint, mapView, redGraphicsLayer });
-
-  const clickHandleRef = useEditPointMapClick({
+  useEditPointCoordinateEffects({
+    selectedPoint,
     mapView,
     redGraphicsLayer,
+    pointsGraphicsLayer,
     coordinateSystem: inputs.coordinateSystem,
+    longitude: inputs.longitude,
+    latitude: inputs.latitude,
     setLongitude: inputs.setLongitude,
     setLatitude: inputs.setLatitude,
     setXCoordinaat_rd: inputs.setXCoordinaat_rd,
     setYCoordinaat_rd: inputs.setYCoordinaat_rd,
-  });
-
-  useEditPointPreviewGraphics({
-    mapView,
-    redGraphicsLayer,
-    pointsGraphicsLayer,
-    selectedPoint,
-    longitude: inputs.longitude,
-    latitude: inputs.latitude,
-  });
-
-  useEditPointCleanup({
-    mapView,
-    redGraphicsLayer,
-    pointsGraphicsLayer,
-    selectedPoint,
     originalCoordsRef: inputs.originalCoordsRef,
-    clickHandleRef,
   });
 
   function handleSubmit() {
