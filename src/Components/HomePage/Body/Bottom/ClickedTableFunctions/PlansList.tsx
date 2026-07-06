@@ -1,11 +1,5 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
-import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useContent } from "hooks/useContent";
 import {
   MdListAlt,
@@ -19,20 +13,12 @@ import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
 } from "@helpers/ArcGISHelpers/flightPlanMapActions";
+import { useBottomCompactListView } from "hooks/bottom/useBottomCompactListView";
 
 export default function PlansList() {
   const { mapView } = useMapViewState();
-  const { flightPlanData: flightPlan, setOpenTable } = useOpenTable();
-
-  const { setOpenResultTab } = useOpenResultTab();
-
-  const { setOpenSearchedTab } = useOpenSearchedTab();
-
-  const { setOpenAllTable } = useOpenAllTable();
-  const { setOpenSideBar } = useOpeSideBarState();
-
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { selectedTab } = useTabState();
+  const { flightPlanData: flightPlan } = useOpenTable();
+  const listView = useBottomCompactListView();
 
   const zoomToPoint = () => {
     if (flightPlan) {
@@ -51,19 +37,6 @@ export default function PlansList() {
   function handleDeletePlan() {
     deleteData({ id: String(flightPlan?.id) });
   }
-
-  const listView = () => {
-    if (selectedTab === "none") {
-      setSelectedBottomTab("searched");
-      setOpenSearchedTab(true);
-    } else {
-      setSelectedBottomTab("result");
-      setOpenResultTab(true);
-    }
-    setOpenSideBar(true);
-    setOpenAllTable(false);
-    setOpenTable(false);
-  };
 
   const content = useContent();
 

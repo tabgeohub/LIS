@@ -1,15 +1,15 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Vluchtnummer from "./Vluchtnummer";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
 
 export default function FormInputs() {
-  const pilootOptions = useConstSelectOptions("piloten");
-  const waarnemerOptions = useConstSelectOptions("waarnemers");
-  const typeLuchtvaartuigOptions = useConstSelectOptions("luchtvaartuig");
+  const { pilootOptions, waarnemerOptions, typeLuchtvaartuigOptions } =
+    useFlightPlanFormSelectOptions();
   const store = useReuseFlightPlan();
   const fields = pickFlightPlanFormFields(store);
 
@@ -19,17 +19,7 @@ export default function FormInputs() {
     <FlightPlanStandardFields
       className="py-4 px-2 space-y-3"
       fields={fields}
-      labels={{
-        omschrijving: "Omschrijving",
-        waarnemer: "Waarnemer",
-        piloot: "Piloot",
-        datum: "Inspectiedatum",
-        geplandeVliegduur: "Geplande vliegduur",
-        typeLuchtvaartuig: "Type luchtvaartuig",
-        aantalPassagiers: "Aantal passagiers",
-        doelEnHoofdthema: "Doel en hoofdthema",
-        aanvullendeInfo: "Aanvullende info",
-      }}
+      labels={defaultFlightPlanFieldLabels}
       pilootOptions={pilootOptions}
       waarnemerOptions={waarnemerOptions}
       typeLuchtvaartuigOptions={typeLuchtvaartuigOptions}

@@ -6,13 +6,21 @@ import type { Feature, FeatureCollection, Point as GeoPoint, Polygon } from "geo
 import type { EnrichedPointType, FlightPlanType } from "Types";
 import { getBboxPolygon } from "@helpers/geo/bboxPolygon";
 
+/** RFC 4180 cell escaping — neutralizes quotes and formula injection in spreadsheet apps. */
+export function escapeCsvCell(value: unknown): string {
+  const str = String(value ?? "");
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 export function buildCsvFromRows<T extends object>(rows: T[], excludeKeys: string[] = []) {
   if (rows.length === 0) return "";
   const headers = Object.keys(rows[0]).filter((key) => !excludeKeys.includes(key));
   return [
-    headers.join(","),
+    headers.map(escapeCsvCell).join(","),
     ...rows.map((row) =>
-      headers.map((h) => `"${(row as Record<string, unknown>)[h] ?? ""}"`).join(",")
+      headers
+        .map((h) => escapeCsvCell((row as Record<string, unknown>)[h]))
+        .join(",")
     ),
   ].join("\n");
 }

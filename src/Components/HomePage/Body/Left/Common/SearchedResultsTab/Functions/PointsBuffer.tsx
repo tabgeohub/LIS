@@ -6,8 +6,6 @@ import {
 } from "@helpers/ArcGISHelpers/bufferGraphics";
 import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
 
-import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
-
 export default function PointsBuffer({
   setFase,
   target,

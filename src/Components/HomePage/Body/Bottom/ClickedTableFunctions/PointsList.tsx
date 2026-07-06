@@ -4,12 +4,6 @@ import { MdOutlineZoomOutMap, MdTableChart } from "react-icons/md";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType } from "Types";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
-import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import Polygon from "@arcgis/core/geometry/Polygon";
@@ -19,19 +13,17 @@ import {
   exportPointsPlansXlsx,
   exportPointsShapefile,
 } from "@helpers/tableExports/pointsPlansTableExport";
+import { useBottomCompactListView } from "hooks/bottom/useBottomCompactListView";
 import BottomTableActionItem from "./BottomTableActionItem";
 
 export default function PointsList() {
   const logAction = useLogAction();
   const { pointsTable, setOpenTable, flightPlans } = useOpenTable();
   const { mapView } = useMapViewState();
-  const { setOpenResultTab } = useOpenResultTab();
-  const { setOpenSearchedTab } = useOpenSearchedTab();
-  const { setOpenAllTable } = useOpenAllTable();
-  const { setOpenSideBar } = useOpeSideBarState();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { selectedTab } = useTabState();
   const content = useContent();
+  const listView = useBottomCompactListView({
+    logMessage: "User clicked 'List view' button",
+  });
 
   const zoomToPoints = useCallback(() => {
     if (!validateMapView(mapView) || !pointsTable || pointsTable.length === 0) return;
@@ -57,32 +49,6 @@ export default function PointsList() {
       step: "Clicked table functions",
     });
   }, [mapView, pointsTable, logAction]);
-
-  const listView = useCallback(() => {
-    if (selectedTab === "none") {
-      setSelectedBottomTab("searched");
-      setOpenSearchedTab(true);
-    } else {
-      setSelectedBottomTab("result");
-      setOpenResultTab(true);
-    }
-    setOpenSideBar(true);
-    setOpenAllTable(false);
-    setOpenTable(false);
-    logAction({
-      message: "User clicked 'List view' button",
-      step: "Clicked table functions",
-    });
-  }, [
-    selectedTab,
-    setSelectedBottomTab,
-    setOpenSearchedTab,
-    setOpenResultTab,
-    setOpenSideBar,
-    setOpenAllTable,
-    setOpenTable,
-    logAction,
-  ]);
 
   const exportCsv = useCallback(
     () =>

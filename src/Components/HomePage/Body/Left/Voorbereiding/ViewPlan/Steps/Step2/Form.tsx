@@ -1,4 +1,3 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
@@ -6,6 +5,7 @@ import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
 import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
+import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
 
 export default function Form({
   vluchtnummer,
@@ -14,8 +14,7 @@ export default function Form({
   vluchtnummer: string;
   setVluchtnummer: (value: string) => void;
 }) {
-  const pilootOptions = useConstSelectOptions("piloten");
-  const waarnemerOptions = useConstSelectOptions("waarnemers");
+  const { pilootOptions, waarnemerOptions } = useFlightPlanFormSelectOptions();
   const viewPlanState = useViewPlanState();
   const fields = pickFlightPlanFormFields(viewPlanState);
   const { user } = useAuth();

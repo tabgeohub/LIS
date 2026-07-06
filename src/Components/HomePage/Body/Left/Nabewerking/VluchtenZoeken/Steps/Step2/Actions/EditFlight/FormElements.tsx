@@ -1,4 +1,3 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
@@ -7,10 +6,12 @@ import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlan
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { nabewerkingVluchtenZoekenFieldLabels } from "hooks/flightPlan/flightPlanFormLabels";
 
 export default function FormElements() {
-  const pilootOptions = useConstSelectOptions("piloten");
-  const typeLuchtvaartuigOptions = useConstSelectOptions("luchtvaartuig");
+  const { pilootOptions, typeLuchtvaartuigOptions } =
+    useFlightPlanFormSelectOptions();
   const store = useFinishedPlansState();
   const fields = pickFlightPlanFormFields(store);
   const content = useContent();
@@ -24,27 +25,13 @@ export default function FormElements() {
     durationSeconds! % 60
   ).padStart(2, "0")}`;
 
+  const labels = content.nabewerking.vluchtenZoeken.step2.labels;
+
   return (
     <>
       <FlightPlanStandardFields
         fields={fields}
-        labels={{
-          omschrijving:
-            content.nabewerking.vluchtenZoeken.step2.labels.omschrijving,
-          waarnemer: content.nabewerking.vluchtenZoeken.step2.labels.waarnemer,
-          piloot: content.nabewerking.vluchtenZoeken.step2.labels.piloot,
-          datum: content.nabewerking.vluchtenZoeken.step2.labels.inspectiedatum,
-          geplandeVliegduur:
-            content.nabewerking.vluchtenZoeken.step2.labels.geplandeVliegduur,
-          typeLuchtvaartuig:
-            content.nabewerking.vluchtenZoeken.step2.labels.luchtvaartuig,
-          aantalPassagiers:
-            content.nabewerking.vluchtenZoeken.step2.labels.aantalPassagiers,
-          doelEnHoofdthema:
-            content.nabewerking.vluchtenZoeken.step2.labels.doelEnHoofdthema,
-          aanvullendeInfo:
-            content.nabewerking.vluchtenZoeken.step2.labels.aanvullendeInfo,
-        }}
+        labels={nabewerkingVluchtenZoekenFieldLabels(content)}
         pilootOptions={pilootOptions}
         typeLuchtvaartuigOptions={typeLuchtvaartuigOptions}
         waarnemerDisabled
@@ -54,30 +41,28 @@ export default function FormElements() {
       />
 
       <InputComp
-        label={content.nabewerking.vluchtenZoeken.step2.labels.begintijdEnDatum}
+        label={labels.begintijdEnDatum}
         value={String(beginTime)}
         setValue={() => {}}
         disabled
       />
 
       <InputComp
-        label={content.nabewerking.vluchtenZoeken.step2.labels.eindtijdEnDatum}
+        label={labels.eindtijdEnDatum}
         value={String(endTime)}
         setValue={() => {}}
         disabled
       />
 
       <InputComp
-        label={
-          content.nabewerking.vluchtenZoeken.step2.labels.werkelijkeVliegduur
-        }
+        label={labels.werkelijkeVliegduur}
         value={durationLabel}
         setValue={() => {}}
         disabled
       />
 
       <InputComp
-        label={content.nabewerking.vluchtenZoeken.step2.labels.status}
+        label={labels.status}
         value={store.selectedPlan?.status!}
         setValue={() => {}}
         disabled

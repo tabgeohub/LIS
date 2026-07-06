@@ -3,6 +3,7 @@ import {
   getFixedPostLoginRedirectUrl,
   storePendingClientRedirect,
 } from "./resolvePostLoginRedirect";
+import { safeServerRedirect } from "./safeServerRedirect";
 
 export function resolveCallbackRedirect(req: Request, res: Response): void {
   // @ts-ignore
@@ -16,12 +17,12 @@ export function resolveCallbackRedirect(req: Request, res: Response): void {
   delete req.session.loginMode;
 
   if (mode === "desktop") {
-    res.redirect("/auth/desktop-ok");
+    safeServerRedirect(res, "/auth/desktop-ok");
     return;
   }
 
   const rawAfterLogin = req.session.afterLoginRedirect;
   delete req.session.afterLoginRedirect;
   storePendingClientRedirect(req.session, rawAfterLogin);
-  res.redirect(getFixedPostLoginRedirectUrl(profileKey));
+  safeServerRedirect(res, getFixedPostLoginRedirectUrl(profileKey));
 }

@@ -1,14 +1,16 @@
 import { RequestHandler } from "express";
 import { getOidcClientFor } from "../oidc";
 import { resolveCallbackRedirect } from "./resolveCallbackRedirect";
+import { getOidcProfile } from "./resolvePostLoginRedirect";
 
 // @ts-ignore
 export const callbackHandler: RequestHandler = async (req, res) => {
   try {
-    const { client, appBaseUrl } = await getOidcClientFor(req);
+    const { client, profile } = await getOidcClientFor(req);
+    const callbackUrl = `${getOidcProfile(profile).appBaseUrl}/auth/callback`;
     const params = client.callbackParams(req);
     const tokenSet = await client.callback(
-      `${appBaseUrl}/auth/callback`,
+      callbackUrl,
       params,
       {
         state: req.session.state,
