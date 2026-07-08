@@ -1,9 +1,44 @@
 // src/routes/auth/authKeycloak/oidc.ts
-import { Issuer, generators, Client } from "openid-client";
+import { Issuer, generators, Client, custom } from "openid-client";
+// @ts-ignore
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 type Profile = "public" | "intranet";
 let publicClient: Client | null = null;
 let intranetClient: Client | null = null;
+
+let httpOptionsConfigured = false;
+
+// Configure how openid-client makes its server-to-Keycloak HTTP calls
+// (discovery + token exchange). In environments that only allow outbound
+// traffic via a corporate proxy (HTTPS_PROXY/HTTP_PROXY), route through it.
+// When no proxy env var is set (local dev, desktop), behavior is unchanged.
+function configureOidcHttpOptions() {
+  if (httpOptionsConfigured) return;
+
+  const timeout = parseInt(
+    process.env.OIDC_DISCOVERY_TIMEOUT_MS || "15000",
+    10
+  );
+
+  const proxyUrl =
+    process.env.HTTPS_PROXY ||
+    process.env.https_proxy ||
+    process.env.HTTP_PROXY ||
+    process.env.http_proxy;
+
+  if (proxyUrl) {
+    // HttpsProxyAgent tunnels HTTPS through the proxy, which is exactly what
+    // openid-client's native request needs. v5's default export is a factory.
+    const agent = HttpsProxyAgent(proxyUrl) as unknown as import("http").Agent;
+    custom.setHttpOptionsDefaults({ timeout, agent });
+    console.log("[oidc] outbound HTTP configured via proxy:", proxyUrl);
+  } else {
+    custom.setHttpOptionsDefaults({ timeout });
+  }
+
+  httpOptionsConfigured = true;
+}
 
 function toProfile(hostLike: string): Profile {
   return (hostLike || "").toLowerCase().includes(".intranet.")
@@ -29,7 +64,9 @@ async function buildClient(input: BuildOidcClientInput) {
   assert("clientSecret", clientSecret);
   assert("appBaseUrl", appBaseUrl);
 
-  const issuer = await Issuer.discover(issuerUrl); // <— if this throws, you’ll see it
+  configureOidcHttpOptions();
+
+  const issuer = await Issuer.discover(issuerUrl);
 
   const client = new issuer.Client({
     client_id: clientId,

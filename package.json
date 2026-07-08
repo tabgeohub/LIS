@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@arcgis/core": "^4.30.9",
+    "@e965/xlsx": "0.20.3",
     "@headlessui/react": "^2.1.5",
     "@mapbox/shp-write": "^0.4.3",
     "@tanstack/react-query": "^5.100.11",
@@ -20,6 +21,7 @@
     "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "framer-motion": "^11.5.4",
+    "https-proxy-agent": "^9.1.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "jszip": "^3.10.1",
@@ -38,7 +40,6 @@
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
     "web-vitals": "^2.1.4",
-    "@e965/xlsx": "0.20.3",
     "zustand": "^4.5.5"
   },
   "scripts": {
