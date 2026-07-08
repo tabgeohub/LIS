@@ -30,7 +30,9 @@ function configureOidcHttpOptions() {
   if (proxyUrl) {
     // HttpsProxyAgent tunnels HTTPS through the proxy, which is exactly what
     // openid-client's native request needs. v5's default export is a factory.
-    const agent = HttpsProxyAgent(proxyUrl) as unknown as import("http").Agent;
+    const agent = new HttpsProxyAgent(
+      proxyUrl
+    ) as unknown as import("http").Agent;
     custom.setHttpOptionsDefaults({ timeout, agent });
     console.log("[oidc] outbound HTTP configured via proxy:", proxyUrl);
   } else {
