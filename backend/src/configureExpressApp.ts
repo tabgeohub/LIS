@@ -1,8 +1,11 @@
 import express, { Express } from "express";
+import { LIS_CLIENT_HEADER } from "./routes/auth2/authClientHeader";
 import cors from "cors";
-import session from "express-session";
 import cookieParser from "cookie-parser";
+import { isAllowedCorsOrigin } from "./helpers/cors/allowedOrigins";
+import { createSessionMiddleware } from "./helpers/session/createSessionMiddleware";
 import { requireSessionAuth } from "./helpers/auth/requireSessionAuth";
+import { legacyAuthUsageMonitor } from "./helpers/auth/legacyAuthUsageMonitor";
 import { requirePassword, uploadsDir } from "./helpers/auth/requirePassword";
 import arcgisPostProxyHandler from "./routes/arcgis/postProxyHandler";
 import { setupSwagger } from "./routes/swagger";
@@ -20,6 +23,7 @@ import devicesUpdatesRouter from "./routes/devices-updates";
 import main from "./routes/main";
 import logsRouter from "./routes/logs";
 import authKeycloak from "./routes/auth/authKeycloak";
+import { createAuth2Router } from "./routes/auth2";
 import keycloakRouter from "./routes/keycloak";
 import constsRouter from "./routes/consts";
 import reportUploadRouter from "./routes/reportUpload";
@@ -27,45 +31,30 @@ import geometriesRouter from "./routes/geometries";
 import timesliderRouter from "./routes/timeslider";
 import arcgisRouter from "./routes/arcgis";
 
-const allowedOrigins = new Set([
-  process.env.PUBLIC_FRONTEND_URL!,
-  process.env.INTRANET_FRONTEND_URL!,
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "app://.",
-]);
-
-export function configureExpressApp(app: Express) {
+export async function configureExpressApp(app: Express) {
   app.use(
     cors({
       origin(origin, cb) {
-        if (!origin) return cb(null, false);
-        if (origin === "null") return cb(null, true);
-        if (allowedOrigins.has(origin)) return cb(null, true);
+        if (isAllowedCorsOrigin(origin)) {
+          return cb(null, true);
+        }
         return cb(null, false);
       },
       credentials: true,
+      allowedHeaders: [
+        "Content-Type",
+        "Accept",
+        "Authorization",
+        LIS_CLIENT_HEADER,
+        "X-LIS-Client",
+      ],
     })
   );
 
   app.set("trust proxy", 1);
   app.use(cookieParser());
 
-  const isHttps = (process.env.PUBLIC_APP_BASE_URL || "").startsWith("https");
-  app.use(
-    session({
-      name: "lis.sid",
-      secret: process.env.SESSION_SECRET!,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-        sameSite: isHttps ? "none" : "lax",
-        secure: isHttps,
-        maxAge: 60 * 60 * 1000,
-      },
-    })
-  );
+  app.use(await createSessionMiddleware());
 
   const JSON_LIMIT = process.env.JSON_LIMIT || "20gb";
   const URLENC_LIMIT = process.env.URLENC_LIMIT || "20gb";
@@ -89,8 +78,12 @@ export function configureExpressApp(app: Express) {
 
   setupSwagger(app);
 
+  const auth2Router = await createAuth2Router();
+
+  app.use(legacyAuthUsageMonitor);
   app.use("/", main);
   app.use("/auth", authKeycloak);
+  app.use("/auth2", auth2Router);
   app.use("/api/keycloak", requireSessionAuth, keycloakRouter);
   app.use("/api/auth", requireSessionAuth, authRouter);
   app.use("/api/users", requireSessionAuth, usersRouter);
