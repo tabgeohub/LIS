@@ -1,9 +1,13 @@
 import { resolveProfile } from "../routes/auth/authKeycloak/resolveProfile";
 import { OIDC_PROFILES } from "../routes/auth/oidcProfiles";
 import { fetch, Response } from "undici";
+import { ensureUndiciCorporateProxy } from "../helpers/http/outboundHttpProxy";
 import { parseKeycloakIssuer } from "./parseKeycloakIssuer";
 
 export async function getKeycloakAdminToken(req: any): Promise<string> {
+  // Acceptance requires outbound HTTPS via corporate proxy (same env as OIDC).
+  ensureUndiciCorporateProxy();
+
   const profile = resolveProfile(req);
   const profileConfig = OIDC_PROFILES[profile];
   const { serverUrl, realm } = parseKeycloakIssuer(profileConfig.issuer);

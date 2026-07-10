@@ -2,6 +2,7 @@
 import { Issuer, generators, Client, custom } from "openid-client";
 // @ts-ignore
 import { HttpsProxyAgent } from "https-proxy-agent";
+import { getCorporateProxyUrl } from "../../helpers/http/outboundHttpProxy";
 
 type Profile = "public" | "intranet";
 let publicClient: Client | null = null;
@@ -21,11 +22,7 @@ function configureOidcHttpOptions() {
     10
   );
 
-  const proxyUrl =
-    process.env.HTTPS_PROXY ||
-    process.env.https_proxy ||
-    process.env.HTTP_PROXY ||
-    process.env.http_proxy;
+  const proxyUrl = getCorporateProxyUrl();
 
   if (proxyUrl) {
     // HttpsProxyAgent tunnels HTTPS through the proxy, which is exactly what

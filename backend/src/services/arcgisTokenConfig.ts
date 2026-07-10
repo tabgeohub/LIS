@@ -1,6 +1,6 @@
-import { ProxyAgent, setGlobalDispatcher } from "undici";
 import type { ArcgisTokenConfig } from "./arcgis";
 import { firstNonEmpty } from "../helpers/firstNonEmpty";
+import { ensureUndiciCorporateProxy } from "../helpers/http/outboundHttpProxy";
 
 export type ResolvedArcgisTokenConfig = Required<ArcgisTokenConfig>;
 
@@ -88,17 +88,7 @@ export function assertArcgisTokenCredentials(
   }
 }
 
-let proxyInitialized = false;
-
 export function ensureArcgisHttpProxy(): void {
-  if (proxyInitialized) {
-    return;
-  }
-
-  const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
-  if (proxy) {
-    setGlobalDispatcher(new ProxyAgent(proxy));
-  }
-
-  proxyInitialized = true;
+  // Same corporate proxy env resolution as OIDC / Keycloak Admin (undici).
+  ensureUndiciCorporateProxy();
 }

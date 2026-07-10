@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { fetch } from "undici";
+import { ensureUndiciCorporateProxy } from "../../../../helpers/http/outboundHttpProxy";
 import {
   getKeycloakAdminBase,
   getKeycloakAdminToken,
@@ -21,6 +22,9 @@ export async function keycloakAdminFetch(
   path: string,
   init: Parameters<typeof fetch>[1] = {}
 ): Promise<Awaited<ReturnType<typeof fetch>>> {
+  // Admin API calls also use undici; ensure proxy before any Keycloak Admin hop.
+  ensureUndiciCorporateProxy();
+
   const { adminToken, adminBase } = await getKeycloakAdminContext(req);
 
   return fetch(`${adminBase}${path}`, {
