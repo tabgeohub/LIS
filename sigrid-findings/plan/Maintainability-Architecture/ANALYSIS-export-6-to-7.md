@@ -2,7 +2,7 @@
 
 **Dashboard delta:** Maintainability **3.1 → 3.2** (+0.1) · Architecture **~2.2 → 2.3** (+0.1) · Security 4.1 · Reliability 5.5 · OSS 4.7
 
-Run `python sigrid-findings/compare-6-vs-7.py` to reproduce.
+Run `python sigrid-findings/compare-exports-pair.py` against archived pair folders (historical; E6 removed from disk) or use the narrative below.
 
 ## RAW finding counts
 
@@ -80,7 +80,7 @@ Helpers stayed smaller this round; shared extractions (table export, plan images
 - **STEPS 01–08:** all implemented and deployed — **both stars +0.1** confirmed.
 - **73 HIGH** maint+arch remain — next work should target these, not new ≥100-finding steps from the old 8-step plan.
 - Regenerate: `python sigrid-findings/plan/generate-plan.py` (defaults to `exported-findings-7`).
-- Compare script: `compare-6-vs-7.py`.
+- Compare script: `compare-exports-pair.py` (for next export pair; E6 folder no longer on disk).
 
 ## Corrective actions going forward
 

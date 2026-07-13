@@ -1,29 +1,27 @@
 # Maintainability & Architecture Plan
 
-**Source:** `exported-findings-7` · **Generated:** 2026-07-04
+**Source:** `exported-findings-7` · **Generated:** 2026-07-13
 
 **1078 RAW** maintainability + architecture findings in `exported-findings-7`.
-**Delta vs `exported-findings-6`:** -3 maint+arch RAW (1081 → 1078). Dashboard: Maintainability **3.1 → 3.2** (+0.1), Architecture **~2.2 → 2.3** (+0.1) — see [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md).
 
+## Progress (STEPS 01–08 complete)
 
-## Progress (STEPS 01–08 deployed — E7 confirmed)
-
-| Step | Status | E6→E7 outcome |
+| Step | Status | Outcome |
 |------|--------|---------------|
-| STEP-01 | ✅ Done | WizardButtonBar + A1 interfacing |
-| STEP-02 | ✅ Done | Voorbereiding complexity sweeps |
-| STEP-03 | ✅ Done | Backend routes/services |
-| STEP-04 | ✅ Done | api-hooks factory |
-| STEP-05 | ✅ Done | Nabewerking + Timeslider |
-| STEP-06 | ✅ Done | Map hooks + popUpModal |
-| STEP-07 | ✅ Done | Tools, Bottom lists, table exports; dup −18 |
-| STEP-08 | ✅ Done | ArcGIS, admin, MapComp; complexity −11 |
+| STEP-01 | Done | WizardButtonBar + A1 interfacing |
+| STEP-02 | Done | Voorbereiding complexity sweeps |
+| STEP-03 | Done | Backend routes/services |
+| STEP-04 | Done | api-hooks factory |
+| STEP-05 | Done | Nabewerking + Timeslider |
+| STEP-06 | Done | Map hooks + popUpModal |
+| STEP-07 | Done | Tools, Bottom lists, table exports; dup −18 |
+| STEP-08 | Done | ArcGIS, admin, MapComp; complexity −11 |
 
-**E6→E7:** HIGH **79 → 73** (−6) · maint+arch RAW **−3** · duplication **209 → 191** (−18). Extraction cost contained: unit size **+4** only.
+Last measured (E6→E7): HIGH **79 → 73** (−6) · maint+arch RAW **−3** · duplication **209 → 191** (−18). See [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md).
 
-> **Next phase:** target remaining **73 HIGH** units + DUP-02/07 — see analysis doc.
+> **Next phase:** remaining **HIGH** units (`maint-arch-MASTER-action-items.csv`) + DUP tails (DUP-01, DUP-07, residual DUP-02/04/05/06/08). Deploy → **export-8** → re-count.
 
-> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md)
 
 ## Finding counts (code only)
 
@@ -37,11 +35,11 @@
 | Component entanglement | 9 |
 | **Total in this plan** | **1078** |
 
-## Execution steps (≥100 findings each)
+## Execution steps (≥100 findings each) — historical scopes
 
-**Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
+**Rule:** After each batch, deploy and re-export. Small 20–30 finding batches are too slow to move stars.
 
-> **Note:** Step RAW counts are **scopes at `exported-findings-7`**. STEPS 01–08 are **complete** (E7 confirmed). Next work: remaining HIGH units + duplication tail.
+> **Note:** Step RAW counts below are **E7 scopes**. STEPS 01–08 are **complete**. Use as reference only; next work is HIGH + DUP tails.
 
 | Step | Name | Open RAW (E7) | Size | Primary tactic |
 |------|------|--------------:|:----:|----------------|
@@ -106,7 +104,7 @@
 
 ## Work packages (reference — do not PR whole packages at once)
 
-Use the steps above; packages below are for mapping and CSV filters only.
+Use HIGH + DUP next phase; packages below are for mapping and CSV filters only.
 
 | ID | Phase | Name | Open RAW | Categories (RAW) |
 |----|-------|------|----------:|------------------|
@@ -123,7 +121,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
 | ARCH-03 | 6 - Architecture | Component independence | 96 | Component independence 96 |
 | ARCH-04 | 6 - Architecture | Component entanglement | 9 | Component entanglement 9 |
 
-## MAINT-08 sub-slices (used by STEP-06 / STEP-07)
+## MAINT-08 sub-slices (historical STEP-06 / STEP-07)
 
 | Slice | RAW (exported-findings-7) | Paths |
 |-------|----------:|-------|
@@ -136,7 +134,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
 | 08f-misc | 85 | remaining MAINT-08 |
 
 
-## Top HIGH-priority units (within current step scope)
+## Top HIGH-priority units (next phase)
 
 | WP | Severity | LOC | Cplx | File | Unit |
 |----|----------|----:|-----:|------|------|
@@ -168,17 +166,17 @@ Use the steps above; packages below are for mapping and CSV filters only.
 
 ## Principles
 
-1. **One step = ≥100 findings cleared** — not one file, not one MAINT package slice.
-2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
-3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
-4. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update folder names).
+1. **Prefer batches that can move stars** — not one-file hero refactors.
+2. **Pattern sweeps** (A1 object params, A2 McCabe ≤5, DUP extract).
+3. **No file moves for score** — helpers reorg caused size/complexity churn with zero star gain.
+4. **Re-export after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-exports-pair.py`.
 
 ## Files
 
 | File | Contents |
 |------|----------|
-| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…08 with open RAW counts |
+| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…08 with open RAW counts (historical) |
 | `maint-arch-00-work-packages.csv` | MAINT-01…08 and ARCH-01…04 definitions |
 | `maint-arch-01-findings-mapping.csv` | Every finding mapped to a work package |
-| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — units to hit inside current step |
+| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — next phase targets |
 | `../plan-02-maintainability-mapping.csv` | Same mappings (includes DUP/WP-06 overlaps) |

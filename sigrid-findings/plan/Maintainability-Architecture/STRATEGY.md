@@ -1,6 +1,6 @@
 # Maintainability & Architecture — strategy to actually move both stars
 
-Read `ANALYSIS-export-4-to-5.md` and `ANALYSIS-export-3-to-4.md` first. Lesson learned: **refactoring for readability ≠ refactoring for Sigrid.** This plan is built around how Sigrid measures, and around clearing findings **in bulk by pattern**, not file-by-file.
+Read [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md) for the latest measured delta. Lesson learned: **refactoring for readability ≠ refactoring for Sigrid.** This plan is built around how Sigrid measures, and around clearing findings **in bulk by pattern**, not file-by-file.
 
 ## Sigrid thresholds (observed in export 4) — Definition of Done
 

@@ -10,9 +10,10 @@ EXPORT_DIR = os.environ.get(
     "SIGRID_EXPORT_DIR",
     os.path.join(FINDINGS, "exported-findings-7"),
 )
+# Optional previous export for delta lines (e.g. exported-findings-7 when comparing to 8)
 PREV_EXPORT_DIR = os.environ.get(
     "SIGRID_PREV_EXPORT_DIR",
-    os.path.join(FINDINGS, "exported-findings-6"),
+    os.path.join(FINDINGS, "exported-findings-7"),
 )
 
 # Each execution step must clear at least this many RAW findings (maint + arch + dup).
@@ -212,13 +213,13 @@ wp(
     code_work_packages,
     "WP-07",
     "3 - Auth/HTML",
-    "Keycloak callback open redirect",
-    "backend/src/routes/auth/authKeycloak/callbackHandler.ts",
-    "Confirm safeReturnPath(); add unit tests; Sigrid remark if satisfied.",
+    "Keycloak callback open redirect + CSV escape",
+    "callbackHandler.ts / safeServerRedirect.ts; pointsPlansTableExport.ts",
+    "Code remediated (safeServerRedirect allowlist + escapeCsvCell). Await export-8; file Sigrid remark if still RAW.",
     "Breaking post-login deep links",
     "WP-00",
-    "Malicious redirect tests pass",
-    "Likely false positive — do not remove validation",
+    "npm run test:safe-server-redirect + test:safe-return-path; export-8 clears or remark accepted",
+    "Code done pending re-export — scanner may not trace allowlist + SPA handoff",
 )
 
 wp(
@@ -247,14 +248,28 @@ wp(
 
 dup_clusters = [
     ("DUP-01", "Flight plan Buttons pattern", "Shared 9-10 line button blocks across Voorbereiding wizard steps"),
-    ("DUP-02", "Flight plan FormElements", "FormElements / FormInputs / Step1 shared form blocks"),
+    (
+        "DUP-02",
+        "Flight plan FormElements",
+        "FormElements / FormInputs / Step1 — shared FlightPlanStandardFields + useFlightPlanFormSelectOptions (code done; await export-8 recount)",
+    ),
     ("DUP-03", "useFilterPlans duplicate", "src/hooks/filters/useFilterPlans.ts + Nabewerking copy (86% dup)"),
-    ("DUP-04", "PointsBuffer internal dup", "PointsBuffer.tsx internal duplication"),
-    ("DUP-05", "PeriodFilter components", "Three PeriodFilter copies"),
-    ("DUP-06", "Dashboard user forms", "AllRoles / AddUser / EditUser"),
-    ("DUP-07", "Zustand plan state", "Finished/reuse/view/duplicate plan state hooks"),
-    ("DUP-08", "PointsList variants", "PointsList.tsx / PointsListEdit.tsx"),
+    ("DUP-04", "PointsBuffer internal dup", "PointsBuffer.tsx internal duplication (shared extract partial)"),
+    ("DUP-05", "PeriodFilter components", "periodFilterState + zustand slices (shared extract partial)"),
+    ("DUP-06", "Dashboard user forms", "PasswordConfirmFields / AllUsersTable / role types (shared extract partial)"),
+    ("DUP-07", "Zustand plan state", "Finished/reuse/view/duplicate plan state → planWizardCore still open"),
+    (
+        "DUP-08",
+        "PointsList variants",
+        "ResultTab row/popup + useBottomCompactListView (code done; await export-8 recount)",
+    ),
 ]
+
+DUP_APPROACH_NOTES = {
+    "DUP-02": "Shared form fields/options/labels extracted; residual RAW until export-8.",
+    "DUP-08": "ResultTab + Bottom listView shared; residual RAW until export-8.",
+    "DUP-07": "Extract shared planWizardCore from remaining zustand plan slices.",
+}
 
 for dup_id, name, scope in dup_clusters:
     wp(
@@ -263,7 +278,10 @@ for dup_id, name, scope in dup_clusters:
         "4 - Duplication",
         name,
         scope,
-        "Extract shared component/hook; one PR per cluster; UI smoke on affected flows.",
+        DUP_APPROACH_NOTES.get(
+            dup_id,
+            "Extract shared component/hook; one PR per cluster; UI smoke on affected flows.",
+        ),
         "Wizard UI regressions; merge conflicts if clusters combined",
         "Independent unless same file as WP-06",
         "Duplication count drops for cluster",
@@ -652,16 +670,23 @@ for r in data["Duplication"]:
 code_remarks = [
     {
         "WorkPackageID": "WP-07",
-        "File": "callbackHandler.ts",
+        "File": "callbackHandler.ts / safeServerRedirect.ts",
         "Finding": "Open redirect CWE-601",
-        "Reason": "res.redirect() uses only getFixedPostLoginRedirectUrl() (config URL). User return path stored as pendingClientPath and applied client-side via /auth/me + PostLoginRedirect. safeReturnPath() rejects //, ://, backslashes.",
-        "Action": "Add Sigrid remark — scanner does not trace fixed-redirect + SPA handoff",
+        "Reason": "All res.redirect targets go through safeServerRedirect() allowlist (OIDC frontendUrl/appBaseUrl + /auth/desktop-ok). User return path uses safeReturnPath() → pendingClientPath (SPA via /auth/me), never Express redirect. OIDC callback URL from getOidcProfile().appBaseUrl only.",
+        "Action": "Await export-8; if still RAW, add Sigrid remark — scanner may not trace allowlist + SPA handoff",
+    },
+    {
+        "WorkPackageID": "WP-07",
+        "File": "pointsPlansTableExport.ts",
+        "Finding": "XSS CWE-79 (CSV template)",
+        "Reason": "buildCsvFromRows uses escapeCsvCell() (RFC 4180 quote doubling). Not HTML context; Semgrep false-positive style on CSV interpolation.",
+        "Action": "Await export-8; remark if Semgrep still flags escaped CSV cells",
     },
     {
         "WorkPackageID": "WP-02",
         "File": "package-lock.json",
         "Finding": "xlsx CWE-1321",
-        "Reason": "Resolved in export 3 — direct @e965/xlsx@0.20.3 dependency",
+        "Reason": "Resolved — direct @e965/xlsx dependency",
         "Action": "DONE — no action",
     },
 ]
@@ -960,7 +985,7 @@ def build_maint_arch_markdown(
     export_label: str,
     today: str,
     maint_raw: int,
-    prev_export_label: str = "exported-findings-6",
+    prev_export_label: str = "exported-findings-7",
     prev_maint_raw: int | None = None,
     maint08_slices: dict[str, int] | None = None,
     dashboard_maint_delta: str = "+0.1",
@@ -977,7 +1002,6 @@ def build_maint_arch_markdown(
         cat_by_wp[wp_id][cat] = cat_by_wp[wp_id].get(cat, 0) + 1
 
     delta_line = ""
-    star_line = ""
     if prev_maint_raw is not None:
         delta = maint_raw - prev_maint_raw
         delta_line = (
@@ -987,22 +1011,24 @@ def build_maint_arch_markdown(
             f"Architecture **~2.2 → 2.3** ({dashboard_arch_delta}) — "
             f"see [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md).\n"
         )
-        star_line = (
-            "\n## Progress (STEPS 01–08 deployed — E7 confirmed)\n\n"
-            "| Step | Status | E6→E7 outcome |\n"
-            "|------|--------|---------------|\n"
-            "| STEP-01 | ✅ Done | WizardButtonBar + A1 interfacing |\n"
-            "| STEP-02 | ✅ Done | Voorbereiding complexity sweeps |\n"
-            "| STEP-03 | ✅ Done | Backend routes/services |\n"
-            "| STEP-04 | ✅ Done | api-hooks factory |\n"
-            "| STEP-05 | ✅ Done | Nabewerking + Timeslider |\n"
-            "| STEP-06 | ✅ Done | Map hooks + popUpModal |\n"
-            "| STEP-07 | ✅ Done | Tools, Bottom lists, table exports; dup −18 |\n"
-            "| STEP-08 | ✅ Done | ArcGIS, admin, MapComp; complexity −11 |\n\n"
-            "**E6→E7:** HIGH **79 → 73** (−6) · maint+arch RAW **−3** · duplication **209 → 191** (−18). "
-            "Extraction cost contained: unit size **+4** only.\n\n"
-            "> **Next phase:** target remaining **73 HIGH** units + DUP-02/07 — see analysis doc.\n"
-        )
+
+    star_line = (
+        "\n## Progress (STEPS 01–08 complete)\n\n"
+        "| Step | Status | Outcome |\n"
+        "|------|--------|---------------|\n"
+        "| STEP-01 | Done | WizardButtonBar + A1 interfacing |\n"
+        "| STEP-02 | Done | Voorbereiding complexity sweeps |\n"
+        "| STEP-03 | Done | Backend routes/services |\n"
+        "| STEP-04 | Done | api-hooks factory |\n"
+        "| STEP-05 | Done | Nabewerking + Timeslider |\n"
+        "| STEP-06 | Done | Map hooks + popUpModal |\n"
+        "| STEP-07 | Done | Tools, Bottom lists, table exports; dup −18 |\n"
+        "| STEP-08 | Done | ArcGIS, admin, MapComp; complexity −11 |\n\n"
+        "Last measured (E6→E7): HIGH **79 → 73** (−6) · maint+arch RAW **−3** · "
+        "duplication **209 → 191** (−18). See [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md).\n\n"
+        "> **Next phase:** remaining **HIGH** units (`maint-arch-MASTER-action-items.csv`) "
+        "+ DUP tails (DUP-01, DUP-07, residual DUP-02/04/05/06/08). Deploy → **export-8** → re-count.\n"
+    )
 
     md = f"""# Maintainability & Architecture Plan
 
@@ -1010,7 +1036,7 @@ def build_maint_arch_markdown(
 
 **{maint_raw} RAW** maintainability + architecture findings in `{export_label}`.{delta_line}
 {star_line}
-> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md) · [ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)
+> **Read first:** [STRATEGY.md](./STRATEGY.md) · [ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md)
 
 ## Finding counts (code only)
 
@@ -1024,11 +1050,11 @@ def build_maint_arch_markdown(
 | Component entanglement | {sum(1 for m in mapping if m.get('Status')=='RAW' and m.get('Category')=='Component entanglement')} |
 | **Total in this plan** | **{maint_raw}** |
 
-## Execution steps (≥{MIN_STEP_FINDINGS} findings each)
+## Execution steps (≥{MIN_STEP_FINDINGS} findings each) — historical scopes
 
-**Rule:** Do not start the next step until the current one is merged, deployed, and a new Sigrid export confirms the expected drop. Small 20–30 finding batches are too slow to move stars.
+**Rule:** After each batch, deploy and re-export. Small 20–30 finding batches are too slow to move stars.
 
-> **Note:** Step RAW counts are **scopes at `{export_label}`**. STEPS 01–08 are **complete** (E7 confirmed). Next work: remaining HIGH units + duplication tail.
+> **Note:** Step RAW counts below are **E7 scopes**. STEPS 01–08 are **complete**. Use as reference only; next work is HIGH + DUP tails.
 
 | Step | Name | Open RAW (E7) | Size | Primary tactic |
 |------|------|--------------:|:----:|----------------|
@@ -1052,7 +1078,7 @@ def build_maint_arch_markdown(
 
     md += """## Work packages (reference — do not PR whole packages at once)
 
-Use the steps above; packages below are for mapping and CSV filters only.
+Use HIGH + DUP next phase; packages below are for mapping and CSV filters only.
 
 | ID | Phase | Name | Open RAW | Categories (RAW) |
 |----|-------|------|----------:|------------------|
@@ -1074,7 +1100,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
         ("08f-misc", "remaining MAINT-08"),
     ]
     md += f"""
-## MAINT-08 sub-slices (used by STEP-06 / STEP-07)
+## MAINT-08 sub-slices (historical STEP-06 / STEP-07)
 
 | Slice | RAW ({export_label}) | Paths |
 |-------|----------:|-------|
@@ -1084,7 +1110,7 @@ Use the steps above; packages below are for mapping and CSV filters only.
         md += f"| {sl} | {n} | {paths} |\n"
     md += """
 
-## Top HIGH-priority units (within current step scope)
+## Top HIGH-priority units (next phase)
 
 | WP | Severity | LOC | Cplx | File | Unit |
 |----|----------|----:|-----:|------|------|
@@ -1099,19 +1125,19 @@ Use the steps above; packages below are for mapping and CSV filters only.
     md += f"""
 ## Principles
 
-1. **One step = ≥{MIN_STEP_FINDINGS} findings cleared** — not one file, not one MAINT package slice.
-2. **Pattern sweeps within a step** (A1 object params, A2 McCabe ≤5, DUP extract) — not hero refactors.
-3. **No file moves for score** — helpers reorg in E4→E5 caused size/complexity churn with zero star gain.
-4. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update folder names).
+1. **Prefer batches that can move stars** — not one-file hero refactors.
+2. **Pattern sweeps** (A1 object params, A2 McCabe ≤5, DUP extract).
+3. **No file moves for score** — helpers reorg caused size/complexity churn with zero star gain.
+4. **Re-export after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-exports-pair.py`.
 
 ## Files
 
 | File | Contents |
 |------|----------|
-| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…{n_steps:02d} with open RAW counts |
+| `maint-arch-EXECUTION-STEPS.csv` | STEP-01…{n_steps:02d} with open RAW counts (historical) |
 | `maint-arch-00-work-packages.csv` | MAINT-01…08 and ARCH-01…04 definitions |
 | `maint-arch-01-findings-mapping.csv` | Every finding mapped to a work package |
-| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — units to hit inside current step |
+| `maint-arch-MASTER-action-items.csv` | HIGH severity RAW — next phase targets |
 | `../plan-02-maintainability-mapping.csv` | Same mappings (includes DUP/WP-06 overlaps) |
 """
     return md
@@ -1126,11 +1152,9 @@ dup_raw = dup_raw_count_by_wp(dup_detail)
 code_packages = enrich_packages(code_work_packages, code_sec_raw, dup_raw)
 
 code_mapping_open = [m for m in code_mapping if m["Status"] == "RAW"]
-code_mapping_cleared = [m for m in code_mapping if m["Status"] == "FIXED"]
 
 write_csv(PLAN, "plan-00-work-packages.csv", code_packages)
 write_csv(PLAN, "plan-01-security-reliability-mapping.csv", code_mapping_open)
-write_csv(PLAN, "plan-01-cleared-security-reliability.csv", code_mapping_cleared)
 write_csv(PLAN, "plan-02-maintainability-mapping.csv", code_maint)
 write_csv(PLAN, "plan-03-duplication-mapping.csv", dup_detail)
 write_csv(PLAN, "plan-04-false-positives-remarks.csv", code_remarks)
@@ -1214,15 +1238,6 @@ maint_raw = sum(1 for r in code_maint if r.get("Status") == "RAW")
 dup_raw_total = sum(1 for r in dup_detail if r.get("Status") == "RAW")
 
 n_exec_steps = len(execution_steps)
-step_order_block = "\n".join(
-    f"{s['StepID']} → {s['Name']} ({s['OpenRAW']} RAW)" for s in execution_steps
-)
-step01_raw = execution_steps[0]["OpenRAW"] if execution_steps else 0
-step02_preview = (
-    f"{execution_steps[1]['StepID']} — {execution_steps[1]['Name']} ({execution_steps[1]['OpenRAW']} findings)"
-    if len(execution_steps) > 1
-    else "—"
-)
 
 code_md = f"""# Sigrid Remediation Plan — Code only
 
@@ -1239,41 +1254,54 @@ Application code, dependencies, and maintainability. **DevOps (Docker) is in [`d
 | Maintainability RAW | {maint_raw} |
 | Duplication RAW | {dup_raw_total} |
 
-**Dashboard (export 7):** Security 4.1 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.2** (+0.1) · Architecture **2.3** (+0.1)
-_(export 6 → 7: maint+arch plan-mapped **{prev_maint_raw or maint_arch_raw} → {maint_arch_raw}** ({maint_arch_raw - (prev_maint_raw or maint_arch_raw):+d}); CSV **1086 → 1083** (−3); HIGH **79 → 73**; dup **209 → 191** — both stars moved. See [ANALYSIS-export-6-to-7.md](./Maintainability-Architecture/ANALYSIS-export-6-to-7.md).)_
+**Dashboard (export 7):** Security 4.1 · Reliability 5.5 · OSS Health 4.7 · Maintainability **3.2** · Architecture **2.3**
 
-## Completed (no open code security/reliability RAW)
+Last measured delta: [ANALYSIS-export-6-to-7.md](./Maintainability-Architecture/ANALYSIS-export-6-to-7.md) (HIGH −6, dup −18, both stars +0.1).
+
+## Completed (STEPS 01–08 + security WPs)
 
 | ID | Name |
 |----|------|
 | WP-01 | Backend deps (multer, undici, nodemailer) |
-| WP-02 | Frontend xlsx → `@e965/xlsx` (FIXED in Sigrid) |
+| WP-02 | Frontend xlsx → `@e965/xlsx` |
 | WP-05 | verify-regio-apis SQL injection |
 | WP-06 | sendEmail refactor |
 | WP-08 | renderDownloadPage HTML |
 | WP-09 | fileDownload verify FIXED |
 | DUP-03 | useFilterPlans shared |
-| DUP-04 | PointsBuffer (partial — 1 dup finding left) |
-| DUP-05 | PeriodFilter panel (partial) |
-| DUP-06 | Dashboard user forms (partial) |
+| STEP-01…08 | MAINT/ARCH execution steps (see MAINT-ARCH-PLAN) |
 
 ## Principles
 
-1. **Each execution step clears ≥{MIN_STEP_FINDINGS} findings** — see [MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md) STEP-01…{n_exec_steps:02d}.
-2. **Re-export Sigrid after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-6-vs-7.py` (update export folder names).
-3. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
-4. **No file moves for score** — folder reorg caused churn in E4→E5 without star movement.
+1. **Re-export after each batch** → `python sigrid-findings/plan/generate-plan.py` + `python sigrid-findings/compare-exports-pair.py`.
+2. **Do not re-edit FIXED files** unless regression (sendEmail, renderDownloadPage, xlsx).
+3. **No file moves for score**.
+4. **Do not invent lower RAW counts** until export-8 measures them.
 
-## What’s next (recommended order)
+## What’s next (post-E7)
 
 ```
-Prep  → WP-07 Sigrid remark on callbackHandler (1 code RAW; not a full step)
-{step_order_block}
+1. Deploy / export-8 → regenerate plan + compare-exports-pair.py
+2. Confirm WP-07 + XSS + DUP-02/08 drops (or file Sigrid remarks)
+3. Remaining HIGH units (maint-arch-MASTER-action-items.csv)
+4. DUP tails still open: DUP-01, DUP-07, residual DUP-04/05/06
+5. DevOps DO-01 Docker USER (deferred — devops/)
 ```
 
-Full step table: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
+Full HIGH list: **[Maintainability-Architecture/MAINT-ARCH-PLAN.md](./Maintainability-Architecture/MAINT-ARCH-PLAN.md)**
 
-## Open security/reliability ({code_raw} RAW)
+## Post-E7 code done (await export-8 recount)
+
+| Item | Notes |
+|------|-------|
+| WP-07 redirect | `safeServerRedirect` allowlist + SPA `pendingClientPath` |
+| XSS CSV remark | `escapeCsvCell` in `pointsPlansTableExport.ts` |
+| DUP-02 | Shared form options/labels helpers |
+| DUP-08 | ResultTab row/popup + Bottom compact list view |
+
+E7 still shows these as open RAW until the next scan.
+
+## Open security/reliability ({code_raw} RAW in `{export_label}`)
 
 | WP | Severity | File | Issue |
 |----|----------|------|-------|
@@ -1302,7 +1330,7 @@ for w in code_packages:
     )
 
 code_md += f"""
-## Duplication clusters (open RAW per cluster)
+## Duplication clusters (open RAW per cluster — E7 counts)
 
 | ID | Open RAW | Notes |
 |----|----------:|-------|
@@ -1311,14 +1339,14 @@ code_md += f"""
 for dup_id, _, scope in dup_clusters:
     n = dup_raw.get(dup_id, 0)
     status = package_status(dup_id, {}, dup_raw)
-    code_md += f"| {dup_id} | {n} | {scope[:55]} ({status}) |\n"
+    code_md += f"| {dup_id} | {n} | {scope[:70]} ({status}) |\n"
 
 code_md += f"""
 ## Suggested next work
 
-1. **WP-07** — Sigrid remark (parallel, small)
-2. **STEP-01** — DUP-01 wizard buttons + A1 interfacing sweep ({step01_raw} findings)
-3. **{step02_preview}** — after STEP-01 deploy + re-export
+1. **Export-8** — measure security + DUP-02/08 code already landed
+2. **HIGH units** — `maint-arch-MASTER-action-items.csv`
+3. **DUP-01 / DUP-07** — remaining duplication tails
 
 ## Files
 
@@ -1326,7 +1354,6 @@ code_md += f"""
 |------|----------|
 | `plan-MASTER-action-items.csv` | Open security/reliability actions only |
 | `plan-01-security-reliability-mapping.csv` | Open (RAW) sec/reliability only |
-| `plan-01-cleared-security-reliability.csv` | FIXED sec/reliability (archive) |
 | `plan-03-duplication-mapping.csv` | All duplication findings |
 | `plan-04-false-positives-remarks.csv` | Remark text for WP-07 |
 | [`Maintainability-Architecture/`](./Maintainability-Architecture/) | MAINT + ARCH work packages ({maint_arch_raw} RAW) |
@@ -1410,21 +1437,19 @@ with open(os.path.join(MAINT_ARCH, "MAINT-ARCH-PLAN.md"), "w", encoding="utf-8")
 
 maint_arch_readme = f"""# Maintainability & Architecture
 
-**{maint_arch_raw} RAW** · **{n_exec_steps} execution steps** (STEPS 01–08 complete) — see **`maint-arch-EXECUTION-STEPS.csv`**
+**{maint_arch_raw} RAW** · STEPS 01–08 **complete** — next: HIGH units + DUP tails
 
 ## Read these first
-1. **[ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md)** — E6→E7: Maint **3.1 → 3.2**, Arch **+0.1**, HIGH −6, dup −18
-2. **[ANALYSIS-export-5-to-6.md](./ANALYSIS-export-5-to-6.md)** — E5→E6: star **2.9 → 3.1**, HIGH −49
-3. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + pattern sweeps
-4. **[ANALYSIS-export-4-to-5.md](./ANALYSIS-export-4-to-5.md)** — E4→E5 baseline
+1. **[STRATEGY.md](./STRATEGY.md)** — Sigrid thresholds + pattern sweeps
+2. **[ANALYSIS-export-6-to-7.md](./ANALYSIS-export-6-to-7.md)** — last measured delta (E6→E7)
+3. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — progress + HIGH list + historical step scopes
 
 ## Work breakdown
-5. **[MAINT-ARCH-PLAN.md](./MAINT-ARCH-PLAN.md)** — **STEP-01…{n_exec_steps:02d}** (all complete; use for scope reference)
-6. **`maint-arch-EXECUTION-STEPS.csv`** — step scope and open RAW counts
-7. **`maint-arch-MASTER-action-items.csv`** — HIGH severity units for next phase
-8. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
+4. **`maint-arch-MASTER-action-items.csv`** — HIGH severity units for next phase
+5. **`maint-arch-EXECUTION-STEPS.csv`** — historical STEP-01…{n_exec_steps:02d} scopes
+6. **`maint-arch-01-findings-mapping.csv`** — full finding → work package map
 
-> `ANALYSIS-*.md` and `STRATEGY.md` are hand-maintained. CSVs and `MAINT-ARCH-PLAN.md` are regenerated.
+> `ANALYSIS-export-6-to-7.md` and `STRATEGY.md` are hand-maintained. CSVs and `MAINT-ARCH-PLAN.md` are regenerated.
 
 ## Regenerate
 
@@ -1441,15 +1466,14 @@ with open(os.path.join(DEVOPS, "DEVOPS-PLAN.md"), "w", encoding="utf-8") as f:
 
 plan_readme = f"""# Sigrid remediation plan — Code focus
 
-**Source:** `{export_label}` · Open code security RAW: **{code_raw}** (WP-07 remark only)
+**Source:** `{export_label}` · Open code security RAW: **{code_raw}** (code remediated; await export-8)
 
 ## Start here
 
 1. **[REMEDIATION-PLAN.md](./REMEDIATION-PLAN.md)** — current plan (what's done + what's next)
-2. **`plan-MASTER-action-items.csv`** — open code security/reliability only (2 items)
-3. **`plan-01-cleared-security-reliability.csv`** — FIXED items (removed from active plan)
+2. **`plan-MASTER-action-items.csv`** — open code security/reliability only
+3. **[Maintainability-Architecture/](./Maintainability-Architecture/)** — HIGH units + MAINT/ARCH ({maint_arch_raw} RAW)
 4. **[devops/](./devops/)** — Docker only (deferred)
-5. **[Maintainability-Architecture/](./Maintainability-Architecture/)** — MAINT + ARCH ({maint_arch_raw} RAW)
 
 ## Layout
 
@@ -1457,7 +1481,6 @@ plan_readme = f"""# Sigrid remediation plan — Code focus
 |------|----------|
 | `plan-MASTER-action-items.csv` | Open sec/reliability RAW only |
 | `plan-01-security-reliability-mapping.csv` | Open sec/reliability RAW only |
-| `plan-01-cleared-security-reliability.csv` | FIXED sec/reliability (archive) |
 | `plan-02-maintainability-mapping.csv` | All maintainability findings (MAINT/ARCH/DUP overlaps) |
 | `plan-03-duplication-mapping.csv` | Duplication findings |
 | `plan-04-false-positives-remarks.csv` | Sigrid remark drafts |
@@ -1468,6 +1491,7 @@ plan_readme = f"""# Sigrid remediation plan — Code focus
 
 ```bash
 python sigrid-findings/plan/generate-plan.py
+python sigrid-findings/compare-exports-pair.py   # after exported-findings-8 exists
 ```
 
 Uses `sigrid-findings/{export_label}/` by default. Override: `SIGRID_EXPORT_DIR=path/to/export`.
@@ -1497,9 +1521,10 @@ parent_readme = f"""# Sigrid findings — Otg-lis
 | **`plan/`** | **Remediation plan** — [start here](./plan/README.md) |
 | `plan/Maintainability-Architecture/` | MAINT + ARCH split plan |
 | `plan/devops/` | Docker/K8s (deferred) |
+| `compare-exports-pair.py` | Compare two export folders (default E7→E8) |
 
 Raw findings live **only** inside export folders (e.g. `{export_label}/`).  
-After a new Sigrid export, add a folder `exported-findings-5/` and run the generator.
+After a new Sigrid export, add `exported-findings-8/` and run the generator + compare script.
 
 ## Quick start
 
@@ -1507,6 +1532,7 @@ Open **[plan/REMEDIATION-PLAN.md](./plan/REMEDIATION-PLAN.md)** or **`plan/plan-
 
 ```bash
 python sigrid-findings/plan/generate-plan.py
+python sigrid-findings/compare-exports-pair.py exported-findings-7 exported-findings-8
 ```
 
 Default source: `{export_label}/`. Override: `SIGRID_EXPORT_DIR=path/to/folder`.
