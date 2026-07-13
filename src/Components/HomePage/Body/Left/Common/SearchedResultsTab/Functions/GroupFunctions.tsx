@@ -1,13 +1,4 @@
 import { useStarredAll } from "@helpers/ZustandStates/starredAll";
-import { EnrichedPointType, FlightPlanType } from "Types";
-import * as XLSX from "@e965/xlsx";
-import { saveAs } from "file-saver";
-import {
-  downloadCsvFromRows,
-  downloadEnrichedPointsShapefile,
-  downloadXlsxFromRows,
-  exportFlightPlansShapefile,
-} from "@helpers/tableExports/pointsPlansTableExport";
 import { FaListAlt, FaSave, FaFolderOpen } from "react-icons/fa";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { MdDeleteOutline } from "react-icons/md";
@@ -16,6 +7,8 @@ import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
+import { createSearchedResultsExportHandlers } from "../shared/searchedResultsExports";
+import GroupFunctionsButtonItem from "./GroupFunctionsButtonItem";
 
 export default function GroupFunctions({
   setFase,
@@ -24,8 +17,15 @@ export default function GroupFunctions({
   flightPlansData,
 }: SearchedResultsTargetProps) {
   const logAction = useLogAction();
-
   const { setStarredAll } = useStarredAll();
+  const content = useContent();
+
+  const { exportCsv, exportXlsx, exportShp } = createSearchedResultsExportHandlers({
+    target,
+    pointsData,
+    flightPlansData,
+    logAction,
+  });
 
   const selectAll = () => {
     setStarredAll(true);
@@ -36,262 +36,89 @@ export default function GroupFunctions({
     });
   };
 
-  const exportCsv = () => {
-    if (target === "points") {
-      downloadCsvFromRows({ rows: pointsData, filename: "points_export.csv" });
-
-      logAction({
-        message: "User exported points to CSV",
-        step: `Searched results - ${target} drop down`,
-      });
-    } else {
-      const plans = flightPlansData as FlightPlanType[];
-      const headers = Object.keys(plans[0]);
-      const csv = [
-        headers.join(","),
-        ...plans.map((p) =>
-          headers
-            .map((h) => {
-              const value = p[h as keyof FlightPlanType];
-              if (h === "points" && Array.isArray(value)) {
-                return `${value
-                  .map(
-                    (pt) =>
-                      `id:${pt.id}, x:${pt.xcoordinaat_rd}, y:${pt.ycoordinaat_rd}`
-                  )
-                  .join(" | ")}`;
-              }
-
-              const stringVal =
-                typeof value === "string"
-                  ? value.replace(/"/g, '""')
-                  : String(value ?? "");
-              return `${stringVal}`;
-            })
-            .join(",")
-        ),
-      ].join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, "plans_export.csv");
-
-      logAction({
-        message: "User exported flight plans to CSV",
-        step: `Searched results - ${target} drop down`,
-      });
-    }
-  };
-
-  const exportXlsx = () => {
-    if (target === "points") {
-      downloadXlsxFromRows({
-        rows: pointsData,
-        filename: "points_export.xlsx",
-        sheetName: "Points",
-      });
-
-      logAction({
-        message: "User exported points to XLSX",
-        step: `Searched results - ${target} drop down`,
-      });
-    } else {
-      const plans = flightPlansData as FlightPlanType[];
-
-      const flattenedPlans = plans.map((plan) => {
-        const formattedPoints = Array.isArray(plan.points)
-          ? plan.points
-              .map(
-                (pt) =>
-                  `id:${pt.id}, x:${pt.xcoordinaat_rd}, y:${pt.ycoordinaat_rd}`
-              )
-              .join(" | ")
-          : "";
-
-        return {
-          ...plan,
-          points: formattedPoints,
-        };
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(flattenedPlans);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Plans");
-
-      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], { type: "application/octet-stream" });
-      saveAs(blob, "plans_export.xlsx");
-
-      logAction({
-        message: "User exported flight plans to XLSX",
-        step: `Searched results - ${target} drop down`,
-      });
-    }
-  };
-
-  const exportShp = async () => {
-    if (target === "points") {
-      downloadEnrichedPointsShapefile(pointsData);
-
-      logAction({
-        message: "User exported flight plans to shapefile",
-        step: `Searched results - ${target} drop down`,
-      });
-    } else {
-      await exportFlightPlansShapefile(flightPlansData);
-
-      logAction({
-        message: "User exported flight plans to shapefile",
-        step: `Searched results - ${target} drop down`,
-      });
-    }
-  };
-
-  const content = useContent();
+  const labels = content.layout.searchResult.listPointFunctions;
 
   return (
     <div className="bg-white max-w-[250px] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] z-50">
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<FaListAlt />}
-        title={content.layout.searchResult.listPointFunctions.zoomAll.title}
-        description={
-          content.layout.searchResult.listPointFunctions.zoomAll.subtitle
-        }
+        title={labels.zoomAll.title}
+        description={labels.zoomAll.subtitle}
         onClick={() => {}}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<PiSelectionForegroundThin />}
-        title={content.layout.searchResult.listPointFunctions.selectAll.title}
-        description={
-          content.layout.searchResult.listPointFunctions.selectAll.subtitle
-        }
+        title={labels.selectAll.title}
+        description={labels.selectAll.subtitle}
         onClick={selectAll}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<TbBorderOuter />}
-        title={
-          content.layout.searchResult.listPointFunctions.bufferOptions.title
-        }
-        description={
-          content.layout.searchResult.listPointFunctions.bufferOptions.subtitle
-        }
+        title={labels.bufferOptions.title}
+        description={labels.bufferOptions.subtitle}
         onClick={() => setFase("buffer")}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<BsFiletypeCsv />}
-        title={content.layout.searchResult.listPointFunctions.exportCsv.title}
-        description={
-          content.layout.searchResult.listPointFunctions.exportCsv.subtitle
-        }
+        title={labels.exportCsv.title}
+        description={labels.exportCsv.subtitle}
         onClick={exportCsv}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<BsFiletypeXlsx />}
-        title={content.layout.searchResult.listPointFunctions.exportXlsx.title}
-        description={
-          content.layout.searchResult.listPointFunctions.exportXlsx.subtitle
-        }
+        title={labels.exportXlsx.title}
+        description={labels.exportXlsx.subtitle}
         onClick={exportXlsx}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<BsFiletypeJson />}
-        title={content.layout.searchResult.listPointFunctions.exportShp.title}
-        description={
-          content.layout.searchResult.listPointFunctions.exportShp.subtitle
-        }
+        title={labels.exportShp.title}
+        description={labels.exportShp.subtitle}
         onClick={exportShp}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<FaFolderOpen />}
-        title={content.layout.searchResult.listPointFunctions.openSaved.title}
-        description={
-          content.layout.searchResult.listPointFunctions.openSaved.subtitle
-        }
+        title={labels.openSaved.title}
+        description={labels.openSaved.subtitle}
         onClick={() => {}}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<FaSave />}
-        title={content.layout.searchResult.listPointFunctions.saveResults.title}
-        description={
-          content.layout.searchResult.listPointFunctions.saveResults.subtitle
-        }
+        title={labels.saveResults.title}
+        description={labels.saveResults.subtitle}
         onClick={() => {}}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<TbLayersLinked />}
-        title={
-          content.layout.searchResult.listPointFunctions.combineResults.title
-        }
-        description={
-          content.layout.searchResult.listPointFunctions.combineResults.subtitle
-        }
+        title={labels.combineResults.title}
+        description={labels.combineResults.subtitle}
         onClick={() => {}}
       />
 
-      <ButtonItem
+      <GroupFunctionsButtonItem
         target={target}
         icon={<MdDeleteOutline />}
-        title={
-          content.layout.searchResult.listPointFunctions.removeFromResults.title
-        }
-        description={
-          content.layout.searchResult.listPointFunctions.removeFromResults
-            .subtitle
-        }
+        title={labels.removeFromResults.title}
+        description={labels.removeFromResults.subtitle}
         onClick={() => {}}
       />
     </div>
   );
 }
-
-const ButtonItem = ({
-  icon,
-  title,
-  description,
-  onClick,
-  target,
-}: {
-  icon: JSX.Element;
-  title: string;
-  description: string;
-  onClick: () => void;
-  target: string;
-}) => {
-  const logAction = useLogAction();
-
-  return (
-    <div
-      className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
-      onClick={() => {
-        onClick();
-
-        logAction({
-          message: `User clicked ${title} button in ${target} drop down`,
-          step: "Searched results",
-        });
-      }}
-    >
-      <div className="text-gray-500 text-xl my-auto">{icon}</div>
-      <div>
-        <p className="text-gray-800 text-sm font-semibold">{title}</p>
-        <p className="text-gray-500 text-sm">{description}</p>
-      </div>
-    </div>
-  );
-};

@@ -7,3 +7,5 @@ export {
 } from "./planSelection";
 
 export { drawYellowGeometries, drawYellowPoint } from "./drawYellowPlanGraphics";
+
+export { submitAddPointsToPlan } from "./submitAddPointsToPlan";

@@ -14,7 +14,12 @@ import {
   PlanListFilterSetters,
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
-import { createPlanWizardCoreSetters } from "hooks/zustand/shared/planWizardCore";
+import {
+  createPlanWizardCoreSetters,
+  emptyPlanWizardCore,
+  PlanWizardCoreSetters,
+  PlanWizardCoreValues,
+} from "hooks/zustand/shared/planWizardCore";
 import {
   createPeriodFilterSetters,
   emptyPeriodFilter,
@@ -28,19 +33,9 @@ interface FinishedPlansState
     PeriodFilterValues,
     FlightPlanFormFieldSetters,
     PlanListFilterSetters,
-    PeriodFilterSetters {
-  step: number;
-  setStep: (value: number) => void;
-
-  selectedPlan: FinishedFlightPlanType | null;
-  setSelectedPlan: (value: FinishedFlightPlanType | null) => void;
-
-  filteredPoints: FinishedPointType[];
-  setFilteredPoints: (value: FinishedPointType[]) => void;
-
-  filteredPlans: FinishedFlightPlanType[];
-  setFilteredPlans: (value: FinishedFlightPlanType[]) => void;
-
+    PeriodFilterSetters,
+    PlanWizardCoreValues<FinishedFlightPlanType, FinishedPointType>,
+    PlanWizardCoreSetters<FinishedFlightPlanType, FinishedPointType> {
   selectedPoint: FinishedPointType | null;
   setSelectedPoint: (value: FinishedPointType | null) => void;
 
@@ -51,10 +46,7 @@ interface FinishedPlansState
 }
 
 const initialState = {
-  step: 1,
-  selectedPlan: null as FinishedFlightPlanType | null,
-  filteredPoints: [] as FinishedPointType[],
-  filteredPlans: [] as FinishedFlightPlanType[],
+  ...emptyPlanWizardCore<FinishedFlightPlanType, FinishedPointType>(),
   ...emptyPeriodFilter,
   periode: "Alle",
   selectedPoint: null as FinishedPointType | null,

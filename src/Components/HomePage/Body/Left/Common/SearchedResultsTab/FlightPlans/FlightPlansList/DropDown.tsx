@@ -24,10 +24,10 @@ import { useContent } from "hooks/useContent";
 import { addPlanStarGraphics } from "hooks/hover-click-handlers/usePlanStarGraphic";
 import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
 import {
-  downloadCsvFromRows,
-  downloadXlsxFromRows,
-  exportFlightPlansShapefile,
-} from "@helpers/tableExports/pointsPlansTableExport";
+  exportSearchedFlightPlansCsv,
+  exportSearchedFlightPlansShp,
+  exportSearchedFlightPlansXlsx,
+} from "../../shared/searchedResultsExports";
 
 export default function DropDown({
   starredPlans,
@@ -81,144 +81,97 @@ export default function DropDown({
     });
   };
 
-  const exportCsv = async () => {
-    downloadCsvFromRows({
-      rows: flightPlansData,
-      filename: "plans_export.csv",
-      excludeKeys: ["points"],
-    });
-  };
-
-  const exportXlsx = async () => {
-    const cleanedPlans = flightPlansData.map(({ points, ...rest }) => rest);
-    downloadXlsxFromRows({
-      rows: cleanedPlans,
-      filename: "exports_xlsx.xlsx",
-      sheetName: "FlightPlans",
-    });
-  };
-
-  const exportShp = async () => {
-    await exportFlightPlansShapefile(flightPlansData);
-  };
+  const exportCsv = () => exportSearchedFlightPlansCsv(flightPlansData);
+  const exportXlsx = () => exportSearchedFlightPlansXlsx(flightPlansData);
+  const exportShp = () => exportSearchedFlightPlansShp(flightPlansData);
 
   const content = useContent();
+  const labels = content.layout.searchResult.listPointFunctions;
 
   return (
     <div className="absolute top-[100%] right-0 z-10 bg-white rounded-md shadow-md w-[350px] max-h-[330px] overflow-y-auto border border-gray-300 thin-scrollbar">
       <MenuItem
         icon={<MdAddCircleOutline className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.addPoints.title}
+        title={labels.addPoints.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.addPoints.subtitle
-        }
+        description={labels.addPoints.subtitle}
       />
 
       <MenuItem
         icon={<MdTableChart className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.tableView.title}
+        title={labels.tableView.title}
         onClick={tableView}
-        description={
-          content.layout.searchResult.listPointFunctions.tableView.subtitle
-        }
+        description={labels.tableView.subtitle}
       />
 
       <MenuItem
         icon={<MdOutlineZoomOutMap className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.zoomAll.title}
+        title={labels.zoomAll.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.zoomAll.subtitle
-        }
+        description={labels.zoomAll.subtitle}
       />
 
       <MenuItem
         icon={<MdOutlineSelectAll className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.selectAll.title}
+        title={labels.selectAll.title}
         onClick={selectAll}
-        description={
-          content.layout.searchResult.listPointFunctions.selectAll.subtitle
-        }
+        description={labels.selectAll.subtitle}
       />
 
       <MenuItem
         icon={<MdDonutLarge className="text-2xl text-primary mt-1" />}
-        title={
-          content.layout.searchResult.listPointFunctions.bufferOptions.title
-        }
+        title={labels.bufferOptions.title}
         onClick={() => setFase("buffer")}
-        description={
-          content.layout.searchResult.listPointFunctions.bufferOptions.subtitle
-        }
+        description={labels.bufferOptions.subtitle}
       />
 
       <MenuItem
         icon={<BsFiletypeCsv className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.exportCsv.title}
+        title={labels.exportCsv.title}
         onClick={exportCsv}
-        description={
-          content.layout.searchResult.listPointFunctions.exportCsv.subtitle
-        }
+        description={labels.exportCsv.subtitle}
       />
 
       <MenuItem
         icon={<BsFiletypeXlsx className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.exportXlsx.title}
+        title={labels.exportXlsx.title}
         onClick={exportXlsx}
-        description={
-          content.layout.searchResult.listPointFunctions.exportXlsx.subtitle
-        }
+        description={labels.exportXlsx.subtitle}
       />
 
       <MenuItem
         icon={<BsFiletypeJson className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.exportShp.title}
+        title={labels.exportShp.title}
         onClick={exportShp}
-        description={
-          content.layout.searchResult.listPointFunctions.exportShp.subtitle
-        }
+        description={labels.exportShp.subtitle}
       />
 
       <MenuItem
         icon={<MdFolderOpen className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.openSaved.title}
+        title={labels.openSaved.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.openSaved.subtitle
-        }
+        description={labels.openSaved.subtitle}
       />
 
       <MenuItem
         icon={<MdSave className="text-2xl text-primary mt-1" />}
-        title={content.layout.searchResult.listPointFunctions.saveResults.title}
+        title={labels.saveResults.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.saveResults.subtitle
-        }
+        description={labels.saveResults.subtitle}
       />
 
       <MenuItem
         icon={<MdLayers className="text-2xl text-primary mt-1" />}
-        title={
-          content.layout.searchResult.listPointFunctions.combineResults.title
-        }
+        title={labels.combineResults.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.combineResults.subtitle
-        }
+        description={labels.combineResults.subtitle}
       />
 
       <MenuItem
         icon={<MdDelete className="text-2xl text-primary mt-1" />}
-        title={
-          content.layout.searchResult.listPointFunctions.removeFromResults.title
-        }
+        title={labels.removeFromResults.title}
         onClick={func}
-        description={
-          content.layout.searchResult.listPointFunctions.removeFromResults
-            .subtitle
-        }
+        description={labels.removeFromResults.subtitle}
       />
     </div>
   );

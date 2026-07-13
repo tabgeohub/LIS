@@ -6,15 +6,20 @@ import {
   FlightPlanFormFieldValues,
   viewPlanFlightPlanFormDefaults,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import {
+  createPlanSelectionCoreSetters,
+  emptyPlanSelectionCore,
+  PlanSelectionCoreSetters,
+  PlanSelectionCoreValues,
+} from "hooks/zustand/shared/planWizardCore";
 
 interface ViewPlanState
   extends FlightPlanFormFieldValues,
-    FlightPlanFormFieldSetters {
+    FlightPlanFormFieldSetters,
+    PlanSelectionCoreValues<FlightPlanType>,
+    PlanSelectionCoreSetters<FlightPlanType> {
   initialPlans: FlightPlanType[];
   setInitialPlans: (initialPlans: FlightPlanType[]) => void;
-
-  step: number;
-  setStep: (step: number) => void;
 
   openFilter: boolean;
   setOpenFilter: (openFilter: boolean) => void;
@@ -28,12 +33,6 @@ interface ViewPlanState
   filterInput: string;
   setFilterInput: (filterInput: string) => void;
 
-  filteredPlans: FlightPlanType[];
-  setFilteredPlans: (filteredPlans: FlightPlanType[]) => void;
-
-  selectedPlan: FlightPlanType | null;
-  setSelectedPlan: (selectedPlan: FlightPlanType) => void;
-
   selectedIndex: number;
   setSelectedIndex: (selectedIndex: number) => void;
 
@@ -46,42 +45,32 @@ interface ViewPlanState
 
 export const useViewPlanState = create<ViewPlanState>((set) => ({
   initialPlans: [],
-  setInitialPlans: (initialPlans: FlightPlanType[]) =>
-    set(() => ({ initialPlans })),
+  setInitialPlans: (initialPlans) => set({ initialPlans }),
 
-  step: 1,
-  setStep: (step: number) => set(() => ({ step })),
+  ...emptyPlanSelectionCore<FlightPlanType>(),
+  ...createPlanSelectionCoreSetters<FlightPlanType>(set),
 
   openFilter: false,
-  setOpenFilter: (openFilter: boolean) => set(() => ({ openFilter })),
+  setOpenFilter: (openFilter) => set({ openFilter }),
 
   dateVan: "",
-  setDateVan: (dateVan: string) => set(() => ({ dateVan })),
+  setDateVan: (dateVan) => set({ dateVan }),
 
   dateTot: "",
-  setDateTot: (dateTot: string) => set(() => ({ dateTot })),
+  setDateTot: (dateTot) => set({ dateTot }),
 
   filterInput: "",
-  setFilterInput: (filterInput: string) => set(() => ({ filterInput })),
-
-  filteredPlans: [],
-  setFilteredPlans: (filteredPlans: FlightPlanType[]) =>
-    set(() => ({ filteredPlans })),
+  setFilterInput: (filterInput) => set({ filterInput }),
 
   selectedIndex: 0,
-  setSelectedIndex: (selectedIndex: number) => set(() => ({ selectedIndex })),
+  setSelectedIndex: (selectedIndex) => set({ selectedIndex }),
 
   ...viewPlanFlightPlanFormDefaults,
   ...createFlightPlanFormFieldSettersWithZeroPassagiers(set),
 
   clickedPoint: 0,
-  setClickedPoint: (clickedPoint: number) => set(() => ({ clickedPoint })),
+  setClickedPoint: (clickedPoint) => set({ clickedPoint }),
 
   clickedGeometry: null,
-  setClickedGeometry: (clickedGeometry: number | null) =>
-    set(() => ({ clickedGeometry })),
-
-  selectedPlan: null,
-  setSelectedPlan: (selectedPlan: FlightPlanType) =>
-    set(() => ({ selectedPlan })),
+  setClickedGeometry: (clickedGeometry) => set({ clickedGeometry }),
 }));

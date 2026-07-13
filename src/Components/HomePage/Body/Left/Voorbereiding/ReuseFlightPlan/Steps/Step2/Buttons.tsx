@@ -8,12 +8,14 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
 import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
+import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 
 export default function Buttons() {
+  const store = useReuseFlightPlan();
   const {
     clear,
     setStep,
@@ -21,18 +23,9 @@ export default function Buttons() {
     currentGeometries,
     newPoints,
     newGeometries,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
     vluchtnummer,
     selectedPlan,
-  } = useReuseFlightPlan();
+  } = store;
   const { user } = useAuth();
   const { dbGeometries } = useGeometriesStore();
   const { create, loading } = useCreateData(`/flightPlans`);
@@ -53,18 +46,7 @@ export default function Buttons() {
     });
 
     const newPlan = buildFlightPlanCreateAttributes({
-      fields: {
-        vluchtnummer,
-        omschrijving,
-        waarnemer,
-        piloot,
-        datum,
-        geplandeVliegduur,
-        typeLuchtvaartuig,
-        aantalPassagiers,
-        doelEnHoofdthema,
-        aanvullendeInfo,
-      },
+      fields: pickFlightPlanCreateFields(store),
       points,
       basemap: selectedBasemap,
       layers: selectedLayers.join(","),
@@ -73,10 +55,13 @@ export default function Buttons() {
       copiedFrom: selectedPlan?.id,
     });
 
-    create({ data: newPlan, onSuccess: () => {
-      graphicsLayer?.graphics.removeAll();
-      clear();
-    },});
+    create({
+      data: newPlan,
+      onSuccess: () => {
+        graphicsLayer?.graphics.removeAll();
+        clear();
+      },
+    });
 
     logStep("User clicked 'Save' button to save copied flight plan data", {
       ...newPlan,
@@ -98,7 +83,7 @@ export default function Buttons() {
           },
           {
             label: labels.opslaan,
-            disabled: !vluchtnummer || !datum,
+            disabled: !vluchtnummer || !store.datum,
             onClick: handleSubmit,
           },
           {

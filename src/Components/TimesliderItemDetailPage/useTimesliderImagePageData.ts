@@ -1,11 +1,3 @@
-import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import {
-  filterFinishedPlansContainingItem,
-  getItemDisplayTitle,
-} from "@helpers/timeslider";
-import { parseTimesliderImageQuery } from "./parseTimesliderImageQuery";
 import { useTimesliderPlansFetch } from "./useTimesliderPlansFetch";
 import {
   useClampedImageIndex,
@@ -13,71 +5,38 @@ import {
 } from "./useTimesliderSelection";
 import { buildTimesliderPageView } from "./buildTimesliderPageView";
 import { useTimesliderItemImages } from "./useTimesliderItemImages";
+import { useTimesliderQueryContext } from "./useTimesliderQueryContext";
+import { useTimesliderDerivedPlans } from "./useTimesliderDerivedPlans";
 
 export function useTimesliderImagePageData() {
-  const [searchParams] = useSearchParams();
-  const parsed = useMemo(
-    () => parseTimesliderImageQuery(searchParams),
-    [searchParams]
-  );
-  const { user } = useAuth();
-
-  const ok = parsed.ok;
-  const from = ok ? parsed.from : "";
-  const to = ok ? parsed.to : "";
-  const itemId = ok ? parsed.id : 0;
-  const kind = ok ? parsed.kind : "point";
-  const planIdFromQuery = ok ? parsed.planId : null;
-  const regioId = user?.role;
+  const query = useTimesliderQueryContext();
 
   const plansFetch = useTimesliderPlansFetch({
-    enabled: ok,
-    regioId,
-    from,
-    to,
+    enabled: query.ok,
+    regioId: query.regioId,
+    from: query.from,
+    to: query.to,
   });
 
-  const filteredPlans = useMemo(
-    () =>
-      ok
-        ? filterFinishedPlansContainingItem({
-            plans: plansFetch.plans,
-            kind,
-            itemId,
-          })
-        : [],
-    [plansFetch.plans, ok, kind, itemId]
-  );
-
-  const planIds = useMemo(
-    () => filteredPlans.map((plan) => plan.id),
-    [filteredPlans]
-  );
-
-  const displayTitle = useMemo(
-    () =>
-      ok
-        ? getItemDisplayTitle({
-            plans: filteredPlans.length ? filteredPlans : plansFetch.plans,
-            kind,
-            itemId,
-          })
-        : "",
-    [ok, filteredPlans, plansFetch.plans, kind, itemId]
-  );
+  const { filteredPlans, planIds, displayTitle } = useTimesliderDerivedPlans({
+    ok: query.ok,
+    plans: plansFetch.plans,
+    kind: query.kind,
+    itemId: query.itemId,
+  });
 
   const { selectedPlan, setSelectedPlan } = useTimesliderSelectedPlan({
     filteredPlans,
-    planIdFromQuery,
+    planIdFromQuery: query.planIdFromQuery,
   });
 
   const { pointResult, geometryResult, rowsForSelectedPlan } =
     useTimesliderItemImages({
-      ok,
-      kind,
-      itemId,
+      ok: query.ok,
+      kind: query.kind,
+      itemId: query.itemId,
       planIds,
-      regioId,
+      regioId: query.regioId,
       selectedPlan,
     });
 
@@ -86,11 +45,11 @@ export function useTimesliderImagePageData() {
   );
 
   const view = buildTimesliderPageView({
-    ok,
-    kind,
-    itemId,
-    from,
-    to,
+    ok: query.ok,
+    kind: query.kind,
+    itemId: query.itemId,
+    from: query.from,
+    to: query.to,
     displayTitle,
     filteredPlans,
     allPlans: plansFetch.plans,
@@ -100,8 +59,8 @@ export function useTimesliderImagePageData() {
     geometryResult,
     plansLoading: plansFetch.loading,
     plansError: plansFetch.error,
-    needsAuth: ok && !user?.role,
-    queryReason: ok ? "" : parsed.reason,
+    needsAuth: query.needsAuth,
+    queryReason: query.queryReason,
   });
 
   return {

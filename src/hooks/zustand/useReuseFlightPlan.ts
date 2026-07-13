@@ -10,16 +10,20 @@ import {
   PlanListFilterSetters,
   PlanListFilterValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
-import { createPlanWizardCoreSetters } from "hooks/zustand/shared/planWizardCore";
+import {
+  createPlanWizardCoreSetters,
+  emptyPlanWizardCore,
+  PlanWizardCoreSetters,
+  PlanWizardCoreValues,
+} from "hooks/zustand/shared/planWizardCore";
 
 interface ReUseFlightPlanState
   extends FlightPlanFormFieldValues,
     PlanListFilterValues,
     FlightPlanFormFieldSetters,
-    PlanListFilterSetters {
-  step: number;
-  setStep: (value: number) => void;
-
+    PlanListFilterSetters,
+    PlanWizardCoreValues<FlightPlanType, EnrichedPointType>,
+    PlanWizardCoreSetters<FlightPlanType, EnrichedPointType> {
   currentPoints: number[];
   setCurrentPoints: (value: number[]) => void;
 
@@ -32,15 +36,6 @@ interface ReUseFlightPlanState
   newGeometries: number[];
   setNewGeometries: (value: number[]) => void;
 
-  selectedPlan: FlightPlanType | null;
-  setSelectedPlan: (value: FlightPlanType | null) => void;
-
-  filteredPlans: FlightPlanType[];
-  setFilteredPlans: (value: FlightPlanType[]) => void;
-
-  filteredPoints: EnrichedPointType[];
-  setFilteredPoints: (value: EnrichedPointType[]) => void;
-
   vluchtnummer: string;
   setVluchtnummer: (value: string) => void;
 
@@ -48,14 +43,11 @@ interface ReUseFlightPlanState
 }
 
 const initialState = {
-  step: 1,
+  ...emptyPlanWizardCore<FlightPlanType, EnrichedPointType>(),
   currentPoints: [] as number[],
   currentGeometries: [] as number[],
   newPoints: [] as number[],
   newGeometries: [] as number[],
-  selectedPlan: null as FlightPlanType | null,
-  filteredPlans: [] as FlightPlanType[],
-  filteredPoints: [] as EnrichedPointType[],
   vluchtnummer: "",
   ...emptyPlanListFilter,
   ...emptyFlightPlanFormFields,

@@ -5,16 +5,8 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { FlightPlanType } from "Types";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import {
-  buildUniquePointIds,
-  drawYellowGeometries,
-  drawYellowPoint,
-  getGeometryVertexIds,
-  mergeGeometries,
-  resolveStandalonePoints,
-} from "./helpers";
+import { submitAddPointsToPlan } from "./helpers/submitAddPointsToPlan";
 
 export default function Buttons({
   selectedPointIds,
@@ -45,79 +37,23 @@ export default function Buttons({
   function handleSubmit() {
     if (!selectedPlan) return;
 
-    const uniquePointIds = buildUniquePointIds({
-      plan: selectedPlan,
+    submitAddPointsToPlan({
+      selectedPlan,
       selectedPointIds,
       selectedGeometryIds,
-      dbGeometries,
-    });
-
-    const updatedGeometries = mergeGeometries({
-      existing: selectedPlan.geometries,
-      newlySelectedIds: selectedGeometryIds,
-      allGeometries: dbGeometries,
-    });
-
-    const standalonePoints = resolveStandalonePoints({
-      allPointIds: uniquePointIds,
       dbPoints,
-      geometries: updatedGeometries,
-    });
-
-    const vertexIds = getGeometryVertexIds(updatedGeometries);
-    const newlySelectedStandalonePoints = dbPoints.filter(
-      (p) => selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
-    );
-
-    update({
-      data: {
-        points: uniquePointIds,
-        id: selectedPlan.id,
-      },
-      onSuccess: () => {
-        const updatedPlan: FlightPlanType = {
-          ...selectedPlan,
-          points: standalonePoints,
-          pointsObjects: standalonePoints,
-          geometries: updatedGeometries,
-        };
-
-        setSelectedPlan(updatedPlan);
-        setPointsTable(standalonePoints);
-        setGeometriesTable(updatedGeometries);
-        setGeometries(updatedGeometries);
-        setOpenTable(true);
-
-        newlySelectedStandalonePoints.forEach((point) =>
-          drawYellowPoint(point, yellowGraphicsLayer)
-        );
-
-        drawYellowGeometries(updatedGeometries, yellowGraphicsLayer);
-
-        setFilteredPlans(
-          filteredPlans.map((p) =>
-            p.id === selectedPlan.id
-              ? {
-                  ...p,
-                  points: standalonePoints,
-                  pointsObjects: standalonePoints,
-                  geometries: updatedGeometries,
-                }
-              : p
-          )
-        );
-
-        logAction({
-          message: "User saved points and geometries to flight plan",
-          newData: {
-            planId: selectedPlan.id,
-            pointIds: uniquePointIds,
-            geometryIds: updatedGeometries.map((g) => g.id),
-          },
-        });
-
-        setStep(2);
-            },
+      dbGeometries,
+      yellowGraphicsLayer,
+      update,
+      setSelectedPlan,
+      setPointsTable,
+      setGeometriesTable,
+      setGeometries,
+      setOpenTable,
+      filteredPlans,
+      setFilteredPlans,
+      logAction,
+      setStep,
     });
   }
 

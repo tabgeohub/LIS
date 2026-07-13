@@ -9,8 +9,10 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";
 import Fase3 from "./Fase3";
-import toast from "react-hot-toast";
 import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
+import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { collectUniquePlanPointIds } from "hooks/flightPlan/collectUniquePlanPointIds";
+import { runFlightPlanCreateSuccess } from "hooks/flightPlan/runFlightPlanCreateSuccess";
 import { Geometry } from "hooks/features/useGeometriesStore";
 
 export interface FlightPlanTemplate {
@@ -33,75 +35,29 @@ export default function TemplateFlight({
   basemapString: string;
 }) {
   const [fase, setFase] = useState(1);
-
   const [selectedTemplate, setSelectedTemplate] =
     useState<FlightPlanTemplate | null>(null);
 
   const { user } = useAuth();
-
   const { data: flightTemplate } = useTemplateFlights({
     regioId: user.role,
     userId: user.user_id,
   });
-
   const { create } = useCreateData("/flightPlans");
-
   const { clearGraphics } = useMapViewState();
-
   const { selectedLayers } = kaartlagenState();
-
-  const {
-    setStep,
-    vluchtnummer,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
-    clear,
-  } = useFlightPlanState();
+  const store = useFlightPlanState();
+  const { setStep, clear } = store;
 
   const handleSubmit = (points: number[], geometries?: number[]) => {
-    // Extract point IDs from selected geometries
-    const geometryPointIds: number[] = [];
-    if (geometries && geometries.length > 0 && selectedTemplate?.geometries) {
-      const selectedGeometryObjects = selectedTemplate.geometries.filter((g: Geometry) =>
-        geometries.includes(g.id)
-      );
-      selectedGeometryObjects.forEach((geometry: Geometry) => {
-        if (geometry.points && Array.isArray(geometry.points)) {
-          geometry.points.forEach((point) => {
-            if (point.id) {
-              geometryPointIds.push(point.id);
-            }
-          });
-        }
-      });
-    }
-
-    // Combine all point IDs (regular points + points from geometries)
-    const allPointIds = [...points, ...geometryPointIds];
-
-    // Remove duplicates
-    const uniquePointIds = Array.from(new Set(allPointIds));
+    const uniquePointIds = collectUniquePlanPointIds({
+      pointIds: points,
+      geometryIds: geometries,
+      geometries: selectedTemplate?.geometries,
+    });
 
     const attributes = buildFlightPlanCreateAttributes({
-      fields: {
-        vluchtnummer,
-        omschrijving,
-        waarnemer,
-        piloot,
-        datum,
-        geplandeVliegduur,
-        typeLuchtvaartuig,
-        aantalPassagiers,
-        doelEnHoofdthema,
-        aanvullendeInfo,
-      },
+      fields: pickFlightPlanCreateFields(store),
       points: uniquePointIds,
       basemap: basemapString,
       layers: selectedLayers.join(","),
@@ -109,19 +65,15 @@ export default function TemplateFlight({
       regioId: user.role,
     });
 
-    create({ data: attributes, onSuccess: () => {
-      setTimeout(() => {
-        toast(
-          "Ga naar “Vluchtplan-informatie” om je vlucht te controleren of bij te werken.",
-          {
-            duration: 5000,
+    create({
+      data: attributes,
+      onSuccess: () =>
+        runFlightPlanCreateSuccess({
+          onCleanup: () => {
+            clear();
+            clearGraphics();
           },
-        );
-      }, 1000);
-
-      clear();
-      clearGraphics();
-    },
+        }),
     });
   };
 

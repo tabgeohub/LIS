@@ -9,6 +9,7 @@ import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures"
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { buildPointUpdatePayload } from "@helpers/points/buildPointUpdatePayload";
 
 export default function Step2({
   setStep,
@@ -35,36 +36,26 @@ export default function Step2({
   async function handleSubmit() {
     if (!clickedPointId) return;
 
-    const attributes = {
-      omschrijving: values.omschrijving,
-      regio_id: values.regio_id,
-      xcoordinaat_rd: values.xcoordinaat_rd,
-      ycoordinaat_rd: values.ycoordinaat_rd,
-      latitude: values.latitude,
-      longitude: values.longitude,
-      vertrouwelijk: values.vertrouwelijk,
-      herhalen: values.herhalen,
-      user_id: values.user_id,
-      activiteit_id: values.activiteit_id,
-      organisatie_id: values.organisatie_id,
-      specifiek_letten_op: values.specifiek_letten_op,
-      datum: values.created_at,
+    const attributes = buildPointUpdatePayload({
+      fields: values,
       id: values.id,
-    };
+      created_at: values.created_at,
+    });
 
-    update({ data: attributes, onSuccess: async (responseData) => {
-      if (!responseData.result) return;
-      // Remove temp red point
-      redGraphicsLayer?.removeAll();
+    update({
+      data: attributes,
+      onSuccess: async (responseData) => {
+        if (!responseData.result) return;
+        redGraphicsLayer?.removeAll();
 
-      mapView?.graphics.removeAll();
+        mapView?.graphics.removeAll();
 
-      await fetchInitialFeatures(user?.role);
+        await fetchInitialFeatures(user?.role);
 
-      // Exit geometry-edit mode and go back to details
-      setCreateNewPoint(false);
-      setSelectedBottomTab("viewSelectedPointDetails");
-    },});
+        setCreateNewPoint(false);
+        setSelectedBottomTab("viewSelectedPointDetails");
+      },
+    });
   }
 
   return (

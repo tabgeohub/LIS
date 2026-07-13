@@ -6,6 +6,7 @@ import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
+import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -19,19 +20,8 @@ export default function Buttons({
 }) {
   const { setStep, setSelectedIndex } = useViewPlanState();
   const { selectedBasemap } = useSelectedBasemapState();
-  const {
-    duplicatedFlightPlan,
-    vluchtnummer,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
-  } = usePlanDuplicateState();
+  const store = usePlanDuplicateState();
+  const { duplicatedFlightPlan } = store;
   const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
   const { create } = useCreateData("/flightPlans");
   const { user } = useAuth();
@@ -40,18 +30,7 @@ export default function Buttons({
 
   const submitStep2 = () => {
     const attributes = buildFlightPlanCreateAttributes({
-      fields: {
-        vluchtnummer,
-        omschrijving,
-        waarnemer,
-        piloot,
-        datum,
-        geplandeVliegduur,
-        typeLuchtvaartuig,
-        aantalPassagiers,
-        doelEnHoofdthema,
-        aanvullendeInfo,
-      },
+      fields: pickFlightPlanCreateFields(store),
       points: duplicatedFlightPlan?.points.flatMap((point) => point.id) ?? [],
       basemap: selectedBasemap,
       layers: selectedLayers.join(","),
@@ -59,10 +38,13 @@ export default function Buttons({
       regioId: user.role,
     });
 
-    create({ data: attributes, onSuccess: () => {
-      refetch();
-      setStep(1);
-    },});
+    create({
+      data: attributes,
+      onSuccess: () => {
+        refetch();
+        setStep(1);
+      },
+    });
   };
 
   return (

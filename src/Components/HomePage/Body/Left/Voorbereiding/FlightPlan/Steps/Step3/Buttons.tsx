@@ -7,8 +7,10 @@ import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFli
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import toast from "react-hot-toast";
 import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
+import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { collectUniquePlanPointIds } from "hooks/flightPlan/collectUniquePlanPointIds";
+import { runFlightPlanCreateSuccess } from "hooks/flightPlan/runFlightPlanCreateSuccess";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -34,69 +36,32 @@ export default function Buttons({
   const { create, loading } = useCreateData("/flightPlans");
   const { selectedLayers } = kaartlagenState();
   const { logStep, withLog, labels } = useWizardButtons("Third step");
+  const store = useFlightPlanState();
   const {
     selectedPoints2,
     selectedPoints,
     selectedGeometries,
     selectedGeometries2,
     setStep,
-    vluchtnummer,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
     clear,
-  } = useFlightPlanState();
+  } = store;
   const { dbGeometries } = useGeometriesStore();
 
   const handleSubmit = () => {
-    const safeSelectedGeometries = Array.isArray(selectedGeometries)
-      ? selectedGeometries
-      : [];
-    const safeSelectedGeometries2 = Array.isArray(selectedGeometries2)
-      ? selectedGeometries2
-      : [];
-    const allSelectedGeometryIds = [
-      ...safeSelectedGeometries,
-      ...safeSelectedGeometries2,
-    ];
-    const selectedGeometryObjects = dbGeometries.filter((geometry) =>
-      allSelectedGeometryIds.includes(geometry.id)
-    );
-    const geometryPointIds = selectedGeometryObjects.flatMap((geometry) =>
-      geometry.points.map((point) => point.id)
-    );
-    const safeSelectedPoints = Array.isArray(selectedPoints)
-      ? selectedPoints
-      : [];
-    const safeSelectedPoints2 = Array.isArray(selectedPoints2)
-      ? selectedPoints2
-      : [];
-    const allPointIds = [
-      ...safeSelectedPoints,
-      ...safeSelectedPoints2,
-      ...geometryPointIds,
-    ];
-    const uniquePointIds = Array.from(new Set(allPointIds));
+    const uniquePointIds = collectUniquePlanPointIds({
+      pointIds: [
+        ...(Array.isArray(selectedPoints) ? selectedPoints : []),
+        ...(Array.isArray(selectedPoints2) ? selectedPoints2 : []),
+      ],
+      geometryIds: [
+        ...(Array.isArray(selectedGeometries) ? selectedGeometries : []),
+        ...(Array.isArray(selectedGeometries2) ? selectedGeometries2 : []),
+      ],
+      geometries: dbGeometries,
+    });
 
     const attributes = buildFlightPlanCreateAttributes({
-      fields: {
-        vluchtnummer,
-        omschrijving,
-        waarnemer,
-        piloot,
-        datum,
-        geplandeVliegduur,
-        typeLuchtvaartuig,
-        aantalPassagiers,
-        doelEnHoofdthema,
-        aanvullendeInfo,
-      },
+      fields: pickFlightPlanCreateFields(store),
       points: uniquePointIds,
       basemap: basemapString,
       layers: selectedLayers.join(","),
@@ -108,16 +73,15 @@ export default function Buttons({
       ...attributes,
     });
 
-    create({ data: attributes, onSuccess: () => {
-      setTimeout(() => {
-        toast(
-          "Ga naar “Vluchtplan-informatie” om je vlucht te controleren of bij te werken.",
-          { duration: 5000 },
-        );
-      }, 1000);
-      clear();
-      clearGraphics();
-    },
+    create({
+      data: attributes,
+      onSuccess: () =>
+        runFlightPlanCreateSuccess({
+          onCleanup: () => {
+            clear();
+            clearGraphics();
+          },
+        }),
     });
   };
 

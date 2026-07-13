@@ -2,10 +2,7 @@ import { useEffect, useRef } from "react";
 import MapView from "@arcgis/core/views/MapView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { AttachmentType, FinishedPointType } from "Types/finished_plans";
-import {
-  buildImageMarkerGraphics,
-  sortAttachmentsWithLocation,
-} from "./buildImageMarkerGraphics";
+import { syncImageMarkersOnLayer } from "./syncImageMarkersOnLayer";
 
 export type UseImageMarkersOnMapInput = {
   attachmentPoint: FinishedPointType | null;
@@ -16,23 +13,23 @@ export type UseImageMarkersOnMapInput = {
 
 export function useImageMarkersOnMap(input: UseImageMarkersOnMapInput) {
   const imageMarkersRef = useRef<__esri.Graphic[]>([]);
-  const { attachmentPoint, validAttachments, mapView, redGraphicsLayer } = input;
+  const { attachmentPoint, validAttachments, mapView, redGraphicsLayer } =
+    input;
 
   useEffect(() => {
     if (!attachmentPoint || !mapView || !redGraphicsLayer) return;
 
-    imageMarkersRef.current.forEach((marker) => redGraphicsLayer.remove(marker));
-    imageMarkersRef.current = [];
-
-    const sorted = sortAttachmentsWithLocation(validAttachments);
-    if (sorted.length === 0) return;
-
-    const graphics = buildImageMarkerGraphics(sorted);
-    graphics.forEach((graphic) => redGraphicsLayer.add(graphic));
-    imageMarkersRef.current = graphics;
+    imageMarkersRef.current = syncImageMarkersOnLayer({
+      attachmentPoint,
+      validAttachments,
+      redGraphicsLayer,
+      previousMarkers: imageMarkersRef.current,
+    });
 
     return () => {
-      imageMarkersRef.current.forEach((marker) => redGraphicsLayer.remove(marker));
+      imageMarkersRef.current.forEach((marker) =>
+        redGraphicsLayer.remove(marker)
+      );
       imageMarkersRef.current = [];
     };
   }, [validAttachments, attachmentPoint, mapView, redGraphicsLayer]);

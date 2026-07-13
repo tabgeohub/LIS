@@ -1,96 +1,16 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import { Field, useFormikContext } from "formik";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { CgSpinner } from "react-icons/cg";
+import { Field } from "formik";
 import InputFormik from "../../Common/InputFormik";
 import SelectFormik from "../../Common/SelectFormik";
-import { EnrichedPointType } from "Types";
-import { useUpdateData } from "utils/useUpdateData";
-import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
-import useLogAction from "hooks/useLogAction";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import Step1Buttons from "./Step1Buttons";
 
 export default function Step1({
   setStep,
 }: {
   setStep: (value: number) => void;
 }) {
-  const logAction = useLogAction();
   const organizations = useConstSelectOptions("organisaties");
-
   const activities = useConstSelectOptions("activiteiten");
-
-  const { setSelectedTab } = useTabState();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { clickedPoint } = usePopUpState();
-
-  const { update, loading } = useUpdateData(`/points/${clickedPoint?.id}`);
-  const { fetchInitialFeatures } = useFetchInitialFeatures();
-  const { resetFeatures } = useResetFeatures();
-
-  function handleClose() {
-    setSelectedBottomTab("Kaartlagenlijst");
-    setSelectedTab("none");
-
-    logAction({
-      message: "User clicked 'Cancel' button",
-      step: "Edit point details - Step 1",
-    });
-  }
-
-  const { values } = useFormikContext();
-
-  const { user } = useAuth();
-
-  function handleSubmit(values: EnrichedPointType) {
-    const attributes = {
-      omschrijving: values.omschrijving,
-      regio_id: values.regio_id,
-      xcoordinaat_rd: values.xcoordinaat_rd,
-      ycoordinaat_rd: values.ycoordinaat_rd,
-      latitude: values.latitude,
-      longitude: values.longitude,
-      vertrouwelijk: values.vertrouwelijk,
-      herhalen: values.herhalen,
-      user_id: values.user_id,
-      activiteit_id: values.activiteit_id,
-      organisatie_id: values.organisatie_id,
-      specifiek_letten_op: values.specifiek_letten_op,
-      datum: values.created_at,
-      id: values.id,
-    };
-
-    update({ data: attributes, onSuccess: (responseData) => {
-      if (!responseData.result) return;
-
-      fetchInitialFeatures(user?.role);
-
-      resetFeatures();
-      setSelectedBottomTab("viewSelectedPointDetails");
-    },});
-
-    logAction({
-      message: "User clicked 'Save' button to edit a point",
-      step: "Edit point details - Step 2",
-      newData: {
-        omschrijving: values.omschrijving,
-        regio_id: values.regio_id,
-        xcoordinaat_rd: values.xcoordinaat_rd,
-        ycoordinaat_rd: values.ycoordinaat_rd,
-        latitude: values.latitude,
-        longitude: values.longitude,
-        vertrouwelijk: values.vertrouwelijk,
-        herhalen: values.herhalen,
-        user_id: values.user_id,
-        activiteit_id: values.activiteit_id,
-        organisatie_id: values.organisatie_id,
-        specifiek_letten_op: values.specifiek_letten_op,
-      },
-    });
-  }
 
   return (
     <div className="h-[65vh] overflow-y-auto thin-scrollbar flex flex-col gap-y-2 p-2">
@@ -137,51 +57,7 @@ export default function Step1({
 
       <InputFormik disabled={true} label="Vertrouwelijk" name="vertrouwelijk" />
 
-      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-        <button className="gray-button">Verwijderen</button>
-
-        <button
-          onClick={() => {
-            setStep(2);
-            // setCreateNewPoint(true);
-
-            logAction({
-              message: "User clicked 'Geometry change' button",
-              step: "Edit point details - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
-          Geometrie aanpassen
-        </button>
-
-        <button
-          onClick={() => {
-            handleSubmit(values as EnrichedPointType);
-
-            logAction({
-              message: "User clicked 'Save' button",
-              step: "Edit point details - Step 1",
-            });
-          }}
-          className="gray-button"
-        >
-          Opslaan
-        </button>
-
-        <button className="gray-button" type="button" onClick={handleClose}>
-          Annuleren
-        </button>
-      </div>
-
-      {loading && (
-        <div className="absolute h-full w-full top-0 left-0 bg-gray-100 opacity-50 z-10 flex justify-center items-center">
-          <div className="flex flex-col items-center justify-center">
-            <CgSpinner className="animate-spin text-blue-500 text-6xl" />
-            <p className="text-gray-500 text-sm">Bezig met opslaan...</p>
-          </div>
-        </div>
-      )}
+      <Step1Buttons setStep={setStep} />
     </div>
   );
 }
