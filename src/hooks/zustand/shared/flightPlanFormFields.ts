@@ -62,6 +62,21 @@ export function createFlightPlanFormFieldSetters(
   };
 }
 
+export function applyFlightPlanFormValues(
+  setters: FlightPlanFormFieldSetters,
+  values: FlightPlanFormFieldValues
+) {
+  setters.setOmschrijving(values.omschrijving);
+  setters.setWaarnemer(values.waarnemer);
+  setters.setPiloot(values.piloot);
+  setters.setDatum(values.datum);
+  setters.setGeplandeVliegduur(values.geplandeVliegduur);
+  setters.setTypeLuchtvaartuig(values.typeLuchtvaartuig);
+  setters.setAantalPassagiers(values.aantalPassagiers);
+  setters.setDoelEnHoofdthema(values.doelEnHoofdthema);
+  setters.setAanvullendeInfo(values.aanvullendeInfo);
+}
+
 export type PlanListFilterValues = {
   openFilter: boolean;
   filterTerm: string;

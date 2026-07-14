@@ -29,24 +29,18 @@ export function addAndOrderMapGraphicsLayers(
     selectedPointGraphicsLayer,
   } = layers;
 
-  map.addMany([
-    pointsGraphicsLayer,
+  const overlayOrder = [
+    graphicsLayerHover,
     yellowGraphicsLayer,
     yellowGeometriesGraphicsLayer,
+    redGraphicsLayer,
     graphicsLayer,
     geometriesGraphicsLayer,
-    graphicsLayerHover,
-    redGraphicsLayer,
     selectedPointGraphicsLayer,
-  ]);
+  ];
 
-  [
-    graphicsLayerHover,
-    yellowGraphicsLayer,
-    yellowGeometriesGraphicsLayer,
-    redGraphicsLayer,
-    graphicsLayer,
-    geometriesGraphicsLayer,
-    selectedPointGraphicsLayer,
-  ].forEach((layer, offset) => map.layers.reorder(layer, map.layers.length - 1 - offset));
+  map.addMany([pointsGraphicsLayer, ...overlayOrder]);
+  overlayOrder.forEach((layer, offset) =>
+    map.layers.reorder(layer, map.layers.length - 1 - offset)
+  );
 }

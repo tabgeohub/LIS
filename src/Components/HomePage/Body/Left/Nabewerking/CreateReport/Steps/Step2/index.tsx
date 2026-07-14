@@ -9,6 +9,7 @@ import { useRenderPoints } from "./hooks/useRenderPoints";
 import { useRenderGeometries } from "./hooks/useRenderGeometries";
 import Points from "./Points";
 import Geometries from "./Geometries";
+import { filterPointsForPlan } from "hooks/filters/filterPlanPoints";
 
 export default function Step2() {
   const {
@@ -26,15 +27,7 @@ export default function Step2() {
 
   // Filter points to only show plan points
   useEffect(() => {
-    const planPointsIds = selectedPlan?.points_data.flatMap(
-      (point) => point.id
-    );
-
-    const filteredPoints = points.filter((point) =>
-      planPointsIds?.includes(point.id)
-    );
-
-    setPoints(filteredPoints);
+    setPoints(filterPointsForPlan(points, selectedPlan));
   }, []);
 
   // Render points on map

@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { usePathPointState } from "@helpers/ZustandStates/pathPointState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import {
-  findNearestPathPoint,
-  parsePlanPath,
-} from "./pathPlanUtils";
+import { parsePlanPath } from "./pathPlanUtils";
 import {
   addSelectedPathHighlight,
   clearSelectedPathHighlights,
 } from "./pathPointGraphics";
+import { resolveSelectedPathPoint } from "./resolveSelectedPathPoint";
 
 const MAX_CLICK_DISTANCE_M = 20;
 
@@ -24,33 +22,30 @@ export default function usePathPointHandlerClick() {
     const planPath = parsePlanPath((selectedPlan as { path?: unknown }).path);
     if (planPath.length === 0) return;
 
+    const map = mapView.map;
+    if (!map) return;
+
     const handle = mapView.on("click", (event) => {
       if (!redGraphicsLayer || !event.mapPoint) return;
 
-      mapView.map.reorder(redGraphicsLayer, mapView.map.layers.length - 1);
+      map.reorder(redGraphicsLayer, map.layers.length - 1);
 
-      const nearest = findNearestPathPoint({
+      const selection = resolveSelectedPathPoint({
+        plan: selectedPlan,
         planPath,
         latitude: Number(event.mapPoint.latitude),
         longitude: Number(event.mapPoint.longitude),
         maxDistanceM: MAX_CLICK_DISTANCE_M,
       });
 
-      if (!nearest) {
+      if (!selection) {
         setSelectedPathPoint(null);
         clearSelectedPathHighlights(redGraphicsLayer);
         return;
       }
 
-      setSelectedPathPoint({
-        longitude: nearest.longitude,
-        latitude: nearest.latitude,
-        altitude: nearest.altitude ?? 0,
-        speed: nearest.speed ?? 0,
-        rotationAngle: nearest.rotationAngle ?? 0,
-        planId: String((selectedPlan as { id?: number }).id ?? ""),
-        vluchtnummer: (selectedPlan as { vluchtnummer?: string }).vluchtnummer ?? "",
-      });
+      const { nearest, ...selectedPathPoint } = selection;
+      setSelectedPathPoint(selectedPathPoint);
 
       addSelectedPathHighlight(redGraphicsLayer, nearest);
     });

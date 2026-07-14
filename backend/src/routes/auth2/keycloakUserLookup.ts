@@ -9,6 +9,29 @@ type KeycloakUserRecord = {
   enabled?: boolean;
 };
 
+function findUserByIdentity(users: KeycloakUserRecord[], identity: string) {
+  const normalized = identity.toLowerCase();
+  return users.find(
+    (entry) =>
+      entry?.id &&
+      (String(entry.username || "").toLowerCase() === normalized ||
+        String(entry.email || "").toLowerCase() === normalized)
+  );
+}
+
+async function searchKeycloakUser(req: Request, username: string) {
+  const response = await keycloakAdminFetch(
+    req,
+    `/users?search=${encodeURIComponent(username)}&max=20`,
+    { method: "GET" }
+  );
+  if (!response.ok) return undefined;
+  return findUserByIdentity(
+    (await response.json()) as KeycloakUserRecord[],
+    username
+  );
+}
+
 type KeycloakCredential = {
   type?: string;
 };
@@ -100,30 +123,8 @@ export async function lookupKeycloakUser(
     }
 
     const users = (await response.json()) as KeycloakUserRecord[];
-    let user = users.find(
-      (entry) =>
-        entry?.id &&
-        String(entry.username || "").toLowerCase() === username.toLowerCase()
-    );
-
-    if (!user?.id) {
-      const searchResponse = await keycloakAdminFetch(
-        req,
-        `/users?search=${encodeURIComponent(username)}&max=20`,
-        { method: "GET" }
-      );
-
-      if (searchResponse.ok) {
-        const searchUsers = (await searchResponse.json()) as KeycloakUserRecord[];
-        const normalized = username.toLowerCase();
-        user = searchUsers.find(
-          (entry) =>
-            entry?.id &&
-            (String(entry.username || "").toLowerCase() === normalized ||
-              String(entry.email || "").toLowerCase() === normalized)
-        );
-      }
-    }
+    let user = findUserByIdentity(users, username);
+    if (!user?.id) user = await searchKeycloakUser(req, username);
 
     if (!user?.id) {
       return { ok: false, reason: "not_found" };

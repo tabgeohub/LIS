@@ -34,6 +34,21 @@ export type BuildUpdatedPlanFromFormInput = {
   geometriesTable: Geometry[];
 };
 
+function mapViewPlanFormToPersistence(form: ViewPlanFormFields) {
+  return {
+    vluchtnummer: form.vluchtnummer,
+    omschrijving: form.omschrijving,
+    waarnemer: form.waarnemer,
+    piloot: form.piloot,
+    datum: form.datum,
+    vliegduur: form.geplandeVliegduur,
+    luchtvaartuig: form.typeLuchtvaartuig,
+    passagiers: form.aantalPassagiers,
+    hoofdthema: form.doelEnHoofdthema,
+    aanvullende: form.aanvullendeInfo,
+  };
+}
+
 export function buildUpdatedPlanFromForm(
   input: BuildUpdatedPlanFromFormInput
 ): FlightPlanType {
@@ -41,18 +56,9 @@ export function buildUpdatedPlanFromForm(
 
   return {
     ...selectedPlan,
-    vluchtnummer: form.vluchtnummer,
-    omschrijving: form.omschrijving,
-    waarnemer: form.waarnemer,
-    piloot: form.piloot,
-    datum: form.datum,
-    vliegduur: form.geplandeVliegduur,
+    ...mapViewPlanFormToPersistence(form),
     geplandeVliegduur: form.geplandeVliegduur,
-    luchtvaartuig: form.typeLuchtvaartuig,
     typeLuchtvaartuig: form.typeLuchtvaartuig,
-    passagiers: form.aantalPassagiers,
-    hoofdthema: form.doelEnHoofdthema,
-    aanvullende: form.aanvullendeInfo,
     points: pointsTable,
     pointsObjects: pointsTable,
     geometries: geometriesTable,
@@ -67,16 +73,7 @@ export function buildViewPlanUpdatePayload(input: BuildViewPlanUpdatePayloadInpu
   const { selectedPlan, form, pointsTable, geometriesTable, userId } = input;
 
   return {
-    vluchtnummer: form.vluchtnummer,
-    omschrijving: form.omschrijving,
-    waarnemer: form.waarnemer,
-    piloot: form.piloot,
-    datum: form.datum,
-    vliegduur: form.geplandeVliegduur,
-    luchtvaartuig: form.typeLuchtvaartuig,
-    passagiers: form.aantalPassagiers,
-    hoofdthema: form.doelEnHoofdthema,
-    aanvullende: form.aanvullendeInfo,
+    ...mapViewPlanFormToPersistence(form),
     points: collectPointIdsFromTables(pointsTable, geometriesTable),
     id: selectedPlan.id,
     status: selectedPlan.status,

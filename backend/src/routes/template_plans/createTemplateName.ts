@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import { missingFields, serverError } from "../../helpers/http/routeResponses";
 import { getMissingFields } from "../../helpers/http/validateBody";
 import {
-  findTemplatePlanByName,
-  respondTemplateNameTaken,
+  ensureTemplateNameAvailable,
 } from "../../helpers/queries/templates/templatePlanHelpers";
 
 export async function createTemplateName(
@@ -18,12 +17,7 @@ export async function createTemplateName(
   }
 
   try {
-    const existingTemplate = await findTemplatePlanByName(name);
-
-    if (existingTemplate.rows.length > 0) {
-      respondTemplateNameTaken(res);
-      return;
-    }
+    if (!(await ensureTemplateNameAvailable(name, res))) return;
 
     res.status(201).json({
       message: "De vluchttemplate is succesvol opgeslagen",

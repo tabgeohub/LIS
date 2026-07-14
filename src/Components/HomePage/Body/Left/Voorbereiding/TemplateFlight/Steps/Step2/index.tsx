@@ -1,13 +1,8 @@
-import ScrollButtonsLayout from "../../../../Common/ScrollButtonsLayout";
-import PointsList from "../../PointsList";
-import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
-import { useTemplateFlightState } from "../../templateFlightStates";
-import Buttons from "./Buttons";
 import { EnrichedPointType } from "Types";
-import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
-import { useState, useEffect, useMemo } from "react";
 import { useContent } from "hooks/useContent";
-import { matchesGeometryRepeat } from "@helpers/geometry/matchesGeometryRepeat";
+import { useTemplateFlightState } from "../../templateFlightStates";
+import TemplateSelectionStep from "../TemplateSelectionStep";
+import Buttons from "./Buttons";
 
 export default function Step2({
   setOpenFilter,
@@ -16,77 +11,19 @@ export default function Step2({
   setOpenFilter: (value: boolean) => void;
   filteredPoints: EnrichedPointType[];
 }) {
-  const {
-    selectedPoints,
-    setSelectedPoints,
-    selectedGeometries,
-    setSelectedGeometries,
-  } = useTemplateFlightState();
-  const { dbGeometries, setGeometries } = useGeometriesStore();
-  const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
-
-  useEffect(() => {
-    const herhalenGeometries = dbGeometries.filter((geometry) =>
-      matchesGeometryRepeat(geometry, true)
-    );
-
-    setGeometries(herhalenGeometries);
-    setFilteredGeometries(herhalenGeometries);
-  }, [dbGeometries, setGeometries]);
-
-  const [filterText, setFilterText] = useState("");
-
-  const displayedGeometries = useMemo(
-    () => filteredGeometries.filter((geometry) =>
-      geometry.omschrijving
-        .toLowerCase()
-        .includes(filterText.toLowerCase())
-    ),
-    [filteredGeometries, filterText]
-  );
-
-  const filteredPointsList = useMemo(
-    () => filteredPoints.filter((point) =>
-      point.herhalen === 1 &&
-      point.omschrijving
-        .toLowerCase()
-        .includes(filterText.toLowerCase())
-    ),
-    [filteredPoints, filterText]
-  );
-
+  const state = useTemplateFlightState();
   const content = useContent();
-
   return (
-    <ScrollButtonsLayout
-      className="h-[100%]"
+    <TemplateSelectionStep
+      repeat
+      text={content.voorbereiding.vluchtenTemplate.step2.text}
+      step={2}
+      filteredPoints={filteredPoints}
+      selectedPoints={state.selectedPoints}
+      setSelectedPoints={state.setSelectedPoints}
+      selectedGeometries={state.selectedGeometries}
+      setSelectedGeometries={state.setSelectedGeometries}
       buttons={<Buttons setOpenFilter={setOpenFilter} />}
-    >
-      <p className="text-gray-800 leading-3 text-[10px] p-3">
-        {content.voorbereiding.vluchtenTemplate.step2.text}
-      </p>
-
-      <input
-        type="text"
-        placeholder="Filter resultaten"
-        className="inputClass !rounded-lg !px-2 !py-0 !pb-0.5 placeholder:text-[10px]"
-        value={filterText}
-        onChange={(e) => setFilterText(e.target.value)}
-      />
-
-      <GeometriesList
-        selectedGeometries={selectedGeometries}
-        setSelectedGeometries={setSelectedGeometries}
-        geometries={displayedGeometries}
-      />
-
-      <PointsList
-        selectedPoints={selectedPoints}
-        setSelectedPoints={setSelectedPoints}
-        points={filteredPointsList}
-        step={2}
-        hideHeader={true}
-      />
-    </ScrollButtonsLayout>
+    />
   );
 }

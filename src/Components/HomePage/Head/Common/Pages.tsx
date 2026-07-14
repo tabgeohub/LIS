@@ -1,31 +1,13 @@
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { pages } from "../constants";
 import { motion } from "framer-motion";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import {
-  clearRightListHover,
-  removeTimesliderHighlights,
-} from "@helpers/timeslider";
 import Users from "../Users";
 import Search from "../Search";
-import useLogAction from "hooks/useLogAction";
+import { usePageSelection } from "./usePageSelection";
 
 export default function Pages() {
-  const { selectedPage, selectedTab, setSelectedPage, setSelectedTab } =
-    useTabState();
-  const { setOpenSideBar } = useOpeSideBarState();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const resetTimeslider = useTimesliderState((s) => s.reset);
-  const yellowGraphicsLayer = useMapViewState((s) => s.yellowGraphicsLayer);
-  const graphicsLayerHover = useMapViewState((s) => s.graphicsLayerHover);
-
   const { user } = useAuth();
-
-  const logAction = useLogAction();
+  const { selectedPage, selectPage } = usePageSelection();
 
   return (
     <div className="flex justify-between bg-gray-200 border-[1px] border-gray-300 w-[100%]">
@@ -37,32 +19,7 @@ export default function Pages() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             animate={{ opacity: selectedPage === tab.value ? 1 : 0.6 }}
-            onClick={() => {
-              const leavingTimeSlider =
-                selectedPage === "timeslider" && tab.value !== "timeslider";
-
-              if (leavingTimeSlider) {
-                if (yellowGraphicsLayer) {
-                  removeTimesliderHighlights(yellowGraphicsLayer);
-                }
-                if (graphicsLayerHover) {
-                  clearRightListHover(graphicsLayerHover);
-                }
-                resetTimeslider();
-                setOpenSideBar(false);
-                setSelectedTab("none");
-                setSelectedBottomTab("Kaartlagenlijst");
-              }
-
-              setSelectedPage(tab.value);
-              if (tab.value === "timeslider") {
-                // Reuse existing left panel flow and content.
-                if (selectedTab !== "timeslider") setSelectedTab("timeslider");
-                setOpenSideBar(true);
-              }
-
-              logAction({ message: `User selected ${tab.label} page` });
-            }}
+            onClick={() => selectPage(tab.value, tab.label)}
             className={`relative px-4 py-1 border-[1px] ${
               selectedPage === tab.value && user.user_id !== 0
                 ? "bg-gray-100 rounded-t-[5px] text-primary/75 border-gray-300 border-b-gray-100 -mb-[1px]"

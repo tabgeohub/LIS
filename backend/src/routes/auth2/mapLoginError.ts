@@ -44,12 +44,13 @@ export function buildStep2LoginFailureBody(
   };
 }
 
-function logMapLoginErrorClassifierDebug(
-  error: unknown,
-  options: MapLoginErrorContext,
-  kind: string,
-  finalDecision: string
-): void {
+function logMapLoginErrorClassifierDebug(input: {
+  error: unknown;
+  options: MapLoginErrorContext;
+  kind: string;
+  finalDecision: string;
+}): void {
+  const { error, options, kind, finalDecision } = input;
   const realError = extractGrantError(error);
   const otpWasSent =
     options.otpWasSent ?? options.loginStep === "otp";
@@ -95,7 +96,12 @@ export function mapLoginError(
 
   if (kind === "invalid_otp") {
     const body = buildStep2LoginFailureBody("otp_incorrect");
-    logMapLoginErrorClassifierDebug(error, options, kind, "otp_incorrect");
+    logMapLoginErrorClassifierDebug({
+      error,
+      options,
+      kind,
+      finalDecision: "otp_incorrect",
+    });
     return { status: 401, body };
   }
 
@@ -104,12 +110,12 @@ export function mapLoginError(
     (kind === "ambiguous_invalid_grant" || kind === "unknown")
   ) {
     const body = buildStep2LoginFailureBody("password_or_otp_incorrect");
-    logMapLoginErrorClassifierDebug(
+    logMapLoginErrorClassifierDebug({
       error,
       options,
       kind,
-      "password_or_otp_incorrect"
-    );
+      finalDecision: "password_or_otp_incorrect",
+    });
     return { status: 401, body };
   }
 
@@ -119,7 +125,12 @@ export function mapLoginError(
     kind === "unknown"
   ) {
     const body = buildStep2LoginFailureBody("password_incorrect");
-    logMapLoginErrorClassifierDebug(error, options, kind, "password_incorrect");
+    logMapLoginErrorClassifierDebug({
+      error,
+      options,
+      kind,
+      finalDecision: "password_incorrect",
+    });
     return { status: 401, body };
   }
 

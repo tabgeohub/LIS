@@ -23,14 +23,23 @@ export async function authenticateLogin(req: Request, credentials: LoginCredenti
   };
 }
 
-function logLoginFailure(
-  req: Request,
-  error: unknown,
-  otpUsed: boolean,
-  status: number,
-  code?: string,
-  step2Kind?: string
-) {
+type LoginFailureLog = {
+  req: Request;
+  error: unknown;
+  otpUsed: boolean;
+  status: number;
+  code?: string;
+  step2Kind?: string;
+};
+
+function logLoginFailure({
+  req,
+  error,
+  otpUsed,
+  status,
+  code,
+  step2Kind,
+}: LoginFailureLog) {
   logAuthSecurityEvent("auth2.login.failure", {
     status,
     code,
@@ -57,7 +66,14 @@ export async function respondToLoginFailure(input: {
         loginStep: "otp",
       });
       const body = buildStep2LoginFailureBody(kind);
-      logLoginFailure(req, error, true, 401, body.code, kind);
+      logLoginFailure({
+        req,
+        error,
+        otpUsed: true,
+        status: 401,
+        code: body.code,
+        step2Kind: kind,
+      });
       return res.status(401).json(body);
     }
   }
@@ -70,6 +86,6 @@ export async function respondToLoginFailure(input: {
     loginStep: otpUsed ? "otp" : "password",
     hasOtp: lookupForDebug?.ok ? lookupForDebug.hasOtp : null,
   });
-  logLoginFailure(req, error, otpUsed, status, body.code);
+  logLoginFailure({ req, error, otpUsed, status, code: body.code });
   return res.status(status).json(body);
 }

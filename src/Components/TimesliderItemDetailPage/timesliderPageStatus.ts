@@ -19,27 +19,30 @@ export function buildTimesliderPageStatus(input: TimesliderPageStatusInput) {
     input.noMatchingPlans ||
     input.allPlansLoading;
 
-  const plansEmptyHint = input.invalidQuery
-    ? input.queryError ?? undefined
-    : input.needsAuth
-      ? "Log in om plannen te laden."
-      : input.plansError ?? undefined;
-
-  const emptyMain = input.invalidQuery
-    ? (input.queryError ?? "Ongeldige link.")
-    : input.needsAuth
-      ? "Log in om afbeeldingen te bekijken."
-      : input.plansError
-        ? input.plansError
-        : input.noPlansInRange
-          ? "Geen voltooide plannen in deze periode."
-          : input.noMatchingPlans
-            ? "Dit item komt niet voor in de plannen van deze periode."
-            : !input.imagesLoading && input.imagesLength === 0
-              ? "Geen afbeeldingen voor deze selectie."
-              : null;
+  const plansEmptyHint = resolvePlansEmptyHint(input);
+  const emptyMain = resolveEmptyMainMessage(input);
 
   return { blockImages, plansEmptyHint, emptyMain };
+}
+
+function resolvePlansEmptyHint(input: TimesliderPageStatusInput) {
+  if (input.invalidQuery) return input.queryError ?? undefined;
+  if (input.needsAuth) return "Log in om plannen te laden.";
+  return input.plansError ?? undefined;
+}
+
+function resolveEmptyMainMessage(input: TimesliderPageStatusInput) {
+  if (input.invalidQuery) return input.queryError ?? "Ongeldige link.";
+  if (input.needsAuth) return "Log in om afbeeldingen te bekijken.";
+  if (input.plansError) return input.plansError;
+  if (input.noPlansInRange) return "Geen voltooide plannen in deze periode.";
+  if (input.noMatchingPlans) {
+    return "Dit item komt niet voor in de plannen van deze periode.";
+  }
+  if (!input.imagesLoading && input.imagesLength === 0) {
+    return "Geen afbeeldingen voor deze selectie.";
+  }
+  return null;
 }
 
 export function buildImageNavigation(input: {

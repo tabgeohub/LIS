@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { LayerItem } from "./LayerItem";
-import { ParentItem } from "./ParentItem";
 import { LegendLayerDefinition } from "../helpers/layerTypes";
 import { useLegendLayers } from "../helpers/useLegendLayers";
+import LegendSectionLayout from "./LegendSectionLayout";
 
 type LegendSectionProps = {
   initialLayers: LegendLayerDefinition[];
@@ -21,29 +20,6 @@ type LegendSectionProps = {
   /** Restore checked state from kaartlagenState.selectedLayers (NNederland). */
   syncFromSelectedLayers?: boolean;
 };
-
-function LayerItemsList({
-  layers,
-  handleLayerChange,
-  isDisabled = false,
-}: {
-  layers: LegendLayerDefinition[];
-  handleLayerChange: (id: string, checked: boolean) => void;
-  isDisabled?: boolean;
-}) {
-  return (
-    <>
-      {layers.map((layer) => (
-        <LayerItem
-          key={layer.id}
-          layer={layer}
-          onLayerChange={handleLayerChange}
-          isDisabled={isDisabled}
-        />
-      ))}
-    </>
-  );
-}
 
 export default function LegendSection({
   initialLayers,
@@ -85,48 +61,19 @@ export default function LegendSection({
     return null;
   }
 
-  const childDisabled = gatedByParent && parentGateChecked === false;
-
-  const nestedDisabled =
-    childDisabled || (nestedParentTitle ? !nestedParentChecked : false);
-
-  const layerList = (
-    <LayerItemsList
+  return (
+    <LegendSectionLayout
       layers={filteredLayers}
       handleLayerChange={handleLayerChange}
-      isDisabled={nestedParentTitle ? nestedDisabled : childDisabled}
+      parentTitle={parentTitle}
+      parentChecked={parentChecked}
+      setParentChecked={setParentChecked}
+      externalParentChecked={externalParentChecked}
+      nestedParentTitle={nestedParentTitle}
+      nestedParentChecked={nestedParentChecked}
+      setNestedParentChecked={setNestedParentChecked}
+      gateNestedByRole={gateNestedByRole}
+      isVisibleForRole={isVisibleForRole}
     />
   );
-
-  const nestedContent =
-    nestedParentTitle && (!gateNestedByRole || isVisibleForRole) ? (
-      <ParentItem
-        title={nestedParentTitle}
-        checked={nestedParentChecked}
-        setChecked={setNestedParentChecked}
-        isDisabled={externalParentChecked === false}
-      >
-        <div className="pl-8">{layerList}</div>
-      </ParentItem>
-    ) : (
-      layerList
-    );
-
-  if (parentTitle) {
-    return (
-      <ParentItem
-        title={parentTitle}
-        checked={parentChecked}
-        setChecked={setParentChecked}
-      >
-        <div className="pl-8">{nestedContent}</div>
-      </ParentItem>
-    );
-  }
-
-  if (nestedParentTitle) {
-    return <>{nestedContent}</>;
-  }
-
-  return <div>{nestedContent}</div>;
 }

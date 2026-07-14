@@ -1,9 +1,8 @@
-import dayjs from "dayjs";
 import useLogAction from "hooks/useLogAction";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
-import { FaMapMarkedAlt } from "react-icons/fa";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlanMapHighlight } from "hooks/hover-click-handlers/useFinishedPlanMapHighlight";
+import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
 
 export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   const { selectedPlan, setSelectedPlan } = useCreateReportState();
@@ -39,17 +38,7 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
         ${selectedPlan === plan && "bg-gray-100"}
         hover:cursor-pointer hover:bg-gray-100 relative`}
     >
-      <div className="flex items-center gap-x-2">
-        <FaMapMarkedAlt className="size-6 text-blue-500" />
-        <p className="text-[12px]">{plan.vluchtnummer}</p>
-      </div>
-
-      <div className="text-[10px] text-gray-500 mt-2">
-        <p>Omschrijving: {plan.omschrijving}</p>
-        <p>Doel en hoofdthema: {plan.hoofdthema}</p>
-        <p>Aanvullende informatie: {plan.aanvullende}</p>
-        <p>Inspectiedatum: {dayjs(plan.datum).format("YYYY-MM-DD")}</p>
-      </div>
+      <FlightPlanSummary plan={plan} />
     </div>
   );
 }

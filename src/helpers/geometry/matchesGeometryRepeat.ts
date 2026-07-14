@@ -1,5 +1,5 @@
 export function matchesGeometryRepeat(
-  geometry: { herhalen: number | string | boolean },
+  geometry: { herhalen?: number | string | boolean },
   repeat: boolean
 ) {
   if (typeof geometry.herhalen === "number") {

@@ -19,6 +19,16 @@ export function respondTemplateNameTaken(res: Response): void {
   });
 }
 
+export async function ensureTemplateNameAvailable(
+  name: string,
+  res: Response
+): Promise<boolean> {
+  const existingTemplate = await findTemplatePlanByName(name);
+  if (existingTemplate.rows.length === 0) return true;
+  respondTemplateNameTaken(res);
+  return false;
+}
+
 export async function fetchTemplateFlightPlanList(
   req: Request,
   res: Response

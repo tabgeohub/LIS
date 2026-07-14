@@ -3,8 +3,7 @@ import { pool } from "../../db";
 import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
 import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
 import {
-  findTemplatePlanByName,
-  respondTemplateNameTaken,
+  ensureTemplateNameAvailable,
 } from "../../helpers/queries/templates/templatePlanHelpers";
 
 export async function createTemplateFlightPlan(
@@ -22,12 +21,7 @@ export async function createTemplateFlightPlan(
   }
 
   try {
-    const existingTemplate = await findTemplatePlanByName(name);
-
-    if (existingTemplate.rows.length > 0) {
-      respondTemplateNameTaken(res);
-      return;
-    }
+    if (!(await ensureTemplateNameAvailable(name, res))) return;
 
     const result = await pool.query(
       `INSERT INTO lis.template_plans (

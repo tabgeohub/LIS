@@ -6,6 +6,7 @@ import {
   useGeometriesStore,
   Geometry,
 } from "hooks/features/useGeometriesStore";
+import SelectableGeometryList from "./SelectableGeometryList";
 
 export default function CurrentGeometriesList() {
   const { selectedPlan, currentGeometries, setCurrentGeometries } =
@@ -34,14 +35,6 @@ export default function CurrentGeometriesList() {
     }
   }, [selectedPlan, dbGeometries, setCurrentGeometries]);
 
-  function handleGeometryChange(id: number) {
-    if (currentGeometries.includes(id)) {
-      setCurrentGeometries(currentGeometries.filter((g) => g !== id));
-    } else {
-      setCurrentGeometries([...currentGeometries, id]);
-    }
-  }
-
   const content = useContent();
 
   // Don't render if no geometries available
@@ -59,29 +52,11 @@ export default function CurrentGeometriesList() {
         {content.voorbereiding.vluchtplanHergebruiken.step2.geometriesText2}
       </p>
 
-      <div className="pr-2 mt-2 mb-4 pl-10">
-        <div className="mt-2 border w-full border-gray-300 overflow-y-scroll">
-          {planGeometries.map((geometry) => (
-            <div
-              key={geometry.id}
-              onClick={() => handleGeometryChange(geometry.id)}
-              className={`flex items-center cursor-pointer gap-x-2 px-1.5 pt-0.5 ${
-                currentGeometries.includes(geometry.id) ? "bg-gray-200" : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                className="size-3 cursor-pointer"
-                checked={currentGeometries.includes(geometry.id)}
-                onChange={() => handleGeometryChange(geometry.id)}
-              />
-              <label className="text-[12px] cursor-pointer">
-                {geometry.omschrijving || `Geometrie ${geometry.id}`}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
+      <SelectableGeometryList
+        geometries={planGeometries}
+        selectedIds={currentGeometries}
+        setSelectedIds={setCurrentGeometries}
+      />
     </div>
   );
 }

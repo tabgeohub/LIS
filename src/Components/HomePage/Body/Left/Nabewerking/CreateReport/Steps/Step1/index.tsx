@@ -1,16 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 import PeriodFilter from "../PeriodFilter";
 import SinglePlan from "./SinglePlan";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useEffect } from "react";
-import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import { useContent } from "hooks/useContent";
+import { useFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
 
 export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
   const { openFilter } = useCreateReportState();
-  const filterPlans = useFilterPlans();
-
   const {
     periode,
     dateFrom,
@@ -20,22 +16,14 @@ export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
     setFilteredPlans,
   } = useCreateReportState();
 
-  useEffect(() => {
-    if (!plans) return;
-
-    const sortedPlansByCreatedAt = plans.sort((a, b) =>
-      a.datum > b.datum ? -1 : 1
-    );
-
-    filterPlans({
-      setFilteredPlans,
-      plans: sortedPlansByCreatedAt,
-      filterText: filterTerm,
-      dateFrom,
-      dateTo,
-      periodFilter: periode,
-    });
-  }, [plans, filterTerm, periode]);
+  useFilteredSortedPlans({
+    plans,
+    filterText: filterTerm,
+    periodFilter: periode,
+    dateFrom,
+    dateTo,
+    setFilteredPlans,
+  });
 
   const content = useContent();
 

@@ -1,49 +1,23 @@
 import { create } from "zustand";
+import {
+  createFilterStoreSetters,
+  emptyFilterStoreValues,
+  FilterStoreSetters,
+  FilterStoreValues,
+} from "./filterStoreState";
 
-export type PeriodType = "Alle" | "Laatste 4 weken" | "Periodoe van-tot";
+export type { PeriodType } from "./filterStoreState";
 
-interface PointsFilterState {
-  filterText: string;
-  setFilterText: (value: string) => void;
-
+interface PointsFilterState extends FilterStoreValues, FilterStoreSetters {
   activityFilter: string;
   setActivityFilter: (value: string) => void;
-
-  periodFilter: PeriodType;
-  setPeriodFilter: (value: PeriodType) => void;
-
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-
-  dateTo: string;
-  setDateTo: (value: string) => void;
-
   resetFilters: () => void;
 }
 
 export const usePointsFilterStore = create<PointsFilterState>((set) => ({
-  filterText: "",
-  setFilterText: (value) => set({ filterText: value }),
-
+  ...emptyFilterStoreValues,
+  ...createFilterStoreSetters(set),
   activityFilter: "",
   setActivityFilter: (value) => set({ activityFilter: value }),
-
-  periodFilter: "Alle",
-  setPeriodFilter: (value) => set({ periodFilter: value }),
-
-  dateFrom: "",
-  setDateFrom: (value) => set({ dateFrom: value }),
-
-  dateTo: "",
-  setDateTo: (value) => set({ dateTo: value }),
-
-  resetFilters: () => {
-    set({
-      filterText: "",
-      activityFilter: "",
-      periodFilter: "Alle",
-      dateFrom: "",
-      dateTo: "",
-    });
-  },
+  resetFilters: () => set({ ...emptyFilterStoreValues, activityFilter: "" }),
 }));

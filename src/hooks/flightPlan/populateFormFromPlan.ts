@@ -1,4 +1,7 @@
-import { FlightPlanFormFieldSetters } from "hooks/zustand/shared/flightPlanFormFields";
+import {
+  applyFlightPlanFormValues,
+  FlightPlanFormFieldSetters,
+} from "hooks/zustand/shared/flightPlanFormFields";
 
 export type FlightPlanFormSource = {
   omschrijving?: string;
@@ -16,13 +19,15 @@ export function populateFormFromPlan(
   plan: FlightPlanFormSource,
   setters: FlightPlanFormFieldSetters
 ): void {
-  setters.setOmschrijving(plan.omschrijving ?? "");
-  setters.setWaarnemer(plan.waarnemer ?? "");
-  setters.setPiloot(plan.piloot ?? "");
-  setters.setDatum(plan.datum ?? "");
-  setters.setGeplandeVliegduur(plan.vliegduur ?? "");
-  setters.setTypeLuchtvaartuig(plan.luchtvaartuig ?? "");
-  setters.setAantalPassagiers(plan.passagiers ?? null);
-  setters.setDoelEnHoofdthema(plan.hoofdthema ?? "");
-  setters.setAanvullendeInfo(plan.aanvullende ?? "");
+  applyFlightPlanFormValues(setters, {
+    omschrijving: plan.omschrijving ?? "",
+    waarnemer: plan.waarnemer ?? "",
+    piloot: plan.piloot ?? "",
+    datum: plan.datum ?? "",
+    geplandeVliegduur: plan.vliegduur ?? "",
+    typeLuchtvaartuig: plan.luchtvaartuig ?? "",
+    aantalPassagiers: plan.passagiers ?? null,
+    doelEnHoofdthema: plan.hoofdthema ?? "",
+    aanvullendeInfo: plan.aanvullende ?? "",
+  });
 }

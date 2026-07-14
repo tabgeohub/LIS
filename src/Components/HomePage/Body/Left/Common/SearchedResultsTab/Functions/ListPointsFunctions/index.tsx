@@ -19,6 +19,7 @@ import {
   exportPointsPlansGeoJsonZip,
   exportPointsPlansXlsx,
 } from "@helpers/tableExports/pointsPlansTableExport";
+import SearchedResultsActionsMenu from "../../shared/SearchedResultsActionsMenu";
 
 export default function ListPointFunctions({
   setFase,
@@ -75,144 +76,21 @@ export default function ListPointFunctions({
 
   const content = useContent();
 
+  const labels = content.layout.searchResult.listPointFunctions;
+  const noop = () => {};
   return (
-    <div className="absolute top-[100%] right-0 z-10 bg-white rounded-md shadow-md w-[350px] max-h-[330px] overflow-y-auto border border-gray-300 thin-scrollbar">
-      <div
-        className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-        onClick={tableView}
-      >
-        <div>
-          <MdTableChart className="text-2xl text-primary mt-1" />
-        </div>
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.tableView.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.tableView.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b">
-        <MdOutlineZoomOutMap className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.zoomAll.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.zoomAll.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-        onClick={() => setFase("buffer")}
-      >
-        <MdDonutLarge className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.bufferOptions.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {
-              content.layout.searchResult.listPointFunctions.bufferOptions
-                .subtitle
-            }
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-        onClick={exportCsv}
-      >
-        <BsFiletypeCsv className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.exportCsv.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.exportCsv.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-        onClick={exportXlsx}
-      >
-        <BsFiletypeXlsx className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.exportXlsx.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.exportXlsx.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b"
-        onClick={exportShp}
-      >
-        <BsFiletypeJson className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.exportShp.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.exportShp.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b">
-        <MdFolderOpen className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.openSaved.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.openSaved.subtitle}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b">
-        <MdSave className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.saveResults.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {
-              content.layout.searchResult.listPointFunctions.saveResults
-                .subtitle
-            }
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b">
-        <MdLayers className="text-2xl text-primary mt-1" />
-        <div>
-          <p className="text-[14px] font-semibold text-gray-800">
-            {
-              content.layout.searchResult.listPointFunctions.combineResults
-                .title
-            }
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {
-              content.layout.searchResult.listPointFunctions.combineResults
-                .subtitle
-            }
-          </p>
-        </div>
-      </div>
-    </div>
+    <SearchedResultsActionsMenu
+      actions={[
+        { key: "table", icon: <MdTableChart className="text-2xl text-primary mt-1" />, title: labels.tableView.title, description: labels.tableView.subtitle, onClick: tableView },
+        { key: "zoom", icon: <MdOutlineZoomOutMap className="text-2xl text-primary mt-1" />, title: labels.zoomAll.title, description: labels.zoomAll.subtitle, onClick: noop },
+        { key: "buffer", icon: <MdDonutLarge className="text-2xl text-primary mt-1" />, title: labels.bufferOptions.title, description: labels.bufferOptions.subtitle, onClick: () => setFase("buffer") },
+        { key: "csv", icon: <BsFiletypeCsv className="text-2xl text-primary mt-1" />, title: labels.exportCsv.title, description: labels.exportCsv.subtitle, onClick: exportCsv },
+        { key: "xlsx", icon: <BsFiletypeXlsx className="text-2xl text-primary mt-1" />, title: labels.exportXlsx.title, description: labels.exportXlsx.subtitle, onClick: exportXlsx },
+        { key: "shp", icon: <BsFiletypeJson className="text-2xl text-primary mt-1" />, title: labels.exportShp.title, description: labels.exportShp.subtitle, onClick: exportShp },
+        { key: "open", icon: <MdFolderOpen className="text-2xl text-primary mt-1" />, title: labels.openSaved.title, description: labels.openSaved.subtitle, onClick: noop },
+        { key: "save", icon: <MdSave className="text-2xl text-primary mt-1" />, title: labels.saveResults.title, description: labels.saveResults.subtitle, onClick: noop },
+        { key: "combine", icon: <MdLayers className="text-2xl text-primary mt-1" />, title: labels.combineResults.title, description: labels.combineResults.subtitle, onClick: noop },
+      ]}
+    />
   );
 }

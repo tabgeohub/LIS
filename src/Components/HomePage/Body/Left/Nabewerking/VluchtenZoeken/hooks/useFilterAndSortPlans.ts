@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from "react";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useFilterPlans } from "hooks/filters/useFilterPlans";
+import { useFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
 
 /**
  * Hook to filter and sort plans based on filter criteria
@@ -11,7 +9,6 @@ export function useFilterAndSortPlans(
   plans: FinishedFlightPlanType[] | undefined,
   filterTerm: string
 ) {
-  const filterPlans = useFilterPlans();
   const {
     periode,
     dateFrom,
@@ -19,21 +16,13 @@ export function useFilterAndSortPlans(
     setFilteredPlans,
   } = useFinishedPlansState();
 
-  useEffect(() => {
-    if (!plans) return;
-
-    const sortedPlansByCreatedAt = plans.sort((a, b) =>
-      a.datum > b.datum ? -1 : 1
-    );
-
-    filterPlans({
-      setFilteredPlans,
-      plans: sortedPlansByCreatedAt,
-      filterText: filterTerm,
-      dateFrom,
-      dateTo,
-      periodFilter: periode,
-    });
-  }, [plans, filterTerm, dateFrom, dateTo, periode]);
+  useFilteredSortedPlans({
+    plans,
+    filterText: filterTerm,
+    periodFilter: periode,
+    dateFrom,
+    dateTo,
+    setFilteredPlans,
+  });
 }
 

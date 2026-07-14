@@ -3,7 +3,10 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
-import { emptyFlightPlanFormFields } from "hooks/zustand/shared/flightPlanFormFields";
+import {
+  applyFlightPlanFormValues,
+  viewPlanFlightPlanFormDefaults,
+} from "hooks/zustand/shared/flightPlanFormFields";
 
 export function resetViewPlanSession(input: {
   setVluchtnummer: (value: string) => void;
@@ -34,20 +37,9 @@ export function resetViewPlanSession(input: {
   input.resetFeatures();
   input.setOpenTable(false);
   input.setVluchtnummer("");
-  input.setViewPlanState.setOmschrijving(emptyFlightPlanFormFields.omschrijving);
-  input.setViewPlanState.setWaarnemer(emptyFlightPlanFormFields.waarnemer);
-  input.setViewPlanState.setPiloot(emptyFlightPlanFormFields.piloot);
-  input.setViewPlanState.setDatum(emptyFlightPlanFormFields.datum);
-  input.setViewPlanState.setGeplandeVliegduur("0:00");
-  input.setViewPlanState.setTypeLuchtvaartuig(
-    emptyFlightPlanFormFields.typeLuchtvaartuig
-  );
-  input.setViewPlanState.setAantalPassagiers(0);
-  input.setViewPlanState.setDoelEnHoofdthema(
-    emptyFlightPlanFormFields.doelEnHoofdthema
-  );
-  input.setViewPlanState.setAanvullendeInfo(
-    emptyFlightPlanFormFields.aanvullendeInfo
+  applyFlightPlanFormValues(
+    input.setViewPlanState,
+    viewPlanFlightPlanFormDefaults
   );
   input.setViewPlanState.setOpenFilter(false);
   input.setSelectedTab("none");

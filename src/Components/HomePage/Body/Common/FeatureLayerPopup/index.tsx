@@ -2,6 +2,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoCloseOutline } from "react-icons/io5";
 import useFeatureLayerPopup from "hooks/hover-click-handlers/useFeatureLayerPopup";
 import { useEffect, useState } from "react";
+import {
+  buildPopupDisplayAttributes,
+  resolvePopupPosition,
+} from "./featureLayerPopupFormatting";
 
 export default function FeatureLayerPopup() {
   const { popupData, closePopup } = useFeatureLayerPopup();
@@ -10,48 +14,14 @@ export default function FeatureLayerPopup() {
   useEffect(() => {
     if (!popupData) return;
 
-    // Position popup to the right of the clicked point with some offset
-    const offsetX = 20;
-    const offsetY = -50; // Center vertically on the point
-
-    setPosition({
-      x: popupData.screenPoint.x + offsetX,
-      y: popupData.screenPoint.y + offsetY,
-    });
+    setPosition(resolvePopupPosition(popupData.screenPoint));
   }, [popupData]);
 
   if (!popupData) {
     return null;
   }
 
-  // Filter out internal ArcGIS fields and format the attributes
-  const displayAttributes = Object.entries(popupData.attributes)
-    .filter(([key]) => {
-      // Exclude internal ArcGIS fields and metadata fields
-      const lowerKey = key.toLowerCase();
-      return (
-        !key.startsWith("OBJECTID") &&
-        key !== "FID" &&
-        key !== "Shape" &&
-        key !== "Shape_Length" &&
-        key !== "Shape_Area" &&
-        lowerKey !== "globalid" &&
-        lowerKey !== "global_id" &&
-        lowerKey !== "created_user" &&
-        lowerKey !== "created_user" &&
-        lowerKey !== "created_date" &&
-        lowerKey !== "createddate" &&
-        lowerKey !== "last_edited_user" &&
-        lowerKey !== "lastediteduser" &&
-        lowerKey !== "last_edited_date" &&
-        lowerKey !== "lastediteddate"
-      );
-    })
-    .map(([key, value]) => ({
-      label: formatFieldName(key),
-      value: formatValue(value),
-    }))
-    .filter((item) => item.value !== null && item.value !== undefined);
+  const displayAttributes = buildPopupDisplayAttributes(popupData.attributes);
 
   return (
     <AnimatePresence>
@@ -105,54 +75,4 @@ export default function FeatureLayerPopup() {
       </motion.div>
     </AnimatePresence>
   );
-}
-
-// Helper function to format field names (convert snake_case to Title Case)
-function formatFieldName(key: string): string {
-  return key
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-// Helper function to format values
-function formatValue(value: any): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  if (typeof value === "boolean") {
-    return value ? "Ja" : "Nee";
-  }
-
-  if (typeof value === "number") {
-    // Check if it's a date (timestamp)
-    if (value > 1000000000000) {
-      // Likely a timestamp in milliseconds
-      try {
-        return new Date(value).toLocaleString("nl-NL");
-      } catch {
-        return value.toString();
-      }
-    }
-    return value.toString();
-  }
-
-  if (typeof value === "string") {
-    // Check if it's a date string
-    if (value.match(/^\d{4}-\d{2}-\d{2}/)) {
-      try {
-        return new Date(value).toLocaleString("nl-NL");
-      } catch {
-        return value;
-      }
-    }
-    return value;
-  }
-
-  if (typeof value === "object") {
-    return JSON.stringify(value, null, 2);
-  }
-
-  return String(value);
 }

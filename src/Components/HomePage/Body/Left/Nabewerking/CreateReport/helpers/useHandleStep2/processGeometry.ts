@@ -1,6 +1,10 @@
 import { calculateGeometryCentroid } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { BaseGeometryData } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import { ProcessGeometryParams, ProcessedItem } from "./types";
+import {
+  pickReportProcessContext,
+  ProcessGeometryParams,
+  ProcessedItem,
+} from "./types";
 import { addGeometryReportGraphic } from "./addGeometryReportGraphic";
 import { runReportGenerationPipeline } from "./reportGenerationPipeline";
 
@@ -27,16 +31,8 @@ export async function processGeometry(
     index,
     totalItems,
     pointsOffset,
-    selectedPlan,
-    activities,
-    organizations,
     attachmentsByGeometry,
-    featureLayerUrl,
     tempLayer,
-    mapServerUrl,
-    pilootOptions,
-    logoDataUrl,
-    setZippingStatus,
   } = params;
 
   const { firstPoint, centroid, description } =
@@ -44,22 +40,15 @@ export async function processGeometry(
   const currentIndex = pointsOffset + index + 1;
 
   return runReportGenerationPipeline({
-    setZippingStatus,
+    ...pickReportProcessContext(params),
     statusMessage: `Rapport ${currentIndex} van ${totalItems} wordt gegenereerd: '${description}'`,
     filenamePrefix: "Geometry",
     renderOnMap: () => addGeometryReportGraphic(tempLayer, geometry),
-    selectedPlan,
     point: firstPoint,
-    activities,
-    organizations,
     omschrijving: description,
     aanvullende: geometry.id,
     longitude: centroid.longitude,
     latitude: centroid.latitude,
     cachedAttachments: attachmentsByGeometry.get(geometry.id),
-    featureLayerUrl,
-    mapServerUrl,
-    pilootOptions,
-    logoDataUrl,
   });
 }

@@ -29,28 +29,18 @@ type BuildTimesliderPageViewInput = {
 };
 
 export function buildTimesliderPageView(input: BuildTimesliderPageViewInput) {
-  const imageRows =
-    input.kind === "point"
-      ? input.pointResult.images
-      : input.geometryResult.images;
-
-  const firstImageUrlByPlanId: Record<number, string> = {};
-  for (const row of imageRows) {
-    if (firstImageUrlByPlanId[row.plan_id] || !row.url) continue;
-    firstImageUrlByPlanId[row.plan_id] = attachmentDisplayUrl(row.url);
-  }
+  const activeImageResult =
+    input.kind === "point" ? input.pointResult : input.geometryResult;
+  const imageRows = activeImageResult.images;
+  const firstImageUrlByPlanId = buildFirstImageUrlByPlanId(imageRows);
 
   const rowsForSelectedPlan = input.selectedPlan
     ? imageRows.filter((row) => row.plan_id === input.selectedPlan!.id)
     : [];
 
   const images = pointPlanImagesToAttachments(rowsForSelectedPlan);
-  const imagesLoading =
-    input.kind === "point"
-      ? input.pointResult.loading
-      : input.geometryResult.loading;
-  const imagesError =
-    input.kind === "point" ? input.pointResult.error : input.geometryResult.error;
+  const imagesLoading = activeImageResult.loading;
+  const imagesError = activeImageResult.error;
 
   return {
     queryError: input.ok ? null : input.queryReason,
@@ -78,4 +68,14 @@ export function buildTimesliderPageView(input: BuildTimesliderPageViewInput) {
       input.allPlans.length > 0 &&
       input.filteredPlans.length === 0,
   };
+}
+
+function buildFirstImageUrlByPlanId(imageRows: PointPlanImageRow[]) {
+  const urls: Record<number, string> = {};
+  for (const row of imageRows) {
+    if (!urls[row.plan_id] && row.url) {
+      urls[row.plan_id] = attachmentDisplayUrl(row.url);
+    }
+  }
+  return urls;
 }

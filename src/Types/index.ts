@@ -100,7 +100,7 @@ export interface PDFPointDataType {
   activiteit: string;
   regio: string;
   omschrijving: string;
-  aanvullende: number;
+  aanvullende: string | number;
   rdX: number;
   rdY: number;
   long: number;
