@@ -78,11 +78,6 @@ RUN npm ci --omit=dev
 COPY --from=build /usr/src/app/dist ./dist
 COPY .env ./
 
-# Non-root runtime user (CWE-266 / KICS Missing User Instruction)
-RUN groupadd -r app && useradd -r -g app app \
- && chown -R app:app /usr/src/app
-USER app
-
 # Adjust if your app listens on another port
 EXPOSE 80
 

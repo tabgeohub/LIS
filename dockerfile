@@ -28,11 +28,5 @@ COPY --from=build /usr/src/app/build/ ./
 # Optional custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Non-root runtime (CWE-266). Port 8080 so nginx can bind without CAP_NET_BIND_SERVICE.
-RUN chown -R nginx:nginx /usr/share/nginx/html \
- && chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run \
- && touch /var/run/nginx.pid && chown nginx:nginx /var/run/nginx.pid
-USER nginx
-
-EXPOSE 8080
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
