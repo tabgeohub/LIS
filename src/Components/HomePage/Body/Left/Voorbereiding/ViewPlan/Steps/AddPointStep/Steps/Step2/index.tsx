@@ -2,13 +2,13 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 import { useState } from "react";
-import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { SpatialReference } from "Types";
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import { createNewPoint } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
 import { useContent } from "hooks/useContent";
+import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
+import useCoordinatesWatcher from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/Steps/Step2/useCoordinatesWatcher";
 
 export default function Step2({
   handleCancel,
@@ -65,19 +65,7 @@ export default function Step2({
     });
   }
 
-  useCoordinateSystemSync({
-    coordinateSystem,
-    rdX: xCoord,
-    rdY: yCoord,
-    latitude,
-    longitude,
-    patchCoords: (patch) => {
-      if (patch.longitude !== undefined) setLongitude(patch.longitude);
-      if (patch.latitude !== undefined) setLatitude(patch.latitude);
-      if (patch.rdX !== undefined) setXCoord(patch.rdX);
-      if (patch.rdY !== undefined) setYCoord(patch.rdY);
-    },
-  });
+  useCoordinatesWatcher();
 
   const content = useContent();
 
@@ -87,107 +75,32 @@ export default function Step2({
         {content.voorbereiding.vluchtplanInformatie.addPointStep.step2.text}
       </p>
 
-      <div className="mt-6 space-y-3">
-        <div className="grid grid-cols-6 gap-x-2 items-center">
-          <p className="col-span-2 labelClass">
-            {
-              content.voorbereiding.vluchtplanInformatie.addPointStep.step2
-                .Coördinatensysteem
-            }
-            :
-          </p>
-
-          <select
-            className="col-span-4 inputClass"
-            name=""
-            id=""
-            value={coordinateSystem}
-            onChange={(e) =>
-              setCoordinateSystem(e.target.value as SpatialReference)
-            }
-          >
-            <option value="RD">
-              {content.voorbereiding.vluchtplanInformatie.addPointStep.step2.coordinates.at(
-                0
-              )}
-            </option>
-            <option value="WGS84">
-              {content.voorbereiding.vluchtplanInformatie.addPointStep.step2.coordinates.at(
-                1
-              )}
-            </option>
-          </select>
-        </div>
-
-        {coordinateSystem === "RD" && (
-          <>
-            <div className="grid grid-cols-6 gap-x-2 items-center">
-              <p className="col-span-2 labelClass">
-                {" "}
-                {
-                  content.voorbereiding.vluchtplanInformatie.addPointStep.step2
-                    .x
-                }
-              </p>
-              <input
-                className="inputClass col-span-4 !w-[60%]"
-                type="number"
-                value={xCoord}
-                onChange={(e) => setXCoord(Number(e.target.value))}
-              />
-            </div>
-
-            <div className="grid grid-cols-6 gap-x-2 items-center">
-              <p className="col-span-2 labelClass">
-                {
-                  content.voorbereiding.vluchtplanInformatie.addPointStep.step2
-                    .y
-                }
-              </p>
-              <input
-                className="inputClass col-span-4 !w-[60%]"
-                type="number"
-                value={yCoord}
-                onChange={(e) => setYCoord(Number(e.target.value))}
-              />
-            </div>
-          </>
-        )}
-
-        {coordinateSystem === "WGS84" && (
-          <>
-            <div className="grid grid-cols-6 gap-x-2 items-center">
-              <p className="col-span-2 labelClass">
-                {
-                  content.voorbereiding.vluchtplanInformatie.addPointStep.step2
-                    .long
-                }
-              </p>
-              <input
-                className="inputClass col-span-4 !w-[60%]"
-                type="number"
-                value={longitude}
-                onChange={(e) => setLongitude(Number(e.target.value))}
-              />
-            </div>
-
-            <div className="grid grid-cols-6 gap-x-2 items-center">
-              <p className="col-span-2 labelClass">
-                {
-                  content.voorbereiding.vluchtplanInformatie.addPointStep.step2
-                    .lat
-                }
-              </p>
-              <input
-                className="inputClass col-span-4 !w-[60%]"
-                type="number"
-                value={latitude}
-                onChange={(e) => setLatitude(Number(e.target.value))}
-              />
-            </div>
-          </>
-        )}
-      </div>
+      <CoordinateFields
+        coordinateSystem={coordinateSystem}
+        setCoordinateSystem={setCoordinateSystem}
+        xCoord={xCoord}
+        setXCoord={setXCoord}
+        yCoord={yCoord}
+        setYCoord={setYCoord}
+        longitude={longitude}
+        setLongitude={setLongitude}
+        latitude={latitude}
+        setLatitude={setLatitude}
+        labels={{
+          coordinateSystem:
+            content.voorbereiding.vluchtplanInformatie.addPointStep.step2
+              .Coördinatensysteem,
+          coordinates:
+            content.voorbereiding.vluchtplanInformatie.addPointStep.step2
+              .coordinates,
+          x: content.voorbereiding.vluchtplanInformatie.addPointStep.step2.x,
+          y: content.voorbereiding.vluchtplanInformatie.addPointStep.step2.y,
+          longitude:
+            content.voorbereiding.vluchtplanInformatie.addPointStep.step2.long,
+          latitude:
+            content.voorbereiding.vluchtplanInformatie.addPointStep.step2.lat,
+        }}
+      />
 
       <div className="flex justify-end gap-x-1 text-[12px] mt-6">
         <button onClick={() => setAddPointStep(1)} className="gray-button">
