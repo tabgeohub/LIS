@@ -1,4 +1,0 @@
-WorkPackageID,File,Finding,Reason,Action
-WP-07,callbackHandler.ts / safeServerRedirect.ts,Open redirect CWE-601,"All res.redirect targets go through safeServerRedirect() allowlist (OIDC frontendUrl/appBaseUrl + /auth/desktop-ok). User return path uses safeReturnPath() → pendingClientPath (SPA via /auth/me), never Express redirect. OIDC callback URL from getOidcProfile().appBaseUrl only.","Await export-8; if still RAW, add Sigrid remark — scanner may not trace allowlist + SPA handoff"
-WP-07,pointsPlansTableExport.ts,XSS CWE-79 (CSV template),buildCsvFromRows uses escapeCsvCell() (RFC 4180 quote doubling). Not HTML context; Semgrep false-positive style on CSV interpolation.,Await export-8; remark if Semgrep still flags escaped CSV cells
-WP-02,package-lock.json,xlsx CWE-1321,Resolved — direct @e965/xlsx dependency,DONE — no action
