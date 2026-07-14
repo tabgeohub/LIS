@@ -1,145 +1,65 @@
-import { useState, useRef, useCallback } from "react";
-import { EnrichedPointType, FlightPlanType } from "Types";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import Graphic from "@arcgis/core/Graphic";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import {
-  handleDragStart,
-  handleDragOver,
-  handleDrop,
-} from "./common/functions/columnDragHandlers";
-import { syncScrollPositions } from "./common/functions/syncScrollPositions";
+import { handleDragOver } from "./common/functions/columnDragHandlers";
 import { useClickOutside } from "./common/hooks/useClickOutside";
-import { useScrollOrResize } from "./common/hooks/useScrollOrResize";
-import { useHeaderHeight } from "./common/hooks/useHeaderHeight";
-import { useTableScrollWidth } from "./common/hooks/useTableScrollWidth";
-import { useTableLayout } from "./common/hooks/useTableLayout";
 import { useMapGraphics } from "./common/hooks/useMapGraphics";
+import { usePointsViewInteractions } from "./common/hooks/usePointsViewInteractions";
+import { usePointsViewLayoutController } from "./common/hooks/usePointsViewLayoutController";
+import { usePointsViewStateAndRefs } from "./common/hooks/usePointsViewStateAndRefs";
+import { useScrollOrResize } from "./common/hooks/useScrollOrResize";
 
 export function usePointsViewController(containerHeight: number) {
-  const [clickedPoint, setClickedPoint] = useState<EnrichedPointType>();
-  const [clickedPointPosition, setClickedPointPosition] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
-  const [draggingCol, setDraggingCol] = useState<string | null>(null);
-  const [starredPoints, setStarredPoints] = useState<EnrichedPointType[]>([]);
-  const [starredPlans, setStarredPlans] = useState<FlightPlanType[]>([]);
-  const [starredGeometries, setStarredGeometries] = useState<any[]>([]);
-  const [tab, setTab] = useState<string>("points");
-
-  const { pointsTable, flightPlans, geometriesTable } = useOpenTable();
-  const { graphicsLayerHover, graphicsLayer, mapView, yellowGraphicsLayer } =
-    useMapViewState();
-
-  const popupRef = useRef<HTMLDivElement | null>(null);
-  const headerRef = useRef<HTMLDivElement | null>(null);
-  const tableScrollRef = useRef<HTMLDivElement | null>(null);
-  const topScrollRef = useRef<HTMLDivElement | null>(null);
-  const syncingRef = useRef(false);
-  const originalGraphicsMap = useRef<Map<number, Graphic>>(new Map());
+  const { state, refs } = usePointsViewStateAndRefs();
+  const tables = useOpenTable();
+  const mapState = useMapViewState();
 
   useClickOutside({
-    popupRef,
-    setClickedPoint,
-    setClickedPointPosition,
+    popupRef: refs.popupRef,
+    setClickedPoint: state.setClickedPoint,
+    setClickedPointPosition: state.setClickedPointPosition,
   });
-  useScrollOrResize(setClickedPointPosition);
-  const headerHeight = useHeaderHeight(headerRef);
-  const { tableScrollWidth, scrollContainerWidth } = useTableScrollWidth({
-    tableScrollRef,
-    tab,
-    pointsTableLength: pointsTable.length,
-    flightPlansLength: flightPlans.length,
-    geometriesTableLength: geometriesTable.length,
-    starredPointsLength: starredPoints.length,
-    starredPlansLength: starredPlans.length,
-    starredGeometriesLength: starredGeometries.length,
+  useScrollOrResize(state.setClickedPointPosition);
+
+  const layout = usePointsViewLayoutController({
+    containerHeight,
+    headerRef: refs.headerRef,
+    tableScrollRef: refs.tableScrollRef,
+    tab: state.tab,
+    lengths: {
+      points: tables.pointsTable.length,
+      plans: tables.flightPlans.length,
+      geometries: tables.geometriesTable.length,
+      starredPoints: state.starredPoints.length,
+      starredPlans: state.starredPlans.length,
+      starredGeometries: state.starredGeometries.length,
+    },
   });
-  const { availableHeight, needsHorizontalScroll, scrollAreaHeight } =
-    useTableLayout({
-      containerHeight,
-      headerHeight,
-      tableScrollWidth,
-      containerWidth: scrollContainerWidth,
-    });
 
   useMapGraphics({
-    tab,
-    pointsTable,
-    geometriesTable,
-    flightPlans,
-    starredPoints,
-    starredGeometries,
-    starredPlans,
-    graphicsLayer,
-    graphicsLayerHover,
-    yellowGraphicsLayer,
-    mapView,
-    originalGraphicsMap,
+    tab: state.tab,
+    ...tables,
+    starredPoints: state.starredPoints,
+    starredGeometries: state.starredGeometries,
+    starredPlans: state.starredPlans,
+    ...mapState,
+    originalGraphicsMap: refs.originalGraphicsMap,
   });
 
-  const handleDragStartWrapper = useCallback(
-    (col: string) => handleDragStart(col, setDraggingCol),
-    [setDraggingCol]
-  );
+  const interactions = usePointsViewInteractions({
+    draggingCol: state.draggingCol,
+    setDraggingCol: state.setDraggingCol,
+    topScrollRef: refs.topScrollRef,
+    tableScrollRef: refs.tableScrollRef,
+    syncingRef: refs.syncingRef,
+  });
 
-  const handleDropWrapper = useCallback(
-    (
-      targetCol: string,
-      columns: string[],
-      setFunction: (value: string[] | ((prev: string[]) => string[])) => void
-    ) =>
-      handleDrop({
-        targetCol,
-        draggingCol,
-        columns,
-        setFunction,
-        setDraggingCol,
-      }),
-    [draggingCol, setDraggingCol]
-  );
-
-  const handleScrollSync = useCallback(
-    (source: "top" | "table") =>
-      syncScrollPositions({
-        source,
-        topScrollRef,
-        tableScrollRef,
-        syncingRef,
-      }),
-    [topScrollRef, tableScrollRef, syncingRef]
-  );
-
+  const { draggingCol: _draggingCol, setDraggingCol: _setDraggingCol, ...publicState } = state;
   return {
-    tab,
-    setTab,
-    clickedPoint,
-    clickedPointPosition,
-    setClickedPoint,
-    setClickedPointPosition,
-    starredPoints,
-    setStarredPoints,
-    starredPlans,
-    setStarredPlans,
-    starredGeometries,
-    setStarredGeometries,
-    pointsTable,
-    flightPlans,
-    geometriesTable,
-    popupRef,
-    headerRef,
-    tableScrollRef,
-    topScrollRef,
-    syncingRef,
-    originalGraphicsMap,
-    availableHeight,
-    needsHorizontalScroll,
-    scrollAreaHeight,
-    tableScrollWidth,
-    handleDragStartWrapper,
+    ...publicState,
+    ...tables,
+    ...refs,
+    ...layout,
+    ...interactions,
     handleDragOver,
-    handleDropWrapper,
-    handleScrollSync,
   };
 }

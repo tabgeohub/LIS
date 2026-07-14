@@ -1,0 +1,57 @@
+import { differenceInMilliseconds, parseISO } from "date-fns";
+
+export const FALLBACK_MIN = new Date(2024, 0, 1);
+export const FALLBACK_MAX = new Date(2025, 11, 31);
+export const SLIDER_PARTS = 10;
+
+export function parseTimesliderRange(
+  from?: string | null,
+  to?: string | null
+) {
+  let minDate = FALLBACK_MIN;
+  let maxDate = FALLBACK_MAX;
+  if (from && to) {
+    const parsedFrom = parseISO(from);
+    const parsedTo = parseISO(to);
+    if (!Number.isNaN(parsedFrom.getTime())) minDate = parsedFrom;
+    if (!Number.isNaN(parsedTo.getTime())) maxDate = parsedTo;
+  }
+  return minDate <= maxDate
+    ? { minDate, maxDate }
+    : { minDate: maxDate, maxDate: minDate };
+}
+
+export function createTimesliderConversions(
+  minDate: Date,
+  maxDate: Date,
+  maxStep = SLIDER_PARTS
+) {
+  const totalMs = Math.max(1, differenceInMilliseconds(maxDate, minDate));
+  return {
+    stepIndexToDate: (stepIndex: number) =>
+      new Date(minDate.getTime() + (stepIndex / maxStep) * totalMs),
+    dateToStepIndex: (date: Date) => {
+      const step = Math.round(
+        ((date.getTime() - minDate.getTime()) / totalMs) * maxStep
+      );
+      return Math.max(0, Math.min(maxStep, step));
+    },
+  };
+}
+
+export function normalizeSliderValues(
+  values: [number, number],
+  maxStep: number
+): [number, number] {
+  const from = Math.max(0, Math.min(values[0], maxStep));
+  const to = Math.max(0, Math.min(values[1], maxStep));
+  return from <= to ? [from, to] : [to, to];
+}
+
+export function clampFromStep(step: number, toStep: number) {
+  return Math.max(0, Math.min(step, toStep - 1));
+}
+
+export function clampToStep(step: number, fromStep: number, maxStep: number) {
+  return Math.min(maxStep, Math.max(step, fromStep + 1));
+}

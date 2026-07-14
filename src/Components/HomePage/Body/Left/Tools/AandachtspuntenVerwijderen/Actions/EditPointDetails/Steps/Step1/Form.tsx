@@ -1,11 +1,11 @@
 import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/AandachtspuntDetailsFields";
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
 import {
   pickDeletePointFormFields,
   useDeletePointState,
 } from "hooks/zustand/tools/useDeletePointState";
+import { ReadOnlyPointCoordinates, ReadOnlyPointFields } from "./ReadOnlyPointFields";
 
 export default function Form() {
   const content = useContent();
@@ -66,53 +66,10 @@ export default function Form() {
         </div>
       }
       fieldsAfterOmschrijving={
-        <>
-          <InputComp
-            type="date"
-            value={selectedPoint?.created_at!}
-            label={labels.datum}
-            setValue={() => {}}
-            disabled
-          />
-
-          <InputComp
-            value={String(user_id)}
-            label={labels.aanmaker}
-            setValue={() => {}}
-            disabled
-          />
-
-          <InputComp
-            value={regio_id}
-            label={labels.regio}
-            setValue={() => {}}
-            disabled
-          />
-        </>
+        <ReadOnlyPointFields values={{ createdAt: selectedPoint?.created_at!, userId: user_id, regioId: regio_id }} labels={labels} />
       }
       trailingFields={
-        <>
-          <InputComp
-            value={`(${xcoordinaat_rd.toFixed(4)}, ${ycoordinaat_rd.toFixed(4)})`}
-            label={labels.rd}
-            setValue={() => {}}
-            disabled
-          />
-
-          <InputComp
-            value={`(${latitude.toFixed(4)}, ${longitude.toFixed(4)})`}
-            label={labels.wgs84}
-            setValue={() => {}}
-            disabled
-          />
-
-          <InputComp
-            value={vertrouwelijk === 1 ? "Ja" : "Nee"}
-            label={labels.vertrouwelijk}
-            setValue={() => {}}
-            disabled
-          />
-        </>
+        <ReadOnlyPointCoordinates values={{ x: xcoordinaat_rd, y: ycoordinaat_rd, latitude, longitude, confidential: vertrouwelijk === 1 }} labels={labels} />
       }
     />
   );
