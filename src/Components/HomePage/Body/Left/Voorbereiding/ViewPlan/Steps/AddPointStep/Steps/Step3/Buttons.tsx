@@ -10,6 +10,7 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import { buildCreatePointPayload } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/buildCreatePointPayload";
 
 export default function Buttons({
   handleCancel,
@@ -24,6 +25,7 @@ export default function Buttons({
   const { mapView, redGraphicsLayer } = useMapViewState();
   const { user } = useAuth();
   const { labels } = useWizardButtons("View plan - Add point step 3");
+  const pointState = useEnrichedPointState();
   const {
     omschrijving,
     activiteit,
@@ -36,7 +38,7 @@ export default function Buttons({
     longitude,
     vertrouwelijk,
     herhalen,
-  } = useEnrichedPointState();
+  } = pointState;
   const { selectedPlan, setSelectedPlan, setStep } = useViewPlanState();
   const { create } = useCreateData("/points");
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
@@ -45,20 +47,7 @@ export default function Buttons({
 
   async function handleSubmit() {
     await create({
-      data: {
-        omschrijving,
-        regio_id: user?.role,
-        xcoordinaat_rd: xCoord,
-        ycoordinaat_rd: yCoord,
-        latitude,
-        longitude,
-        vertrouwelijk: vertrouwelijk ? 1 : 0,
-        herhalen: herhalen ? 1 : 0,
-        user_id: user?.user_id,
-        activiteit_id: activiteit,
-        organisatie_id: organisatie,
-        specifiek_letten_op: specifiekLettenOp,
-      },
+      data: buildCreatePointPayload({ point: pointState, user }),
       onSuccess: (response) => {
         const newPoint: EnrichedPointType = (response as { point: EnrichedPointType })
           .point;

@@ -3,23 +3,42 @@ import autoTable from "jspdf-autotable";
 import { PDFPointDataType } from "Types";
 import { wrapPdfSection } from "./pdfReportLayout";
 
-export function addGeneralInfoTable(input: {
+function addWrappedTable(input: {
   doc: jsPDF;
-  pointData: PDFPointDataType;
-  pilootOptions: { label: string; value: string }[];
+  startY: number;
+  body: any[][];
+  textColor?: number;
 }) {
-  const generalStart = 55;
   autoTable(input.doc, {
-    startY: generalStart,
+    startY: input.startY,
     margin: { left: 25 },
     styles: {
       fontSize: 11,
       halign: "left",
       cellPadding: 1,
       fillColor: [255, 255, 255],
-      textColor: 0,
+      ...(input.textColor === undefined ? {} : { textColor: input.textColor }),
     },
     alternateRowStyles: { fillColor: [255, 255, 255] },
+    body: input.body,
+  });
+  wrapPdfSection({
+    doc: input.doc,
+    startY: input.startY,
+    height: input.doc.lastAutoTable.finalY - input.startY,
+  });
+}
+
+export function addGeneralInfoTable(input: {
+  doc: jsPDF;
+  pointData: PDFPointDataType;
+  pilootOptions: { label: string; value: string }[];
+}) {
+  const generalStart = 55;
+  addWrappedTable({
+    doc: input.doc,
+    startY: generalStart,
+    textColor: 0,
     body: [
       [
         { content: "Datum:", styles: { fontStyle: "bold" } },
@@ -37,25 +56,13 @@ export function addGeneralInfoTable(input: {
       ],
     ],
   });
-  wrapPdfSection({
-    doc: input.doc,
-    startY: generalStart,
-    height: input.doc.lastAutoTable.finalY - generalStart,
-  });
 }
 
 export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
   const coordsStart = doc.lastAutoTable.finalY + 8;
-  autoTable(doc, {
+  addWrappedTable({
+    doc,
     startY: coordsStart,
-    margin: { left: 25 },
-    styles: {
-      fontSize: 11,
-      halign: "left",
-      cellPadding: 1,
-      fillColor: [255, 255, 255],
-    },
-    alternateRowStyles: { fillColor: [255, 255, 255] },
     body: [
       [
         { content: "Tijd:", styles: { fontStyle: "bold" } },
@@ -77,25 +84,13 @@ export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
       ],
     ],
   });
-  wrapPdfSection({
-    doc,
-    startY: coordsStart,
-    height: doc.lastAutoTable.finalY - coordsStart,
-  });
 }
 
 export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
   const detailStart = doc.lastAutoTable.finalY + 8;
-  autoTable(doc, {
+  addWrappedTable({
+    doc,
     startY: detailStart,
-    margin: { left: 25 },
-    styles: {
-      fontSize: 11,
-      halign: "left",
-      cellPadding: 1,
-      fillColor: [255, 255, 255],
-    },
-    alternateRowStyles: { fillColor: [255, 255, 255] },
     body: [
       [
         { content: "Activiteit:", styles: { fontStyle: "bold" } },
@@ -118,10 +113,5 @@ export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
         pointData.aanvullende || "-",
       ],
     ],
-  });
-  wrapPdfSection({
-    doc,
-    startY: detailStart,
-    height: doc.lastAutoTable.finalY - detailStart,
   });
 }
