@@ -2,13 +2,11 @@ import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import useGeometryListMapActions from "hooks/hover-click-handlers/useGeometryListMapActions";
-import { MdFilterAlt } from "react-icons/md";
-import { RxDragHandleDots2 } from "react-icons/rx";
 import { useState } from "react";
-import { IoClose } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { TbPolygon, TbLine } from "react-icons/tb";
+import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsGeometries = [
   "omschrijving",
@@ -57,44 +55,14 @@ export default function GeometriesTable({
       }}
     >
       <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-        <thead className="text-[12px] sticky top-0 bg-white z-10">
-          <tr>
-            <th className="px-2 py-2">
-              <MdFilterAlt className="text-gray-500 text-xl" />
-            </th>
-
-            {visibleColumnsGeometries.map((col: string) => (
-              <th
-                key={col}
-                className="px-2 py-2 cursor-move whitespace-nowrap"
-                draggable
-                onDragStart={() => handleDragStart(col)}
-                onDragOver={handleDragOver}
-                onDrop={() =>
-                  handleDrop(
-                    col,
-                    visibleColumnsGeometries,
-                    setVisibleColumnsGeometries
-                  )
-                }
-              >
-                <div className="flex justify-between items-center gap-1">
-                  <button title="Drag column">
-                    <RxDragHandleDots2 />
-                  </button>
-                  <span>{col}</span>
-                  <button
-                    onClick={() =>
-                      removeColumn(col, setVisibleColumnsGeometries)
-                    }
-                  >
-                    <IoClose />
-                  </button>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+        <DraggableTableHeader
+          columns={visibleColumnsGeometries}
+          setColumns={setVisibleColumnsGeometries}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          removeColumn={removeColumn}
+        />
 
         <tbody>
           {geometriesTable.map((geometry: Geometry, index: number) => {

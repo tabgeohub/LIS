@@ -3,15 +3,13 @@ import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { EnrichedPointType } from "Types";
 
-import { MdFilterAlt } from "react-icons/md";
-import { RxDragHandleDots2 } from "react-icons/rx";
 import { useState } from "react";
-import { IoClose } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
 import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
 
 import { POINT_CORE_DISPLAY_COLUMNS } from "@helpers/points/pointColumnKeys";
+import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPoints = [...POINT_CORE_DISPLAY_COLUMNS];
 
@@ -53,38 +51,14 @@ export default function PointsTable({
       }}
     >
       <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-        <thead className="text-[12px] sticky top-0 bg-white z-10">
-          <tr>
-            <th className="px-2 py-2">
-              <MdFilterAlt className="text-gray-500 text-xl" />
-            </th>
-
-            {visibleColumnsPoints.map((col: string) => (
-              <th
-                key={col}
-                className="px-2 py-2 cursor-move whitespace-nowrap"
-                draggable
-                onDragStart={() => handleDragStart(col)}
-                onDragOver={handleDragOver}
-                onDrop={() =>
-                  handleDrop(col, visibleColumnsPoints, setVisibleColumnsPoints)
-                }
-              >
-                <div className="flex justify-between items-center gap-1">
-                  <button title="Drag column">
-                    <RxDragHandleDots2 />
-                  </button>
-                  <span>{col}</span>
-                  <button
-                    onClick={() => removeColumn(col, setVisibleColumnsPoints)}
-                  >
-                    <IoClose />
-                  </button>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+        <DraggableTableHeader
+          columns={visibleColumnsPoints}
+          setColumns={setVisibleColumnsPoints}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          removeColumn={removeColumn}
+        />
 
         <tbody>
           {pointsTable.map((point: EnrichedPointType, index: number) => {

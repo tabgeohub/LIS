@@ -7,13 +7,34 @@ export type PointUpdateFormFields = {
   ycoordinaat_rd: number;
   latitude: number;
   longitude: number;
-  vertrouwelijk: number;
-  herhalen: boolean | number;
+  vertrouwelijk: boolean | number | string;
+  herhalen: boolean | number | string;
   user_id: number;
   activiteit_id: string;
   organisatie_id: string;
   specifiek_letten_op: string;
 };
+
+export function buildPointCorePayload(
+  fields: PointUpdateFormFields,
+  overrides: Partial<PointUpdateFormFields> = {}
+) {
+  return {
+    omschrijving: fields.omschrijving,
+    regio_id: fields.regio_id,
+    xcoordinaat_rd: fields.xcoordinaat_rd,
+    ycoordinaat_rd: fields.ycoordinaat_rd,
+    latitude: fields.latitude,
+    longitude: fields.longitude,
+    vertrouwelijk: fields.vertrouwelijk,
+    herhalen: fields.herhalen,
+    user_id: fields.user_id,
+    activiteit_id: fields.activiteit_id,
+    organisatie_id: fields.organisatie_id,
+    specifiek_letten_op: fields.specifiek_letten_op,
+    ...overrides,
+  };
+}
 
 export function buildPointUpdatePayload(input: {
   fields: PointUpdateFormFields;
@@ -21,18 +42,8 @@ export function buildPointUpdatePayload(input: {
   created_at?: string;
 }) {
   return {
-    omschrijving: input.fields.omschrijving,
-    regio_id: input.fields.regio_id,
-    xcoordinaat_rd: input.fields.xcoordinaat_rd,
-    ycoordinaat_rd: input.fields.ycoordinaat_rd,
-    latitude: input.fields.latitude,
-    longitude: input.fields.longitude,
-    vertrouwelijk: input.fields.vertrouwelijk,
+    ...buildPointCorePayload(input.fields),
     herhalen: input.fields.herhalen ? 1 : 0,
-    user_id: input.fields.user_id,
-    activiteit_id: input.fields.activiteit_id,
-    organisatie_id: input.fields.organisatie_id,
-    specifiek_letten_op: input.fields.specifiek_letten_op,
     datum: input.created_at,
     id: input.id,
   };

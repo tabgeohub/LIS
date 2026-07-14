@@ -1,23 +1,13 @@
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import type { FinishedGeometryType } from "Types/finished_plans";
+import { buildPointCorePayload } from "@helpers/points/buildPointUpdatePayload";
 
 type GeometryPoint = NonNullable<FinishedGeometryType["points"]>[number];
 
 function buildPointUpdatePayload(point: GeometryPoint, comment: string) {
   return {
-    omschrijving: point.omschrijving,
-    regio_id: point.regio_id,
-    xcoordinaat_rd: point.xcoordinaat_rd,
-    ycoordinaat_rd: point.ycoordinaat_rd,
-    latitude: point.latitude,
-    longitude: point.longitude,
-    vertrouwelijk: point.vertrouwelijk,
-    herhalen: point.herhalen,
-    user_id: point.user_id,
-    activiteit_id: point.activiteit_id,
-    organisatie_id: point.organisatie_id,
-    specifiek_letten_op: comment,
+    ...buildPointCorePayload(point, { specifiek_letten_op: comment }),
     datum: point.datum,
     id: point.id,
   };

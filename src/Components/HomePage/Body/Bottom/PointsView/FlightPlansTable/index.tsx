@@ -3,9 +3,6 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
-import { IoClose } from "react-icons/io5";
-import { MdFilterAlt } from "react-icons/md";
-import { RxDragHandleDots2 } from "react-icons/rx";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { FlightPlanType } from "Types";
 import Data from "./Data";
@@ -18,6 +15,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "hooks/hover-click-handlers/usePlanStarGraphic";
+import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [
   "Aanmaker vlieplan",
@@ -129,37 +127,14 @@ export default function FlightPlansTable({
       }}
     >
       <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-        <thead className="text-[12px] sticky top-0 bg-white z-10">
-          <tr>
-            <th className="px-2 py-2">
-              <MdFilterAlt className="text-gray-500 text-xl" />
-            </th>
-            {visibleColumnsPlans.map((col) => (
-              <th
-                key={col}
-                className="px-2 py-2 cursor-move whitespace-nowrap"
-                draggable
-                onDragStart={() => handleDragStart(col)}
-                onDragOver={handleDragOver}
-                onDrop={() =>
-                  handleDrop(col, visibleColumnsPlans, setVisibleColumnsPlans)
-                }
-              >
-                <div className="flex justify-between items-center gap-1">
-                  <button title="Drag column">
-                    <RxDragHandleDots2 />
-                  </button>
-                  <span>{col}</span>
-                  <button
-                    onClick={() => removeColumn(col, setVisibleColumnsPlans)}
-                  >
-                    <IoClose />
-                  </button>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+        <DraggableTableHeader
+          columns={visibleColumnsPlans}
+          setColumns={setVisibleColumnsPlans}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          removeColumn={removeColumn}
+        />
 
         <tbody>
           {flightPlans.map((plan: FlightPlanType, index: number) => {

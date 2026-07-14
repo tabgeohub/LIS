@@ -47,100 +47,74 @@ interface EnrichedPointState {
   reset: () => void;
 }
 
-export const useEnrichedPointState = create<EnrichedPointState>((set) => ({
+type EnrichedPointValues = Pick<
+  EnrichedPointState,
+  | "step"
+  | "xCoord"
+  | "yCoord"
+  | "longitude"
+  | "latitude"
+  | "coordinateSystem"
+  | "vertrouwelijk"
+  | "herhalen"
+  | "omschrijving"
+  | "activiteit"
+  | "organisatie"
+  | "specifiekLettenOp"
+  | "currentPoint"
+  | "mapClickedNotify"
+>;
+
+export const initialEnrichedPointValues: EnrichedPointValues = {
   step: 1,
+  xCoord: 0,
+  yCoord: 0,
+  longitude: 0,
+  latitude: 0,
+  coordinateSystem: "RD",
+  vertrouwelijk: false,
+  herhalen: false,
+  omschrijving: "",
+  activiteit: "",
+  organisatie: "",
+  specifiekLettenOp: "",
+  currentPoint: { x: 0, y: 0 },
+  mapClickedNotify: 0,
+};
+
+export const useEnrichedPointState = create<EnrichedPointState>((set) => ({
+  ...initialEnrichedPointValues,
   setStep: (value: number) => set(() => ({ step: value })),
 
-  xCoord: 0,
   setXCoord: (value: number) => set(() => ({ xCoord: value })),
 
-  yCoord: 0,
   setYCoord: (value: number) => set(() => ({ yCoord: value })),
 
-  longitude: 0,
   setLongitude: (value: number) => set(() => ({ longitude: value })),
 
-  latitude: 0,
   setLatitude: (value: number) => set(() => ({ latitude: value })),
 
-  coordinateSystem: "RD",
   setCoordinateSystem: (value: SpatialReference) =>
     set(() => ({ coordinateSystem: value })),
 
-  vertrouwelijk: false,
   setVertrouwelijk: (value: boolean) => set(() => ({ vertrouwelijk: value })),
 
-  herhalen: false,
   setHerhalen: (value: boolean) => set(() => ({ herhalen: value })),
 
-  omschrijving: "",
   setOmschrijving: (value: string) => set(() => ({ omschrijving: value })),
 
-  activiteit: "",
   setActiviteit: (value: string) => set(() => ({ activiteit: value })),
 
-  organisatie: "",
   setOrganisatie: (value: string) => set(() => ({ organisatie: value })),
 
-  specifiekLettenOp: "",
   setSpecifiekLettenOp: (value: string) =>
     set(() => ({ specifiekLettenOp: value })),
 
-  currentPoint: { x: 0, y: 0 },
   setCurrentPoint: (value: { x: number; y: number }) =>
     set(() => ({ currentPoint: value })),
 
-  mapClickedNotify: 0,
   setMapClickedNotify: (value: number) =>
     set(() => ({ mapClickedNotify: value })),
 
-  reset: () =>
-    set(() => ({
-      step: 1,
-      setStep: (value: number) => set(() => ({ step: value })),
-
-      xCoord: 0,
-      setXCoord: (value: number) => set(() => ({ xCoord: value })),
-
-      yCoord: 0,
-      setYCoord: (value: number) => set(() => ({ yCoord: value })),
-
-      longitude: 0,
-      setLongitude: (value: number) => set(() => ({ longitude: value })),
-
-      latitude: 0,
-      setLatitude: (value: number) => set(() => ({ latitude: value })),
-
-      coordinateSystem: "RD",
-      setCoordinateSystem: (value: SpatialReference) =>
-        set(() => ({ coordinateSystem: value })),
-
-      vertrouwelijk: false,
-      setVertrouwelijk: (value: boolean) =>
-        set(() => ({ vertrouwelijk: value })),
-
-      herhalen: false,
-      setHerhalen: (value: boolean) => set(() => ({ herhalen: value })),
-
-      omschrijving: "",
-      setOmschrijving: (value: string) => set(() => ({ omschrijving: value })),
-
-      activiteit: "",
-      setActiviteit: (value: string) => set(() => ({ activiteit: value })),
-
-      organisatie: "",
-      setOrganisatie: (value: string) => set(() => ({ organisatie: value })),
-
-      specifiekLettenOp: "",
-      setSpecifiekLettenOp: (value: string) =>
-        set(() => ({ specifiekLettenOp: value })),
-
-      currentPoint: { x: 0, y: 0 },
-      setCurrentPoint: (value: { x: number; y: number }) =>
-        set(() => ({ currentPoint: value })),
-
-      mapClickedNotify: 0,
-      setMapClickedNotify: (value: number) =>
-        set(() => ({ mapClickedNotify: value })),
-    })),
+  reset: () => set(initialEnrichedPointValues),
 }));

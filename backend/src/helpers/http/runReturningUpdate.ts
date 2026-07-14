@@ -25,19 +25,29 @@ export type RunReturningUpdateByIdInput = {
   config: ReturningUpdateConfig;
 };
 
-export async function runReturningUpdateById(
-  input: RunReturningUpdateByIdInput
-): Promise<void> {
-  const { res, id, runQuery, config } = input;
+type UpdateExecutionConfig = {
+  successMessage: string;
+  logLabel: string;
+  errorMessage: string;
+  notFoundMessage?: string;
+};
 
-  if (!requireRouteId(res, id)) {
-    return;
-  }
+async function executeReturningUpdate(input: {
+  res: Response;
+  runQuery: () => Promise<QueryResult>;
+  config: UpdateExecutionConfig;
+  requireReturnedRow: boolean;
+}): Promise<void> {
+  const { res, runQuery, config, requireReturnedRow } = input;
 
   try {
     const result = await runQuery();
 
-    if (result.rows.length === 0) {
+    if (
+      requireReturnedRow &&
+      result.rows.length === 0 &&
+      config.notFoundMessage
+    ) {
       notFound(res, config.notFoundMessage);
       return;
     }
@@ -57,6 +67,23 @@ export async function runReturningUpdateById(
       err,
     });
   }
+}
+
+export async function runReturningUpdateById(
+  input: RunReturningUpdateByIdInput
+): Promise<void> {
+  const { res, id, runQuery, config } = input;
+
+  if (!requireRouteId(res, id)) {
+    return;
+  }
+
+  await executeReturningUpdate({
+    res,
+    runQuery,
+    config,
+    requireReturnedRow: true,
+  });
 }
 
 type StatusUpdateConfig = {
@@ -80,27 +107,10 @@ export async function runStatusUpdate(input: RunStatusUpdateInput): Promise<void
     return;
   }
 
-  try {
-    const result = await runQuery();
-
-    if (config.notFoundMessage && result.rows.length === 0) {
-      notFound(res, config.notFoundMessage);
-      return;
-    }
-
-    okResult({
-      res,
-      result: result.rows[0],
-      message: config.successMessage,
-    });
-  } catch (err) {
-    const errText = err instanceof Error ? err.message : String(err);
-    const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
-    serverError({
-      res,
-      logLabel: config.logLabel,
-      message: `${config.errorMessage}${separator}${errText}`,
-      err,
-    });
-  }
+  await executeReturningUpdate({
+    res,
+    runQuery,
+    config,
+    requireReturnedRow: Boolean(config.notFoundMessage),
+  });
 }

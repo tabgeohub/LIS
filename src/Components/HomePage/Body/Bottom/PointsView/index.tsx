@@ -13,47 +13,17 @@ export default function PointsView({
   containerHeight,
   containerWidth,
 }: PointsViewProps) {
-  const {
-    tab,
-    setTab,
-    clickedPoint,
-    clickedPointPosition,
-    setClickedPoint,
-    setClickedPointPosition,
-    starredPoints,
-    setStarredPoints,
-    starredPlans,
-    setStarredPlans,
-    starredGeometries,
-    setStarredGeometries,
-    pointsTable,
-    flightPlans,
-    geometriesTable,
-    popupRef,
-    headerRef,
-    tableScrollRef,
-    topScrollRef,
-    syncingRef,
-    originalGraphicsMap,
-    availableHeight,
-    needsHorizontalScroll,
-    scrollAreaHeight,
-    tableScrollWidth,
-    handleDragStartWrapper,
-    handleDragOver,
-    handleDropWrapper,
-    handleScrollSync,
-  } = usePointsViewController(containerHeight);
+  const controller = usePointsViewController(containerHeight);
 
   return (
     <div className="h-full w-full flex flex-col min-w-0 min-h-0">
-      <div ref={headerRef} className="shrink-0 min-w-0 max-w-full overflow-hidden">
+      <div ref={controller.headerRef} className="shrink-0 min-w-0 max-w-full overflow-hidden">
         <TabButtons
-          tab={tab}
-          setTab={setTab}
-          pointsTableLength={pointsTable.length}
-          geometriesTableLength={geometriesTable.length}
-          flightPlansLength={flightPlans.length}
+          tab={controller.tab}
+          setTab={controller.setTab}
+          pointsTableLength={controller.pointsTable.length}
+          geometriesTableLength={controller.geometriesTable.length}
+          flightPlansLength={controller.flightPlans.length}
         />
       </div>
 
@@ -61,53 +31,53 @@ export default function PointsView({
         className="flex-1 min-h-0 min-w-0 max-w-full overflow-hidden flex flex-col"
         style={{
           maxHeight:
-            typeof availableHeight === "number"
-              ? `${availableHeight}px`
+            typeof controller.availableHeight === "number"
+              ? `${controller.availableHeight}px`
               : undefined,
         }}
       >
         <HorizontalScrollControls
-          needsHorizontalScroll={needsHorizontalScroll}
-          tableScrollWidth={tableScrollWidth}
-          topScrollRef={topScrollRef}
-          tableScrollRef={tableScrollRef}
-          syncingRef={syncingRef}
+          needsHorizontalScroll={controller.needsHorizontalScroll}
+          tableScrollWidth={controller.tableScrollWidth}
+          topScrollRef={controller.topScrollRef}
+          tableScrollRef={controller.tableScrollRef}
+          syncingRef={controller.syncingRef}
         />
         <div
           className="flex-1 min-h-0 min-w-0 max-w-full w-full overflow-x-auto overflow-y-auto overscroll-contain thin-scrollbar"
-          ref={tableScrollRef}
-          onScroll={() => handleScrollSync("table")}
+          ref={controller.tableScrollRef}
+          onScroll={() => controller.handleScrollSync("table")}
           style={{
             maxHeight:
-              typeof scrollAreaHeight === "number"
-                ? `${scrollAreaHeight}px`
+              typeof controller.scrollAreaHeight === "number"
+                ? `${controller.scrollAreaHeight}px`
                 : undefined,
           }}
         >
           <PointsViewTables
-            tab={tab}
-            containerHeight={availableHeight}
+            tab={controller.tab}
+            containerHeight={controller.availableHeight}
             containerWidth={containerWidth}
-            starredPoints={starredPoints}
-            setStarredPoints={setStarredPoints}
-            starredPlans={starredPlans}
-            setStarredPlans={setStarredPlans}
-            starredGeometries={starredGeometries}
-            setStarredGeometries={setStarredGeometries}
-            handleDragStart={handleDragStartWrapper}
-            handleDragOver={handleDragOver}
-            handleDrop={handleDropWrapper}
-            setClickedPoint={setClickedPoint}
-            setClickedPointPosition={setClickedPointPosition}
-            originalGraphicsMap={originalGraphicsMap}
+            starredPoints={controller.starredPoints}
+            setStarredPoints={controller.setStarredPoints}
+            starredPlans={controller.starredPlans}
+            setStarredPlans={controller.setStarredPlans}
+            starredGeometries={controller.starredGeometries}
+            setStarredGeometries={controller.setStarredGeometries}
+            handleDragStart={controller.handleDragStartWrapper}
+            handleDragOver={controller.handleDragOver}
+            handleDrop={controller.handleDropWrapper}
+            setClickedPoint={controller.setClickedPoint}
+            setClickedPointPosition={controller.setClickedPointPosition}
+            originalGraphicsMap={controller.originalGraphicsMap}
           />
         </div>
       </div>
 
       <ClickedPointPopup
-        clickedPoint={clickedPoint}
-        clickedPointPosition={clickedPointPosition}
-        popupRef={popupRef}
+        clickedPoint={controller.clickedPoint}
+        clickedPointPosition={controller.clickedPointPosition}
+        popupRef={controller.popupRef}
       />
     </div>
   );

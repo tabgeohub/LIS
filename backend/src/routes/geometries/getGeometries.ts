@@ -1,25 +1,20 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { buildGeometryPointsJsonAgg } from "../../helpers/queries/geometries/geometryJson";
+import {
+  buildGeometryPointsJsonAgg,
+  buildGeometrySelectFields,
+} from "../../helpers/queries/geometries/geometryJson";
 import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 
 export async function getGeometries(req: Request, res: Response): Promise<void> {
   try {
     const regio = resolveRegioFilter(req);
     const pointsAgg = buildGeometryPointsJsonAgg("full", "p");
+    const selectFields = buildGeometrySelectFields(pointsAgg);
 
     let query = `
       SELECT
-        g.id,
-        g.omschrijving,
-        g.organisatie,
-        g.vertrouwelijk,
-        g.herhalen,
-        g.activiteit,
-        g.specifiek_letten_op,
-        g.type,
-        g.regio_id,
-        ${pointsAgg} AS points
+        ${selectFields}
       FROM lis.geometries g
       JOIN lis.points p ON p.geometry_id = g.id
     `;

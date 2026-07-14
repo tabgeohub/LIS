@@ -3,37 +3,15 @@ import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/Aan
 import Omschrijving from "./Omschrijving";
 
 export default function Form() {
-  const {
-    omschrijving,
-    setOmschrijving,
-    vertrouwelijk,
-    setVertrouwelijk,
-    herhalen,
-    setHerhalen,
-    activiteit,
-    setActiviteit,
-    organisatie,
-    setOrganisatie,
-    specifiekLettenOp,
-    setSpecifiekLettenOp,
-  } = useEnrichedPointState();
+  const pointState = useEnrichedPointState();
 
   return (
     <AandachtspuntDetailsFields
-      vertrouwelijk={vertrouwelijk}
-      setVertrouwelijk={setVertrouwelijk}
-      herhalen={herhalen}
-      setHerhalen={setHerhalen}
-      activiteit={activiteit}
-      setActiviteit={setActiviteit}
-      organisatie={organisatie}
-      setOrganisatie={setOrganisatie}
-      specifiekLettenOp={specifiekLettenOp}
-      setSpecifiekLettenOp={setSpecifiekLettenOp}
+      {...pointState}
       omschrijvingField={
         <Omschrijving
-          omschrijving={omschrijving}
-          setOmschrijving={setOmschrijving}
+          omschrijving={pointState.omschrijving}
+          setOmschrijving={pointState.setOmschrijving}
         />
       }
     />

@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import type { EnrichedPointType } from "Types";
+import {
+  removeOwnedBluePointGraphics,
+  syncBluePointGraphics,
+} from "hooks/map/syncBluePointGraphics";
 import {
   filterPointsNotInPlan,
   SelectFromSourceItem,
@@ -11,7 +14,6 @@ import {
   findHoverableGraphic,
   PinRefMap,
   removeAllPins,
-  removeBlueGraphics,
   syncPinsForSelection,
 } from "./helpers/selectFromSourceGraphics";
 
@@ -32,49 +34,35 @@ export function useSelectFromSourceMapEffects(input: {
       } catch {
         /* ignore */
       }
-      blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
+      blueGraphicsRef.current = removeOwnedBluePointGraphics(
+        mapView,
+        blueGraphicsRef.current
+      );
       removeAllPins(mapView, pinRefs.current);
       useHoveredGraphicState.getState().setHovered(null);
     };
   }, [mapView, pointsGraphicsLayer]);
 
   useEffect(() => {
-    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
+    blueGraphicsRef.current = removeOwnedBluePointGraphics(
+      mapView,
+      blueGraphicsRef.current
+    );
     pointsGraphicsLayer?.removeAll();
     removeAllPins(mapView, pinRefs.current);
   }, [input.selectedItem, mapView, pointsGraphicsLayer]);
 
   useEffect(() => {
-    blueGraphicsRef.current = removeBlueGraphics(mapView, blueGraphicsRef.current);
-    pointsGraphicsLayer?.removeAll();
-    if (!input.selectedItem) return;
+    const points = input.selectedItem
+      ? filterPointsNotInPlan(input.selectedItem.points, input.planPointIds)
+      : [];
 
-    const uncommonPoints = filterPointsNotInPlan(
-      input.selectedItem.points,
-      input.planPointIds
-    );
-    const graphics = createPointGraphics(uncommonPoints, {
-      symbolOptions: {
-        color: "blue",
-        size: 10,
-        style: "circle",
-        outlineColor: "white",
-        outlineWidth: 1,
-      },
-      transformCoordinates: true,
+    blueGraphicsRef.current = syncBluePointGraphics({
+      points,
+      mapView,
+      pointsGraphicsLayer,
+      ownedGraphics: blueGraphicsRef.current,
     });
-
-    if (!graphics.length) return;
-
-    if (pointsGraphicsLayer) {
-      pointsGraphicsLayer.addMany(graphics as __esri.Graphic[]);
-      return;
-    }
-
-    if (mapView) {
-      mapView.graphics.addMany(graphics as __esri.Graphic[]);
-      blueGraphicsRef.current = graphics;
-    }
   }, [input.selectedItem, input.planPointIds, pointsGraphicsLayer, mapView]);
 
   useEffect(() => {

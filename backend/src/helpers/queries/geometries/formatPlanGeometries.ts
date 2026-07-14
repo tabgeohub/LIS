@@ -1,5 +1,8 @@
 import { Pool } from "pg";
-import { buildGeometryPointsJsonAgg } from "./geometryJson";
+import {
+  buildGeometryPointsJsonAgg,
+  buildGeometrySelectFields,
+} from "./geometryJson";
 import { buildTemplateGeometryGroup } from "./buildTemplateGeometryGroup";
 
 type RawPoint = Record<string, unknown> & {
@@ -116,18 +119,10 @@ export async function fetchGeometryDataMap(
   }
 
   const pointsAgg = buildGeometryPointsJsonAgg("coords", "p");
+  const selectFields = buildGeometrySelectFields(pointsAgg);
   const geometryQuery = `
         SELECT
-          g.id,
-          g.omschrijving,
-          g.organisatie,
-          g.vertrouwelijk,
-          g.herhalen,
-          g.activiteit,
-          g.specifiek_letten_op,
-          g.type,
-          g.regio_id,
-          ${pointsAgg} AS points
+          ${selectFields}
         FROM lis.geometries g
         JOIN lis.points p ON p.geometry_id = g.id
         WHERE g.id = ANY($1)

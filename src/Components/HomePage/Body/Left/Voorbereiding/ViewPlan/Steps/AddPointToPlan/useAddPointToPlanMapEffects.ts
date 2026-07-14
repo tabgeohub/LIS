@@ -3,44 +3,21 @@ import { useEffect, useRef } from "react";
 import { EnrichedPointType } from "Types";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
-import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
+import { syncBluePointGraphics } from "hooks/map/syncBluePointGraphics";
 
 export function useAddPointToPlanBluePoints(filteredPoints: EnrichedPointType[]) {
   const { mapView, pointsGraphicsLayer } = useMapViewState();
   const blueGraphicsRef = useRef<__esri.Graphic[]>([]);
 
   useEffect(() => {
-    if (mapView && blueGraphicsRef.current.length) {
-      try {
-        mapView.graphics.removeMany(blueGraphicsRef.current);
-      } catch {}
-      blueGraphicsRef.current = [];
-    }
-    pointsGraphicsLayer?.removeAll();
-
-    if (!filteredPoints.length) return;
-
-    const graphics = createPointGraphics(filteredPoints, {
-      symbolOptions: {
-        color: "blue",
-        size: 10,
-        style: "circle",
-        outlineColor: "white",
-        outlineWidth: 1,
-      },
-      transformCoordinates: true,
+    blueGraphicsRef.current = syncBluePointGraphics({
+      points: filteredPoints,
+      mapView,
+      pointsGraphicsLayer,
+      ownedGraphics: blueGraphicsRef.current,
     });
-
-    if (!graphics.length) return;
-
-    if (pointsGraphicsLayer) {
-      pointsGraphicsLayer.addMany(graphics as __esri.Graphic[]);
-    } else if (mapView) {
-      mapView.graphics.addMany(graphics as __esri.Graphic[]);
-      blueGraphicsRef.current = graphics;
-    }
   }, [filteredPoints, mapView, pointsGraphicsLayer]);
 }
 

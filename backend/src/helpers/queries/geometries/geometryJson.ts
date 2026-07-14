@@ -59,3 +59,16 @@ export function buildGeometryPointsJsonAgg(
             ORDER BY ${pointAlias}.id ASC
           )`;
 }
+
+export function buildGeometrySelectFields(pointsAggregate: string): string {
+  return `g.id,
+          g.omschrijving,
+          g.organisatie,
+          g.vertrouwelijk,
+          g.herhalen,
+          g.activiteit,
+          g.specifiek_letten_op,
+          g.type,
+          g.regio_id,
+          ${pointsAggregate} AS points`;
+}

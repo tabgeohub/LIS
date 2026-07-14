@@ -42,14 +42,18 @@ export function downloadXlsxFromRows<T extends object>(input: {
   filename: string;
   sheetName: string;
 }) {
-  const worksheet = XLSX.utils.json_to_sheet(input.rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, input.sheetName);
-  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const buffer = buildXlsxBuffer(input.rows, input.sheetName);
   saveAs(
     new Blob([buffer], { type: "application/octet-stream" }),
     input.filename
   );
+}
+
+function buildXlsxBuffer<T extends object>(rows: T[], sheetName: string) {
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  return XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 }
 
 export function enrichedPointsToFeatureCollection(
@@ -153,21 +157,15 @@ function appendXlsxToZip(input: {
   points: EnrichedPointType[];
   plans: FlightPlanType[];
 }) {
-  const wsPoints = XLSX.utils.json_to_sheet(input.points);
-  const wbPoints = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wbPoints, wsPoints, "Points");
   input.zip.file(
     "points_export.xlsx",
-    XLSX.write(wbPoints, { bookType: "xlsx", type: "array" })
+    buildXlsxBuffer(input.points, "Points")
   );
 
   const cleanedPlans = input.plans.map(({ points, ...rest }) => rest);
-  const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-  const wbPlans = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
   input.zip.file(
     "plans_export.xlsx",
-    XLSX.write(wbPlans, { bookType: "xlsx", type: "array" })
+    buildXlsxBuffer(cleanedPlans, "FlightPlans")
   );
 }
 
@@ -186,10 +184,7 @@ export async function exportPointsPlansXlsx(input: {
   }
 
   if (hasPoints) {
-    const wsPoints = XLSX.utils.json_to_sheet(input.points);
-    const wbPoints = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPoints, wsPoints, "Points");
-    const buffer = XLSX.write(wbPoints, { bookType: "xlsx", type: "array" });
+    const buffer = buildXlsxBuffer(input.points, "Points");
     saveAs(
       new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -201,10 +196,7 @@ export async function exportPointsPlansXlsx(input: {
 
   if (hasPlans) {
     const cleanedPlans = input.plans.map(({ points, ...rest }) => rest);
-    const wsPlans = XLSX.utils.json_to_sheet(cleanedPlans);
-    const wbPlans = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wbPlans, wsPlans, "FlightPlans");
-    const buffer = XLSX.write(wbPlans, { bookType: "xlsx", type: "array" });
+    const buffer = buildXlsxBuffer(cleanedPlans, "FlightPlans");
     saveAs(
       new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
