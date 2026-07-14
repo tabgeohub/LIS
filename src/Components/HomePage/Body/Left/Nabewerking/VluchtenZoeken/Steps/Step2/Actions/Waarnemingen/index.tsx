@@ -10,6 +10,7 @@ import EditPointDetails from "./EditPointDetails";
 import EditGeometryDetails from "./EditGeometryDetails";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { sortPointsByImageCount } from "@helpers/points/sortPointsByImageCount";
 
 export default function Waarnemingen({
   setAction,
@@ -35,8 +36,12 @@ export default function Waarnemingen({
   const content = useContent();
 
   const filteredPoints = useMemo(() => {
-    return selectedPlan?.points_data.filter((point) =>
-      point.omschrijving.toLowerCase().includes(value.toLowerCase())
+    if (!selectedPlan?.points_data) return [];
+
+    return sortPointsByImageCount(
+      selectedPlan.points_data.filter((point) =>
+        point.omschrijving.toLowerCase().includes(value.toLowerCase())
+      )
     );
   }, [value, selectedPlan?.points_data]);
 

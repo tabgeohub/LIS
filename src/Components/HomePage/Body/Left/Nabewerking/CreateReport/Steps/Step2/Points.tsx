@@ -1,6 +1,8 @@
 import { FinishedPointType } from "Types/finished_plans";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { usePointHandlers } from "./hooks/usePointHandlers";
+import { useMemo } from "react";
+import { sortPointsByImageCount } from "@helpers/points/sortPointsByImageCount";
 
 interface PointsProps {
   points: FinishedPointType[];
@@ -16,10 +18,14 @@ export default function Points({
   onFocusPoint,
 }: PointsProps) {
   const { handleHoveredPoint, handleRemoveHoveredPoint } = usePointHandlers();
+  const orderedPoints = useMemo(
+    () => sortPointsByImageCount(points),
+    [points]
+  );
 
   return (
     <>
-      {points.map((point) => (
+      {orderedPoints.map((point) => (
         <div
           className={`flex items-center space-x-3 p-2 py-1 hover:bg-gray-100 transition-all duration-300 ${
             selectedPoints.includes(point.id) && "bg-gray-200"
