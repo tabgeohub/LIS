@@ -61,17 +61,39 @@ export function enrichedPointsToFeatureCollection(
 ): FeatureCollection<GeoPoint> {
   return {
     type: "FeatureCollection",
-    features: points.map((point) => {
-      const feature: Feature<GeoPoint> = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [point.longitude, point.latitude],
-        },
-        properties: { ...point },
-      };
-      return feature;
-    }),
+    features: points.map(enrichedPointToFeature),
+  };
+}
+
+function enrichedPointToFeature(
+  point: EnrichedPointType
+): Feature<GeoPoint> {
+  return {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [point.longitude, point.latitude],
+    },
+    properties: { ...point },
+  };
+}
+
+function enrichedPointExportProperties(point: EnrichedPointType) {
+  return {
+    id: point.id,
+    omschrijving: point.omschrijving,
+    regio_id: point.regio_id,
+    datum: point.datum,
+    vertrouwelijk: point.vertrouwelijk,
+    order: point.order,
+    region: point.region,
+  };
+}
+
+function enrichedPointToExportFeature(point: EnrichedPointType) {
+  return {
+    ...enrichedPointToFeature(point),
+    properties: enrichedPointExportProperties(point),
   };
 }
 
@@ -214,22 +236,7 @@ export async function exportPointsShapefile(points: EnrichedPointType[]) {
 
   const geojsonPoints: FeatureCollection<GeoPoint> = {
     type: "FeatureCollection",
-    features: points.map((p) => ({
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [p.longitude, p.latitude],
-      },
-      properties: {
-        id: p.id,
-        omschrijving: p.omschrijving,
-        regio_id: p.regio_id,
-        datum: p.datum,
-        vertrouwelijk: p.vertrouwelijk,
-        order: p.order,
-        region: p.region,
-      },
-    })),
+    features: points.map(enrichedPointToExportFeature),
   };
 
   const zip = new JSZip();
@@ -251,22 +258,7 @@ export async function exportPointsPlansGeoJsonZip(input: {
     JSON.stringify(
       {
         type: "FeatureCollection",
-        features: input.points.map((p) => ({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [p.longitude, p.latitude],
-          },
-          properties: {
-            id: p.id,
-            omschrijving: p.omschrijving,
-            regio_id: p.regio_id,
-            datum: p.datum,
-            vertrouwelijk: p.vertrouwelijk,
-            order: p.order,
-            region: p.region,
-          },
-        })),
+        features: input.points.map(enrichedPointToExportFeature),
       },
       null,
       2

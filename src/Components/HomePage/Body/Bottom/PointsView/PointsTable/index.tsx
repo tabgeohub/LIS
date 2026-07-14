@@ -2,6 +2,7 @@ import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { EnrichedPointType } from "Types";
+import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
 
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
@@ -41,16 +42,7 @@ export default function PointsTable({
     });
 
   return (
-    <div
-      className="w-max min-w-full"
-      style={{
-        minHeight:
-          typeof containerHeight === "number"
-            ? `${containerHeight}px`
-            : undefined,
-      }}
-    >
-      <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+    <PointsViewTableFrame containerHeight={containerHeight}>
         <DraggableTableHeader
           columns={visibleColumnsPoints}
           setColumns={setVisibleColumnsPoints}
@@ -136,7 +128,6 @@ export default function PointsTable({
             );
           })}
         </tbody>
-      </table>
-    </div>
+    </PointsViewTableFrame>
   );
 }

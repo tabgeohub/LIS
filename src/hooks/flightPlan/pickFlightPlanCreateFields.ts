@@ -1,4 +1,6 @@
 import type { FlightPlanPayloadFields } from "./usePopulateFlightPlanFormEffect";
+export { pickFlightPlanFormValues } from "hooks/zustand/shared/flightPlanFormFields";
+import { pickFlightPlanFormValues } from "hooks/zustand/shared/flightPlanFormFields";
 
 /** Pick create-payload form fields from a wizard zustand slice. */
 export function pickFlightPlanCreateFields(store: {
@@ -15,14 +17,6 @@ export function pickFlightPlanCreateFields(store: {
 }): FlightPlanPayloadFields {
   return {
     vluchtnummer: store.vluchtnummer,
-    omschrijving: store.omschrijving,
-    waarnemer: store.waarnemer,
-    piloot: store.piloot,
-    datum: store.datum,
-    geplandeVliegduur: store.geplandeVliegduur,
-    typeLuchtvaartuig: store.typeLuchtvaartuig,
-    aantalPassagiers: store.aantalPassagiers,
-    doelEnHoofdthema: store.doelEnHoofdthema,
-    aanvullendeInfo: store.aanvullendeInfo,
+    ...pickFlightPlanFormValues(store),
   };
 }

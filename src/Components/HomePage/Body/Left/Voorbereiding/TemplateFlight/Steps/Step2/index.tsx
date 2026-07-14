@@ -7,6 +7,7 @@ import { EnrichedPointType } from "Types";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useState, useEffect, useMemo } from "react";
 import { useContent } from "hooks/useContent";
+import { matchesGeometryRepeat } from "@helpers/geometry/matchesGeometryRepeat";
 
 export default function Step2({
   setOpenFilter,
@@ -25,15 +26,9 @@ export default function Step2({
   const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
 
   useEffect(() => {
-    const herhalenGeometries = dbGeometries.filter((geometry) => {
-      const herhalenValue =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === 1
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === "1"
-            : geometry.herhalen === true;
-      return herhalenValue;
-    });
+    const herhalenGeometries = dbGeometries.filter((geometry) =>
+      matchesGeometryRepeat(geometry, true)
+    );
 
     setGeometries(herhalenGeometries);
     setFilteredGeometries(herhalenGeometries);

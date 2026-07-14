@@ -1,6 +1,7 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
+import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
 import useGeometryListMapActions from "hooks/hover-click-handlers/useGeometryListMapActions";
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
@@ -45,16 +46,7 @@ export default function GeometriesTable({
     });
 
   return (
-    <div
-      className="w-max min-w-full"
-      style={{
-        minHeight:
-          typeof containerHeight === "number"
-            ? `${containerHeight}px`
-            : undefined,
-      }}
-    >
-      <table className="min-w-max text-[11px] text-left rtl:text-right text-gray-500 border-2 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+    <PointsViewTableFrame containerHeight={containerHeight}>
         <DraggableTableHeader
           columns={visibleColumnsGeometries}
           setColumns={setVisibleColumnsGeometries}
@@ -192,8 +184,7 @@ export default function GeometriesTable({
             );
           })}
         </tbody>
-      </table>
-    </div>
+    </PointsViewTableFrame>
   );
 }
 

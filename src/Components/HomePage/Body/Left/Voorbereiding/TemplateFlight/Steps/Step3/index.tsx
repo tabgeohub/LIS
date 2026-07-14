@@ -7,6 +7,7 @@ import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 import { useState, useEffect, useMemo } from "react";
 import { useContent } from "hooks/useContent";
+import { matchesGeometryRepeat } from "@helpers/geometry/matchesGeometryRepeat";
 
 export default function Step3({
   name,
@@ -27,15 +28,9 @@ export default function Step3({
   const [filteredGeometries, setFilteredGeometries] = useState<Geometry[]>([]);
 
   useEffect(() => {
-    const notHerhalenGeometries = dbGeometries.filter((geometry) => {
-      const herhalenValue =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === 0
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === "0"
-            : geometry.herhalen === false;
-      return herhalenValue;
-    });
+    const notHerhalenGeometries = dbGeometries.filter((geometry) =>
+      matchesGeometryRepeat(geometry, false)
+    );
 
     setGeometries(notHerhalenGeometries);
     setFilteredGeometries(notHerhalenGeometries);

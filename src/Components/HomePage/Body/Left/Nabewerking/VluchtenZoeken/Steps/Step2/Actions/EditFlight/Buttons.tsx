@@ -6,25 +6,15 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import { pickFlightPlanFormValues } from "hooks/flightPlan/pickFlightPlanCreateFields";
 
 export default function Buttons({
   setAction,
 }: {
   setAction: (action: ActionType) => void;
 }) {
-  const {
-    selectedPlan,
-    setSelectedPlan,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
-  } = useFinishedPlansState();
+  const store = useFinishedPlansState();
+  const { selectedPlan, setSelectedPlan } = store;
   const { user } = useAuth();
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans`);
   const { logStep, withLog, labels } = useWizardButtons("Second step - Edit flight");
@@ -34,17 +24,7 @@ export default function Buttons({
 
     const attributes = {
       vluchtnummer: selectedPlan.vluchtnummer,
-      ...buildFlightPlanPayloadFields({
-        omschrijving,
-        waarnemer,
-        piloot,
-        datum,
-        geplandeVliegduur,
-        typeLuchtvaartuig,
-        aantalPassagiers,
-        doelEnHoofdthema,
-        aanvullendeInfo,
-      }),
+      ...buildFlightPlanPayloadFields(pickFlightPlanFormValues(store)),
       points: selectedPlan.points_data.flatMap((point) => point.id),
       user_id: user.user_id,
       status: selectedPlan.status,

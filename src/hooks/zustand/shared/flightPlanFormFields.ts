@@ -22,6 +22,18 @@ export const emptyFlightPlanFormFields: FlightPlanFormFieldValues = {
   aanvullendeInfo: "",
 };
 
+const flightPlanFormFieldKeys = Object.keys(
+  emptyFlightPlanFormFields
+) as (keyof FlightPlanFormFieldValues)[];
+
+export function pickFlightPlanFormValues(
+  source: FlightPlanFormFieldValues
+): FlightPlanFormFieldValues {
+  return Object.fromEntries(
+    flightPlanFormFieldKeys.map((field) => [field, source[field]])
+  ) as FlightPlanFormFieldValues;
+}
+
 export type FlightPlanFormFieldSetters = {
   setOmschrijving: (value: string) => void;
   setWaarnemer: (value: string) => void;

@@ -12,6 +12,7 @@ import {
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { pickFlightPlanFormValues } from "hooks/flightPlan/pickFlightPlanCreateFields";
 
 export default function Buttons({
   vluchtnummer,
@@ -24,17 +25,9 @@ export default function Buttons({
 }) {
   const { logStep, withLog } = useWizardButtons("View plan - Step 2");
   const { user } = useAuth();
+  const store = useViewPlanState();
   const {
     setStep,
-    omschrijving,
-    waarnemer,
-    piloot,
-    datum,
-    geplandeVliegduur,
-    typeLuchtvaartuig,
-    aantalPassagiers,
-    doelEnHoofdthema,
-    aanvullendeInfo,
     selectedPlan,
     setSelectedIndex,
     setFilteredPlans,
@@ -42,7 +35,7 @@ export default function Buttons({
     setSelectedPlan,
     setInitialPlans,
     initialPlans,
-  } = useViewPlanState();
+  } = store;
   const { update } = useUpdateData(`/flightPlans/vluchtplans`);
   const { pointsTable, geometriesTable, setPointsTable, setGeometriesTable, setOpenTable } =
     useOpenTable();
@@ -56,15 +49,8 @@ export default function Buttons({
 
     const form = {
       vluchtnummer,
-      omschrijving,
-      waarnemer,
-      piloot,
-      datum,
-      geplandeVliegduur,
-      typeLuchtvaartuig,
-      aantalPassagiers,
-      doelEnHoofdthema,
-      aanvullendeInfo,
+      ...pickFlightPlanFormValues(store),
+      aantalPassagiers: store.aantalPassagiers ?? 0,
     };
 
     const payload = buildViewPlanUpdatePayload({

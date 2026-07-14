@@ -2,7 +2,6 @@ import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 /* eslint-disable react-hooks/exhaustive-deps */
 import TabHeader from "../TabHeader";
 import PeriodeComp from "./PeriodeComp";
-import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useFilterState } from "@helpers/ZustandStates/filterState";
 import { FilterInput } from "./FilterInput";
 import FilterSelect from "./FilterSelect";
@@ -10,14 +9,13 @@ import { useContent } from "hooks/useContent";
 import { useEffect } from "react";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetPointFilters } from "hooks/features/useResetPointFilters";
 
 export default function FiltersSection() {
-  const { setSelectedTab } = useTabState();
   const activities = useConstSelectOptions("activiteiten");
   const organizations = useConstSelectOptions("organisaties");
   const { fetchPoints } = usePointsStore();
-  const { resetFeatures } = useResetFeatures();
+  const { resetPointFilters } = useResetPointFilters();
 
   const {
     naamAandachtspunt,
@@ -47,19 +45,6 @@ export default function FiltersSection() {
 
     setRegio(user.role);
   }, [user.role]);
-
-  function resetFilters() {
-    setNaamAandachtspunt("");
-    setActiviteit("");
-    setOrganisatie("");
-    setVan("");
-    setTot("");
-    setHerhalen("");
-
-    resetFeatures();
-
-    setSelectedTab("none");
-  }
 
   const regiosType = () => {
     const userRole = user.role;
@@ -149,7 +134,7 @@ export default function FiltersSection() {
               {content.common.filteren}
             </button>
 
-            <button onClick={resetFilters} className="gray-button">
+            <button onClick={resetPointFilters} className="gray-button">
               {content.common.annuleren}
             </button>
           </div>

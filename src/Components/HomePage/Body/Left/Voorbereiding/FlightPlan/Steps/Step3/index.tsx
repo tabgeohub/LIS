@@ -13,6 +13,7 @@ import PointsList from "../../Common/PointsList";
 import GeometriesList from "../../Common/GeometriesList";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
+import { matchesGeometryRepeat } from "@helpers/geometry/matchesGeometryRepeat";
 
 dayjs.extend(isBetween);
 
@@ -33,15 +34,9 @@ export default function Step3({ basemapString }: { basemapString: string }) {
     setPoints(dbPoints.filter((point) => point.herhalen === 0));
     setFilteredPoints(dbPoints.filter((point) => point.herhalen === 0));
 
-    const notHerhalenGeometries = dbGeometries.filter((geometry) => {
-      const herhalenValue =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === 0
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === "0"
-            : geometry.herhalen === false;
-      return herhalenValue;
-    });
+    const notHerhalenGeometries = dbGeometries.filter((geometry) =>
+      matchesGeometryRepeat(geometry, false)
+    );
     
     setGeometries(notHerhalenGeometries);
     setFilteredGeometries(notHerhalenGeometries);

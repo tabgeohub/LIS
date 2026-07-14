@@ -3,6 +3,7 @@ import { useFormikContext } from "formik";
 import useLogAction from "hooks/useLogAction";
 import { useState } from "react";
 import { useEditPointFormMapClick } from "./useEditPointFormMapClick";
+import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
 
 export default function Step2Sub1({
   setStep,
@@ -12,15 +13,7 @@ export default function Step2Sub1({
   handleSubmit,
   currentPoint,
   setCurrentPoint,
-}: {
-  setStep: (value: number) => void;
-  setSubStep: (value: number) => void;
-  subStep: number;
-  isLoading: boolean;
-  handleSubmit: () => void;
-  currentPoint: { x: number; y: number };
-  setCurrentPoint: (value: { x: number; y: number }) => void;
-}) {
+}: EditPointMapStepProps) {
   const logAction = useLogAction();
   const { values, setValues } = useFormikContext<{
     id: number;

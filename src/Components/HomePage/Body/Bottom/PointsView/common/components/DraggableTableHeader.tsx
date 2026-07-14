@@ -3,30 +3,30 @@ import { IoClose } from "react-icons/io5";
 import { MdFilterAlt } from "react-icons/md";
 import { RxDragHandleDots2 } from "react-icons/rx";
 
-type DraggableTableHeaderProps = {
-  columns: string[];
-  setColumns: Dispatch<SetStateAction<string[]>>;
+type DraggableTableHeaderProps<Column extends string> = {
+  columns: Column[];
+  setColumns: Dispatch<SetStateAction<Column[]>>;
   handleDragStart: (column: string) => void;
   handleDragOver: DragEventHandler<HTMLTableCellElement>;
   handleDrop: (
     column: string,
-    columns: string[],
-    setColumns: Dispatch<SetStateAction<string[]>>
+    columns: Column[],
+    setColumns: Dispatch<SetStateAction<Column[]>>
   ) => void;
   removeColumn: (
     column: string,
-    setColumns: Dispatch<SetStateAction<string[]>>
+    setColumns: Dispatch<SetStateAction<Column[]>>
   ) => void;
 };
 
-export default function DraggableTableHeader({
+export default function DraggableTableHeader<Column extends string>({
   columns,
   setColumns,
   handleDragStart,
   handleDragOver,
   handleDrop,
   removeColumn,
-}: DraggableTableHeaderProps) {
+}: DraggableTableHeaderProps<Column>) {
   return (
     <thead className="text-[12px] sticky top-0 bg-white z-10">
       <tr>

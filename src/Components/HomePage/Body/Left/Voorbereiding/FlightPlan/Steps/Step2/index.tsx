@@ -15,6 +15,7 @@ import Header from "../../Common/Header";
 import PointsList from "../../Common/PointsList";
 import GeometriesList from "../../Common/GeometriesList";
 import { EnrichedPointType } from "Types";
+import { matchesGeometryRepeat } from "@helpers/geometry/matchesGeometryRepeat";
 
 dayjs.extend(isBetween);
 
@@ -36,15 +37,9 @@ export default function Step2() {
     setPoints(dbPoints.filter((point) => point.herhalen === 1));
     setFilteredPoints(dbPoints.filter((point) => point.herhalen === 1));
 
-    const herhalenGeometries = dbGeometries.filter((geometry) => {
-      const herhalenValue =
-        typeof geometry.herhalen === "number"
-          ? geometry.herhalen === 1
-          : typeof geometry.herhalen === "string"
-            ? geometry.herhalen === "1"
-            : geometry.herhalen === true;
-      return herhalenValue;
-    });
+    const herhalenGeometries = dbGeometries.filter((geometry) =>
+      matchesGeometryRepeat(geometry, true)
+    );
 
     setGeometries(herhalenGeometries);
     setFilteredGeometries(herhalenGeometries);

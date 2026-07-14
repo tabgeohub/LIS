@@ -3,6 +3,7 @@ import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { useDeletePointMapClick } from "./useDeletePointMapClick";
+import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
 
 export default function Step2Sub1({
   setStep,
@@ -12,15 +13,7 @@ export default function Step2Sub1({
   handleSubmit,
   currentPoint,
   setCurrentPoint,
-}: {
-  setStep: (value: number) => void;
-  setSubStep: (value: number) => void;
-  subStep: number;
-  isLoading: boolean;
-  handleSubmit: () => void;
-  currentPoint: { x: number; y: number };
-  setCurrentPoint: (value: { x: number; y: number }) => void;
-}) {
+}: EditPointMapStepProps) {
   const logAction = useLogAction();
   const content = useContent();
   const { setXCoordinaat_rd, setYCoordinaat_rd, setLatitude, setLongitude } =

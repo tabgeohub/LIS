@@ -16,4 +16,6 @@ export {
   buildPointInsertSql,
   buildPointUpdateParams,
   buildPointUpdateSql,
+  buildPointUpdateAssignments,
+  POINT_UPDATE_COLUMNS,
 } from "./pointSqlBuilders";

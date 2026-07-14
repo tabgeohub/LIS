@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { missingFields, notFound, okResult, serverError } from "../../helpers/http/routeResponses";
-import { requireId } from "../../helpers/http/validateBody";
+import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function deleteSingleEmail(
   req: Request,
@@ -9,35 +8,16 @@ export async function deleteSingleEmail(
 ): Promise<void> {
   const { id } = req.params;
 
-  if (!requireId(id)) {
-    missingFields(res);
-    return;
-  }
-
-  try {
-    const result = await pool.query(
-      `DELETE FROM lis.emails WHERE id = $1 RETURNING *`,
-      [id]
-    );
-
-    if (result.rows.length === 0) {
-      notFound(res, "E-mail niet gevonden");
-      return;
-    }
-
-    okResult({
-      res,
-      result: result.rows[0],
-      message: "E-mail succesvol verwijderd",
-    });
-  } catch (err) {
-    serverError({
-      res,
+  await runReturningUpdateById({
+    res,
+    id,
+    runQuery: () =>
+      pool.query(`DELETE FROM lis.emails WHERE id = $1 RETURNING *`, [id]),
+    config: {
+      notFoundMessage: "E-mail niet gevonden",
+      successMessage: "E-mail succesvol verwijderd",
       logLabel: "Error deleting email:",
-      message: `Failed to delete email: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-      err,
-    });
-  }
+      errorMessage: "Failed to delete email:",
+    },
+  });
 }

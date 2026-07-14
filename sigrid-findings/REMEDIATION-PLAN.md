@@ -1,165 +1,156 @@
 # Sigrid Findings Remediation Plan — LIS
 
-## Context
+## Current state
 
-Sigrid (SIG's code-quality/security platform) scanned the LIS repo. The current export lives in
-[`sigrid findings/`](./sigrid%20findings/) as 11 CSVs. Analysis of those CSVs shows:
+The immutable baseline export from July 13, 2026 is in [`sigrid findings/`](./sigrid%20findings/). The current export from July 14, 2026 is in [`sigrid-findings-new/`](./sigrid-findings-new/) and is the source of truth for further remediation.
 
-- **Security / Reliability are essentially clean.** Almost every finding is already `FIXED` (SQL-injection, SSRF,
-  open-redirect, vulnerable deps xlsx/multer/undici/nodemailer). Only **3 items are still `RAW` (open)**.
-- **The real backlog is maintainability**, all `RAW`: **147 HIGH duplication**, **~190 unit-size** (15 HIGH),
-  **181 unit-complexity** (40 MEDIUM), **106 component-independence** (29 HIGH), **30 module-coupling** (2 HIGH),
-  **9 component-entanglement**, plus unit-interfacing (parameter counts).
+| Category | Baseline RAW | Current RAW | Severity change |
+| --- | ---: | ---: | --- |
+| Duplication | 147 | 119 | HIGH 147 → 119 |
+| Unit size | 683 | 683 | HIGH 17 → 4; MEDIUM 214 → 207 |
+| Component independence | 106 | 113 | HIGH 29 → 27 |
+| Unit complexity | 241 | 240 | MEDIUM 55 → 46 |
+| Unit interfacing | 38 | 49 | MEDIUM 1 → 3 |
+| Module coupling | 30 | 29 | HIGH remains 2 |
+| Component entanglement | 9 | 9 | MEDIUM remains 2 |
+| Security | 3 | 3 | HIGH 2; MEDIUM 1 |
+| Reliability | 0 | 0 | Clean |
 
-Goal (scope = **Everything**): close the 3 open security items, then work the maintainability backlog in
-severity waves (HIGH → MEDIUM → LOW) until Sigrid re-scan shows the ratings improved. Each wave is independently
-shippable so we can re-export and measure progress with the existing
-[`compare-exports-pair.py`](./compare-exports-pair.py) once an `exported-findings-8/` exists.
-
-Guiding rule: **behavior-preserving refactors only.** No feature changes. Every wave ends with typecheck + build + the
-app running (see Verification).
-
----
-
-## Phase 0 — Open security items (fast, do first)
-
-Only 3 findings are still `RAW` in [`Security findings.csv`](./sigrid%20findings/Security%20findings.csv):
-
-1. **Missing `USER` instruction (CWE-266), HIGH** — `backend/dockerfile:4` and root `dockerfile:22`.
-   Container runs as root. Fix: add a non-root user in the runtime stage of each Dockerfile, e.g. after deps are
-   installed and files copied:
-   ```dockerfile
-   RUN groupadd -r app && useradd -r -g app app \
-    && chown -R app:app /usr/src/app
-   USER app
-   ```
-   Place `USER app` before `CMD`. Verify the app still boots (Chromium/Puppeteer in the backend image runs fine as
-   non-root; it already uses system `/usr/bin/chromium`).
-
-2. **XSS in CSV export (CWE-79), MEDIUM** — `src/helpers/tableExports/pointsPlansTableExport.ts:18`.
-   **This is a false positive.** The flagged code is `escapeCsvCell` / `buildCsvFromRows` — a CSV/spreadsheet builder,
-   not HTML. There is no HTML sink, `innerHTML`, or DOM write in the file. Action: add a `// nosemgrep: <rule-id>`
-   suppression comment on the flagged line with a one-line justification, and mark it a false positive in Sigrid.
-   Do **not** restructure working CSV-escaping logic.
-
-**Deliverable:** 2 Dockerfiles edited, 1 suppression comment. Re-export → these drop off the Security board.
+The refactors reduced the most serious unit-size and complexity findings, but Phase 1 is not complete: 119 HIGH duplication findings remain. All changes must remain behavior-preserving and uncommitted for review. Do not push, create branches, edit deployment files, change database schemas, or change HTTP contracts.
 
 ---
 
-## Phase 1 — HIGH duplication (147 findings) — highest leverage
+## Phase 0 — Security disposition
 
-Source: [`Duplication findings.csv`](./sigrid%20findings/Duplication%20findings.csv). Clones cluster into a
-few repeatable patterns; fixing the pattern kills many findings at once.
+Source: [`Security findings.csv`](./sigrid-findings-new/Security%20findings.csv).
 
-**1a. Wizard `Buttons.tsx` / `Form.tsx` clones (biggest cluster).**
-Repeated Back/Next/Submit button blocks and form-field blocks across the step wizards, e.g.
-`.../DrawingTool/Step2/Form.tsx`, `.../EnrichedAddPoint/Steps/Step3/Form.tsx`, `.../ViewPlan/Steps/Step2/Buttons.tsx`,
-`.../Nabewerking/.../EditFlight/Buttons.tsx`.
-Action: extract shared **`WizardStepButtons`** and **`WizardPointFormFields`** components into
-`src/Components/HomePage/Body/Left/Common/` (co-locate with the existing `WizardPointsList.tsx`) and replace each clone
-with the shared component + props.
-
-**1b. Map-effect hook clones.**
-`useAddPointToPlanMapEffects.ts`, `useSelectFromSourceMapEffects.ts`, `useStepContentMapSync.ts` share 10–13-line
-effect bodies. Extract a shared hook (e.g. `useStepMapSyncEffect`) in `src/hooks/` and call it from each.
-
-**1c. Self-duplication inside one file.**
-`useEnrichedPointState.ts` (17-line and 14-line blocks twice), `runReturningUpdate.ts`,
-`pointsPlansTableExport.ts` (L225/L262). Extract a local helper and call it twice.
-
-**1d. Shared type duplication.**
-`src/Types/keycloakUser.ts` vs `backend/src/routes/keycloak/management/users/types.ts` (11 identical lines), and
-`templateFlightStates.ts` vs `useFlightPlanState.ts`. Where a type is duplicated front/back, define once and import;
-where they can't share a module (front vs back), accept it or generate from a single source.
-
-**1e. Backend query/route clones.**
-`formatPlanGeometries.ts` vs `getGeometries.ts`; `buildPointUpdatePayload.ts` vs `updateGeometryPointsComment.ts`.
-Extract shared query/format helpers into the existing `backend/src/helpers/queries/` tree.
-
-Work file-pair by file-pair from the CSV top (largest `Redundant lines of code` first). Re-run the app after each
-cluster.
+- `dockerfile` and `backend/dockerfile` still have two HIGH missing-user findings. They are explicitly out of scope because Dockerfiles, Nginx, and other deployment files must not be modified. Record them as accepted deployment-boundary findings rather than changing the repository.
+- The MEDIUM XSS finding in `pointsPlansTableExport.ts` is a false positive. The flagged function creates escaped CSV cells and has no HTML or DOM sink. The source already contains a suppression explanation; accept the finding in Sigrid rather than changing working CSV behavior again.
+- Reliability has no open findings and needs no remediation.
 
 ---
 
-## Phase 2 — HIGH unit size & HIGH component independence
+## Phase 1 — Remaining HIGH duplication
 
-**2a. Unit size HIGH (15)** — [`Unit size findings.csv`](./sigrid%20findings/Unit%20size%20findings.csv).
-Split each >65-line unit into named helpers. Representative targets:
-- `src/Components/HomePage/Body/Bottom/PointsView/usePointsViewController.ts` (117 LOC)
-- `backend/src/routes/auth2/verifyCredentialsHandler.ts` (102 LOC, McCabe 21 — also Phase 3)
-- `src/helpers/ArcGISHelpers/createMapView.ts` (86 LOC)
-- `backend/src/services/getKeycloakAdminToken.ts` (83 LOC, McCabe 20)
-- `nnederlandLayerSpecsPart1/2/3.ts` — these are data-spec files; split the spec arrays into smaller grouped modules.
+Sources: [`Duplication findings.csv`](./sigrid-findings-new/Duplication%20findings.csv) and [`Duplicates.csv`](./sigrid-findings-new/Duplicates.csv). Use the IDs in `Duplicates.csv` so overlapping clones are counted once.
 
-**2b. Component independence HIGH (29)** — [`Component independence findings.csv`](./sigrid%20findings/Component%20independence%20findings.csv).
-"Interface module with N lines" = hooks in `src/hooks/` exposing too much surface. Targets include
-`useFlightPlanQuery.ts` (111), `useEntityQuery.ts` (87), `useEditGeometryVerticesOnMap.ts` (77), `useRenderGeometries.ts`,
-`useLogAction.ts`, `useGetFlightTimesDistance.ts`. Reduce the exported/public surface: move pure helpers out of the hook
-into a sibling non-hook module so the hook file itself shrinks, and narrow what each hook returns to what callers use.
+The first Phase 1 pass closed 28 findings, from 147 to 119. Continue in behavior-preserving batches ordered by redundant lines:
 
-These two overlap heavily with the same files (a big hook is both "too large" and "too much interface"), so do them
-together per file.
+1. Consolidate identical flight-plan button definitions only where labels, order, disabled rules, navigation, submission, and cleanup semantics match. Continue using `WizardButtonBar`; do not introduce a universal wizard abstraction.
+2. Centralize repeated point and flight-plan field sequences in typed frontend constants/builders. Keep separate backend constants where build boundaries differ.
+3. Route the four flight-plan list handlers through their existing shared query configuration instead of repeating route-level option blocks.
+4. Extract feature-specific table header/layout and tab-header presentation blocks shared by the point, geometry, and flight-plan tables.
+5. Reuse one edit-point step wrapper for the Tools and Voorbereiding flows while retaining their different store adapters and labels.
+6. Extract the remaining same-file XLSX/export row builder clone in `pointsPlansTableExport.ts`.
+7. Review the remaining filter, coordinate-watcher, token-server, and result-tab clones by ID after each batch, because one extraction may close several overlapping findings.
 
----
+### July 14 implementation batch
 
-## Phase 3 — MEDIUM complexity + HIGH module coupling
+The following July 14 findings have now been addressed in the working tree and require confirmation by the next immutable Sigrid export:
 
-**3a. Unit complexity MEDIUM (40)** — [`Unit complexity findings.csv`](./sigrid%20findings/Unit%20complexity%20findings.csv).
-Highest McCabe first: `verifyCredentialsHandler` (21), `getKeycloakAdminToken` (20), `filterPoints` (20),
-`TimesliderItemDetailPage` (23), `LegendSection` (22), `usePathPointHandlerClick` (18), `FeatureLayerPopup` (18).
-Reduce branching: extract guard/early-return helpers, replace nested `if/else` chains with lookup maps or small
-`classify*` functions (the auth2 code already has `classifyStep2OtpLoginFailure` as a model to follow).
+- `e7e6db51-c848-4677-95be-113c92fa071d`: flight-plan form values are selected by one typed helper.
+- `0faa85fb-81c8-4fe0-b54e-941e26aa3108`: both edit-point map steps share one props contract.
+- `a69a498a-d56e-42b5-8e64-8468bd4dd4b2`: add-points submission consumes its input object without restating the complete field list.
+- `c7e3764d-011e-4a0f-8c66-5432fb7ce199`: point export feature construction is shared by Shapefile and GeoJSON ZIP exports.
+- `69b8b926-d91e-41a5-89ea-199f22f3de02`: point, geometry, and flight-plan tables use one table frame.
+- `173fce86-b119-4cac-ae77-c25236ef0ac0`: the four regional flight-plan list routes use one shared route configuration.
+- `ef8feed0-1487-4a5a-af8a-151f1a242f8b`, `7885ab43-c150-48d8-b742-b84494bdecbc`, and `2fab6676-4bae-40d0-b3e1-145cd0cfe2ea`: filter inputs and selects are thin adapters over the existing common controls.
+- `cc74972f-d376-467f-adde-e7eb9ffff173`: point/geometry selection filters use one configurable panel.
+- `880736fd-41a8-477c-badb-8ac0d3d58d21` and `bd048923-9271-40fa-bdac-4ca53ea6cd9e`: ArcGIS token refresh and registration use one server catalogue.
+- `d0c828c0-ede2-41f5-b3e5-5f3c62eb11c3`: plan-information fields use one presentation component while preserving each flow's urgent-value display.
+- `232aff57-b05f-4ade-b517-2e87dcf21baf`: point and geometry-owned-point updates share typed SQL assignments and parameter ordering.
+- `ca55656a-3db3-48b6-a277-1dcbb1c3fb65`: email update/delete routes use the common returning-update executor.
 
-**3b. Module coupling HIGH (2)** — [`Module coupling findings.csv`](./sigrid%20findings/Module%20coupling%20findings.csv).
-`useLogAction.ts` (fan-in 98) and `useContent.ts` (fan-in 123). These are hubs imported everywhere. Don't force this —
-high fan-in on a genuinely shared utility is often acceptable. Only act if the module bundles unrelated concerns; then
-split it so callers import just what they need. Otherwise mark as accepted risk in Sigrid with a rationale.
+The repeated filter reset, frontend point payload field selection, XLSX buffer creation, and geometry repeat normalization were also consolidated. Do not mark Phase 1 complete until a new export confirms which overlapping IDs disappeared.
 
----
+Accept rather than merge:
 
-## Phase 4 — MEDIUM/LOW long tail
+- the duplicated Keycloak user shape across frontend and backend build contexts;
+- declarative domain field lists where consolidation would hide meaning or create cross-package coupling;
+- superficially similar UI or cleanup flows with different behavior.
 
-Work these in bulk, lowest-risk mechanical changes, re-exporting periodically to track the rating:
+Stable accepted IDs from the July 14 export:
 
-- **Unit size MEDIUM (173) / LOW (354):** continue the Phase-2 split pattern down the severity list.
-- **Unit complexity LOW (141):** same as 3a at smaller scale.
-- **Unit interfacing (all LOW/MEDIUM):** functions with 3–5 params. Bundle related params into a single typed options
-  object (the codebase already uses this pattern, e.g. `CreateGeometryGraphicOptions`, `BuildFlightPlanQueryOptions`).
-- **Module coupling MEDIUM/LOW (28) & Component entanglement (9):** mostly `COMMUNICATION_DENSITY` /
-  `LAYER_BYPASSING_DEPENDENCY` on `src/hooks`, `src/helpers`, `src/utils`, `src/Components/HomePage`. Address the
-  layer-bypassing transitive deps (`src/hooks → src/utils`, `TimesliderItemDetailPage → src/hooks/helpers`) by routing
-  through the proper layer; density findings largely resolve as Phases 1–2 shrink the hot components.
+- `e693dac9-7ed2-47cf-b948-d3c375fc612b`: Keycloak user structures live in separate frontend and backend build contexts.
+- `c08a36ac-e8a1-46c2-9c61-cc66660681ac` and `8b0a205d-522f-49af-9f47-1b171a3b7605`: device structures cross the same package boundary.
+- `4f1487b1-abfe-413f-be8f-1c5ed6fb591b`: installer route and frontend structure cannot share a module without introducing a package boundary.
+- `6cf934e6-f39f-4fce-9b00-0a416bdf3310`: backend geometry JSON fields and frontend point columns are independent declarative sequences.
+- `dac91103-8f36-4874-bc1b-0d908536685c`: the Netherlands layer builders intentionally construct two different ArcGIS layer classes behind a stable catalogue boundary.
 
-Many long-tail findings will disappear automatically as Phases 1–3 land, so re-measure before grinding through the
-remainder.
+After each batch, run both production builds, targeted tests, affected manual workflows, and compare a fresh export with the current one using [`compare-exports-pair.py`](./compare-exports-pair.py).
 
 ---
 
-## Execution & measurement loop
+## Phase 2 — HIGH unit size and component independence
 
-1. Do a wave (or a cluster within a wave).
-2. `cd backend && npm run build` and root `npm run build` + typecheck; run the app (Verification below).
-3. Commit the wave on the `maintain` branch with a message naming the finding category.
-4. When a batch is done, request a fresh Sigrid export, drop it in `sigrid-findings/exported-findings-8/`, and run
-   `python "sigrid-findings/compare-exports-pair.py" "sigrid findings" exported-findings-8` to confirm findings dropped
-   and no regressions appeared.
+Phase 2 is complete for actionable executable findings.
 
-## Verification
+The four remaining HIGH unit-size findings are accepted declarative data:
 
-- **Typecheck/build (both packages):** root `npm run build` and `backend/ npm run build` must pass after every wave.
-- **Lint:** run the repo linter if configured; refactors must not introduce new warnings.
-- **Run the app end-to-end:** load the HomePage map, exercise a flight-plan wizard (the Voorbereiding step flow touched
-  in Phase 1), do a CSV/XLSX export (Phase 0 file), and a login/auth2 flow (Phase 3 files). Confirm no behavioral change.
-- **Security spot-check Phase 0:** build both Docker images, run the backend container, confirm it starts as non-root
-  (`whoami` → `app`) and Puppeteer PDF generation still works.
-- **Regression safety:** since these are behavior-preserving, prefer extracting to shared units that are covered by
-  existing usage; if a refactor touches auth, verify login manually before committing.
+- `nnederlandLayerSpecsPart1.ts`
+- `nnederlandLayerSpecsPart2.ts`
+- `nnederlandLayerSpecsPart3.ts`
+- `voorbereidingTabs.ts`
 
-## Critical files / utilities to reuse (don't reinvent)
+These catalogues have negligible branching; splitting them solely to lower the metric would make them harder to review.
 
-- `src/helpers/tableExports/pointsPlansTableExport.ts` — already has `escapeCsvCell` (RFC-4180 + formula-injection
-  safe); reuse, don't rewrite.
-- `src/Components/HomePage/Body/Left/Common/` — home for shared wizard components (`WizardPointsList.tsx` precedent).
-- `backend/src/helpers/queries/` — home for shared backend query/format helpers.
-- Existing `*Options` typed-param objects — the established pattern for fixing unit-interfacing findings.
-- [`compare-exports-pair.py`](./compare-exports-pair.py) — progress measurement between exports.
+The 27 remaining HIGH component-independence findings are small, cohesive hooks, query groups, utilities, or compatibility façades. Examples include `usePlanStarGraphic`, `syncBluePointGraphics`, `useMapInitialization`, the domain query modules, `useLogAction`, and `refreshToken`. Keep these stable boundaries unless a future scan or code change shows that a module has acquired unrelated responsibilities. Do not keep moving implementation between tiny files to game the metric.
+
+---
+
+## Phase 3 — MEDIUM complexity and parameter cleanup
+
+Source: [`Unit complexity findings.csv`](./sigrid-findings-new/Unit%20complexity%20findings.csv). Address the 46 MEDIUM findings from highest McCabe complexity downward:
+
+1. Decompose `TimesliderItemDetailPage` and `LegendSection` into state/controller logic and focused presentation sections.
+2. Simplify the timeslider status/view builders with named predicates and lookup tables while preserving status precedence and rendered output.
+3. Split `filterPoints` and flight-plan form population into independent filter/mapping steps with early returns.
+4. Extract event resolution and response construction from `FeatureLayerPopup` and `usePathPointHandlerClick`.
+5. Continue with export, import parsing, grant-error parsing, login validation, geometry creation, image handling, Keycloak lookup, and path drawing in descending complexity order.
+
+Source: [`Unit interfacing findings.csv`](./sigrid-findings-new/Unit%20interfacing%20findings.csv). Fix the three MEDIUM findings with typed options objects:
+
+- the six-parameter login-failure logger;
+- the five-parameter finished-plan highlight drawing helper;
+- the five-parameter geometry coordinate builder.
+
+Keep return values, authentication decisions, logging event names, map symbols, and public hook imports compatible.
+
+The two HIGH module-coupling findings, `useLogAction` and `useContent`, are accepted high-fan-in application services. Both are cohesive and intentionally shared; splitting them would distribute coupling rather than remove it.
+
+---
+
+## Phase 4 — Current long tail
+
+Re-scan after Phases 1 and 3 before starting this phase. The current lower-severity backlog is:
+
+- 207 MEDIUM and 472 LOW unit-size findings;
+- 194 LOW unit-complexity findings;
+- 46 LOW unit-interfacing findings;
+- 86 MEDIUM component-independence findings;
+- 12 MEDIUM and 15 LOW module-coupling findings;
+- 2 MEDIUM and 7 LOW component-entanglement findings.
+
+Continue the established patterns: focused helpers for executable units, typed options objects for related parameters, stable façades for public imports, and explicit acceptance for cohesive high-fan-in or declarative modules. Prioritize real complexity and coupling reduction over file-count growth.
+
+---
+
+## Verification and measurement
+
+For application-code batches:
+
+1. Run the frontend production build and backend TypeScript build.
+2. Run all existing authentication tests plus focused tests for the changed subsystem.
+3. Manually exercise the affected map, table, wizard, export, or authentication workflows.
+4. Confirm `dockerfile`, `backend/dockerfile`, both Nginx files, database schemas, and HTTP request/response shapes are unchanged.
+5. Run `git diff --check` and leave all changes uncommitted and unpushed.
+6. Place each future Sigrid export in a new immutable directory. Do not edit prior exports. Compare exports by duplication ID and category/severity totals using `compare-exports-pair.py` in an environment with Python available.
+
+For documentation-only updates, verify links, export hashes, protected-file diffs, and `git diff --check`; application builds are not required.
+
+## Reuse and compatibility rules
+
+- Reuse existing Common components, `WizardButtonBar`, query builders, map graphic builders, and typed `*Options` patterns.
+- Do not introduce a shared frontend/backend package during behavior-preserving remediation.
+- Do not change UI labels, button order, disabled conditions, cleanup ownership, map symbols, logging messages, export filenames, SQL parameters, or response JSON shapes.
+- Every accepted finding must be documented with its rationale when Sigrid provides an acceptance mechanism or stable identifier.

@@ -4,6 +4,18 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 
 import "react-datepicker/dist/react-datepicker.css";
 
+export type InputCompProps = {
+  label: string;
+  value: string;
+  setValue?: (value: string) => void;
+  required?: boolean;
+  type?: string;
+  disabled?: boolean;
+  nativeDate?: boolean;
+  min?: string;
+  inputClassName?: string;
+};
+
 export default function InputComp({
   label,
   value,
@@ -11,14 +23,10 @@ export default function InputComp({
   required = false,
   type = "text",
   disabled = false,
-}: {
-  label: string;
-  value: string;
-  setValue?: (value: string) => void;
-  required?: boolean;
-  type?: string;
-  disabled?: boolean;
-}) {
+  nativeDate = false,
+  min,
+  inputClassName = "",
+}: InputCompProps) {
   return (
     <div className="grid grid-cols-6 gap-x-2 items-center">
       <p className="col-span-2 labelClass">
@@ -32,12 +40,23 @@ export default function InputComp({
           value={value}
           onChange={(e) => setValue && setValue(e.target.value)}
           type="text"
-          className="inputClass col-span-4"
+          className={`inputClass col-span-4 ${inputClassName}`}
           disabled={disabled}
         />
       )}
 
-      {type === "date" && (
+      {type === "date" && nativeDate && (
+        <input
+          disabled={disabled}
+          value={value}
+          onChange={(event) => setValue?.(event.target.value)}
+          type="date"
+          min={min}
+          className={`inputClass col-span-4 ${inputClassName}`}
+        />
+      )}
+
+      {type === "date" && !nativeDate && (
         <div className="relative col-span-4">
           <DatePicker
             selected={value ? dayjs(value).toDate() : null}
@@ -62,7 +81,8 @@ export default function InputComp({
           value={value}
           onChange={(e) => setValue && setValue(e.target.value)}
           type="number"
-          className="inputClass col-span-4"
+          className={`inputClass col-span-4 ${inputClassName}`}
+          disabled={disabled}
         />
       )}
     </div>

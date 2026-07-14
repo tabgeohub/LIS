@@ -18,6 +18,11 @@ type FetchFlightPlanListOptions = Omit<
   transform?: (rows: unknown[]) => unknown;
 };
 
+export type RegionalFlightPlanListOptions = Omit<
+  FetchFlightPlanListOptions,
+  "useRegioFilter" | "regioFilter"
+>;
+
 export type FetchFlightPlanListInput = {
   req: Request;
   res: Response;
@@ -62,4 +67,15 @@ export async function fetchFlightPlanList(
       ...(includeErrorField ? { error: errText } : {}),
     });
   }
+}
+
+export function fetchRegionalFlightPlanList(input: {
+  req: Request;
+  res: Response;
+} & RegionalFlightPlanListOptions): Promise<void> {
+  return fetchFlightPlanList({
+    ...input,
+    regioFilter: { caseInsensitiveAdmin: true },
+    useRegioFilter: true,
+  });
 }

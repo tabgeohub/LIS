@@ -35,77 +35,58 @@ type SubmitAddPointsToPlanInput = {
 };
 
 export function submitAddPointsToPlan(input: SubmitAddPointsToPlanInput) {
-  const {
-    selectedPlan,
-    selectedPointIds,
-    selectedGeometryIds,
-    dbPoints,
-    dbGeometries,
-    yellowGraphicsLayer,
-    update,
-    setSelectedPlan,
-    setPointsTable,
-    setGeometriesTable,
-    setGeometries,
-    setOpenTable,
-    filteredPlans,
-    setFilteredPlans,
-    logAction,
-    setStep,
-  } = input;
-
   const uniquePointIds = buildUniquePointIds({
-    plan: selectedPlan,
-    selectedPointIds,
-    selectedGeometryIds,
-    dbGeometries,
+    plan: input.selectedPlan,
+    selectedPointIds: input.selectedPointIds,
+    selectedGeometryIds: input.selectedGeometryIds,
+    dbGeometries: input.dbGeometries,
   });
 
   const updatedGeometries = mergeGeometries({
-    existing: selectedPlan.geometries,
-    newlySelectedIds: selectedGeometryIds,
-    allGeometries: dbGeometries,
+    existing: input.selectedPlan.geometries,
+    newlySelectedIds: input.selectedGeometryIds,
+    allGeometries: input.dbGeometries,
   });
 
   const standalonePoints = resolveStandalonePoints({
     allPointIds: uniquePointIds,
-    dbPoints,
+    dbPoints: input.dbPoints,
     geometries: updatedGeometries,
   });
 
   const vertexIds = getGeometryVertexIds(updatedGeometries);
-  const newlySelectedStandalonePoints = dbPoints.filter(
-    (p) => selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
+  const newlySelectedStandalonePoints = input.dbPoints.filter(
+    (p) => input.selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
   );
 
-  update({
+  input.update({
     data: {
       points: uniquePointIds,
-      id: selectedPlan.id,
+      id: input.selectedPlan.id,
     },
     onSuccess: () => {
       const updatedPlan: FlightPlanType = {
-        ...selectedPlan,
+        ...input.selectedPlan,
         points: standalonePoints,
         pointsObjects: standalonePoints,
         geometries: updatedGeometries,
       };
 
-      setSelectedPlan(updatedPlan);
-      setPointsTable(standalonePoints);
-      setGeometriesTable(updatedGeometries);
-      setGeometries(updatedGeometries);
-      setOpenTable(true);
+      input.setSelectedPlan(updatedPlan);
+      input.setPointsTable(standalonePoints);
+      input.setGeometriesTable(updatedGeometries);
+      input.setGeometries(updatedGeometries);
+      input.setOpenTable(true);
 
       newlySelectedStandalonePoints.forEach((point) =>
-        drawYellowPoint(point, yellowGraphicsLayer)
+        drawYellowPoint(point, input.yellowGraphicsLayer)
       );
 
-      drawYellowGeometries(updatedGeometries, yellowGraphicsLayer);
+      drawYellowGeometries(updatedGeometries, input.yellowGraphicsLayer);
 
-      setFilteredPlans(
-        filteredPlans.map((p) =>
-          p.id === selectedPlan.id
+      input.setFilteredPlans(
+        input.filteredPlans.map((p) =>
+          p.id === input.selectedPlan.id
             ? {
                 ...p,
                 points: standalonePoints,
@@ -116,16 +97,16 @@ export function submitAddPointsToPlan(input: SubmitAddPointsToPlanInput) {
         )
       );
 
-      logAction({
+      input.logAction({
         message: "User saved points and geometries to flight plan",
         newData: {
-          planId: selectedPlan.id,
+          planId: input.selectedPlan.id,
           pointIds: uniquePointIds,
           geometryIds: updatedGeometries.map((g) => g.id),
         },
       });
 
-      setStep(2);
+      input.setStep(2);
     },
   });
 }

@@ -1,20 +1,33 @@
 import { classNames } from "@helpers/classNames";
 
+export type SelectCompProps = {
+  label: string;
+  value: string;
+  setValue: (value: string) => void;
+  options: { label: string; value: string }[];
+  required?: boolean;
+  disabled?: boolean;
+  containerClassName?: string;
+  selectClassName?: string;
+};
+
 export default function SelectComp({
   label,
   value,
   setValue,
   options,
   required = false,
-}: {
-  label: string;
-  value: string;
-  setValue: (value: string) => void;
-  options: { label: string; value: string }[];
-  required?: boolean;
-}) {
+  disabled = false,
+  containerClassName = "w-full",
+  selectClassName = "",
+}: SelectCompProps) {
   return (
-    <div className="grid grid-cols-6 w-full gap-x-2 items-center">
+    <div
+      className={classNames(
+        "grid grid-cols-6 gap-x-2 items-center",
+        containerClassName
+      )}
+    >
       <p className="col-span-2 labelClass">
         {label} {required && <span className="text-gray-500"> *</span>}
       </p>
@@ -22,11 +35,13 @@ export default function SelectComp({
       <select
         className={classNames(
           "col-span-4 inputClass",
+          selectClassName,
           value === "" ? "text-gray-300" : "text-black font-semibold"
         )}
         name=""
         id=""
         value={value}
+        disabled={disabled}
         onChange={(e) => setValue(e.target.value)}
       >
         {options.map((option) => (

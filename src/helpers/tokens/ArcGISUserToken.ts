@@ -2,6 +2,7 @@ import esriId from "@arcgis/core/identity/IdentityManager";
 import esriConfig from "@arcgis/core/config";
 import * as urlUtils from "@arcgis/core/core/urlUtils";
 import { getBackEndUrl } from "../getBackEndUrl";
+import { ARCGIS_TOKEN_SERVERS } from "../arcgisTokenRegistration";
 
 type RefreshOptions = {
   useProxy?: boolean;
@@ -30,19 +31,8 @@ export async function refreshArcGISUserToken(
   const backendUrl = getBackEndUrl();
   const tokenEndpoint = `${backendUrl}/api/arcgis/token`;
 
-  const defaultServers = [
-    "https://www.arcgis.com/sharing/rest",
-    "https://services.arcgis.com",
-    "https://services-eu1.arcgis.com",
-    "https://tiles.arcgis.com",
-    "https://utility.arcgis.com",
-    "https://basemaps.arcgis.com",
-    "https://rijkswaterstaat.maps.arcgis.com",
-    "https://rijkswaterstaat.maps.arcgis.com/sharing/rest",
-  ];
-
   const servers = Array.from(
-    new Set([...defaultServers, ...extraServers].filter(Boolean))
+    new Set([...ARCGIS_TOKEN_SERVERS, ...extraServers].filter(Boolean))
   );
 
   if (useProxy) {
@@ -53,17 +43,13 @@ export async function refreshArcGISUserToken(
     esriConfig.request.trustedServers = Array.from(
       new Set([...(esriConfig.request.trustedServers || []), backendHost])
     );
-    [
-      "https://www.arcgis.com",
-      "https://services.arcgis.com",
-      "https://services-eu1.arcgis.com",
-      "https://tiles.arcgis.com",
-      "https://utility.arcgis.com",
-      "https://basemaps.arcgis.com",
-      "https://rijkswaterstaat.maps.arcgis.com",
-    ].forEach((urlPrefix) => {
+    ARCGIS_TOKEN_SERVERS.map((server) =>
+      server.replace("/sharing/rest", "")
+    )
+      .filter((server, index, all) => all.indexOf(server) === index)
+      .forEach((urlPrefix) => {
       urlUtils.addProxyRule({ urlPrefix, proxyUrl });
-    });
+      });
   } else {
     esriConfig.request.useIdentity = true;
   }

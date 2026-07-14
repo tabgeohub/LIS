@@ -4,7 +4,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useFilterState } from "@helpers/ZustandStates/filterState";
+import { useResetPointFilters } from "hooks/features/useResetPointFilters";
 
 export default function TabHeader() {
   const { selectedTab, setSelectedTab } = useTabState();
@@ -13,30 +13,9 @@ export default function TabHeader() {
   const { setSelectedIndex } = useViewPlanState();
 
   const { resetFeatures } = useResetFeatures();
-
-  const {
-    setNaamAandachtspunt,
-    setActiviteit,
-    setOrganisatie,
-    setVan,
-    setTot,
-    setHerhalen,
-  } = useFilterState();
+  const { resetPointFilters } = useResetPointFilters();
 
   const content = useContent();
-
-  function resetFilters() {
-    setNaamAandachtspunt("");
-    setActiviteit("");
-    setOrganisatie("");
-    setVan("");
-    setTot("");
-    setHerhalen("");
-
-    resetFeatures();
-
-    setSelectedTab("none");
-  }
 
   function handleClose() {
     setSelectedTab("none");
@@ -51,7 +30,7 @@ export default function TabHeader() {
     }
 
     if (selectedTab === "aandachtspuntenFilteren") {
-      resetFilters();
+      resetPointFilters();
     }
 
     yellowGraphicsLayer?.graphics.removeAll();

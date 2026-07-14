@@ -1,14 +1,7 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import {
-  PeriodType,
-  usePointsFilterStore,
-} from "hooks/filters/usePointsFilterStore";
-import { EnrichedPointType } from "Types";
-import { useFilterPoints } from "hooks/filters/useFilterPoints";
-import { useFilterGeometries } from "hooks/filters/useFilterGeometries";
-import { Geometry } from "hooks/features/useGeometriesStore";
-import SelectComp from "../../../Common/FormComponents/SelectComp";
+import PointGeometryFilterPanel from "../../../Common/PointGeometryFilterPanel";
 import { useContent } from "hooks/useContent";
+import type { Geometry } from "hooks/features/useGeometriesStore";
+import type { EnrichedPointType } from "Types";
 
 export default function Filter({
   setOpenFilter,
@@ -21,97 +14,26 @@ export default function Filter({
   setFilteredPoints: (value: EnrichedPointType[]) => void;
   setFilteredGeometries?: (value: Geometry[]) => void;
 }) {
-  const activities = useConstSelectOptions("activiteiten");
-
   const content = useContent();
-
-  const {
-    activityFilter,
-    periodFilter,
-    dateFrom,
-    dateTo,
-    setDateFrom,
-    setDateTo,
-    setActivityFilter,
-    setPeriodFilter,
-  } = usePointsFilterStore();
-
-  const filterPoints = useFilterPoints();
-  const filterGeometries = useFilterGeometries();
+  const labels = content.common.filterSection;
 
   return (
-    <div className="flex flex-col gap-y-2">
-      <SelectComp
-        label={content.common.filterSection.activiteit}
-        value={activityFilter}
-        setValue={(value) => setActivityFilter(value)}
-        options={activities}
-      />
-
-      <SelectComp
-        label="Periode"
-        value={periodFilter}
-        setValue={(value) => setPeriodFilter(value as PeriodType)}
-        options={[
-          { label: content.common.filterSection.Alle, value: "Alle" },
-          {
-            label: content.common.filterSection.Laatste4weken,
-            value: "Laatste 4 weken",
-          },
-          {
-            label: content.common.filterSection.PeriodeVanTot,
-            value: "Periodoe van-tot",
-          },
-        ]}
-      />
-
-      {periodFilter === "Periodoe van-tot" && (
-        <>
-          <div className="grid grid-cols-6 gap-x-2 items-center">
-            <p className="col-span-2 labelClass">
-              {content.common.filterSection.Periodevan}
-            </p>
-            <input
-              className="inputClass col-span-4 !w-[75%]"
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-6 gap-x-2 items-center">
-            <p className="col-span-2 labelClass">
-              {content.common.filterSection.Periodetot}
-            </p>
-            <input
-              className="inputClass col-span-4 !w-[75%]"
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-            />
-          </div>
-        </>
-      )}
-
-      <div className="flex justify-end gap-x-1 text-[12px] mt-6">
-        <button
-          onClick={() => {
-            setOpenFilter(false);
-
-            filterPoints(herhalen, setFilteredPoints);
-            if (setFilteredGeometries) {
-              filterGeometries(herhalen, setFilteredGeometries);
-            }
-          }}
-          className="gray-button"
-        >
-          {content.common.filteren}
-        </button>
-
-        <button onClick={() => setOpenFilter(false)} className="gray-button">
-          {content.common.annuleren}
-        </button>
-      </div>
-    </div>
+    <PointGeometryFilterPanel
+      setOpenFilter={setOpenFilter}
+      setFilteredPoints={setFilteredPoints}
+      setFilteredGeometries={setFilteredGeometries}
+      herhalen={herhalen}
+      closeBeforeFilter
+      labels={{
+        activity: labels.activiteit,
+        all: labels.Alle,
+        lastFourWeeks: labels.Laatste4weken,
+        customPeriod: labels.PeriodeVanTot,
+        dateFrom: labels.Periodevan,
+        dateTo: labels.Periodetot,
+        apply: content.common.filteren,
+        cancel: content.common.annuleren,
+      }}
+    />
   );
 }

@@ -1,4 +1,5 @@
 import { EnrichedPointType } from "Types";
+import { pickPointCoreFields } from "./pointColumnKeys";
 
 export type PointUpdateFormFields = {
   omschrijving: string;
@@ -20,18 +21,7 @@ export function buildPointCorePayload(
   overrides: Partial<PointUpdateFormFields> = {}
 ) {
   return {
-    omschrijving: fields.omschrijving,
-    regio_id: fields.regio_id,
-    xcoordinaat_rd: fields.xcoordinaat_rd,
-    ycoordinaat_rd: fields.ycoordinaat_rd,
-    latitude: fields.latitude,
-    longitude: fields.longitude,
-    vertrouwelijk: fields.vertrouwelijk,
-    herhalen: fields.herhalen,
-    user_id: fields.user_id,
-    activiteit_id: fields.activiteit_id,
-    organisatie_id: fields.organisatie_id,
-    specifiek_letten_op: fields.specifiek_letten_op,
+    ...pickPointCoreFields(fields),
     ...overrides,
   };
 }
@@ -50,18 +40,5 @@ export function buildPointUpdatePayload(input: {
 }
 
 export function pickPointCoreLogData(point: EnrichedPointType) {
-  return {
-    omschrijving: point.omschrijving,
-    regio_id: point.regio_id,
-    xcoordinaat_rd: point.xcoordinaat_rd,
-    ycoordinaat_rd: point.ycoordinaat_rd,
-    latitude: point.latitude,
-    longitude: point.longitude,
-    vertrouwelijk: point.vertrouwelijk,
-    herhalen: point.herhalen,
-    user_id: point.user_id,
-    activiteit_id: point.activiteit_id,
-    organisatie_id: point.organisatie_id,
-    specifiek_letten_op: point.specifiek_letten_op,
-  };
+  return pickPointCoreFields(point);
 }
