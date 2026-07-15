@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import { FlightPlanType } from "Types";
-import { AttachmentType } from "Types/finished_plans";
 import { usePlanPointAttachments } from "api-hooks/finishedPlans";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 
@@ -34,7 +33,6 @@ export default function Images({
   return (
     <>
       {selectedPlan.is_finished &&
-        attachmentsUrl &&
         attachments &&
         attachments.length > 0 && (
           <div className="space-y-2 mt-4">
@@ -55,7 +53,6 @@ export default function Images({
         )}
 
       {selectedPlan.is_finished &&
-        attachmentsUrl &&
         attachments &&
         attachments.length === 0 && (
           <div className="text-sm text-gray-500">
