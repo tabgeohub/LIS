@@ -1,5 +1,5 @@
 import SelectedPlanImagesPanel from "./SelectedPlanImagesPanel";
-import { usePointPlanImages } from "../Common/usePointPlanImages";
+import { usePointPlanImages } from "api-hooks/planImages";
 
 export default function SelectedPlanPointImagesPanel({
   pointId,

@@ -3,5 +3,5 @@ export {
   usePartialFinishedPlans,
   useSingleFinishedPlan,
   useFinishedPlanPath,
-  usePlanPointAttachments,
-} from "../useEntityQuery";
+} from "./useFinishedPlanQueries";
+export { usePlanPointAttachments } from "./usePlanPointAttachments";

@@ -5,7 +5,7 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useContent } from "hooks/useContent";
-import { addPlanStarGraphics } from "hooks/hover-click-handlers/usePlanStarGraphic";
+import { addPlanStarGraphics } from "@helpers/ArcGISHelpers/planStarGraphics";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import {
   MdAddCircleOutline,

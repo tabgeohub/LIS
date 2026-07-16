@@ -10,7 +10,7 @@ export function matchesHerhalen(herhalenValue: HerhalenValue, herhalen: boolean)
   return herhalen ? herhalenValue === true : herhalenValue === false;
 }
 
-export function filterByHerhalen<T extends { herhalen: HerhalenValue }>(
+export function filterByHerhalen<T extends { herhalen?: HerhalenValue }>(
   items: T[],
   herhalen: boolean
 ): T[] {

@@ -5,7 +5,7 @@ import { useUpdateData } from "utils/useUpdateData";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { MdLocationOn } from "react-icons/md";
-import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 import { deleteArcgisPointAttachment } from "@helpers/arcgis/deleteArcgisAttachment";
 import toast from "react-hot-toast";
 import {

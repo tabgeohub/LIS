@@ -1,6 +1,6 @@
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useCreateData } from "utils/useCreateData";
+import { useCreateData } from "api-hooks/mutations";
 import { buildLogEntry, LogActionInput } from "./logging/logEntry";
 import { enqueueLogEntry, initializeLogQueue } from "./logging/logQueue";
 

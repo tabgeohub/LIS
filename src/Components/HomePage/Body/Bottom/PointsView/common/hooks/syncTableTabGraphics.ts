@@ -6,7 +6,7 @@ import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/h
 import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { addPlanStarGraphic } from "hooks/hover-click-handlers/usePlanStarGraphic";
+import { addPlanStarGraphic } from "@helpers/ArcGISHelpers/planStarGraphics";
 
 type GraphicsContext = {
   graphicsLayer: __esri.GraphicsLayer | null;

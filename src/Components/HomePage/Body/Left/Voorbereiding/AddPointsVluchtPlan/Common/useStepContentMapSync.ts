@@ -5,7 +5,7 @@ import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import {
   removeOwnedBluePointGraphics,
   syncBluePointGraphics,
-} from "hooks/map/syncBluePointGraphics";
+} from "@helpers/ArcGISHelpers/syncBluePointGraphics";
 import type { PointData } from "@helpers/ArcGISHelpers/createPointGraphic";
 
 export function useStepContentMapSync(displayedPoints: PointData[]) {

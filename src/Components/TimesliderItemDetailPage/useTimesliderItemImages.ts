@@ -1,6 +1,8 @@
 import { useMemo } from "react";
-import { usePointPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/usePointPlanImages";
-import { useGeometryPlanImages } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/useGeometryPlanImages";
+import {
+  useGeometryPlanImages,
+  usePointPlanImages,
+} from "api-hooks/planImages";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
 export function useTimesliderItemImages(input: {

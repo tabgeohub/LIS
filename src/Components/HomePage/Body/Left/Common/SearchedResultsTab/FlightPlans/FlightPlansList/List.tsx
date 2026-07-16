@@ -13,7 +13,7 @@ import {
 import {
   addPlanStarGraphic,
   removePlanStarGraphics,
-} from "hooks/hover-click-handlers/usePlanStarGraphic";
+} from "@helpers/ArcGISHelpers/planStarGraphics";
 
 export default function List({
   flightPlansData,

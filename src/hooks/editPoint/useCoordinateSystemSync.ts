@@ -1,14 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 import { useEffect } from "react";
 import { SpatialReference } from "Types";
+import {
+  buildCoordinateSyncPatch,
+  type CoordinateSyncPatch,
+} from "@helpers/geo/buildCoordinateSyncPatch";
 
-export type CoordinateSyncPatch = {
-  rdX?: number;
-  rdY?: number;
-  latitude?: number;
-  longitude?: number;
-};
+export type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 
 export function useCoordinateSystemSync({
   coordinateSystem,
@@ -26,22 +24,13 @@ export function useCoordinateSystemSync({
   patchCoords: (patch: CoordinateSyncPatch) => void;
 }) {
   useEffect(() => {
-    if (coordinateSystem === "RD") {
-      const { x: transformedLongitude, y: transformedLatitude } =
-        getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: rdX, y: rdY });
-
-      patchCoords({
-        longitude: transformedLongitude,
-        latitude: transformedLatitude,
-      });
-    } else if (coordinateSystem === "WGS84") {
-      const { x: transformedRdX, y: transformedRdY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
-       });
-
-      patchCoords({
-        rdX: transformedRdX,
-        rdY: transformedRdY,
-      });
-    }
+    const patch = buildCoordinateSyncPatch({
+      coordinateSystem,
+      rdX,
+      rdY,
+      latitude,
+      longitude,
+    });
+    if (patch) patchCoords(patch);
   }, [coordinateSystem, rdX, rdY, latitude, longitude]);
 }

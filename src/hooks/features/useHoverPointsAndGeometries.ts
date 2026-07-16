@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { findHoveredMapGraphic, toHoveredState } from "./hoverMapGraphic";
+import { registerMapHoverHandler } from "./registerMapHoverHandler";
 
 interface UseHoverPointsAndGeometriesOptions {
   pinRefs?: React.MutableRefObject<
@@ -22,23 +22,13 @@ export function useHoverPointsAndGeometries(
   useEffect(() => {
     if (!validateMapView(mapView)) return;
     const { setHovered } = useHoveredGraphicState.getState();
-
-    const handle = mapView.on("pointer-move", async (event) => {
-      if (checkMapContainer) {
-        const target = event.native.target as HTMLElement;
-        const mapContainer = mapView.container;
-        if (!mapContainer || !mapContainer.contains(target)) return;
-      }
-
-      const hit = await mapView.hitTest(event);
-      const graphic = findHoveredMapGraphic({
-        results: hit.results,
-        pointsGraphicsLayer,
-        geometriesGraphicsLayer,
-        pinRefs,
-      });
-
-      setHovered(graphic ? toHoveredState(graphic) : null);
+    const handle = registerMapHoverHandler({
+      mapView: mapView!,
+      pointsGraphicsLayer,
+      geometriesGraphicsLayer,
+      pinRefs,
+      checkMapContainer,
+      onHovered: setHovered,
     });
 
     return () => {

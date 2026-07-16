@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { flightPlanKeys } from "lib/queryKeys";
 import { FlightPlanType } from "Types";
-import { useDebouncedValue } from "utils/useDebouncedValue";
+import { useDebouncedValue } from "hooks/shared/useDebouncedValue";
 import { FLIGHT_PLAN_DEBOUNCE_MS } from "./constants";
 
 export function useSearchedFlightPlans(search: string) {

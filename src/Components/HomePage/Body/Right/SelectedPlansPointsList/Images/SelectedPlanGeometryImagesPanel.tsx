@@ -1,5 +1,5 @@
 import SelectedPlanImagesPanel from "./SelectedPlanImagesPanel";
-import { useGeometryPlanImages } from "../Common/useGeometryPlanImages";
+import { useGeometryPlanImages } from "api-hooks/planImages";
 
 export default function SelectedPlanGeometryImagesPanel({
   geometryId,

@@ -1,6 +1,6 @@
 import { FinishedPointType } from "Types/finished_plans";
 import { fetchWithRetry } from "./utils";
-import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 import type { AttachmentWithMeta } from "./types";
 
 const proxyFetchInit: RequestInit = { credentials: "include" };

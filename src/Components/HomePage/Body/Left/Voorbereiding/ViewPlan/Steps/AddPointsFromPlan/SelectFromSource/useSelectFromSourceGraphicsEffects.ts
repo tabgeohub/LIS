@@ -4,7 +4,7 @@ import type { EnrichedPointType } from "Types";
 import {
   removeOwnedBluePointGraphics,
   syncBluePointGraphics,
-} from "hooks/map/syncBluePointGraphics";
+} from "@helpers/ArcGISHelpers/syncBluePointGraphics";
 import { filterPointsNotInPlan, SelectFromSourceItem } from "./helpers/mapSourceItems";
 import {
   findHoverableGraphic,

@@ -4,7 +4,7 @@ type HoveredGraphic = {
 } | null;
 
 export function findHoveredMapGraphic(input: {
-  results: __esri.HitTestResult[];
+  results: __esri.MapViewViewHit[];
   pointsGraphicsLayer?: __esri.GraphicsLayer | null;
   geometriesGraphicsLayer?: __esri.GraphicsLayer | null;
   pinRefs?: React.MutableRefObject<
@@ -12,7 +12,8 @@ export function findHoveredMapGraphic(input: {
   >;
 }): __esri.Graphic | null {
   for (const result of input.results) {
-    const graphic = (result as __esri.GraphicHit).graphic;
+    if (result.type !== "graphic") continue;
+    const graphic = result.graphic;
     if (!graphic?.attributes) continue;
 
     if (input.pinRefs) {

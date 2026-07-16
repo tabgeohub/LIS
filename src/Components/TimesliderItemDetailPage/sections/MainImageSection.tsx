@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { LuChevronLeft, LuChevronRight, LuImages } from "react-icons/lu";
 import type { AttachmentType } from "Types/finished_plans";
-import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 
 type Props = {
   attachment: AttachmentType | null;

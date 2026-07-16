@@ -1,1 +1,4 @@
-export { useSearchedPoints, useDuplicateOmschrijvingCount } from "../useEntityQuery";
+export {
+  useDuplicateOmschrijvingCount,
+  useSearchedPoints,
+} from "./usePointLookupQueries";

@@ -5,7 +5,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
-import { syncBluePointGraphics } from "hooks/map/syncBluePointGraphics";
+import { syncBluePointGraphics } from "@helpers/ArcGISHelpers/syncBluePointGraphics";
 
 export function useAddPointToPlanBluePoints(filteredPoints: EnrichedPointType[]) {
   const { mapView, pointsGraphicsLayer } = useMapViewState();

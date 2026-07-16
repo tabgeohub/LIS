@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import { attachmentDisplayUrl } from "../Common/attachmentDisplayUrl";
-import { pointPlanImagesToAttachments } from "../Common/pointPlanImagesToAttachments";
-import type { PointPlanImageRow } from "../Common/planImageTypes";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
+import {
+  pointPlanImagesToAttachments,
+  type PointPlanImageRow,
+} from "api-hooks/planImages";
 
 export default function SelectedPlanImagesPanel({
   images,

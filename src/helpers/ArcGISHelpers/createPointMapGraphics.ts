@@ -8,6 +8,15 @@ import {
   YELLOW_MARKER_SYMBOL,
 } from "@helpers/ArcGISHelpers/createSymbols";
 import { EnrichedPointType } from "Types";
+import {
+  getUnstarredPoints,
+  mergeStarredPoints,
+} from "@helpers/points/starredPointSelection";
+
+export {
+  getUnstarredPoints,
+  mergeStarredPoints,
+} from "@helpers/points/starredPointSelection";
 
 export function createPointGeometry(point: EnrichedPointType) {
   return new Point({
@@ -77,23 +86,6 @@ export function goToEnrichedPoint(
 ) {
   if (!mapView) return;
   mapView.goTo(createPointGeometry(point));
-}
-
-export function mergeStarredPoints(
-  starredPoints: EnrichedPointType[],
-  pointsToAdd: EnrichedPointType[]
-) {
-  const combined = [...starredPoints, ...pointsToAdd];
-  return Array.from(new Map(combined.map((p) => [p.id, p])).values());
-}
-
-export function getUnstarredPoints(
-  allPoints: EnrichedPointType[],
-  starredPoints: EnrichedPointType[]
-) {
-  return allPoints.filter(
-    (point) => !starredPoints.some((p) => p.id === point.id)
-  );
 }
 
 export function starAllPointsOnMap({

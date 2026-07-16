@@ -1,6 +1,6 @@
-import type { PointPlanImageRow } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/planImageTypes";
-import { attachmentDisplayUrl } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/attachmentDisplayUrl";
-import { pointPlanImagesToAttachments } from "Components/HomePage/Body/Right/SelectedPlansPointsList/Common/pointPlanImagesToAttachments";
+import type { PointPlanImageRow } from "api-hooks/planImages";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
+import { pointPlanImagesToAttachments } from "api-hooks/planImages";
 import type { FinishedFlightPlanType } from "Types/finished_plans";
 
 type ImageHookResult = {

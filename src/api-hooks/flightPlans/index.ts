@@ -3,9 +3,11 @@ export {
   useUnPreparedPlans,
   usePrepreparedFlightPlans,
   useFullPreparedFlightPlans,
+} from "./useRegionalFlightPlanQueries";
+export {
   useVluchtnummerExists,
   useSearchedFlightPlans,
   usePointFlightPlans,
-  useTemplateFlights,
-} from "./useFlightPlanQuery";
-export type { UseTemplateFlightsInput } from "./useFlightPlanQuery";
+} from "./useFlightPlanLookupQueries";
+export { useTemplateFlights } from "../templateFlights/useTemplateFlights";
+export type { UseTemplateFlightsInput } from "../templateFlights/useTemplateFlights";
