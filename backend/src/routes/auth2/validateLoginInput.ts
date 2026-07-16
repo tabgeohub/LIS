@@ -8,6 +8,18 @@ export type ParsedLoginInput = {
   otp?: string;
 };
 
+function exceedsCredentialLimits(input: ParsedLoginInput): boolean {
+  return (
+    input.username.length > MAX_USERNAME_LENGTH ||
+    input.password.length > MAX_PASSWORD_LENGTH ||
+    Boolean(input.otp && input.otp.length > MAX_OTP_LENGTH)
+  );
+}
+
+function isValidOtp(otp: string | undefined): boolean {
+  return !otp || /^\d+$/.test(otp);
+}
+
 export function parseLoginInput(body: unknown): ParsedLoginInput | null {
   const record = body as {
     username?: unknown;
@@ -20,23 +32,10 @@ export function parseLoginInput(body: unknown): ParsedLoginInput | null {
   const otpRaw = String(record?.otp ?? "").trim();
   const otp = otpRaw || undefined;
 
-  if (!username || !password) {
-    return null;
-  }
-
-  if (
-    username.length > MAX_USERNAME_LENGTH ||
-    password.length > MAX_PASSWORD_LENGTH ||
-    (otp && otp.length > MAX_OTP_LENGTH)
-  ) {
-    return null;
-  }
-
-  if (otp && !/^\d+$/.test(otp)) {
-    return null;
-  }
-
-  return { username, password, otp };
+  const parsed = { username, password, otp };
+  if (!username || !password) return null;
+  if (exceedsCredentialLimits(parsed) || !isValidOtp(otp)) return null;
+  return parsed;
 }
 
 export function parseVerifyInput(body: unknown): Omit<ParsedLoginInput, "otp"> | null {

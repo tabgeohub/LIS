@@ -1,4 +1,4 @@
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { buildCoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { createNewPoint } from "../../helpers/createNewPoint";
@@ -27,19 +27,17 @@ export default function UpdateBtn() {
 
   function handleUpdate() {
     if (redGraphicsLayer) {
-      if (coordinateSystem === "RD") {
-        const { x: transformedX, y: transformedY } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xCoord, y: yCoord
-         });
-
-        setLongitude(transformedX);
-        setLatitude(transformedY);
-      } else if (coordinateSystem === "WGS84") {
-        const { x: transformedX, y: transformedY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
-         });
-
-        setXCoord(transformedX);
-        setYCoord(transformedY);
-      }
+      const patch = buildCoordinateSyncPatch({
+        coordinateSystem,
+        rdX: xCoord,
+        rdY: yCoord,
+        latitude,
+        longitude,
+      });
+      if (patch?.longitude !== undefined) setLongitude(patch.longitude);
+      if (patch?.latitude !== undefined) setLatitude(patch.latitude);
+      if (patch?.rdX !== undefined) setXCoord(patch.rdX);
+      if (patch?.rdY !== undefined) setYCoord(patch.rdY);
 
       redGraphicsLayer.removeAll();
 

@@ -7,24 +7,7 @@ type NumericColumn =
   | "latitude"
   | "longitude";
 
-const NUMERIC_COLUMNS = new Set<NumericColumn>([
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
-]);
-
 type TruthyColumn = "herhalen" | "vertrouwelijk";
-
-const TRUTHY_COLUMNS = new Set<TruthyColumn>(["herhalen", "vertrouwelijk"]);
-
-function isNumericColumn(key: string): key is NumericColumn {
-  return NUMERIC_COLUMNS.has(key as NumericColumn);
-}
-
-function isTruthyColumn(key: string): key is TruthyColumn {
-  return TRUTHY_COLUMNS.has(key as TruthyColumn);
-}
 
 function parseNumericCell(value: unknown): number {
   const raw = String(value ?? "")
@@ -115,29 +98,23 @@ export function mapImportRowsToPoints(input: {
     .filter((p) => p.omschrijving !== "");
 }
 
-function applyImportColumn(input: {
+type ApplyImportColumnInput = {
   obj: PointImportRow;
   key: string;
   value: unknown;
   resolveOrgValue: (label: string) => string;
-}) {
-  const { obj, key, value, resolveOrgValue } = input;
-  if (key === "omschrijving") {
-    obj.omschrijving = String(value || "").trim();
-    return;
-  }
+};
 
-  if (key === "regio_id") {
-    obj.regio_id = String(value || "").trim();
-    return;
-  }
+type ImportColumnHandler = (input: ApplyImportColumnInput) => void;
 
-  if (isNumericColumn(key)) {
+function numericColumnHandler(key: NumericColumn): ImportColumnHandler {
+  return ({ obj, value }) => {
     obj[key] = parseNumericCell(value);
-    return;
-  }
+  };
+}
 
-  if (isTruthyColumn(key)) {
+function truthyColumnHandler(key: TruthyColumn): ImportColumnHandler {
+  return ({ obj, value }) => {
     obj[key] =
       value == null ||
       typeof value === "string" ||
@@ -145,25 +122,38 @@ function applyImportColumn(input: {
       typeof value === "boolean"
         ? value ?? 0
         : String(value);
-    return;
-  }
+  };
+}
 
-  if (key === "activiteit_id") {
+const IMPORT_COLUMN_HANDLERS: Record<string, ImportColumnHandler> = {
+  omschrijving: ({ obj, value }) => {
+    obj.omschrijving = String(value || "").trim();
+  },
+  regio_id: ({ obj, value }) => {
+    obj.regio_id = String(value || "").trim();
+  },
+  xcoordinaat_rd: numericColumnHandler("xcoordinaat_rd"),
+  ycoordinaat_rd: numericColumnHandler("ycoordinaat_rd"),
+  latitude: numericColumnHandler("latitude"),
+  longitude: numericColumnHandler("longitude"),
+  herhalen: truthyColumnHandler("herhalen"),
+  vertrouwelijk: truthyColumnHandler("vertrouwelijk"),
+  activiteit_id: ({ obj, value }) => {
     obj.activiteit_id = String(value ?? "")
       .replace(/[\n\r"]/g, "")
       .trim()
       .toLowerCase();
-    return;
-  }
-
-  if (key === "organisatie_id") {
+  },
+  organisatie_id: ({ obj, value, resolveOrgValue }) => {
     obj.organisatie_id = String(resolveOrgValue(String(value ?? ""))).trim();
-    return;
-  }
-
-  if (key === "specifiek_letten_op") {
+  },
+  specifiek_letten_op: ({ obj, value }) => {
     obj.specifiek_letten_op = String(value || "").trim();
-  }
+  },
+};
+
+export function applyImportColumn(input: ApplyImportColumnInput): void {
+  IMPORT_COLUMN_HANDLERS[input.key]?.(input);
 }
 
 export function splitImportedPointIds(points: Array<PointImportRow & { id: number | null }>) {

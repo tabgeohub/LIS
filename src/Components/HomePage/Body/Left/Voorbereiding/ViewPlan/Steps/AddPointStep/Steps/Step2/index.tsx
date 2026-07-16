@@ -4,7 +4,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useState } from "react";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { buildCoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 import { createNewPoint } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
 import { useContent } from "hooks/useContent";
 import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
@@ -40,22 +40,23 @@ export default function Step2({
     let drawLon = longitude;
     let drawLat = latitude;
 
-    if (coordinateSystem === "RD") {
-      const { x: lonWgs84, y: latWgs84 } = getTransformedCoordinates({ fromProjection: "RD", toProjection: "WGS84", x: xCoord, y: yCoord
-       });
-
-      setLongitude(lonWgs84);
-      setLatitude(latWgs84);
-
-      drawLon = lonWgs84;
-      drawLat = latWgs84;
-    } else if (coordinateSystem === "WGS84") {
-      const { x: rdX, y: rdY } = getTransformedCoordinates({ fromProjection: "WGS84", toProjection: "RD", x: longitude, y: latitude
-       });
-
-      setXCoord(rdX);
-      setYCoord(rdY);
+    const patch = buildCoordinateSyncPatch({
+      coordinateSystem,
+      rdX: xCoord,
+      rdY: yCoord,
+      latitude,
+      longitude,
+    });
+    if (patch?.longitude !== undefined) {
+      setLongitude(patch.longitude);
+      drawLon = patch.longitude;
     }
+    if (patch?.latitude !== undefined) {
+      setLatitude(patch.latitude);
+      drawLat = patch.latitude;
+    }
+    if (patch?.rdX !== undefined) setXCoord(patch.rdX);
+    if (patch?.rdY !== undefined) setYCoord(patch.rdY);
 
     createNewPoint({
       redGraphicsLayer,

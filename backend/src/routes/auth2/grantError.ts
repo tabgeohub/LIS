@@ -13,38 +13,56 @@ function tryParseJsonObject(value: string): Record<string, unknown> | null {
   }
 }
 
-export function extractGrantError(error: unknown): GrantErrorDetails {
-  const err = error as {
-    error?: string;
-    error_description?: string;
-    message?: string;
-    response?: { body?: { error?: string; error_description?: string } };
-  };
+type GrantErrorLike = {
+  error?: string;
+  error_description?: string;
+  message?: string;
+  response?: { body?: { error?: string; error_description?: string } };
+};
 
-  let errorCode = err?.error || err?.response?.body?.error;
-  let errorDescription =
-    err?.error_description ||
-    err?.response?.body?.error_description ||
-    err?.message ||
-    "";
-
+function readDirectGrantError(error: unknown) {
+  const err = error as GrantErrorLike;
   const messageText = String(err?.message || "");
-  const embeddedJson = messageText.match(/\{[\s\S]*\}/)?.[0];
+  return {
+    errorCode: err?.error || err?.response?.body?.error || "",
+    errorDescription:
+      err?.error_description ||
+      err?.response?.body?.error_description ||
+      err?.message ||
+      "",
+    messageText,
+  };
+}
 
+function readEmbeddedGrantError(messageText: string) {
+  const embeddedJson = messageText.match(/\{[\s\S]*\}/)?.[0];
   const candidates = [messageText, embeddedJson].filter(Boolean) as string[];
 
   for (const candidate of candidates) {
     const parsed = tryParseJsonObject(candidate);
-    if (!parsed) continue;
-
-    errorCode = errorCode || String(parsed.error || "");
-    errorDescription =
-      errorDescription || String(parsed.error_description || "");
+    if (parsed) {
+      return {
+        errorCode: String(parsed.error || ""),
+        errorDescription: String(parsed.error_description || ""),
+      };
+    }
   }
+
+  return { errorCode: "", errorDescription: "" };
+}
+
+export function extractGrantError(error: unknown): GrantErrorDetails {
+  const direct = readDirectGrantError(error);
+  const embedded = readEmbeddedGrantError(direct.messageText);
+  const errorCode = direct.errorCode || embedded.errorCode;
+  const errorDescription =
+    direct.errorDescription || embedded.errorDescription;
 
   return {
     error: errorCode || undefined,
     error_description: errorDescription || undefined,
-    message: String(errorDescription || messageText || "Unknown grant error"),
+    message: String(
+      errorDescription || direct.messageText || "Unknown grant error"
+    ),
   };
 }

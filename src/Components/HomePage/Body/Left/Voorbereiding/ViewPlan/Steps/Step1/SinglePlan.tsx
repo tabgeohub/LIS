@@ -1,9 +1,8 @@
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
-import { EnrichedPointType, FlightPlanType } from "Types";
+import { FlightPlanType } from "Types";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaLock } from "react-icons/fa6";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import * as XLSX from "@e965/xlsx";
 import { saveAs } from "file-saver";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { GoCheckCircleFill } from "react-icons/go";
@@ -14,6 +13,8 @@ import { classNames } from "@helpers/classNames";
 import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
 import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
 import { POINT_EXPORT_COLUMNS } from "@helpers/points/pointColumnKeys";
+import { buildFlightPlanPointExportRows } from "@helpers/points/flightPlanPointExcel";
+import { buildXlsxBuffer } from "@helpers/tableExports/xlsxExport";
 
 export default function SinglePlan({
   plan,
@@ -29,58 +30,12 @@ export default function SinglePlan({
 
   const exportExcel = (plan: FlightPlanType) => {
     const columns = [...POINT_EXPORT_COLUMNS] as const;
-
-    const toJaNee = (v: number): string => {
-      if (typeof v === "boolean") return v ? "ja" : "nee";
-      if (typeof v === "number") return v === 1 ? "ja" : "nee";
-      const s = String(v ?? "")
-        .trim()
-        .toLowerCase();
-      return s === "1" || s === "true" || s === "ja" || s === "yes"
-        ? "ja"
-        : "nee";
-    };
-
-    const toNumOrEmpty = (v: string | number): number | "" => {
-      const n =
-        typeof v === "string"
-          ? parseFloat(v.replace(",", ".").replace(/\s/g, ""))
-          : Number(v);
-      return Number.isFinite(n) ? n : "";
-    };
-
-    const points = (plan.points as EnrichedPointType[]) ?? [];
-
-    const rows = points.map((p) => {
-      const geometry = `X: ${p.longitude}, Y: ${p.latitude}`;
-
-      const datum = p.created_at;
-
-      return {
-        geometry,
-        omschrijving: p.omschrijving ?? "",
-        regio_id: p.regio_id ?? "",
-        xcoordinaat_rd: toNumOrEmpty(p.xcoordinaat_rd),
-        ycoordinaat_rd: toNumOrEmpty(p.ycoordinaat_rd),
-        latitude: toNumOrEmpty(p.latitude),
-        longitude: toNumOrEmpty(p.longitude),
-        herhalen: toJaNee(p.herhalen),
-        vertrouwelijk: toJaNee(p.vertrouwelijk),
-        indiener_id: p.user_id,
-        activiteit_id: p.activiteit_id ?? plan.activiteit_id ?? "",
-        organisatie_id: p.organisatie_id ?? plan.organisatie_id ?? "",
-        specifiek_letten_op: p.specifiek_letten_op ?? "",
-        datum,
-      };
-    });
-
-    const sheet = XLSX.utils.json_to_sheet(rows, {
-      header: columns as unknown as string[],
-    });
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, "Points");
-
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const rows = buildFlightPlanPointExportRows(plan);
+    const wbout = buildXlsxBuffer(
+      rows,
+      "Points",
+      columns as unknown as string[]
+    );
     const blob = new Blob([wbout], { type: "application/octet-stream" });
     saveAs(blob, `${plan.vluchtnummer}.xlsx`);
 

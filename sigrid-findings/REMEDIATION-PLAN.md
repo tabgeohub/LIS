@@ -64,7 +64,7 @@ Five HIGH unit-size findings remain:
 
 - `nnederlandLayerSpecsPart1.ts`, `Part2.ts`, and `Part3.ts` are accepted declarative layer catalogues with McCabe 1.
 - `voorbereidingTabs.ts` is accepted declarative tab data with McCabe 1.
-- `backend/src/routes/auth2/mapLoginError.ts` is executable and remains actionable; split logging/diagnostic orchestration from response classification without changing status codes, event names, or authentication decisions.
+- `backend/src/routes/auth2/mapLoginError.ts` was executable and is now addressed pending Sigrid confirmation. The public mapper is a short facade over response decision and diagnostic helpers, with status codes, event names, and authentication decisions preserved.
 
 ---
 
@@ -103,6 +103,15 @@ The ledger key is `category + file/description + severity`. Because these export
 - React Query barrels now export directly from their domain query modules instead of routing through generic aggregators.
 - `configureExpressApp.ts`: reduced to a composition root; request middleware and route registration are separate backend modules with the original order preserved.
 
+**Pre-deployment maintainability batch**
+
+- `mapLoginError.ts`: response selection and classifier diagnostics are separated from the compatibility facade.
+- `grantError.ts` and `validateLoginInput.ts`: direct extraction, embedded JSON parsing, length validation, and OTP validation are focused helpers.
+- `SinglePlan.tsx`: point-row preparation and XLSX-buffer construction moved to tested export helpers while filename and logging behavior remain in the component.
+- `parsePointImportFile.ts`: column-specific parsing now uses typed handlers without changing supported headers or normalization rules.
+- Point coordinate update paths reuse `buildCoordinateSyncPatch`; feature-specific drawing, state updates, and logging remain local.
+- `nnederlandLayerBuilders.ts`: the repeated layer-spec envelope is shared while IDs, URLs, titles, ordering, and symbols remain unchanged.
+
 All entries above stay `addressed pending confirmation` until a post-deployment Sigrid export proves that the original row cleared or resegmented.
 
 ### Accepted architecture findings
@@ -126,6 +135,8 @@ An accepted row must be reopened if a future scan or code review shows bundled r
 
 MEDIUM complexity fell from 46 to 40. Continue in descending executable complexity, beginning with form population, Excel export, import-column application, grant-error extraction, Timeslider detail orchestration, login parsing, geometry creation, selection sorting, image-query parsing, path drawing, and image handling.
 
+The Excel export, import-column application, grant-error extraction, and login parsing rows are addressed pending confirmation in the next export. Timeslider detail orchestration, form population, and geometry construction were already decomposed after the current export and also remain pending confirmation.
+
 Two MEDIUM parameter-count findings remain:
 
 - `finishedPlanHighlightActions.ts.draw(...)`
@@ -142,7 +153,7 @@ For each implementation batch:
 1. Run `npm run check:architecture`.
 2. Run `npm run test:architecture-helpers` for the extracted selection, image-conversion, and form-field helpers.
 3. Run the frontend production build outside the restricted environment and run the backend TypeScript build.
-4. Run the frontend test suite when its missing Vitest installation is restored, plus the three backend safe-return/redirect tests.
+4. Run the restored frontend Vitest suite, plus all backend authentication, credential-flow, and Keycloak token tests.
 5. Manually verify map hover/click, point and geometry selection, flight-plan workflows, Timeslider, exports, and authentication.
 6. Confirm Dockerfiles, Nginx, deployment, and database files have no diff.
 7. Run `git diff --check`; leave all work uncommitted and unpushed.
@@ -151,8 +162,8 @@ For each implementation batch:
 Current baseline limitations:
 
 - The frontend production build requires unrestricted parent-directory access; it passes when run outside the restricted environment.
-- The frontend test command cannot start because `vitest` is not installed in the current `node_modules` tree.
-- Standalone frontend `tsc --noEmit` has pre-existing type failures; changed modules must not introduce additional identifiable failures.
+- Vitest is installed with a dedicated configuration and the frontend test suite passes.
+- Standalone frontend `tsc --noEmit` is clean.
 
 ## Compatibility rules
 

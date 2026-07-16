@@ -5,9 +5,10 @@ import type { EnrichedPointType, FlightPlanType } from "Types";
 
 export function buildXlsxBuffer<T extends object>(
   rows: T[],
-  sheetName: string
+  sheetName: string,
+  header?: string[]
 ) {
-  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const worksheet = XLSX.utils.json_to_sheet(rows, { header });
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   return XLSX.write(workbook, { bookType: "xlsx", type: "array" });

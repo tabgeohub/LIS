@@ -14,6 +14,18 @@ type NnLayerSpec = {
   layer: FeatureLayer | MapImageLayer;
 };
 
+function nnLayerSpec(input: Omit<NnLayerSpec, "layer"> & {
+  layer: NnLayerSpec["layer"];
+}): NnLayerSpec {
+  return {
+    id: input.id,
+    title: input.title,
+    icon: input.icon,
+    regio: input.regio,
+    layer: input.layer,
+  };
+}
+
 export function nnFeatureLayerSpec(input: {
   id: string;
   serviceName: string;
@@ -21,7 +33,7 @@ export function nnFeatureLayerSpec(input: {
   icon: ReactNode;
   regio?: string[];
 }): NnLayerSpec {
-  return {
+  return nnLayerSpec({
     id: input.id,
     title: input.title,
     icon: input.icon,
@@ -30,7 +42,7 @@ export function nnFeatureLayerSpec(input: {
       url: `${NNEDERLAND_EU_SERVICES}/${input.serviceName}/FeatureServer`,
       title: input.title,
     }),
-  };
+  });
 }
 
 export function nnMapImageLayerSpec(input: {
@@ -40,7 +52,7 @@ export function nnMapImageLayerSpec(input: {
   icon: ReactNode;
   regio?: string[];
 }): NnLayerSpec {
-  return {
+  return nnLayerSpec({
     id: input.id,
     title: input.title,
     icon: input.icon,
@@ -49,7 +61,7 @@ export function nnMapImageLayerSpec(input: {
       url: input.url,
       title: input.title,
     }),
-  };
+  });
 }
 
 export function toLegendLayerDefinitions(
