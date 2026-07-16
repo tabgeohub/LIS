@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { EnrichedPointType } from "Types";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import PointsSelectionHeader from "Components/HomePage/Body/Common/ViewPlan/PointsSelectionHeader";
@@ -14,7 +14,7 @@ export default function PointsList({
 }: {
   selectedItem: ItemModel;
   selectedPointIds: number[];
-  setSelectedPointIds: (updater: (prev: number[]) => number[]) => void;
+  setSelectedPointIds: Dispatch<SetStateAction<number[]>>;
 }) {
   const [filter, setFilter] = useState("");
   const { dbPoints } = usePointsStore();

@@ -9,7 +9,7 @@ export default function ResultTabClickedPointPopup({
 }: {
   clickedPoint: EnrichedPointType;
   position: { top: number; left: number };
-  popupRef: RefObject<HTMLDivElement | null>;
+  popupRef: RefObject<HTMLDivElement>;
 }) {
   return (
     <div

@@ -1,10 +1,10 @@
-import { RefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 
 export const syncScrollPositions = (input: {
   source: "top" | "table";
   topScrollRef: RefObject<HTMLDivElement>;
   tableScrollRef: RefObject<HTMLDivElement>;
-  syncingRef: RefObject<boolean>;
+  syncingRef: MutableRefObject<boolean>;
 }) => {
   if (!input.topScrollRef.current || !input.tableScrollRef.current) return;
   if (input.syncingRef.current) return;

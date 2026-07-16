@@ -52,7 +52,7 @@ export default function BasemapsList({
   };
 
   const applyBasemap = (id: BasemapsType) => {
-    if (!mapView) return;
+    if (!mapView?.map) return;
     const bm = basemaps[id];
     mapView.map.basemap = bm;
     setSelectedBasemap(id);
@@ -66,7 +66,7 @@ export default function BasemapsList({
   };
 
   useEffect(() => {
-    if (!mapView) return;
+    if (!mapView?.map) return;
     mapView.map.basemap?.baseLayers.forEach((lyr) => {
       lyr.visible = ondergrond;
     });

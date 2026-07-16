@@ -29,6 +29,9 @@ function ensureGraphicsLayer(input: {
   setGraphicsLayer: (layer: GraphicsLayer | null) => void;
 }): GraphicsLayer {
   if (input.graphicsLayer) return input.graphicsLayer;
+  if (!input.mapView.map) {
+    throw new Error("Map is not available");
+  }
 
   const layer = new GraphicsLayer({
     title: "Tekeninglaag",

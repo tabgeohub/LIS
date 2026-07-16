@@ -1,5 +1,5 @@
 import { initialPointState } from "@helpers/ZustandStates/popUpState";
-import type { EnrichedPointType } from "Types";
+import type { EnrichedPointType, TabType } from "Types";
 import { createYellowCircle } from "hooks/popUpModal/createYellowCircle";
 import { isPopupTabBlocked } from "./popupBlockedTabs";
 
@@ -16,12 +16,12 @@ export function clearPopupSelection(input: {
 export function openPopupForClickedPoint(input: {
   clickedPointId: number;
   points: EnrichedPointType[];
-  selectedTab: string;
+  selectedTab: TabType;
   selectedPointGraphicsLayer: __esri.GraphicsLayer;
   setClickedPoint: (value: EnrichedPointType) => void;
   setOpenModal: (open: boolean) => void;
   setSelectedBottomTab: (tab: string) => void;
-  setSelectedTab: (tab: string) => void;
+  setSelectedTab: (tab: TabType) => void;
   setOpenSideBar: (open: boolean) => void;
   logAction: (payload: { message: string; newData: unknown }) => void;
 }) {

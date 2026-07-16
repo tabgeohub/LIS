@@ -44,7 +44,8 @@ export function useHandleStep2(input: UseHandleStep2Input) {
   const mapServerUrl = resolveMapServerUrl(selectedBasemap);
 
   return async function handleStep2() {
-    if (!mapView || !selectedPlan) return;
+    if (!mapView?.map || !selectedPlan) return;
+    const map = mapView.map;
 
     const selectedPointsData = selectedPlan.points_data.filter((point) =>
       selectedPoints.includes(point.id)
@@ -54,7 +55,7 @@ export function useHandleStep2(input: UseHandleStep2Input) {
     );
 
     const tempLayer = new GraphicsLayer();
-    mapView.map.add(tempLayer);
+    map.add(tempLayer);
     const zip = new JSZip();
     const totalItems = selectedPointsData.length + selectedGeometriesData.length;
 
@@ -105,7 +106,7 @@ export function useHandleStep2(input: UseHandleStep2Input) {
         `error:${err instanceof Error ? err.message : "Rapport genereren mislukt"}`
       );
     } finally {
-      mapView.map.remove(tempLayer);
+      map.remove(tempLayer);
     }
   };
 }

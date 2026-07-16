@@ -34,16 +34,19 @@ export function useRenderPlanGeometries() {
       const graphic = createGeometryGraphic(
         {
           id: geometry.id,
-          geometry_type: geometry.geometry_type,
-          geometry_omschrijving: geometry.geometry_omschrijving,
+          geometry_type:
+            geometry.geometry_type === "polygon" || geometry.geometry_type === "line"
+              ? geometry.geometry_type
+              : undefined,
+          geometry_omschrijving: geometry.geometry_omschrijving ?? undefined,
           points: geometry.points,
         },
         {
           transformCoordinates,
           attributes: {
             geometryId: geometry.id,
-            geometryType: geometry.geometry_type,
-            omschrijving: geometry.geometry_omschrijving,
+            geometryType: geometry.geometry_type ?? undefined,
+            omschrijving: geometry.geometry_omschrijving ?? undefined,
             type: "geometry",
           },
         }

@@ -1,7 +1,7 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 
 export function matchesHerhalenValue(
-  geometryHerhalen: Geometry["herhalen"],
+  geometryHerhalen: Geometry["herhalen"] | string,
   herhalen: boolean
 ): boolean {
   const herhalenValue = herhalen ? 1 : 0;
@@ -14,11 +14,13 @@ export function matchesHerhalenValue(
   return geometryHerhalen === herhalen;
 }
 
-export function filterPointsForStepContent(input: {
-  dbPoints: Array<{ id: number; herhalen: number; omschrijving: string }>;
+export function filterPointsForStepContent<
+  T extends { id: number; herhalen: number; omschrijving: string }
+>(input: {
+  dbPoints: T[];
   herhalen: boolean;
   selectedPlanPointIds: number[];
-}) {
+}): T[] {
   const herhalenValue = input.herhalen ? 1 : 0;
   const planIds = new Set(input.selectedPlanPointIds);
 

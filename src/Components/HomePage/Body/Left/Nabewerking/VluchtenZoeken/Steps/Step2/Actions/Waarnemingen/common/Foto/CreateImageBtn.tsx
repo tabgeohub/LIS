@@ -1,4 +1,3 @@
-import { base64ToBlob } from "@helpers/base64ToBlob";
 import { useContent } from "hooks/useContent";
 import { useEffect, useState } from "react";
 import { useCreateData } from "utils/useCreateData";
@@ -13,6 +12,21 @@ import {
   buildAttachmentFromUploadResponse,
   readImageFileAsBlob,
 } from "./attachmentUploadHelpers";
+
+type CreateAttachmentResponse = {
+  id?: number;
+  message?: string;
+  result: { id: number; url: string };
+};
+
+type CreateAttachmentPayload = {
+  url: string;
+  pointId: number;
+  attachmentId: number;
+  taken_at: number;
+  long: number;
+  lat: number;
+};
 
 export default function CreateImageBtn({
   setLoading,
@@ -35,7 +49,10 @@ export default function CreateImageBtn({
   const uploadAttachmentForPoint = useUploadAttachmentForPoint();
   const content = useContent();
 
-  const { create } = useCreateData("/finished_plans/attachment");
+  const { create } = useCreateData<
+    CreateAttachmentPayload,
+    CreateAttachmentResponse
+  >("/finished_plans/attachment");
   const { update } = useUpdateData(
     "/finished_plans/points/finishedPointAttachments"
   );
@@ -94,13 +111,11 @@ export default function CreateImageBtn({
             : [...attachmentPoint.attachments, uploadedAttachment];
 
           const attachmentsIds = isFirstAttachment
-            ? // @ts-ignore
-              [responseData.result.id]
+            ? [responseData.result.id]
             : [
                 ...attachmentPoint.attachments.flatMap(
                   (attachment) => attachment.id
                 ),
-                // @ts-ignore
                 responseData.result.id,
               ];
 

@@ -43,7 +43,7 @@ export default function PointsList() {
       spatialReference: { wkid: 4326 },
     });
 
-    mapView.goTo(polygon);
+    mapView!.goTo(polygon);
     logAction({
       message: "User clicked 'Zoom to all points' button",
       step: "Clicked table functions",

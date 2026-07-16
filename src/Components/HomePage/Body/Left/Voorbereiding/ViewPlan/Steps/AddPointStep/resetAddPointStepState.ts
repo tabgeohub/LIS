@@ -1,4 +1,5 @@
 import { findSpecificPoint } from "../../../EnrichedAddPoint/helpers/findSpecificPoint";
+import type { SpatialReference } from "Types";
 
 export function removeAddPointMapGraphics(input: {
   mapView: __esri.MapView | null;
@@ -37,7 +38,7 @@ export function resetAddPointFormState(input: {
   setYCoord: (value: number) => void;
   setLatitude: (value: number) => void;
   setLongitude: (value: number) => void;
-  setCoordinateSystem: (value: string) => void;
+  setCoordinateSystem: (value: SpatialReference) => void;
   setVertrouwelijk: (value: boolean) => void;
   setHerhalen: (value: boolean) => void;
   setOmschrijving: (value: string) => void;

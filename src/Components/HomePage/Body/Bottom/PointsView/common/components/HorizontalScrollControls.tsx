@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 import { scrollHorizontally } from "../functions/scrollHorizontally";
 import { syncScrollPositions } from "../functions/syncScrollPositions";
 
@@ -7,7 +7,7 @@ interface HorizontalScrollControlsProps {
   tableScrollWidth: number;
   topScrollRef: RefObject<HTMLDivElement>;
   tableScrollRef: RefObject<HTMLDivElement>;
-  syncingRef: RefObject<boolean>;
+  syncingRef: MutableRefObject<boolean>;
   onTopScroll?: () => void;
 }
 

@@ -23,7 +23,7 @@ const LINE_HOVER_SYMBOL = new SimpleLineSymbol({
 const HOVER_GEOMETRY_TYPES = new Set(["point", "polygon", "polyline"]);
 
 export function isMapHoverGraphicHit(
-  result: __esri.HitTestResult
+  result: __esri.MapViewViewHit
 ): result is __esri.MapViewGraphicHit {
   if (result.type !== "graphic" || !result.graphic?.geometry) return false;
   return HOVER_GEOMETRY_TYPES.has(result.graphic.geometry.type);

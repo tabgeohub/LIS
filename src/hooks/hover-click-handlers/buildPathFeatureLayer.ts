@@ -60,27 +60,29 @@ export function addPathLayerBelowPoints(input: {
   pointsGraphicsLayer?: __esri.GraphicsLayer | null;
 }) {
   const { mapView, pathLayer, pointsGraphicsLayer } = input;
+  const map = mapView.map;
+  if (!map) return;
 
   if (pointsGraphicsLayer) {
-    const pointsLayerIndex = mapView.map.layers.indexOf(pointsGraphicsLayer);
+    const pointsLayerIndex = map.layers.indexOf(pointsGraphicsLayer);
     if (pointsLayerIndex >= 0) {
-      mapView.map.add(pathLayer, pointsLayerIndex);
+      map.add(pathLayer, pointsLayerIndex);
     } else {
-      mapView.map.add(pathLayer);
+      map.add(pathLayer);
     }
   } else {
-    mapView.map.add(pathLayer);
+    map.add(pathLayer);
   }
 
   if (
     pointsGraphicsLayer &&
-    mapView.map.layers.includes(pointsGraphicsLayer) &&
-    mapView.map.layers.includes(pathLayer)
+    map.layers.includes(pointsGraphicsLayer) &&
+    map.layers.includes(pathLayer)
   ) {
-    const pathIndex = mapView.map.layers.indexOf(pathLayer);
-    const pointsIndex = mapView.map.layers.indexOf(pointsGraphicsLayer);
+    const pathIndex = map.layers.indexOf(pathLayer);
+    const pointsIndex = map.layers.indexOf(pointsGraphicsLayer);
     if (pointsIndex < pathIndex) {
-      mapView.map.reorder(pointsGraphicsLayer, pathIndex + 1);
+      map.reorder(pointsGraphicsLayer, pathIndex + 1);
     }
   }
 }

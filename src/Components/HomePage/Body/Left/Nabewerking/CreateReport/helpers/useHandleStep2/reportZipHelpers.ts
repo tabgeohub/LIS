@@ -64,7 +64,7 @@ export async function preloadReportAttachments(input: {
 }
 
 export function addProcessedItemsToZip(
-  zip: JSZip,
+  zip: InstanceType<typeof JSZip>,
   processedItems: ProcessedItem[]
 ) {
   const attachmentsFolder = zip.folder("attachments");

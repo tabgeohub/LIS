@@ -1,4 +1,4 @@
-import assert from "assert";
+import { describe, expect, it } from "vitest";
 import { filterPointsByCriteria } from "./filterPointsByCriteria";
 
 const points = [
@@ -18,24 +18,29 @@ const points = [
   },
 ] as any;
 
-const recurring = filterPointsByCriteria(points, {
-  herhalen: true,
-  activityFilter: "inspectie",
-  periodFilter: "Laatste 4 weken",
-  dateFrom: "",
-  dateTo: "",
-  filterText: "brug",
-  now: new Date("2026-07-14T00:00:00Z").getTime(),
-});
-assert.deepEqual(recurring.map((point) => point.id), [1]);
+describe("filterPointsByCriteria", () => {
+  it("combines recurring, activity, period, and text filters", () => {
+    const recurring = filterPointsByCriteria(points, {
+      herhalen: true,
+      activityFilter: "inspectie",
+      periodFilter: "Laatste 4 weken",
+      dateFrom: "",
+      dateTo: "",
+      filterText: "brug",
+      now: new Date("2026-07-14T00:00:00Z").getTime(),
+    });
+    expect(recurring.map((point) => point.id)).toEqual([1]);
+  });
 
-const bounded = filterPointsByCriteria(points, {
-  herhalen: false,
-  activityFilter: "",
-  periodFilter: "Periodoe van-tot",
-  dateFrom: "2026-04-01",
-  dateTo: "2026-05-31",
-  filterText: "",
+  it("filters non-recurring points within explicit bounds", () => {
+    const bounded = filterPointsByCriteria(points, {
+      herhalen: false,
+      activityFilter: "",
+      periodFilter: "Periodoe van-tot",
+      dateFrom: "2026-04-01",
+      dateTo: "2026-05-31",
+      filterText: "",
+    });
+    expect(bounded.map((point) => point.id)).toEqual([2]);
+  });
 });
-assert.deepEqual(bounded.map((point) => point.id), [2]);
-console.log("filterPointsByCriteria tests passed");

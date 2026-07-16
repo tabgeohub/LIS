@@ -19,7 +19,7 @@ export function useEnrichedAddPointMapClick(input: {
   setYCoord: (value: number) => void;
   setLatitude: (value: number) => void;
   setLongitude: (value: number) => void;
-  setCurrentPoint: (value: EnrichedPointType | null) => void;
+  setCurrentPoint: (value: { x: number; y: number }) => void;
   setStep: (value: number) => void;
 }) {
   const { mapView, redGraphicsLayer } = useMapViewState();

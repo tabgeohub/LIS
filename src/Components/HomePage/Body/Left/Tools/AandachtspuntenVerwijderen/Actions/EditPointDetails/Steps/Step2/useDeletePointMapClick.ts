@@ -24,7 +24,7 @@ export function useDeletePointMapClick(input: {
   const { mapView, redGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (subStep !== 1 || !mapView || !redGraphicsLayer) return;
+    if (input.subStep !== 1 || !mapView || !redGraphicsLayer) return;
 
     const handle = mapView.on("click", async (event) => {
       if (!isValidMapClickPoint(event.mapPoint)) return;

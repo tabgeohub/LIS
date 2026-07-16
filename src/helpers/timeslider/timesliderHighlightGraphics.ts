@@ -68,7 +68,7 @@ function addPlanGeometryHighlights(
     const path = geometryPathFromPoints(g.points);
     if (path.length < 2) continue;
 
-    const isPolygon = isPolygonGeometryType(g.geometry_type);
+    const isPolygon = isPolygonGeometryType(g.geometry_type ?? undefined);
 
     if (isPolygon && path.length >= 3) {
       layer.add(

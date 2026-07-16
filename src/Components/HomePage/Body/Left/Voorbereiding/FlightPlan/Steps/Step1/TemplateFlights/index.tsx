@@ -13,21 +13,9 @@ import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPla
 import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
 import { collectUniquePlanPointIds } from "hooks/flightPlan/collectUniquePlanPointIds";
 import { runFlightPlanCreateSuccess } from "hooks/flightPlan/runFlightPlanCreateSuccess";
-import { Geometry } from "hooks/features/useGeometriesStore";
+import type { Template } from "api-hooks/templateFlights/types";
 
-export interface FlightPlanTemplate {
-  id: number;
-  name: string;
-  points: {
-    id: number;
-    omschrijving: string;
-    xcoordinaat_rd: number;
-    ycoordinaat_rd: number;
-    latitude: number;
-    longitude: number;
-  }[];
-  geometries: Geometry[];
-}
+export type FlightPlanTemplate = Template;
 
 export default function TemplateFlight({
   basemapString,

@@ -3,18 +3,22 @@ import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import type { PeriodFilterSetters, PeriodFilterValues } from "hooks/zustand/shared/periodFilterState";
 import type { PlanListFilterSetters, PlanListFilterValues } from "hooks/zustand/shared/flightPlanFormFields";
 
-export type PeriodFilterStoreSlice = PeriodFilterValues &
+export type PeriodFilterStoreSlice<
+  T extends { datum: string; vluchtnummer: string },
+> = PeriodFilterValues &
   PeriodFilterSetters &
   Pick<PlanListFilterValues, "filterTerm"> &
   Pick<PlanListFilterSetters, "setOpenFilter"> & {
-    filteredPlans: { datum: string; vluchtnummer: string }[];
-    setFilteredPlans: (value: { datum: string; vluchtnummer: string }[]) => void;
+    filteredPlans: T[];
+    setFilteredPlans: (value: T[]) => void;
   };
 
-export default function PeriodFilterPanel({
+export default function PeriodFilterPanel<
+  T extends { datum: string; vluchtnummer: string },
+>({
   store,
 }: {
-  store: PeriodFilterStoreSlice;
+  store: PeriodFilterStoreSlice<T>;
 }) {
   const {
     periode,

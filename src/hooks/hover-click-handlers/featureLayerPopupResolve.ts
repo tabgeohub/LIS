@@ -2,12 +2,13 @@ import { FeatureLayerAttributes } from "@helpers/ZustandStates/popUpState";
 import { isTargetFeatureLayer } from "./featureLayerTargets";
 import type { FeatureLayerPopupData } from "./useFeatureLayerPopup";
 
-export function findTargetFeatureHit(results: __esri.HitTestResult[]) {
+export function findTargetFeatureHit(results: __esri.MapViewViewHit[]) {
   return results.find((result) => {
-    const graphic = (result as __esri.GraphicHit).graphic;
+    if (result.type !== "graphic") return false;
+    const graphic = result.graphic;
     if (!graphic?.layer) return false;
     return isTargetFeatureLayer(graphic.layer as __esri.Layer);
-  }) as __esri.GraphicHit | undefined;
+  }) as __esri.MapViewGraphicHit | undefined;
 }
 
 export function readFeatureObjectId(attributes: FeatureLayerAttributes) {

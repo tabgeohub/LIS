@@ -7,6 +7,7 @@ import {
   applyFlightPlanFormValues,
   viewPlanFlightPlanFormDefaults,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import type { TabType } from "Types";
 
 export function resetViewPlanSession(input: {
   setVluchtnummer: (value: string) => void;
@@ -15,7 +16,7 @@ export function resetViewPlanSession(input: {
   yellowGraphicsLayer: __esri.GraphicsLayer | null;
   resetFeatures: () => void;
   setOpenTable: (value: boolean) => void;
-  setSelectedTab: (value: string) => void;
+  setSelectedTab: (value: TabType) => void;
   setViewPlanState: {
     setOmschrijving: (value: string) => void;
     setWaarnemer: (value: string) => void;

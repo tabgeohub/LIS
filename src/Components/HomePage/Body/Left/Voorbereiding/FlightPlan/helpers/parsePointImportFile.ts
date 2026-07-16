@@ -1,14 +1,30 @@
 import * as XLSX from "@e965/xlsx";
 import { PointImportRow } from "@helpers/points/pointColumnKeys";
 
-const NUMERIC_COLUMNS = new Set([
+type NumericColumn =
+  | "xcoordinaat_rd"
+  | "ycoordinaat_rd"
+  | "latitude"
+  | "longitude";
+
+const NUMERIC_COLUMNS = new Set<NumericColumn>([
   "xcoordinaat_rd",
   "ycoordinaat_rd",
   "latitude",
   "longitude",
 ]);
 
-const TRUTHY_COLUMNS = new Set(["herhalen", "vertrouwelijk"]);
+type TruthyColumn = "herhalen" | "vertrouwelijk";
+
+const TRUTHY_COLUMNS = new Set<TruthyColumn>(["herhalen", "vertrouwelijk"]);
+
+function isNumericColumn(key: string): key is NumericColumn {
+  return NUMERIC_COLUMNS.has(key as NumericColumn);
+}
+
+function isTruthyColumn(key: string): key is TruthyColumn {
+  return TRUTHY_COLUMNS.has(key as TruthyColumn);
+}
 
 function parseNumericCell(value: unknown): number {
   const raw = String(value ?? "")
@@ -116,13 +132,19 @@ function applyImportColumn(input: {
     return;
   }
 
-  if (NUMERIC_COLUMNS.has(key)) {
-    (obj as Record<string, number>)[key] = parseNumericCell(value);
+  if (isNumericColumn(key)) {
+    obj[key] = parseNumericCell(value);
     return;
   }
 
-  if (TRUTHY_COLUMNS.has(key)) {
-    (obj as Record<string, unknown>)[key] = value ?? 0;
+  if (isTruthyColumn(key)) {
+    obj[key] =
+      value == null ||
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+        ? value ?? 0
+        : String(value);
     return;
   }
 

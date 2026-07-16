@@ -7,7 +7,9 @@ function firstPlanPath(raw: PlanPathRow | PlanPathRow[] | undefined) {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
-export function useGetFlightTimesDistance(flightPlan: { id?: number }) {
+export function useGetFlightTimesDistance(
+  flightPlan: { id?: number } | null | undefined
+) {
   const { data } = useFinishedPlanPath(flightPlan?.id);
   const row = firstPlanPath(data);
   return useMemo(() => calculateFlightPathMetrics(row), [row]);

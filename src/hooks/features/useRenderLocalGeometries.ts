@@ -15,6 +15,7 @@ export function useRenderLocalGeometries(geometries: Geometry[]) {
 
   useEffect(() => {
     if (!validateMapView(mapView, geometriesGraphicsLayer)) return;
+    if (!geometriesGraphicsLayer) return;
 
     if (!geometries.length) {
       geometriesGraphicsLayer.removeAll();

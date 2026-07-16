@@ -79,10 +79,10 @@ export function submitAddPointsToPlan(input: SubmitAddPointsToPlanInput) {
       input.setOpenTable(true);
 
       newlySelectedStandalonePoints.forEach((point) =>
-        drawYellowPoint(point, input.yellowGraphicsLayer)
+        drawYellowPoint(point, input.yellowGraphicsLayer ?? null)
       );
 
-      drawYellowGeometries(updatedGeometries, input.yellowGraphicsLayer);
+      drawYellowGeometries(updatedGeometries, input.yellowGraphicsLayer ?? null);
 
       input.setFilteredPlans(
         input.filteredPlans.map((p) =>

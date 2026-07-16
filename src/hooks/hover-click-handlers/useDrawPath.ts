@@ -19,14 +19,14 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
   usePathPointHandlerClick();
 
   useEffect(() => {
-    if (featureLayerRef.current && mapView) {
+    if (featureLayerRef.current && mapView?.map) {
       if (mapView.map.layers.includes(featureLayerRef.current)) {
         mapView.map.remove(featureLayerRef.current);
       }
       featureLayerRef.current = null;
     }
 
-    if (!selectedPlan || !mapView) {
+    if (!selectedPlan || !mapView?.map) {
       setLoadingPath(false);
       return;
     }
@@ -39,12 +39,13 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
 
     setLoadingPath(true);
     const pathLayer = buildPathFeatureLayer({ selectedPlan, planPath });
+    const map = mapView.map;
     featureLayerRef.current = pathLayer;
     addPathLayerBelowPoints({ mapView, pathLayer, pointsGraphicsLayer });
 
     return () => {
-      if (mapView.map.layers.includes(pathLayer)) {
-        mapView.map.remove(pathLayer);
+      if (map.layers.includes(pathLayer)) {
+        map.remove(pathLayer);
       }
       featureLayerRef.current = null;
       setLoadingPath(false);
@@ -53,7 +54,7 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
 
   const pathLayerReady = !!(
     featureLayerRef.current &&
-    mapView?.map.layers.includes(featureLayerRef.current)
+    mapView?.map?.layers.includes(featureLayerRef.current)
   );
 
   usePathLoadingReady({

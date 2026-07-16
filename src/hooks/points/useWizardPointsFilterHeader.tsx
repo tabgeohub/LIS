@@ -1,7 +1,9 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 
-export function useWizardPointsFilterHeader(input: {
-  points: { omschrijving?: string | null }[];
+export function useWizardPointsFilterHeader<
+  T extends { omschrijving?: string | null }
+>(input: {
+  points: T[];
   step?: number;
   hideHeader?: boolean;
   introText?: string;

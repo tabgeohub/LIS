@@ -113,7 +113,8 @@ export default function AddToPlan() {
   }
 
   const initPolygonDrawer = useCallback(async () => {
-    if (!mapView) return;
+    if (!mapView?.map) return;
+    const map = mapView.map;
 
     try {
       if (!projection.isLoaded()) {
@@ -128,7 +129,7 @@ export default function AddToPlan() {
 
     const graphicsLayer = new GraphicsLayer({ listMode: "hide" });
     graphicsLayerRef.current = graphicsLayer;
-    mapView.map.add(graphicsLayer);
+    map.add(graphicsLayer);
 
     const sketchViewModel = new SketchViewModel({
       view: mapView,

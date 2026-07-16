@@ -172,7 +172,7 @@ export function drawGeometryHoverSkyBlue(
   const path = geometryPathFromPoints(geometry.points);
   if (path.length < 2) return;
 
-  const isPolygon = isPolygonGeometryType(geometry.geometry_type);
+  const isPolygon = isPolygonGeometryType(geometry.geometry_type ?? undefined);
 
   if (isPolygon && path.length >= 3) {
     layer.add(

@@ -3,14 +3,16 @@ import { Geometry } from "hooks/features/useGeometriesStore";
 const TRUTHY_STRINGS = new Set(["1", "ja", "yes", "true"]);
 const TRUTHY_NUMBERS = new Set([1]);
 
-export function isHerhalenTruthy(value: Geometry["herhalen"]): boolean {
+type HerhalenValue = Geometry["herhalen"] | string;
+
+export function isHerhalenTruthy(value: HerhalenValue): boolean {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return TRUTHY_NUMBERS.has(value);
   if (typeof value === "string") return TRUTHY_STRINGS.has(value.toLowerCase());
   return false;
 }
 
-export function formatHerhalenLabel(value: Geometry["herhalen"]): string {
+export function formatHerhalenLabel(value: HerhalenValue): string {
   return isHerhalenTruthy(value) ? "Ja" : "Nee";
 }
 
