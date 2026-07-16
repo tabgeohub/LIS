@@ -3,27 +3,54 @@ import {
   FinishedGeometryType,
 } from "Types/finished_plans";
 
+type Coordinate = { latitude: number; longitude: number };
+type LatLon = { lat: number; lon: number };
+
+const DEFAULT_MAP_VIEW = {
+  center: { latitude: 52.1326, longitude: 5.2913 },
+  zoom: 8,
+};
+
+const ZOOM_THRESHOLDS = [
+  { maxDistance: 1, zoom: 15 },
+  { maxDistance: 2, zoom: 14 },
+  { maxDistance: 5, zoom: 13 },
+  { maxDistance: 10, zoom: 12 },
+  { maxDistance: 20, zoom: 11 },
+  { maxDistance: 40, zoom: 10 },
+  { maxDistance: 80, zoom: 9 },
+  { maxDistance: 190, zoom: 8 },
+] as const;
+
+function isFiniteCoordinate(point: Coordinate | null | undefined): point is Coordinate {
+  return Boolean(
+    point &&
+      Number.isFinite(point.latitude) &&
+      Number.isFinite(point.longitude)
+  );
+}
+
+function averageCoordinates(points: Coordinate[]): Coordinate {
+  const totals = points.reduce(
+    (sum, point) => ({
+      latitude: sum.latitude + point.latitude,
+      longitude: sum.longitude + point.longitude,
+    }),
+    { latitude: 0, longitude: 0 }
+  );
+  return {
+    latitude: totals.latitude / points.length,
+    longitude: totals.longitude / points.length,
+  };
+}
+
 export function geometryCentroid(
   g: FinishedGeometryType
 ): { lat: number; lon: number } | null {
-  if (!g.points?.length) return null;
-  let sumLat = 0;
-  let sumLon = 0;
-  let n = 0;
-  for (const p of g.points) {
-    if (
-      typeof p.latitude === "number" &&
-      typeof p.longitude === "number" &&
-      Number.isFinite(p.latitude) &&
-      Number.isFinite(p.longitude)
-    ) {
-      sumLat += p.latitude;
-      sumLon += p.longitude;
-      n++;
-    }
-  }
-  if (n === 0) return null;
-  return { lat: sumLat / n, lon: sumLon / n };
+  const points = (g.points ?? []).filter(isFiniteCoordinate);
+  if (points.length === 0) return null;
+  const center = averageCoordinates(points);
+  return { lat: center.latitude, lon: center.longitude };
 }
 
 /** All standalone points plus one centroid per geometry (for map extent / center). */
@@ -32,29 +59,18 @@ export function collectPointsForCenterAndZoom(
 ): { latitude: number; longitude: number }[] {
   if (!plan) return [];
 
-  const out: { latitude: number; longitude: number }[] = [];
   const pointsData = Array.isArray(plan.points_data) ? plan.points_data : [];
-  for (const p of pointsData) {
-    if (
-      typeof p.latitude === "number" &&
-      typeof p.longitude === "number" &&
-      Number.isFinite(p.latitude) &&
-      Number.isFinite(p.longitude)
-    ) {
-      out.push({ latitude: p.latitude, longitude: p.longitude });
-    }
-  }
+  const standalonePoints = pointsData
+    .filter(isFiniteCoordinate)
+    .map(({ latitude, longitude }) => ({ latitude, longitude }));
 
   const geometries = Array.isArray(plan.geometries) ? plan.geometries : [];
-  for (const g of geometries) {
-    if (!g) continue;
-    const c = geometryCentroid(g);
-    if (c && Number.isFinite(c.lat) && Number.isFinite(c.lon)) {
-      out.push({ latitude: c.lat, longitude: c.lon });
-    }
-  }
+  const geometryCenters = geometries
+    .map((geometry) => (geometry ? geometryCentroid(geometry) : null))
+    .filter((center): center is LatLon => center !== null)
+    .map(({ lat, lon }) => ({ latitude: lat, longitude: lon }));
 
-  return out;
+  return [...standalonePoints, ...geometryCenters];
 }
 
 function haversineDistance(input: {
@@ -75,17 +91,28 @@ function haversineDistance(input: {
   return R * c;
 }
 
-function calculateZoom(maxDistance: number): number {
-  if (maxDistance < 1) return 15; // Very close points
-  if (maxDistance < 2) return 14; // Close points
-  if (maxDistance < 5) return 13; // Moderate distance
-  if (maxDistance < 10) return 12; // City-wide
-  if (maxDistance < 20) return 11; // City to regional
-  if (maxDistance < 40) return 10; // Regional
-  if (maxDistance < 80) return 9; // Larger regional
-  if (maxDistance < 190) return 8; // Country-wide
+export function calculateZoom(maxDistance: number): number {
+  return (
+    ZOOM_THRESHOLDS.find(({ maxDistance: threshold }) => maxDistance < threshold)
+      ?.zoom ?? 7
+  );
+}
 
-  return 7; // Continental or global scale
+function maximumDistanceFromCenter(
+  points: Coordinate[],
+  center: Coordinate
+): number {
+  return points.reduce(
+    (maximum, point) =>
+      Math.max(
+        maximum,
+        haversineDistance({
+          from: { lat: center.latitude, lon: center.longitude },
+          to: { lat: point.latitude, lon: point.longitude },
+        })
+      ),
+    0
+  );
 }
 
 export function calculateCenterAndZoom(
@@ -94,43 +121,17 @@ export function calculateCenterAndZoom(
   center: { latitude: number; longitude: number };
   zoom: number;
 } {
-  const valid = points.filter(
-    (p) =>
-      p != null && Number.isFinite(p.latitude) && Number.isFinite(p.longitude)
-  );
+  const valid = points.filter(isFiniteCoordinate);
 
   if (valid.length === 0) {
-    return {
-      center: { latitude: 52.1326, longitude: 5.2913 },
-      zoom: 8,
-    };
+    return DEFAULT_MAP_VIEW;
   }
 
-  let sumLat = 0;
-  let sumLon = 0;
-  const numPoints = valid.length;
-
-  valid.forEach((point) => {
-    sumLat += point.latitude;
-    sumLon += point.longitude;
-  });
-
-  const centerLat = sumLat / numPoints;
-  const centerLon = sumLon / numPoints;
-
-  let maxDistance = 0;
-  for (const point of valid) {
-    const distance = haversineDistance({
-      from: { lat: centerLat, lon: centerLon },
-      to: { lat: point.latitude, lon: point.longitude },
-    });
-    if (distance > maxDistance) maxDistance = distance;
-  }
-
-  const zoom = calculateZoom(maxDistance * 2);
+  const center = averageCoordinates(valid);
+  const maxDistance = maximumDistanceFromCenter(valid, center);
 
   return {
-    center: { latitude: centerLat, longitude: centerLon },
-    zoom,
+    center,
+    zoom: calculateZoom(maxDistance * 2),
   };
 }

@@ -112,6 +112,13 @@ The ledger key is `category + file/description + severity`. Because these export
 - Point coordinate update paths reuse `buildCoordinateSyncPatch`; feature-specific drawing, state updates, and logging remain local.
 - `nnederlandLayerBuilders.ts`: the repeated layer-spec envelope is shared while IDs, URLs, titles, ordering, and symbols remain unchanged.
 
+**Final pure maintainability batch**
+
+- `calculateCenterAndZoom.ts`: coordinate validation, averaging, maximum-distance calculation, and zoom thresholds are focused pure helpers with the existing Netherlands fallback and thresholds preserved.
+- `geometryHerhalen.ts`: selection sorting uses explicit original and reverse-selection ranks while retaining the existing order.
+- `parseTimesliderImageQuery.ts` and `filterPlansByPeriod.ts`: ID/date parsing and period/text predicates are separated without changing query keys, error text, date boundaries, or current filter labels.
+- `ViewPlans/Images.tsx`: loading/empty/ready decisions and attachment sorting are separated from presentation; thumbnails and `ImageGallery` now use the shared backend-proxy display URL.
+
 All entries above stay `addressed pending confirmation` until a post-deployment Sigrid export proves that the original row cleared or resegmented.
 
 ### Accepted architecture findings
@@ -135,12 +142,12 @@ An accepted row must be reopened if a future scan or code review shows bundled r
 
 MEDIUM complexity fell from 46 to 40. Continue in descending executable complexity, beginning with form population, Excel export, import-column application, grant-error extraction, Timeslider detail orchestration, login parsing, geometry creation, selection sorting, image-query parsing, path drawing, and image handling.
 
-The Excel export, import-column application, grant-error extraction, and login parsing rows are addressed pending confirmation in the next export. Timeslider detail orchestration, form population, and geometry construction were already decomposed after the current export and also remain pending confirmation.
+The Excel export, import-column application, grant-error extraction, login parsing, geometry selection sorting, image-query parsing, plan filtering, center/zoom calculation, and plan-image rendering rows are addressed pending confirmation in the next export. Timeslider detail orchestration, form population, and geometry construction were already decomposed after the current export and also remain pending confirmation.
 
-Two MEDIUM parameter-count findings remain:
+The two MEDIUM parameter-count rows from the current export are addressed pending confirmation:
 
-- `finishedPlanHighlightActions.ts.draw(...)`
-- `geometryGraphicBuilders.ts.pointsToCoordinates(...)`
+- `finishedPlanHighlightActions.ts.draw(...)` now has four parameters inside a focused action factory.
+- `geometryGraphicBuilders.ts.pointsToCoordinates(...)` now takes only points and an optional transform callback.
 
 Use typed options objects only when this improves ownership and readability; preserve compatibility wrappers for exported helpers.
 

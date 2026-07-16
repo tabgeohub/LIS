@@ -1,5 +1,6 @@
 import { useMemo, useEffect } from "react";
 import { AttachmentType } from "Types/finished_plans";
+import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 
 // Lightweight inline SVG icons (replaces react-icons - saves ~80-120 KB)
 const CloseIcon = () => (
@@ -113,18 +114,12 @@ export default function ImageGallery({
   onDelete?: (attachmentId: number) => void;
   onShowLocation?: (location: string) => void;
 }) {
-  const token = localStorage.getItem("credential_token");
-
-  // Memoize image URLs to avoid recalculating on every render
-  const getImageUrl = useMemo(
-    () => (url: string) => `${url.split("token=").at(0)}token=${token}`,
-    [token]
-  );
-
   const mainImageUrl = useMemo(
     () =>
-      attachments[activeIndex] ? getImageUrl(attachments[activeIndex].url) : "",
-    [attachments, activeIndex, getImageUrl]
+      attachments[activeIndex]
+        ? attachmentDisplayUrl(attachments[activeIndex].url)
+        : "",
+    [attachments, activeIndex]
   );
 
   // Preload adjacent images for smoother navigation
@@ -139,16 +134,16 @@ export default function ImageGallery({
     // Preload next image
     const nextIndex = (activeIndex + 1) % attachments.length;
     if (attachments[nextIndex]) {
-      preloadImage(getImageUrl(attachments[nextIndex].url));
+      preloadImage(attachmentDisplayUrl(attachments[nextIndex].url));
     }
 
     // Preload previous image
     const prevIndex =
       (activeIndex - 1 + attachments.length) % attachments.length;
     if (attachments[prevIndex]) {
-      preloadImage(getImageUrl(attachments[prevIndex].url));
+      preloadImage(attachmentDisplayUrl(attachments[prevIndex].url));
     }
-  }, [isOpen, activeIndex, attachments, getImageUrl]);
+  }, [isOpen, activeIndex, attachments]);
 
   if (attachments.length === 0) return null;
 
@@ -179,7 +174,7 @@ export default function ImageGallery({
               {attachments.map((attachment, index) => (
                 <img
                   key={attachment.id}
-                  src={getImageUrl(attachment.url)}
+                  src={attachmentDisplayUrl(attachment.url)}
                   alt={String(attachment.id)}
                   loading="lazy"
                   onClick={() => setActiveIndex(index)}

@@ -11,6 +11,36 @@ export type FilterPlansByPeriodInput<T extends PlanWithDatumAndVluchtnummer> = {
   periodFilter?: string;
 };
 
+function matchesPeriod(input: {
+  planDate: string;
+  periodFilter?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  now: Date;
+}): boolean {
+  if (input.periodFilter === "Laatste 4 weken") {
+    const fourWeeksAgo = new Date(input.now);
+    fourWeeksAgo.setDate(input.now.getDate() - 28);
+    return new Date(input.planDate) >= fourWeeksAgo;
+  }
+
+  if (
+    input.periodFilter === "Periodoe van-tot" &&
+    input.dateFrom &&
+    input.dateTo
+  ) {
+    const planDate = new Date(input.planDate);
+    return planDate >= new Date(input.dateFrom) && planDate <= new Date(input.dateTo);
+  }
+
+  return true;
+}
+
+function matchesFlightNumber(vluchtnummer: string, filterText?: string): boolean {
+  const term = filterText?.trim().toLowerCase();
+  return !term || vluchtnummer.toLowerCase().includes(term);
+}
+
 export function filterPlansByPeriod<T extends PlanWithDatumAndVluchtnummer>(
   input: FilterPlansByPeriodInput<T>
 ): T[] {
@@ -22,26 +52,14 @@ export function filterPlansByPeriod<T extends PlanWithDatumAndVluchtnummer>(
   }
 
   return plans.filter((plan) => {
-    if (periodFilter === "Laatste 4 weken") {
-      const planDate = new Date(plan.datum);
-      const fourWeeksAgo = new Date();
-      fourWeeksAgo.setDate(now.getDate() - 28);
-      if (planDate < fourWeeksAgo) return false;
-    } else if (periodFilter === "Periodoe van-tot" && dateFrom && dateTo) {
-      const planDate = new Date(plan.datum);
-      const fromDate = new Date(dateFrom);
-      const toDate = new Date(dateTo);
-      if (planDate < fromDate || planDate > toDate) return false;
-    }
-
-    if (
-      filterText &&
-      filterText.trim() !== "" &&
-      !plan.vluchtnummer.toLowerCase().includes(filterText.toLowerCase())
-    ) {
-      return false;
-    }
-
-    return true;
+    return (
+      matchesPeriod({
+        planDate: plan.datum,
+        periodFilter,
+        dateFrom,
+        dateTo,
+        now,
+      }) && matchesFlightNumber(plan.vluchtnummer, filterText)
+    );
   });
 }

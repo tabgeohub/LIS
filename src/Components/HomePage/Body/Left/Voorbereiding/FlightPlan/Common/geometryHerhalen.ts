@@ -28,29 +28,20 @@ export function sortGeometriesForSelection(
   geometries: Geometry[],
   selectedIds: number[]
 ): Geometry[] {
-  const indexMap = new Map<number, number>();
-  geometries.forEach((g, i) => indexMap.set(g.id, i));
-
-  const selectedReverseIndex = new Map<number, number>();
-  selectedIds.forEach((id, i) => {
-    selectedReverseIndex.set(id, selectedIds.length - 1 - i);
-  });
-
   const selectedSet = new Set(selectedIds);
+  const originalIndex = new Map(
+    geometries.map((geometry, index) => [geometry.id, index])
+  );
+  const selectedRank = new Map(
+    selectedIds.map((id, index) => [id, selectedIds.length - 1 - index])
+  );
 
   return [...geometries].sort((a, b) => {
-    const aSelected = selectedSet.has(a.id) ? 0 : 1;
-    const bSelected = selectedSet.has(b.id) ? 0 : 1;
-    if (aSelected !== bSelected) return aSelected - bSelected;
-
-    if (selectedSet.has(a.id) && selectedSet.has(b.id)) {
-      return (
-        (selectedReverseIndex.get(a.id) ?? 0) -
-        (selectedReverseIndex.get(b.id) ?? 0)
-      );
-    }
-
-    return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
+    const selectionDifference =
+      Number(!selectedSet.has(a.id)) - Number(!selectedSet.has(b.id));
+    if (selectionDifference !== 0) return selectionDifference;
+    const rank = selectedSet.has(a.id) ? selectedRank : originalIndex;
+    return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0);
   });
 }
 
