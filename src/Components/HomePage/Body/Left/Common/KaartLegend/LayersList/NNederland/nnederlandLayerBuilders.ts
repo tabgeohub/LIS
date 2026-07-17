@@ -1,30 +1,14 @@
 import { ReactNode } from "react";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
-import { LegendLayerDefinition } from "../helpers/layerTypes";
+import {
+  nnFeatureLayerUrl,
+  nnLayerSpec,
+  type NnLayerSpec,
+} from "./nnederlandLayerSpecEnvelope";
 
-export const NNEDERLAND_EU_SERVICES =
-  "https://services-eu1.arcgis.com/4D1GBrbE6xp1T4YG/arcgis/rest/services";
-
-type NnLayerSpec = {
-  id: string;
-  title: string;
-  icon: ReactNode;
-  regio?: string[];
-  layer: FeatureLayer | MapImageLayer;
-};
-
-function nnLayerSpec(input: Omit<NnLayerSpec, "layer"> & {
-  layer: NnLayerSpec["layer"];
-}): NnLayerSpec {
-  return {
-    id: input.id,
-    title: input.title,
-    icon: input.icon,
-    regio: input.regio,
-    layer: input.layer,
-  };
-}
+export { NNEDERLAND_EU_SERVICES } from "./nnederlandLayerSpecEnvelope";
+export { toLegendLayerDefinitions } from "./nnederlandLegendDefinitions";
 
 export function nnFeatureLayerSpec(input: {
   id: string;
@@ -39,7 +23,7 @@ export function nnFeatureLayerSpec(input: {
     icon: input.icon,
     regio: input.regio,
     layer: new FeatureLayer({
-      url: `${NNEDERLAND_EU_SERVICES}/${input.serviceName}/FeatureServer`,
+      url: nnFeatureLayerUrl(input.serviceName),
       title: input.title,
     }),
   });
@@ -62,17 +46,4 @@ export function nnMapImageLayerSpec(input: {
       title: input.title,
     }),
   });
-}
-
-export function toLegendLayerDefinitions(
-  specs: NnLayerSpec[]
-): LegendLayerDefinition[] {
-  return specs.map((spec) => ({
-    id: spec.id,
-    title: spec.title,
-    layer: spec.layer,
-    checked: false,
-    icon: spec.icon,
-    ...(spec.regio ? { regio: spec.regio } : {}),
-  }));
 }
