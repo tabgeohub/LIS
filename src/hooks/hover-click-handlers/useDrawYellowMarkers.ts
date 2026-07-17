@@ -3,8 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEffect } from "react";
 import { EnrichedPointType } from "Types";
 import { FinishedPointType } from "Types/finished_plans";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { buildYellowMarkerGraphics } from "./yellowMarkerGraphics";
+import { syncYellowMarkerSelection } from "./syncYellowMarkerSelection";
 
 type PointType = EnrichedPointType | FinishedPointType;
 
@@ -22,17 +21,12 @@ export default function useDrawYellowMarkers({
   const { mapView, yellowGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!validateMapView(mapView, yellowGraphicsLayer) || !yellowGraphicsLayer) return;
-
-    yellowGraphicsLayer.graphics.removeAll();
-
-    if (!selectedPointIds || selectedPointIds.length === 0) {
-      onPointsDrawn?.([]);
-      return;
-    }
-
-    yellowGraphicsLayer.addMany(buildYellowMarkerGraphics(points, selectedPointIds));
-
-    onPointsDrawn?.(selectedPointIds);
+    syncYellowMarkerSelection({
+      mapView,
+      yellowGraphicsLayer,
+      selectedPointIds,
+      points,
+      onPointsDrawn,
+    });
   }, [selectedPointIds, points, mapView, yellowGraphicsLayer, onPointsDrawn]);
 }

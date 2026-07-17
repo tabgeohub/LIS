@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { registerMapHoverHandler } from "./registerMapHoverHandler";
+import { attachMapHoverLifecycle } from "./attachMapHoverLifecycle";
 
 interface UseHoverPointsAndGeometriesOptions {
   pinRefs?: React.MutableRefObject<
@@ -19,21 +17,15 @@ export function useHoverPointsAndGeometries(
     useMapViewState();
   const { pinRefs, checkMapContainer = false } = options;
 
-  useEffect(() => {
-    if (!validateMapView(mapView)) return;
-    const { setHovered } = useHoveredGraphicState.getState();
-    const handle = registerMapHoverHandler({
-      mapView: mapView!,
-      pointsGraphicsLayer,
-      geometriesGraphicsLayer,
-      pinRefs,
-      checkMapContainer,
-      onHovered: setHovered,
-    });
-
-    return () => {
-      handle.remove();
-      useHoveredGraphicState.getState().setHovered(null);
-    };
-  }, [mapView, pointsGraphicsLayer, geometriesGraphicsLayer, pinRefs, checkMapContainer]);
+  useEffect(
+    () =>
+      attachMapHoverLifecycle({
+        mapView,
+        pointsGraphicsLayer,
+        geometriesGraphicsLayer,
+        pinRefs,
+        checkMapContainer,
+      }),
+    [mapView, pointsGraphicsLayer, geometriesGraphicsLayer, pinRefs, checkMapContainer]
+  );
 }

@@ -2,9 +2,9 @@
 
 ## Current state
 
-The July 15 export in [`sigrid-findings-new/`](./sigrid-findings-new/) is the comparison baseline. The immutable July 16 export in [`sigrid-findings-1243/`](./sigrid-findings-1243/) is the current source of truth.
+The immutable July 17 export in [`all-findings-rijkswaterstaat-otg-lis-20260717/`](./all-findings-rijkswaterstaat-otg-lis-20260717/) is the **current source of truth**. Earlier on-disk snapshots (`sigrid-findings-new/`, `sigrid-findings-1243/`) are no longer present in this folder; category RAW totals below are counted directly from the July 17 CSVs.
 
-Quality overview reported with the July 16 deployment:
+Last quality overview recorded with the prior deployment (still the best dashboard figures available until the next Sigrid UI refresh after this export is ingested):
 
 - Maintainability: 3.6 (+0.80)
 - Architecture: 3.3 (+1.04)
@@ -12,19 +12,21 @@ Quality overview reported with the July 16 deployment:
 - Security: 4.3
 - Reliability: 5.5
 
-| Category | Previous RAW | Current RAW | Current severity |
-| --- | ---: | ---: | --- |
-| Duplication | 119 | 91 | HIGH 91 |
-| Unit size | 683 | 671 | HIGH 5; MEDIUM 188; LOW 478 |
-| Unit complexity | 240 | 245 | MEDIUM 40; LOW 205 |
-| Unit interfacing | 49 | 47 | MEDIUM 2; LOW 45 |
-| Module coupling | 29 | 29 | HIGH 2; MEDIUM 13; LOW 14 |
-| Component independence | 113 | 118 | HIGH 27; MEDIUM 91 |
-| Component entanglement | 9 | 9 | MEDIUM 2; LOW 7 |
-| Security | 3 | 3 | HIGH 2; MEDIUM 1 |
-| Reliability | 0 | 0 | Clean |
+| Category | July 17 RAW | Severity breakdown |
+| --- | ---: | --- |
+| Duplication | 91 | HIGH 91 |
+| Unit size | 671 | HIGH 5; MEDIUM 188; LOW 478 |
+| Unit complexity | 245 | MEDIUM 40; LOW 205 |
+| Unit interfacing | 47 | MEDIUM 2; LOW 45 |
+| Module coupling | 29 | HIGH 2; MEDIUM 13; LOW 14 |
+| Component independence | 118 | HIGH 27; MEDIUM 91 |
+| Component entanglement | 9 | MEDIUM 2; LOW 7 |
+| Security | 3 | HIGH 2; MEDIUM 1 |
+| Reliability | 0 | Clean |
 
-Across maintainability and architecture categories, 99 findings cleared, 95 appeared or were resegmented, and total RAW findings fell from 1,123 to 1,119. HIGH duplication fell by 28, from 119 to 91. Clone IDs remain the authoritative way to reconcile duplication; line movement can resegment IDs.
+**Maintainability + architecture RAW total: 1,210.** Security + reliability open: **3**.
+
+Relative to the last documented July 16 table in this plan, category RAW totals are **unchanged**. Treat July 17 as a re-baseline of the same scoreboard, not as evidence that pending remediations cleared.
 
 All work remains behavior-preserving and uncommitted for review. Do not push, create branches, edit Dockerfiles, edit Nginx or deployment files, change database schemas, or change HTTP contracts.
 
@@ -32,27 +34,41 @@ All work remains behavior-preserving and uncommitted for review. Do not push, cr
 
 ## Phase 0 — Security and reliability
 
-Source: [`Security findings.csv`](./sigrid-findings-1243/Security%20findings.csv).
+Source: [`Security findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Security%20findings.csv).
 
-- `dockerfile` and `backend/dockerfile` retain two HIGH missing-user findings. They are accepted as out of scope because deployment files must remain untouched.
-- The MEDIUM XSS finding in the table-export code is a false positive. CSV cells are RFC 4180 quoted and the value is never sent to an HTML/DOM sink.
-- Reliability remains clean.
+Still **3 RAW** (unchanged):
+
+| Severity | Finding | Location |
+| --- | --- | --- |
+| HIGH | Missing `USER` (CWE-266) | `dockerfile#L22` |
+| HIGH | Missing `USER` (CWE-266) | `backend/dockerfile#L4` |
+| MEDIUM | XSS in “HTML string” (CWE-79) | `src/helpers/tableExports/pointsPlansTableExport.ts#L18` |
+
+- The two Docker HIGH findings remain **accepted / out of scope** because deployment files must remain untouched.
+- The MEDIUM XSS finding remains a **false positive**: CSV cells are RFC 4180 quoted (`escapeCsvCell` / `buildCsvFromRows`); there is no HTML/DOM sink. Mark false positive in Sigrid UI; do not restructure working CSV logic.
+- Reliability remains clean (`Reliability findings.csv`: 0 RAW).
 
 ---
 
 ## Phase 1 — Remaining HIGH duplication
 
-Sources: [`Duplication findings.csv`](./sigrid-findings-1243/Duplication%20findings.csv) and [`Duplicates.csv`](./sigrid-findings-1243/Duplicates.csv).
+Sources: [`Duplication findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Duplication%20findings.csv) and [`Duplicates.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Duplicates.csv).
 
-HIGH duplication is down from 147 initially, to 119, and now to 91. Compared with the July 15 export, 66 IDs cleared, 38 appeared or were resegmented, and 53 were retained.
+HIGH duplication remains **91** (all RAW rows are HIGH). Largest redundant clusters in this export (by redundant LOC):
 
-The remaining implementation order is:
+1. Shared point / finished-plan field fragments across Types, validators, and `buildPointUpdatePayload` (up to 24 redundant LOC, 5 occurrences).
+2. Geometry/point column key sequences (`pointColumnKeys`, backend `geometryJson` / `pointCoreColumns`).
+3. Flight-plan form field sequences (`flightPlanFormFields`, `buildUpdatedPlanFromForm`, route query configs).
+4. Wizard / edit buttons and plan cards (`EditFlight/Buttons` ↔ `RemovePoint`, `SinglePlan` Nabewerking ↔ Reuse).
+5. Same-file / near-duplicate import and popup field blocks.
+
+Implementation order (unchanged intent):
 
 1. Repeated flight-plan button definitions and identical plan/list cards.
 2. Point and flight-plan field sequences that remain inside the same build context.
 3. Flight-plan route query configurations and status-update route preparation.
 4. Table headers/layout blocks and duplicate edit-point wrappers.
-5. Remaining same-file export/report builders after a fresh scan.
+5. Remaining same-file export/report builders after the next scan.
 
 Frontend/backend structural types remain accepted across build boundaries. No shared package is introduced during behavior-preserving remediation.
 
@@ -60,21 +76,31 @@ Frontend/backend structural types remain accepted across build boundaries. No sh
 
 ## Phase 2 — Unit size
 
-Five HIGH unit-size findings remain:
+Source: [`Unit size findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Unit%20size%20findings.csv).
 
-- `nnederlandLayerSpecsPart1.ts`, `Part2.ts`, and `Part3.ts` are accepted declarative layer catalogues with McCabe 1.
-- `voorbereidingTabs.ts` is accepted declarative tab data with McCabe 1.
-- `backend/src/routes/auth2/mapLoginError.ts` was executable and is now addressed pending Sigrid confirmation. The public mapper is a short facade over response decision and diagnostic helpers, with status codes, event names, and authentication decisions preserved.
+Five HIGH unit-size findings remain **RAW** in July 17:
+
+| Unit | LOC | Disposition |
+| --- | ---: | --- |
+| `nnederlandLayerSpecsPart3.ts` | 83 | Accepted declarative layer catalogue (McCabe 1) |
+| `nnederlandLayerSpecsPart2.ts` | 79 | Accepted declarative layer catalogue (McCabe 1) |
+| `nnederlandLayerSpecsPart1.ts` | 78 | Accepted declarative layer catalogue (McCabe 1) |
+| `voorbereidingTabs.ts` | 63 | Accepted declarative tab data (McCabe 1) |
+| `backend/.../mapLoginError.ts` | 62 | Previously marked addressed; **still HIGH RAW** in July 17 — keep on confirmation backlog / re-check deployed artifact |
+
+MEDIUM (188) and LOW (478) unit-size remain the long-tail split work after HIGH and duplication.
 
 ---
 
 ## Architecture remediation ledger
 
-Sources: [`Module coupling findings.csv`](./sigrid-findings-1243/Module%20coupling%20findings.csv), [`Component independence findings.csv`](./sigrid-findings-1243/Component%20independence%20findings.csv), and [`Component entanglement findings.csv`](./sigrid-findings-1243/Component%20entanglement%20findings.csv).
+Sources: [`Module coupling findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Module%20coupling%20findings.csv), [`Component independence findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Component%20independence%20findings.csv), and [`Component entanglement findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Component%20entanglement%20findings.csv).
+
+July 17 RAW: coupling **29** (HIGH 2), independence **118** (HIGH 27), entanglement **9**. Category totals did not drop vs the prior documented table, so prior “addressed pending confirmation” items are **not yet confirmed cleared** by this export.
 
 The ledger key is `category + file/description + severity`. Because these exports do not provide stable IDs, every RAW row is covered by the addressed list or the deterministic acceptance rules below.
 
-### Addressed pending Sigrid confirmation
+### Addressed in code — not yet confirmed by July 17
 
 **Component entanglement and ownership**
 
@@ -119,13 +145,32 @@ The ledger key is `category + file/description + severity`. Because these export
 - `parseTimesliderImageQuery.ts` and `filterPlansByPeriod.ts`: ID/date parsing and period/text predicates are separated without changing query keys, error text, date boundaries, or current filter labels.
 - `ViewPlans/Images.tsx`: loading/empty/ready decisions and attachment sorting are separated from presentation; thumbnails and `ImageGallery` now use the shared backend-proxy display URL.
 
-All entries above stay `addressed pending confirmation` until a post-deployment Sigrid export proves that the original row cleared or resegmented.
+**July 17 confirmation:** none of the category totals above moved. Keep these as “addressed in workspace / awaiting a scan of the deployed artifact,” or reopen if review shows the live tree still matches the finding locations.
+
+### Confirmation gate (workspace vs July 17)
+
+Next Architecture score move depends on scanning the **current tree**. On-disk sizes already undercut several July 17 HIGH/MEDIUM independence rows:
+
+| Module (July 17 LOC) | Workspace LOC (approx.) |
+| --- | ---: |
+| `usePlanStarGraphic.ts` (53) | ~6 |
+| `syncBluePointGraphics.ts` (48) | ~4 |
+| `useMapInitialization.ts` (47) | ~14 |
+| `pointsPlansTableExport.ts` (251) | ~18 façade |
+| `flightPlanFormFields.ts` (127) | ~23 |
+| `useUpdateData.ts` (53) | ~2 façade |
+
+After the next deploy/export lands beside `all-findings-rijkswaterstaat-otg-lis-20260717/`, move matching rows from “not yet confirmed” into a confirmed-cleared list. Do **not** re-extract modules that are already thin façades.
+
+**Architecture next code wave (post-gate / parallel):** keep thinning remaining ~30–40 LOC HIGH interface hooks (`useHerhalenSelectionHandlers`, `useCoordinateSystemSync`, `useHoverPointsAndGeometries`, hover cluster) and move lookup/query config out of fat `api-hooks` modules. Leave `useLogAction` / `useContent` and HomePage/hooks communication density accepted.
+
+**Architecture wave applied in workspace (await next export):** HIGH hooks thinned via pure helpers (`createHerhalenSelectionHandlers`, `applyCoordinateSystemSync`, `attachMapHoverLifecycle`, yellow sync/hover/plan handler modules). Lookup/regional/search query config moved to sibling non-hook modules under `api-hooks/`. `npm run check:architecture` green; `useLogAction` / `useContent` / Docker untouched.
 
 ### Accepted architecture findings
 
 These acceptance rules cover every current architecture row not named in the addressed list:
 
-- HIGH coupling in `useLogAction.ts` and `useContent.ts` is accepted. Both are cohesive application services with intentional high fan-in; splitting them would distribute coupling.
+- HIGH coupling in `useLogAction.ts` and `useContent.ts` is accepted. Both are cohesive application services with intentional high fan-in; splitting them would distribute coupling. (July 17 still shows fan-in 98 and 123.)
 - Domain query hooks and barrels for flight plans, finished plans, points, templates, constants, attachments, and emails are accepted supported interface boundaries.
 - Focused map lifecycle hooks (`useDrawYellowMarkers`, geometry/list hover, plan hover/click, local render, and edit highlight) are accepted after their pure calculations/builders live outside React orchestration.
 - Small foundational utilities such as `classNames`, `fetchApi`, `validateMapView`, coordinate transforms, route responses, authentication security logging, and request validation are accepted when they retain one responsibility.
@@ -140,16 +185,18 @@ An accepted row must be reopened if a future scan or code review shows bundled r
 
 ## Phase 3 — Complexity and parameter count
 
-MEDIUM complexity fell from 46 to 40. Continue in descending executable complexity, beginning with form population, Excel export, import-column application, grant-error extraction, Timeslider detail orchestration, login parsing, geometry creation, selection sorting, image-query parsing, path drawing, and image handling.
+Sources: [`Unit complexity findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Unit%20complexity%20findings.csv) and [`Unit interfacing findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Unit%20interfacing%20findings.csv).
 
-The Excel export, import-column application, grant-error extraction, login parsing, geometry selection sorting, image-query parsing, plan filtering, center/zoom calculation, and plan-image rendering rows are addressed pending confirmation in the next export. Timeslider detail orchestration, form population, and geometry construction were already decomposed after the current export and also remain pending confirmation.
+July 17: MEDIUM complexity **40**, LOW **205**; MEDIUM interfacing **2**, LOW **45**.
 
-The two MEDIUM parameter-count rows from the current export are addressed pending confirmation:
+Highest MEDIUM McCabe still open (examples): `populateFormFromPlan` (19), `SinglePlan.exportExcel` (17), `parsePointImportFile.applyImportColumn` (17), `grantError.extractGrantError` (17), `TimesliderItemDetailPage` (16), `parseLoginInput` (16), `createGeometryGraphic` (15).
 
-- `finishedPlanHighlightActions.ts.draw(...)` now has four parameters inside a focused action factory.
-- `geometryGraphicBuilders.ts.pointsToCoordinates(...)` now takes only points and an optional transform callback.
+The two MEDIUM parameter-count rows are **still RAW** in July 17:
 
-Use typed options objects only when this improves ownership and readability; preserve compatibility wrappers for exported helpers.
+- `finishedPlanHighlightActions.ts.draw(...)` — 5 parameters.
+- `geometryGraphicBuilders.ts.pointsToCoordinates(...)` — 5 parameters.
+
+Continue in descending executable complexity. Prefer typed options objects only when ownership and readability improve; preserve compatibility wrappers for exported helpers.
 
 ---
 
@@ -164,7 +211,7 @@ For each implementation batch:
 5. Manually verify map hover/click, point and geometry selection, flight-plan workflows, Timeslider, exports, and authentication.
 6. Confirm Dockerfiles, Nginx, deployment, and database files have no diff.
 7. Run `git diff --check`; leave all work uncommitted and unpushed.
-8. Keep every Sigrid export immutable and compare the next export with `sigrid-findings-1243` using [`compare-exports-pair.py`](./compare-exports-pair.py).
+8. Keep every Sigrid export immutable. After the next export lands beside this folder, compare it against **`all-findings-rijkswaterstaat-otg-lis-20260717`** (restore or re-add `compare-exports-pair.py` if needed).
 
 Current baseline limitations:
 

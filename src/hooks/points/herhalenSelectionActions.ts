@@ -35,3 +35,16 @@ export function clearHerhalenSelection(setters: HerhalenSelectionSetters) {
   setters.setSelectedGeometries([]);
   setters.setSelectedGeometries2?.([]);
 }
+
+/** Non-hook handlers for herhalen select-all / select-none. */
+export function createHerhalenSelectionHandlers(input: {
+  points: HerhalenItem[];
+  geometries: HerhalenItem[];
+  herhalen: boolean;
+  setters: HerhalenSelectionSetters;
+}) {
+  return {
+    handleSelectAll: () => selectAllByHerhalen(input),
+    handleSelectNone: () => clearHerhalenSelection(input.setters),
+  };
+}

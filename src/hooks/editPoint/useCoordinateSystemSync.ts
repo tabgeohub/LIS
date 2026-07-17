@@ -1,36 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { SpatialReference } from "Types";
+import type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 import {
-  buildCoordinateSyncPatch,
-  type CoordinateSyncPatch,
-} from "@helpers/geo/buildCoordinateSyncPatch";
+  applyCoordinateSystemSync,
+  type CoordinateSystemSyncInput,
+} from "./applyCoordinateSystemSync";
 
 export type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 
-export function useCoordinateSystemSync({
-  coordinateSystem,
-  rdX,
-  rdY,
-  latitude,
-  longitude,
-  patchCoords,
-}: {
-  coordinateSystem: SpatialReference | string;
-  rdX: number;
-  rdY: number;
-  latitude: number;
-  longitude: number;
-  patchCoords: (patch: CoordinateSyncPatch) => void;
-}) {
+export function useCoordinateSystemSync(input: CoordinateSystemSyncInput) {
+  const { coordinateSystem, rdX, rdY, latitude, longitude, patchCoords } = input;
+
   useEffect(() => {
-    const patch = buildCoordinateSyncPatch({
-      coordinateSystem,
-      rdX,
-      rdY,
-      latitude,
-      longitude,
-    });
-    if (patch) patchCoords(patch);
-  }, [coordinateSystem, rdX, rdY, latitude, longitude]);
+    applyCoordinateSystemSync(input);
+  }, [coordinateSystem, rdX, rdY, latitude, longitude, patchCoords]);
 }
