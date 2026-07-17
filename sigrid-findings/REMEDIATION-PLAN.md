@@ -76,9 +76,13 @@ Frontend/backend structural types remain accepted across build boundaries. No sh
 
 ## Phase 2 — Unit size
 
-Source: [`Unit size findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Unit%20size%20findings.csv).
+Phased unit-size backlog (accept vs code-next vs out of scope): [`UNIT-SIZE-PHASES.md`](./UNIT-SIZE-PHASES.md).
 
-Five HIGH unit-size findings remain **RAW** in July 17:
+Dedicated export: [`unit-size-findings-rijkswaterstaat-otg-lis-20260717.csv`](./unit-size-findings-rijkswaterstaat-otg-lis-20260717.csv) (also mirrored in the full pack [`Unit size findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Unit%20size%20findings.csv)).
+
+July 17 dedicated export: HIGH **4** · MEDIUM **181** · LOW **486** (total **671**). Relative to the prior full-pack table, HIGH dropped by one (`mapLoginError` is now LOW at 17 LOC); MEDIUM 181 (was 188); LOW 486 (was 478).
+
+Four HIGH unit-size findings remain **RAW** — all McCabe 1 declarative catalogues, **Accepted** (see Phase 0 in the ledger):
 
 | Unit | LOC | Disposition |
 | --- | ---: | --- |
@@ -86,9 +90,8 @@ Five HIGH unit-size findings remain **RAW** in July 17:
 | `nnederlandLayerSpecsPart2.ts` | 79 | Accepted declarative layer catalogue (McCabe 1) |
 | `nnederlandLayerSpecsPart1.ts` | 78 | Accepted declarative layer catalogue (McCabe 1) |
 | `voorbereidingTabs.ts` | 63 | Accepted declarative tab data (McCabe 1) |
-| `backend/.../mapLoginError.ts` | 62 | Previously marked addressed; **still HIGH RAW** in July 17 — keep on confirmation backlog / re-check deployed artifact |
 
-MEDIUM (188) and LOW (478) unit-size remain the long-tail split work after HIGH and duplication.
+`backend/.../mapLoginError.ts` is **confirmed cleared** from HIGH (now LOW). Backend `dockerfile` MEDIUM remains out of scope. Code waves start at Phase 1 (fat MEDIUM, McCabe ≥ 10) in [`UNIT-SIZE-PHASES.md`](./UNIT-SIZE-PHASES.md).
 
 ---
 

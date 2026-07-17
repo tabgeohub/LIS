@@ -1,8 +1,8 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import type { DownloadInfo } from "../types";
+import { copyDownloadLinkAfterPassword } from "./copyLinkActions";
 
 type UseCopyLinkInput = {
   downloadInfo: DownloadInfo | null;
@@ -35,29 +35,10 @@ export function useCopyLink(input: UseCopyLinkInput) {
 
     try {
       setErrorMsg(null);
-
-      const url = new URL(downloadInfo.url, getBackEndUrl());
-      const parts = url.pathname.split("/");
-      const filename = parts[parts.length - 1];
-
-      const res = await fetch(
-        `${getBackEndUrl()}/api/file-download/${encodeURIComponent(
-          filename
-        )}/password`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: trimmed }),
-        }
-      );
-
-      if (!res.ok) {
-        const msg = await res.text().catch(() => "");
-        throw new Error(msg || `Failed to set password (${res.status})`);
-      }
-
-      await navigator.clipboard.writeText(downloadInfo.url);
+      await copyDownloadLinkAfterPassword({
+        downloadInfo,
+        password: trimmed,
+      });
       toast.success(content.nabewerking.createReport.step3.toasts.success);
       logAction({
         message: "User set password and copied link",

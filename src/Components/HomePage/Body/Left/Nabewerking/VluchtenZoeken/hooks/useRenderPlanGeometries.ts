@@ -2,11 +2,9 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import Graphic from "@arcgis/core/Graphic";
-import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { createGeometryGraphic, GeometryPoint } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
+import { buildPlanGeometryGraphics } from "./buildPlanGeometryGraphics";
 
 /**
  * Hook to render plan geometries on the map
@@ -17,47 +15,16 @@ export function useRenderPlanGeometries() {
   const { mapView, geometriesGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
-    if (!validateMapView(mapView, geometriesGraphicsLayer) || !selectedPlan?.geometries) return;
+    if (
+      !validateMapView(mapView, geometriesGraphicsLayer) ||
+      !selectedPlan?.geometries
+    ) {
+      return;
+    }
 
-    const graphics: __esri.Graphic[] = [];
-
-    selectedPlan.geometries.forEach((geometry) => {
-      if (!geometry.points || geometry.points.length === 0) return;
-
-      // Transform coordinates function for RD to WGS84 conversion
-      const transformCoordinates = (point: GeometryPoint): [number, number] | null => {
-        const coords = getPointCoordinates(point);
-        if (!coords) return null;
-        return [coords.longitude, coords.latitude];
-      };
-
-      const graphic = createGeometryGraphic(
-        {
-          id: geometry.id,
-          geometry_type:
-            geometry.geometry_type === "polygon" || geometry.geometry_type === "line"
-              ? geometry.geometry_type
-              : undefined,
-          geometry_omschrijving: geometry.geometry_omschrijving ?? undefined,
-          points: geometry.points,
-        },
-        {
-          transformCoordinates,
-          attributes: {
-            geometryId: geometry.id,
-            geometryType: geometry.geometry_type ?? undefined,
-            omschrijving: geometry.geometry_omschrijving ?? undefined,
-            type: "geometry",
-          },
-        }
-      );
-
-      if (graphic) {
-        graphics.push(graphic);
-      }
-    });
-
-    replaceGraphics(geometriesGraphicsLayer, graphics);
+    replaceGraphics(
+      geometriesGraphicsLayer,
+      buildPlanGeometryGraphics(selectedPlan.geometries)
+    );
   }, [selectedPlan?.geometries, mapView, geometriesGraphicsLayer]);
 }
-

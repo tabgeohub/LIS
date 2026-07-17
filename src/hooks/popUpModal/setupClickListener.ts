@@ -1,6 +1,10 @@
-import { initialPointState } from "@helpers/ZustandStates/popUpState";
 import { EnrichedPointType } from "Types";
 import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
+import {
+  applyPointHitSelection,
+  clearSelectedPointGraphics,
+  graphicsFromHitTest,
+} from "./pointHitSelection";
 
 export type SetupClickListenerInput = {
   mapView: __esri.MapView;
@@ -43,32 +47,13 @@ export const setupClickListener = (input: SetupClickListenerInput) => {
         includeLayers ? { include: includeLayers } : undefined
       );
 
-      const clickedGraphics = response.results
-        .filter((result) => (result as __esri.GraphicHit).graphic)
-        .map((result) => (result as __esri.GraphicHit).graphic);
-
       if (!createNewPoint) {
-        if (clickedGraphics.length > 0) {
-          const g = clickedGraphics.find(
-            (gr) =>
-              // @ts-ignore
-              gr?.attributes && typeof (gr as any).attributes?.id === "number"
-          ) as __esri.Graphic | undefined;
-
-          // @ts-ignore
-          const id = g?.attributes?.id as number | undefined;
-          if (typeof id === "number") {
-            setClickedPointId(id);
-          } else {
-            setClickedPointId(0);
-            setClickedPoint(initialPointState);
-            clearGraphics(selectedPointGraphicsLayer);
-          }
-        } else {
-          setClickedPointId(0);
-          setClickedPoint(initialPointState);
-          clearGraphics(selectedPointGraphicsLayer);
-        }
+        applyPointHitSelection({
+          clickedGraphics: graphicsFromHitTest(response),
+          setClickedPointId,
+          setClickedPoint,
+          selectedPointGraphicsLayer,
+        });
       }
     } catch (error) {
       console.error("Error querying features:", error);
@@ -77,17 +62,8 @@ export const setupClickListener = (input: SetupClickListenerInput) => {
     }
   });
 
-  return () => cleanupClickListener(selectedPointGraphicsLayer, clickHandler);
+  return () => {
+    clearSelectedPointGraphics(selectedPointGraphicsLayer);
+    clickHandler.remove();
+  };
 };
-
-function clearGraphics(selectedPointGraphicsLayer: __esri.GraphicsLayer) {
-  selectedPointGraphicsLayer.removeAll();
-}
-
-function cleanupClickListener(
-  selectedPointGraphicsLayer: __esri.GraphicsLayer,
-  clickHandler: __esri.Handle
-) {
-  clearGraphics(selectedPointGraphicsLayer);
-  clickHandler.remove();
-}

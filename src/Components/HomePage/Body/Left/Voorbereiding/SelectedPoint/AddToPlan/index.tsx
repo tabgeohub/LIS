@@ -1,14 +1,9 @@
-/* eslint-disable no-mixed-operators */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CgClose } from "react-icons/cg";
 
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
-import Polygon from "@arcgis/core/geometry/Polygon";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import Point from "@arcgis/core/geometry/Point";
-import * as projection from "@arcgis/core/geometry/projection";
-import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
@@ -20,8 +15,7 @@ import Step1 from "./Step1";
 import StepYes from "./StepYes";
 import StepNo from "./StepNo";
 import StepMultiplePoints from "./StepMultiplePoints";
-
-import { EnrichedPointType } from "Types";
+import { startPolygonDrawer } from "./polygonDrawer";
 
 export default function AddToPlan() {
   const { setSelectedTab } = useTabState();
@@ -35,7 +29,6 @@ export default function AddToPlan() {
   const createHandleRef = useRef<__esri.Handle | null>(null);
   const { points, polygonPoints, setPolygonPoints } = usePointsStore();
 
-  // Draw yellow markers for polygon-selected points
   useDrawYellowMarkers({
     selectedPointIds: polygonPoints?.map((p) => p.id) || [],
     points: polygonPoints || [],
@@ -60,6 +53,19 @@ export default function AddToPlan() {
     }
   }, [mapView]);
 
+  const initPolygonDrawer = useCallback(async () => {
+    if (!mapView?.map) return;
+    await startPolygonDrawer({
+      mapView,
+      cleanupSketch,
+      sketchRef,
+      graphicsLayerRef,
+      createHandleRef,
+      points,
+      setPolygonPoints,
+    });
+  }, [mapView, cleanupSketch, points, setPolygonPoints]);
+
   useEffect(() => {
     if (step === 3) {
       setTopMessage({
@@ -73,111 +79,6 @@ export default function AddToPlan() {
       cleanupSketch();
     }
   }, [step]);
-
-  function isPointInPolygon(point: __esri.Point, ring: number[][]): boolean {
-    const x = point.x;
-    const y = point.y;
-
-    let minX = Infinity,
-      maxX = -Infinity;
-    let minY = Infinity,
-      maxY = -Infinity;
-
-    for (const [px, py] of ring) {
-      if (px < minX) minX = px;
-      if (px > maxX) maxX = px;
-      if (py < minY) minY = py;
-      if (py > maxY) maxY = py;
-    }
-
-    if (x < minX || x > maxX || y < minY || y > maxY) {
-      return false;
-    }
-
-    let inside = false;
-    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-      const xi = ring[i][0],
-        yi = ring[i][1];
-      const xj = ring[j][0],
-        yj = ring[j][1];
-
-      const intersect =
-        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-      if (intersect) {
-        inside = !inside;
-      }
-    }
-
-    return inside;
-  }
-
-  const initPolygonDrawer = useCallback(async () => {
-    if (!mapView?.map) return;
-    const map = mapView.map;
-
-    try {
-      if (!projection.isLoaded()) {
-        await projection.load();
-      }
-    } catch (error) {
-      console.error("Failed to load projection module:", error);
-      return;
-    }
-
-    cleanupSketch();
-
-    const graphicsLayer = new GraphicsLayer({ listMode: "hide" });
-    graphicsLayerRef.current = graphicsLayer;
-    map.add(graphicsLayer);
-
-    const sketchViewModel = new SketchViewModel({
-      view: mapView,
-      layer: graphicsLayer,
-      defaultCreateOptions: { mode: "click" },
-    });
-
-    sketchRef.current = sketchViewModel;
-
-    createHandleRef.current = sketchViewModel.on("create", (event) => {
-      if (event.state !== "complete") return;
-
-      const polygon = event.graphic.geometry as __esri.Polygon;
-      if (!polygon) return;
-
-      const projectedPolygon = projection.project(
-        polygon,
-        new SpatialReference({ wkid: 4326 })
-      ) as Polygon;
-
-      const ring = projectedPolygon?.rings?.[0];
-      if (!ring) return;
-
-      const selected: EnrichedPointType[] = [];
-
-      points.forEach((point) => {
-        if (
-          typeof point.longitude !== "number" ||
-          typeof point.latitude !== "number"
-        ) {
-          return;
-        }
-
-        const pt = new Point({
-          longitude: point.longitude,
-          latitude: point.latitude,
-        });
-
-        if (isPointInPolygon(pt as __esri.Point, ring)) {
-          selected.push(point);
-        }
-      });
-
-      setPolygonPoints(selected);
-    });
-
-    sketchViewModel.create("polygon");
-  }, [mapView, cleanupSketch, points, setPolygonPoints]);
 
   useEffect(() => {
     return () => {
