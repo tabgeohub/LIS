@@ -31,6 +31,11 @@ const rules = [
       /from\s+["']utils\/(?:useCreateData|useUpdateData|useDeleteData|useDebouncedValue)["']/,
   },
   {
+    name: "api-hooks must not import hooks (avoids hooks↔api-hooks cycles)",
+    appliesTo: (path) => path.startsWith("api-hooks/"),
+    forbidden: /from\s+["']hooks\//,
+  },
+  {
     name: "pure map helpers must be imported from ArcGISHelpers",
     appliesTo: () => true,
     forbidden:
@@ -40,7 +45,7 @@ const rules = [
 
 const violations = [];
 for (const absolutePath of sourceFiles(sourceRoot)) {
-    const path = relative(sourceRoot, absolutePath).replaceAll("\\", "/");
+  const path = relative(sourceRoot, absolutePath).replaceAll("\\", "/");
   const contents = readFileSync(absolutePath, "utf8");
   for (const rule of rules) {
     if (rule.appliesTo(path) && rule.forbidden.test(contents)) {
