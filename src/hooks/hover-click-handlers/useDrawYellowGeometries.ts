@@ -1,15 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { ClickableGeometry } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
-import { syncYellowGeometrySelection } from "./syncYellowGeometrySelection";
-
-interface UseDrawYellowGeometriesOptions {
-  selectedGeometryIds: number[];
-  geometries: ClickableGeometry[];
-  allGeometries: ClickableGeometry[];
-  herhalenFilter?: boolean | null;
-}
+import {
+  syncYellowGeometrySelection,
+  type UseDrawYellowGeometriesOptions,
+} from "./syncYellowGeometrySelection";
 
 export default function useDrawYellowGeometries({
   selectedGeometryIds,

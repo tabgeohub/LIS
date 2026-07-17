@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { attachMapHoverLifecycle } from "./attachMapHoverLifecycle";
+import {
+  attachMapHoverLifecycle,
+  type AttachMapHoverLifecycleInput,
+} from "./attachMapHoverLifecycle";
 
-interface UseHoverPointsAndGeometriesOptions {
-  pinRefs?: React.MutableRefObject<
-    Map<number, { outerGraphic: __esri.Graphic; pinGraphic: __esri.Graphic }>
-  >;
-  checkMapContainer?: boolean;
-}
+type UseHoverPointsAndGeometriesOptions = Pick<
+  AttachMapHoverLifecycleInput,
+  "pinRefs" | "checkMapContainer"
+>;
 
 export function useHoverPointsAndGeometries(
   options: UseHoverPointsAndGeometriesOptions = {}
 ) {
   const { mapView, pointsGraphicsLayer, geometriesGraphicsLayer } =
     useMapViewState();
-  const { pinRefs, checkMapContainer = false } = options;
 
   useEffect(
     () =>
@@ -23,9 +23,8 @@ export function useHoverPointsAndGeometries(
         mapView,
         pointsGraphicsLayer,
         geometriesGraphicsLayer,
-        pinRefs,
-        checkMapContainer,
+        ...options,
       }),
-    [mapView, pointsGraphicsLayer, geometriesGraphicsLayer, pinRefs, checkMapContainer]
+    [mapView, pointsGraphicsLayer, geometriesGraphicsLayer, options.pinRefs, options.checkMapContainer]
   );
 }

@@ -1,0 +1,25 @@
+import { useQuery } from "@tanstack/react-query";
+import { fetchApi } from "api/fetchApi";
+import { FlightPlanType } from "Types";
+import { enabledForRegio } from "./enabled";
+import { appendRegioQuery } from "./regioQuery";
+import {
+  FLIGHT_PLAN_REGIO_CONFIG,
+  type FlightPlanRegioKind,
+  type FlightPlanRegioQueryInput,
+} from "./regionalFlightPlanQueryConfig";
+
+/** Shared regio-scoped flight-plan query; not a public API surface. */
+export function useRegionalFlightPlans(
+  kind: FlightPlanRegioKind,
+  input: FlightPlanRegioQueryInput
+) {
+  const config = FLIGHT_PLAN_REGIO_CONFIG[kind];
+  return useQuery({
+    queryKey: config.key(input.regioId ?? ""),
+    queryFn: () =>
+      fetchApi<FlightPlanType[]>(appendRegioQuery(config.path, input.regioId)),
+    enabled:
+      (input.enabled ?? true) && enabledForRegio(input.regioId, input.userId),
+  });
+}

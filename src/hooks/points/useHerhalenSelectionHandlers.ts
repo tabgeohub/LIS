@@ -6,9 +6,9 @@ import {
   type HerhalenSelectionSetters,
 } from "./herhalenSelectionActions";
 
-type GeometryItem = { id: number; herhalen: number | string | boolean };
-
 export type { HerhalenSelectionSetters } from "./herhalenSelectionActions";
+
+type GeometryItem = { id: number; herhalen: number | string | boolean };
 
 export function useHerhalenSelectionHandlers(input: {
   herhalen: boolean;
@@ -17,15 +17,16 @@ export function useHerhalenSelectionHandlers(input: {
 }) {
   const { points } = usePointsStore();
   const { geometries } = useGeometriesStore();
+  const { herhalen, setters, filteredGeometries } = input;
 
   return useMemo(
     () =>
       createHerhalenSelectionHandlers({
         points,
-        geometries: input.filteredGeometries ?? geometries,
-        herhalen: input.herhalen,
-        setters: input.setters,
+        geometries: filteredGeometries ?? geometries,
+        herhalen,
+        setters,
       }),
-    [geometries, input.filteredGeometries, input.herhalen, input.setters, points]
+    [filteredGeometries, geometries, herhalen, points, setters]
   );
 }

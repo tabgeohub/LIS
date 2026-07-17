@@ -94,6 +94,8 @@ MEDIUM (188) and LOW (478) unit-size remain the long-tail split work after HIGH 
 
 ## Architecture remediation ledger
 
+Phased architecture-only backlog (await-deploy vs code-next vs accepted): [`ARCHITECTURE-PHASES.md`](./ARCHITECTURE-PHASES.md).
+
 Sources: [`Module coupling findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Module%20coupling%20findings.csv), [`Component independence findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Component%20independence%20findings.csv), and [`Component entanglement findings.csv`](./all-findings-rijkswaterstaat-otg-lis-20260717/Component%20entanglement%20findings.csv).
 
 July 17 RAW: coupling **29** (HIGH 2), independence **118** (HIGH 27), entanglement **9**. Category totals did not drop vs the prior documented table, so prior “addressed pending confirmation” items are **not yet confirmed cleared** by this export.
