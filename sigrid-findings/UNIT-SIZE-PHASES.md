@@ -114,9 +114,31 @@ Phase 1 ≥50 leftovers (`useEditPointCoordinateInputs`, `safeFetchPointAttachme
 
 **Goal:** Work descending LOC within 40–49, and finish leftover McCabe ≥ 8 below 40.
 
-Clusters: Nabewerking edit forms, Voorbereiding map-click hooks, legend specs, backend query builders / auth helpers, Timeslider helpers (`buildTimesliderPageView` McCabe 13 @ 38 LOC).
+**Exit-criteria wave (LOC ≥ 40 and McCabe ≥ 8) — Applied / prior phases:**
 
-**Accepted in this band (McCabe 1 declarative):** `overigLayerSpecs`, `pointColumnKeys`, `regionCoordintaes`, symbol catalogues — unless they mix logic.
+| Unit | CSV LOC | McCabe | Status |
+| --- | ---: | ---: | --- |
+| `handleUpdate` (EditGeometry Form) | 48 | 8 | Applied — `applyGeometryCommentUpdate` |
+| `useEnrichedAddPointMapClick` | 45 | 9 | Applied — `handleEnrichedAddPointClick` |
+| `sendEmail` | 45 | 8 | Applied — `buildAndSendSpoedReport` |
+| `addPlanGeometryHighlights` | 41 | 8 | Applied — `timesliderGeometryHighlights` |
+| `useViewPlanStepMap` | 41 | 10 | Applied — `viewPlanStepMapActions` |
+| `handleCopyLink` | 49 | 10 | Applied — `promptPasswordAndCopyDownloadLink` (+ Phase 1 `copyLinkActions`) |
+| Phase 1/2 ≥50 McCabe≥8 rows | 40–60 | ≥8 | Already Applied in Phases 1–2 |
+
+**McCabe ≥ 8 below 40 — Applied this wave:**
+
+| Unit | CSV LOC | McCabe | Status |
+| --- | ---: | ---: | --- |
+| `buildTimesliderPageView` | 38 | 13 | Applied — `buildTimesliderPageViewParts` |
+| `useDeletePointMapClick` | 37 | 11 | Applied — `handleDeletePointEmptyMapClick` |
+| `uploadZip` | 34 | 11 | Applied — `uploadReportZipFile` |
+| `classifyStep2OtpLoginFailure` | 33 | 11 | Applied — `grantFailureSignals` |
+| `useTimesliderFlightPlans` | 39 | 10 | Applied — `fetchTimesliderFinishedPlans` |
+
+**Accepted in this band (McCabe 1 declarative / composition):** `overigLayerSpecs`, `pointColumnKeys`, `regionCoordintaes`, symbol catalogues, DuplicateFlightPlan `Form`, `Step2Sub1` wrappers unless they mix logic.
+
+**Deferred (McCabe ≥ 8, LOC &lt; 40 — cleared in Phase 4):** ~~`syncBluePointGraphics`, `oidc.getOidcClientFor`, `loginErrorDecision`, `updateUserRoles`, `deleteImage`, `patchCoords`, `usePathPointHandlerClick`, `useGeometryListMapClick`, `useAddPointStepMapClick`, `verifyCredentialsHandler`, `buildApplyAgentReportQuery`~~ → see Phase 4.
 
 **Exit criteria:** No open MEDIUM TypeScript with both LOC ≥ 40 and McCabe ≥ 8 left unaddressed or unaccepted.
 
@@ -127,6 +149,37 @@ Clusters: Nabewerking edit forms, Voorbereiding map-click hooks, legend specs, b
 **Goal:** Opportunistic splits when editing a file anyway, or targeted batches of LOW ≥ ~30 LOC with elevated McCabe. Not a blocking gate for dashboard moves.
 
 **Exit criteria:** No dedicated gate; track remaining LOW RAW after next export.
+
+### Deferred from Phase 3 (McCabe ≥ 8, LOC &lt; 40) — Applied
+
+| Unit | CSV LOC | McCabe | Status |
+| --- | ---: | ---: | --- |
+| `syncBluePointGraphics` | 36 | 8 | Applied — `placeBluePointGraphics` |
+| `oidc.getOidcClientFor` | 37 | 9 | Applied — `oidcProfile` + `oidcClientCache` |
+| `resolveLoginErrorDecision` | 36 | 9 | Applied — `resolveCredentialOrAmbiguousLoginError` |
+| `updateUserRoles` | 35 | 9 | Applied — `computeRealmRoleDiff` + `syncRealmRoleMappings` |
+| `deleteImage` (FotoPanel) | 35 | 9 | Applied — `runFotoAttachmentDelete` |
+| `patchCoords` (EditPoint Step2Sub2) | 33 | 11 | Applied — `applyEditPointCoordinatePatch` |
+| `usePathPointHandlerClick` | 32 | 9 | Applied — `handlePathPointMapClick` |
+| `useGeometryListMapClick` | 31 | 8 | Applied — `selectGeometryFromMapClick` |
+| `useAddPointStepMapClick` | 32 | 8 | Applied — `handleAddPointStepMapClick` |
+| `verifyCredentialsHandler` | 39 | 8 | Applied — missing/error response helpers |
+| `buildApplyAgentReportQuery` | 38 | 9 | Applied — SQL const + `buildApplyAgentReportParams` |
+
+### HIGH-McCabe LOW batch — Applied
+
+| Unit | CSV LOC | McCabe | Status |
+| --- | ---: | ---: | --- |
+| `buildFlightPlanPointExportRows` | 19 | 17 | Applied — `mapPointToExportRow` |
+| `validateSpoedReportRequest` | 29 | 13 | Applied — `validateSpoedReportFields` |
+| `isPointInPolygon` | 25 | 13 | Applied — `ringBoundingBox` + `pointInRingRayCast` |
+| `buildTemplateGeometryGroup` | 23 | 12 | Applied — full/fallback builders |
+| `sortPointsWithSelectionOrder` | 21 | 12 | Applied — `comparePointsWithSelectionOrder` |
+| `findHoveredMapGraphic` | 21 | 11 | Applied — `isHoverableMapGraphic` |
+| `collectSelectedData` | 27 | 10 | Applied — `collectSelectedDataFromPlan` |
+| Tools `Step2Sub2` patchCoords | 24 | 7 | Applied — `applyDeletePointCoordinatePatch` |
+
+Remaining LOW (~450+) stay opportunistic on next touch; no dashboard gate.
 
 ---
 

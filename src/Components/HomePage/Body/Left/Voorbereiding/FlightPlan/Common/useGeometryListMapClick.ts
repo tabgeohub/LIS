@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import useGeometryClick from "hooks/hover-click-handlers/useGeometryClick";
-import { getHerhalenFilterFromGeometries, toggleGeometrySelection } from "./geometryHerhalen";
+import { getHerhalenFilterFromGeometries } from "./geometryHerhalen";
+import { selectGeometryFromMapClick } from "./selectGeometryFromMapClick";
 
 export function useGeometryListMapClick(input: {
   mapView: __esri.MapView | null;
@@ -14,26 +15,13 @@ export function useGeometryListMapClick(input: {
     if (!input.mapView || !input.redGraphicsLayer) return;
 
     const handle = input.mapView.on("click", async (event) => {
-      event.stopPropagation();
-      const hitTestResults = await input.mapView!.hitTest(event);
-      const existingFeature = hitTestResults.results.find(
-        (result) => (result as __esri.GraphicHit).graphic
-      );
-      const attributes = (existingFeature as __esri.GraphicHit | undefined)
-        ?.graphic?.attributes;
-
-      if (!attributes || attributes.type !== "geometry" || !attributes.geometryId) {
-        return;
-      }
-
-      const geometry = input.geometries.find(
-        (item) => item.id === attributes.geometryId
-      );
-      if (!geometry) return;
-
-      input.setSelectedGeometries(
-        toggleGeometrySelection(input.selectedGeometries, geometry.id)
-      );
+      await selectGeometryFromMapClick({
+        mapView: input.mapView!,
+        event,
+        geometries: input.geometries,
+        selectedGeometries: input.selectedGeometries,
+        setSelectedGeometries: input.setSelectedGeometries,
+      });
     });
 
     return () => handle.remove();

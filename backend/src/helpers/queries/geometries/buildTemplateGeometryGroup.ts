@@ -4,6 +4,36 @@ type RawPoint = Record<string, unknown> & {
   geometry_omschrijving?: string | null;
 };
 
+export function buildTemplateGeometryFromFullData(
+  geometryId: number,
+  fullGeometryData: Record<string, unknown>
+) {
+  return {
+    id: geometryId,
+    type: (fullGeometryData.type as string | null) ?? null,
+    omschrijving: (fullGeometryData.omschrijving as string | null) ?? null,
+    organisatie: fullGeometryData.organisatie,
+    vertrouwelijk: fullGeometryData.vertrouwelijk,
+    herhalen: fullGeometryData.herhalen,
+    activiteit: fullGeometryData.activiteit,
+    specifiek_letten_op: fullGeometryData.specifiek_letten_op,
+    regio_id: fullGeometryData.regio_id,
+    points: (fullGeometryData.points as Record<string, unknown>[]) ?? [],
+  };
+}
+
+export function buildTemplateGeometryFallback(
+  geometryId: number,
+  point: RawPoint
+) {
+  return {
+    id: geometryId,
+    type: point.geometry_type ?? null,
+    omschrijving: point.geometry_omschrijving ?? null,
+    points: [],
+  };
+}
+
 export function buildTemplateGeometryGroup(input: {
   point: RawPoint;
   geometryId: number;
@@ -12,24 +42,8 @@ export function buildTemplateGeometryGroup(input: {
   const fullGeometryData = input.geometryDataMap.get(input.geometryId);
 
   if (fullGeometryData) {
-    return {
-      id: input.geometryId,
-      type: (fullGeometryData.type as string | null) ?? null,
-      omschrijving: (fullGeometryData.omschrijving as string | null) ?? null,
-      organisatie: fullGeometryData.organisatie,
-      vertrouwelijk: fullGeometryData.vertrouwelijk,
-      herhalen: fullGeometryData.herhalen,
-      activiteit: fullGeometryData.activiteit,
-      specifiek_letten_op: fullGeometryData.specifiek_letten_op,
-      regio_id: fullGeometryData.regio_id,
-      points: (fullGeometryData.points as Record<string, unknown>[]) ?? [],
-    };
+    return buildTemplateGeometryFromFullData(input.geometryId, fullGeometryData);
   }
 
-  return {
-    id: input.geometryId,
-    type: input.point.geometry_type ?? null,
-    omschrijving: input.point.geometry_omschrijving ?? null,
-    points: [],
-  };
+  return buildTemplateGeometryFallback(input.geometryId, input.point);
 }

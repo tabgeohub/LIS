@@ -5,6 +5,7 @@ import useLogAction from "hooks/useLogAction";
 import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import { useState } from "react";
+import { applyDeletePointCoordinatePatch } from "./applyDeletePointCoordinatePatch";
 
 export default function Step2Sub2({
   setSubStep,
@@ -36,17 +37,18 @@ export default function Step2Sub2({
     latitude,
     longitude,
     patchCoords: (patch) => {
-      if (coordinateSystem === "RD") {
-        if (patch.latitude !== undefined) setLatitude(patch.latitude);
-        if (patch.longitude !== undefined) setLongitude(patch.longitude);
-        setXCoordinaat_rd(xcoordinaat_rd);
-        setYCoordinaat_rd(ycoordinaat_rd);
-      } else if (coordinateSystem === "WGS84") {
-        if (patch.rdX !== undefined) setXCoordinaat_rd(patch.rdX);
-        if (patch.rdY !== undefined) setYCoordinaat_rd(patch.rdY);
-        setLatitude(latitude);
-        setLongitude(longitude);
-      }
+      applyDeletePointCoordinatePatch({
+        coordinateSystem,
+        patch,
+        xcoordinaat_rd,
+        ycoordinaat_rd,
+        latitude,
+        longitude,
+        setXCoordinaat_rd,
+        setYCoordinaat_rd,
+        setLatitude,
+        setLongitude,
+      });
 
       logAction({
         message: "User changed coordinate system",

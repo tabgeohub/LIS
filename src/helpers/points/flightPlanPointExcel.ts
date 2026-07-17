@@ -20,11 +20,11 @@ export function normalizeExportNumber(value: unknown): number | "" {
   return Number.isFinite(parsed) ? parsed : "";
 }
 
-export function buildFlightPlanPointExportRows(
+export function mapPointToExportRow(
+  point: EnrichedPointType,
   plan: FlightPlanType
-): FlightPlanPointExportRow[] {
-  const points = (plan.points as EnrichedPointType[]) ?? [];
-  return points.map((point) => ({
+): FlightPlanPointExportRow {
+  return {
     geometry: `X: ${point.longitude}, Y: ${point.latitude}`,
     omschrijving: point.omschrijving ?? "",
     regio_id: point.regio_id ?? "",
@@ -39,5 +39,12 @@ export function buildFlightPlanPointExportRows(
     organisatie_id: point.organisatie_id ?? plan.organisatie_id ?? "",
     specifiek_letten_op: point.specifiek_letten_op ?? "",
     datum: point.created_at,
-  }));
+  };
+}
+
+export function buildFlightPlanPointExportRows(
+  plan: FlightPlanType
+): FlightPlanPointExportRow[] {
+  const points = (plan.points as EnrichedPointType[]) ?? [];
+  return points.map((point) => mapPointToExportRow(point, plan));
 }

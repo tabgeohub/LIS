@@ -55,6 +55,35 @@ function unauthorizedDecision(
   };
 }
 
+export function resolveCredentialOrAmbiguousLoginError(input: {
+  kind: GrantFailureKind;
+  otpWasSent: boolean;
+  errorMessage?: string;
+  exposeErrorMessage: boolean;
+}): LoginErrorDecision {
+  const isAmbiguous =
+    input.kind === "ambiguous_invalid_grant" || input.kind === "unknown";
+
+  if (input.otpWasSent && isAmbiguous) {
+    return unauthorizedDecision("password_or_otp_incorrect");
+  }
+
+  if (input.kind === "invalid_credentials" || isAmbiguous) {
+    return unauthorizedDecision("password_incorrect");
+  }
+
+  return {
+    result: {
+      status: 500,
+      body: {
+        success: false,
+        message: "Login failed",
+        error: input.exposeErrorMessage ? input.errorMessage : undefined,
+      },
+    },
+  };
+}
+
 export function resolveLoginErrorDecision(input: {
   kind: GrantFailureKind;
   otpWasSent: boolean;
@@ -79,24 +108,5 @@ export function resolveLoginErrorDecision(input: {
     return unauthorizedDecision("otp_incorrect");
   }
 
-  const isAmbiguous =
-    input.kind === "ambiguous_invalid_grant" || input.kind === "unknown";
-  if (input.otpWasSent && isAmbiguous) {
-    return unauthorizedDecision("password_or_otp_incorrect");
-  }
-
-  if (input.kind === "invalid_credentials" || isAmbiguous) {
-    return unauthorizedDecision("password_incorrect");
-  }
-
-  return {
-    result: {
-      status: 500,
-      body: {
-        success: false,
-        message: "Login failed",
-        error: input.exposeErrorMessage ? input.errorMessage : undefined,
-      },
-    },
-  };
+  return resolveCredentialOrAmbiguousLoginError(input);
 }

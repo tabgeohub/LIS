@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
+import { handleAddPointStepMapClick } from "./handleAddPointStepMapClick";
 
 export function useAddPointStepMapClick(input: {
   addPointStep: number;
@@ -23,28 +23,19 @@ export function useAddPointStepMapClick(input: {
 
     if ((input.addPointStep === 2 || input.addPointStep === 1) && mapView) {
       clickHandle = mapView.on("click", async (event) => {
-        if (!event.mapPoint.longitude || !event.mapPoint.latitude) return;
-
-        input.setMapClickedNotify(input.mapClickedNotify + 1);
-
-        input.setCurrentPoint({
-          x: event.mapPoint.longitude,
-          y: event.mapPoint.latitude,
-        });
-
-        createNewPointEvent({
+        handleAddPointStepMapClick({
           event,
           redGraphicsLayer,
+          addPointStep: input.addPointStep,
+          mapClickedNotify: input.mapClickedNotify,
+          setMapClickedNotify: input.setMapClickedNotify,
+          setCurrentPoint: input.setCurrentPoint,
           setXCoord: input.setXCoord,
           setYCoord: input.setYCoord,
           setLatitude: input.setLatitude,
           setLongitude: input.setLongitude,
-          setCurrentPoint: input.setCurrentPoint,
+          setAddPointStep: input.setAddPointStep,
         });
-
-        if (input.addPointStep === 1) {
-          input.setAddPointStep(3);
-        }
       });
     }
 

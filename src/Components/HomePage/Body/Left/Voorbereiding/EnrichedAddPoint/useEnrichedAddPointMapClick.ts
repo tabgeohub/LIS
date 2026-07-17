@@ -2,12 +2,8 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { EnrichedPointType } from "Types";
-import toast from "react-hot-toast";
-import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
 import useLogAction from "hooks/useLogAction";
-import { getDistanceInMeters } from "./helpers/getDistanceInMeters";
-
-const NEAR_POINT_THRESHOLD_METERS = 50;
+import { handleEnrichedAddPointClick } from "./handleEnrichedAddPointClick";
 
 export function useEnrichedAddPointMapClick(input: {
   step: number;
@@ -32,42 +28,22 @@ export function useEnrichedAddPointMapClick(input: {
 
     if ((input.step === 1 || input.step === 2) && mapView) {
       clickHandle = mapView.on("click", async (event) => {
-        const lon = event.mapPoint.longitude;
-        const lat = event.mapPoint.latitude;
-        if (!lon || !lat) return;
-
-        const isNear = input.points.some((p) =>
-          getDistanceInMeters({
-            from: { lat, lon },
-            to: { lat: p.latitude, lon: p.longitude },
-          }) < NEAR_POINT_THRESHOLD_METERS
-        );
-
-        if (isNear) {
-          toast.error(input.nearPointToast);
-          return;
-        }
-
-        input.setMapClickedNotify(input.mapClickedNotify + 1);
-
-        createNewPointEvent({
+        handleEnrichedAddPointClick({
           event,
+          points: input.points,
+          nearPointToast: input.nearPointToast,
+          mapClickedNotify: input.mapClickedNotify,
+          step: input.step,
           redGraphicsLayer,
+          setMapClickedNotify: input.setMapClickedNotify,
           setXCoord: input.setXCoord,
           setYCoord: input.setYCoord,
           setLatitude: input.setLatitude,
           setLongitude: input.setLongitude,
           setCurrentPoint: input.setCurrentPoint,
+          setStep: input.setStep,
+          logAction,
         });
-
-        logAction({
-          message: "User clicked on map to add point",
-          newData: { latitude: lat, longitude: lon },
-        });
-
-        if (input.step === 1) {
-          input.setStep(3);
-        }
       });
     }
 

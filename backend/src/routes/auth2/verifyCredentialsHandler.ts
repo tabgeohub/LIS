@@ -1,4 +1,5 @@
-import type { RequestHandler } from "express";
+import type { RequestHandler, Response } from "express";
+import type { Request } from "express";
 import { logAuthSecurityEvent } from "./authSecurityLog";
 import { lookupKeycloakUser } from "./keycloakUserLookup";
 import { parseVerifyInput } from "./validateLoginInput";
@@ -8,15 +9,36 @@ import {
   respondToVerifyLookup,
 } from "./verifyCredentialsResponses";
 
+function respondMissingVerifyFields(res: Response) {
+  return res.status(400).json({
+    success: false,
+    status: "invalid_credentials",
+    code: "MISSING_FIELDS",
+    message: "Username and password are required",
+  });
+}
+
+function respondVerifyError(req: Request, res: Response, error: unknown) {
+  logAuthSecurityEvent(
+    "auth2.verify.error",
+    { message: (error as Error)?.message },
+    req
+  );
+  return res.status(500).json({
+    success: false,
+    status: "error",
+    message: "Login failed",
+    error:
+      process.env.NODE_ENV !== "production"
+        ? (error as Error)?.message
+        : undefined,
+  });
+}
+
 export const verifyCredentialsHandler: RequestHandler = async (req, res) => {
   const credentials = parseVerifyInput(req.body);
   if (!credentials) {
-    return res.status(400).json({
-      success: false,
-      status: "invalid_credentials",
-      code: "MISSING_FIELDS",
-      message: "Username and password are required",
-    });
+    return respondMissingVerifyFields(res);
   }
 
   try {
@@ -39,12 +61,6 @@ export const verifyCredentialsHandler: RequestHandler = async (req, res) => {
       otpStatusUnknown: decision.otpStatusUnknown,
     });
   } catch (error: unknown) {
-    logAuthSecurityEvent("auth2.verify.error", { message: (error as Error)?.message }, req);
-    return res.status(500).json({
-      success: false,
-      status: "error",
-      message: "Login failed",
-      error: process.env.NODE_ENV !== "production" ? (error as Error)?.message : undefined,
-    });
+    return respondVerifyError(req, res, error);
   }
 };

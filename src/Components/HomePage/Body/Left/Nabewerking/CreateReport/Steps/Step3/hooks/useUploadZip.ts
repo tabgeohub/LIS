@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import toast from "react-hot-toast";
 import { useContent } from "hooks/useContent";
 import type { DownloadInfo } from "../types";
+import { uploadReportZipFile } from "./uploadReportZipFile";
 
 export function useUploadZip() {
   const { zipFile, selectedPlan, zippingStatus } = useCreateReportState();
@@ -21,34 +21,14 @@ export function useUploadZip() {
     const uploadZip = async () => {
       if (!zipFile || !selectedPlan) return;
 
-      const formData = new FormData();
-      const rawName = `${selectedPlan.omschrijving || "report"}`.trim();
-      // @ts-ignore – unicode safe replace
-      const safeName = rawName.replace(/[^\p{L}\p{N}\s._-]+/gu, "_");
-      const filename = `${safeName}.zip`;
-      formData.append("report", zipFile, filename);
-
       try {
         setErrorMsg(null);
         setIsUploading(true);
-
-        const res = await fetch(`${getBackEndUrl()}/api/upload-report`, {
-          method: "POST",
-          credentials: "include",
-          body: formData,
+        const result = await uploadReportZipFile({
+          zipFile,
+          omschrijving: selectedPlan.omschrijving || "report",
         });
-
-        if (!res.ok) {
-          const msg = await res.text().catch(() => "");
-          throw new Error(msg || `Upload failed (${res.status})`);
-        }
-
-        const result = await res.json().catch(() => ({} as any));
-        if (!result?.url || typeof result.url !== "string") {
-          throw new Error("Bad response from server (missing url)");
-        }
-
-        setDownloadInfo({ url: result.url, filename });
+        setDownloadInfo(result);
       } catch (error: any) {
         const msg =
           content.nabewerking.createReport.step3.toasts?.error ||
@@ -65,7 +45,6 @@ export function useUploadZip() {
     }
   }, [zippingStatus, zipFile, selectedPlan, content]);
 
-  // Cleanup blob URLs
   useEffect(() => {
     return () => {
       if (downloadInfo?.url && downloadInfo.url.startsWith("blob:")) {
@@ -82,6 +61,3 @@ export function useUploadZip() {
     fail,
   };
 }
-
-
-

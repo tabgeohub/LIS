@@ -1,37 +1,18 @@
 import Graphic from "@arcgis/core/Graphic";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import Polygon from "@arcgis/core/geometry/Polygon";
 import Point from "@arcgis/core/geometry/Point";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import {
-  closePolygonRing,
-  geometryPathFromPoints,
-  isPolygonGeometryType,
-} from "@helpers/ArcGISHelpers/geometryPathFromPoints";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { FinishedFlightPlanType } from "Types/finished_plans";
+import { addPlanGeometryHighlights } from "./timesliderGeometryHighlights";
+import { TIMESLIDER_HIGHLIGHT_LABEL } from "./timesliderHighlightLabel";
 
-export const TIMESLIDER_HIGHLIGHT_LABEL = "timeslider-selected-plan-highlight";
+export { TIMESLIDER_HIGHLIGHT_LABEL } from "./timesliderHighlightLabel";
 
 const pointSymbol = new SimpleMarkerSymbol({
   color: [255, 213, 0, 0.95],
   size: 11,
   style: "circle",
   outline: { color: [255, 255, 255, 1], width: 2 },
-});
-
-const lineSymbol = new SimpleLineSymbol({
-  color: [255, 213, 0, 0.95],
-  width: 3,
-  style: "solid",
-});
-
-const polygonSymbol = new SimpleFillSymbol({
-  color: [255, 213, 0, 0.2],
-  outline: { color: [255, 213, 0, 0.95], width: 3 },
-  style: "solid",
 });
 
 function addPlanPointHighlights(
@@ -54,55 +35,6 @@ function addPlanPointHighlights(
           kind: "point",
           planId: plan.id,
           pointId: p.id,
-        },
-      })
-    );
-  }
-}
-
-function addPlanGeometryHighlights(
-  layer: __esri.GraphicsLayer,
-  plan: FinishedFlightPlanType
-) {
-  for (const g of plan.geometries || []) {
-    const path = geometryPathFromPoints(g.points);
-    if (path.length < 2) continue;
-
-    const isPolygon = isPolygonGeometryType(g.geometry_type ?? undefined);
-
-    if (isPolygon && path.length >= 3) {
-      layer.add(
-        new Graphic({
-          geometry: new Polygon({
-            rings: [closePolygonRing(path)],
-            spatialReference: { wkid: 4326 },
-          }),
-          symbol: polygonSymbol,
-          attributes: {
-            label: TIMESLIDER_HIGHLIGHT_LABEL,
-            kind: "geometry",
-            geometryType: "polygon",
-            planId: plan.id,
-            geometryId: g.id,
-          },
-        })
-      );
-      continue;
-    }
-
-    layer.add(
-      new Graphic({
-        geometry: new Polyline({
-          paths: [path],
-          spatialReference: { wkid: 4326 },
-        }),
-        symbol: lineSymbol,
-        attributes: {
-          label: TIMESLIDER_HIGHLIGHT_LABEL,
-          kind: "geometry",
-          geometryType: "line",
-          planId: plan.id,
-          geometryId: g.id,
         },
       })
     );

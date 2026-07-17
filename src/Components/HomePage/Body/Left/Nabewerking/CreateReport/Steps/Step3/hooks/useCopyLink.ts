@@ -1,8 +1,8 @@
-import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import type { DownloadInfo } from "../types";
 import { copyDownloadLinkAfterPassword } from "./copyLinkActions";
+import { promptPasswordAndCopyDownloadLink } from "./promptPasswordAndCopyDownloadLink";
 
 type UseCopyLinkInput = {
   downloadInfo: DownloadInfo | null;
@@ -18,40 +18,24 @@ export function useCopyLink(input: UseCopyLinkInput) {
   const handleCopyLink = async () => {
     if (!downloadInfo?.url) return;
 
-    const promptResult = window.prompt(
-      content.nabewerking.createReport.step3.done.passwordPrompt
-    );
-
-    if (typeof promptResult !== "string") return;
-
-    const trimmed = promptResult.trim();
-    if (!trimmed) {
-      const msg =
-        content.nabewerking.createReport.step3.toasts.passwordRequired;
-      fail(msg);
-      toast.error(msg);
-      return;
-    }
-
-    try {
-      setErrorMsg(null);
-      await copyDownloadLinkAfterPassword({
-        downloadInfo,
-        password: trimmed,
-      });
-      toast.success(content.nabewerking.createReport.step3.toasts.success);
-      logAction({
-        message: "User set password and copied link",
-        step: "Third step",
-      });
-    } catch (e: any) {
-      const msg =
-        e?.message ||
+    await promptPasswordAndCopyDownloadLink({
+      downloadInfo,
+      passwordPrompt: content.nabewerking.createReport.step3.done.passwordPrompt,
+      passwordRequiredMsg:
+        content.nabewerking.createReport.step3.toasts.passwordRequired,
+      successMsg: content.nabewerking.createReport.step3.toasts.success,
+      errorFallbackMsg:
         content.nabewerking.createReport.step3.toasts.error ||
-        "Er is iets misgegaan bij het instellen van het wachtwoord.";
-      fail(msg);
-      toast.error(msg);
-    }
+        "Er is iets misgegaan bij het instellen van het wachtwoord.",
+      setErrorMsg,
+      fail,
+      copyDownloadLinkAfterPassword,
+      logSuccess: () =>
+        logAction({
+          message: "User set password and copied link",
+          step: "Third step",
+        }),
+    });
   };
 
   return { handleCopyLink };

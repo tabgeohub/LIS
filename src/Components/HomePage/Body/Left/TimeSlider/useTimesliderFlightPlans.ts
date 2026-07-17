@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import dayjs from "dayjs";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import {
   drawSelectedPlansYellowHighlights,
   removeTimesliderHighlights,
-  sortPlansNewestFirst,
 } from "@helpers/timeslider";
-import { FinishedFlightPlanType } from "Types/finished_plans";
+import { fetchTimesliderFinishedPlans } from "./fetchTimesliderFinishedPlans";
 
 export function useTimesliderFlightPlans() {
   const role = useAuth((state) => state.user.role);
@@ -25,18 +21,12 @@ export function useTimesliderFlightPlans() {
       return;
     }
     setLoading(true);
-    axios
-      .get<FinishedFlightPlanType[]>(
-        `${getBackEndUrl()}/api/timeslider/getFinishedPlansTimeslider`,
-        {
-          params: {
-            regio_id: role,
-            from: dayjs(state.dateFrom).format("YYYY-MM-DD"),
-            to: dayjs(state.dateTo).format("YYYY-MM-DD"),
-          },
-        }
-      )
-      .then((response) => state.setPlans(sortPlansNewestFirst(response.data || [])))
+    fetchTimesliderFinishedPlans({
+      regioId: role,
+      dateFrom: state.dateFrom,
+      dateTo: state.dateTo,
+    })
+      .then((plans) => state.setPlans(plans))
       .catch(() => state.setPlans([]))
       .finally(() => setLoading(false));
   }, [state.dateFrom, state.dateTo, role, state.setPlans, state.setSelectedPlanIds]);

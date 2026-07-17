@@ -5,44 +5,9 @@ import Point from "@arcgis/core/geometry/Point";
 import * as projection from "@arcgis/core/geometry/projection";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import { EnrichedPointType } from "Types";
+import { isPointInPolygon } from "./isPointInPolygon";
 
-export function isPointInPolygon(point: __esri.Point, ring: number[][]): boolean {
-  const x = point.x;
-  const y = point.y;
-
-  let minX = Infinity,
-    maxX = -Infinity;
-  let minY = Infinity,
-    maxY = -Infinity;
-
-  for (const [px, py] of ring) {
-    if (px < minX) minX = px;
-    if (px > maxX) maxX = px;
-    if (py < minY) minY = py;
-    if (py > maxY) maxY = py;
-  }
-
-  if (x < minX || x > maxX || y < minY || y > maxY) {
-    return false;
-  }
-
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const xi = ring[i][0],
-      yi = ring[i][1];
-    const xj = ring[j][0],
-      yj = ring[j][1];
-
-    const intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-    if (intersect) {
-      inside = !inside;
-    }
-  }
-
-  return inside;
-}
+export { isPointInPolygon } from "./isPointInPolygon";
 
 export function selectPointsInPolygonRing(
   points: EnrichedPointType[],

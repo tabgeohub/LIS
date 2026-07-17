@@ -1,6 +1,29 @@
 /**
  * Sort points with selected items first; among selected, last-clicked appears first.
  */
+function comparePointsWithSelectionOrder(
+  aId: number,
+  bId: number,
+  selectedPointIds: number[],
+  selectedReverseIndexMap: Map<number, number>,
+  indexMap: Map<number, number>
+): number {
+  const isSelected = (id: number) => (selectedPointIds.includes(id) ? 0 : 1);
+  const selOrder = isSelected(aId) - isSelected(bId);
+  if (selOrder !== 0) return selOrder;
+
+  if (
+    selectedPointIds.includes(aId) &&
+    selectedPointIds.includes(bId)
+  ) {
+    const aReverseIndex = selectedReverseIndexMap.get(aId) ?? 0;
+    const bReverseIndex = selectedReverseIndexMap.get(bId) ?? 0;
+    return aReverseIndex - bReverseIndex;
+  }
+
+  return (indexMap.get(aId) ?? 0) - (indexMap.get(bId) ?? 0);
+}
+
 export function sortPointsWithSelectionOrder<T extends { id: number }>(
   points: T[],
   selectedPointIds: number[]
@@ -13,21 +36,13 @@ export function sortPointsWithSelectionOrder<T extends { id: number }>(
     selectedReverseIndexMap.set(id, selectedPointIds.length - 1 - i);
   });
 
-  const isSelected = (id: number) => (selectedPointIds.includes(id) ? 0 : 1);
-
-  return [...points].sort((a, b) => {
-    const selOrder = isSelected(a.id) - isSelected(b.id);
-    if (selOrder !== 0) return selOrder;
-
-    if (
-      selectedPointIds.includes(a.id) &&
-      selectedPointIds.includes(b.id)
-    ) {
-      const aReverseIndex = selectedReverseIndexMap.get(a.id) ?? 0;
-      const bReverseIndex = selectedReverseIndexMap.get(b.id) ?? 0;
-      return aReverseIndex - bReverseIndex;
-    }
-
-    return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
-  });
+  return [...points].sort((a, b) =>
+    comparePointsWithSelectionOrder(
+      a.id,
+      b.id,
+      selectedPointIds,
+      selectedReverseIndexMap,
+      indexMap
+    )
+  );
 }

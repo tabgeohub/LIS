@@ -52,6 +52,27 @@ export type SelectedListItem =
       planId: number;
     };
 
+export function collectSelectedDataFromPlan(
+  plan: FinishedFlightPlanType
+): { points: PointWithPlan[]; geometries: GeometryWithPlan[] } {
+  const vn = plan.vluchtnummer || `Plan ${plan.id}`;
+  const points: PointWithPlan[] = (plan.points_data || []).map((p) => ({
+    point: p,
+    vluchtnummers: [vn],
+    planId: plan.id,
+  }));
+
+  const geometries: GeometryWithPlan[] = (plan.geometries || []).map((g) => ({
+    geometry: g,
+    vluchtnummers: [vn],
+    geometryLabel:
+      g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`,
+    planId: plan.id,
+  }));
+
+  return { points, geometries };
+}
+
 export function collectSelectedData(
   plans: FinishedFlightPlanType[],
   selectedIds: number[]
@@ -62,26 +83,9 @@ export function collectSelectedData(
 
   for (const plan of plans) {
     if (!selectedSet.has(plan.id)) continue;
-    const vn = plan.vluchtnummer || `Plan ${plan.id}`;
-
-    for (const p of plan.points_data || []) {
-      points.push({
-        point: p,
-        vluchtnummers: [vn],
-        planId: plan.id,
-      });
-    }
-
-    for (const g of plan.geometries || []) {
-      const label =
-        g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`;
-      geometries.push({
-        geometry: g,
-        vluchtnummers: [vn],
-        geometryLabel: label,
-        planId: plan.id,
-      });
-    }
+    const collected = collectSelectedDataFromPlan(plan);
+    points.push(...collected.points);
+    geometries.push(...collected.geometries);
   }
 
   return { points, geometries };

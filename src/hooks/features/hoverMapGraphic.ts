@@ -3,6 +3,34 @@ type HoveredGraphic = {
   label: string;
 } | null;
 
+export function isHoverableMapGraphic(
+  graphic: __esri.Graphic,
+  input: {
+    pointsGraphicsLayer?: __esri.GraphicsLayer | null;
+    geometriesGraphicsLayer?: __esri.GraphicsLayer | null;
+    pinRefs?: React.MutableRefObject<
+      Map<number, { outerGraphic: __esri.Graphic; pinGraphic: __esri.Graphic }>
+    >;
+  }
+): boolean {
+  if (!graphic?.attributes) return false;
+
+  if (input.pinRefs) {
+    const id = graphic.attributes.id;
+    if (typeof id === "number" && input.pinRefs.current.has(id)) {
+      return true;
+    }
+  }
+
+  const isBluePoint =
+    !!input.pointsGraphicsLayer && graphic.layer === input.pointsGraphicsLayer;
+  const isBlueGeometry =
+    !!input.geometriesGraphicsLayer &&
+    graphic.layer === input.geometriesGraphicsLayer;
+
+  return isBluePoint || isBlueGeometry;
+}
+
 export function findHoveredMapGraphic(input: {
   results: __esri.MapViewViewHit[];
   pointsGraphicsLayer?: __esri.GraphicsLayer | null;
@@ -14,23 +42,7 @@ export function findHoveredMapGraphic(input: {
   for (const result of input.results) {
     if (result.type !== "graphic") continue;
     const graphic = result.graphic;
-    if (!graphic?.attributes) continue;
-
-    if (input.pinRefs) {
-      const id = graphic.attributes.id;
-      if (typeof id === "number" && input.pinRefs.current.has(id)) {
-        return graphic;
-      }
-    }
-
-    const isBluePoint =
-      !!input.pointsGraphicsLayer &&
-      graphic.layer === input.pointsGraphicsLayer;
-    const isBlueGeometry =
-      !!input.geometriesGraphicsLayer &&
-      graphic.layer === input.geometriesGraphicsLayer;
-
-    if (isBluePoint || isBlueGeometry) return graphic;
+    if (isHoverableMapGraphic(graphic, input)) return graphic;
   }
 
   return null;

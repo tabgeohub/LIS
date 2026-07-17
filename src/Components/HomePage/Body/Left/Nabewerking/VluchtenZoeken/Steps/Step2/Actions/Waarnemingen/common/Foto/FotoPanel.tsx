@@ -6,8 +6,6 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { MdLocationOn } from "react-icons/md";
 import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
-import { deleteArcgisPointAttachment } from "@helpers/arcgis/deleteArcgisAttachment";
-import toast from "react-hot-toast";
 import {
   AttachmentType,
   FinishedFlightPlanType,
@@ -19,7 +17,7 @@ import { filterValidAttachments } from "./filterValidAttachments";
 import { useFotoMapClickHandler } from "./useFotoMapClickHandler";
 import { useImageMarkersOnMap } from "./useImageMarkersOnMap";
 import { navigateToLocation } from "./navigateToLocation";
-import { computeActiveIndexAfterDelete } from "./computeActiveIndexAfterDelete";
+import { runFotoAttachmentDelete } from "./runFotoAttachmentDelete";
 
 export default function FotoPanel({
   setAction,
@@ -67,48 +65,18 @@ export default function FotoPanel({
   };
 
   async function deleteImage(attachmentId: number) {
-    const removed = validAttachments.find((a) => a.id === attachmentId);
-    if (!removed?.url || !attachmentPoint || !selectedPlan) return;
-
-    setLoading(true);
-    try {
-      await deleteArcgisPointAttachment(
-        removed.url,
-        removed.attachmentid ?? null
-      );
-    } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Verwijderen op kaartlaag mislukt"
-      );
-      setLoading(false);
-      return;
-    }
-
-    const newAttachments = validAttachments.filter(
-      (attachment) => attachment.id !== attachmentId
-    );
-
-    const { newIndex, closeGallery } = computeActiveIndexAfterDelete(
+    if (!attachmentPoint || !selectedPlan) return;
+    await runFotoAttachmentDelete({
+      attachmentId,
+      validAttachments,
+      attachmentPoint,
+      selectedPlan,
       activeIndex,
-      newAttachments.length
-    );
-
-    if (closeGallery) {
-      setIsOpen(false);
-    }
-
-    update({
-      data: {
-        point_id: attachmentPoint.id,
-        plan_id: selectedPlan.id,
-        attachments_id: newAttachments.flatMap((attachment) => attachment.id),
-      },
-      onSuccess: () => {
-        setActiveIndex(newIndex);
-        onAttachmentsUpdated(newAttachments);
-        setLoading(false);
-      },
-      onError: () => setLoading(false),
+      setLoading,
+      setIsOpen,
+      setActiveIndex,
+      onAttachmentsUpdated,
+      update,
     });
   }
 

@@ -9,7 +9,7 @@ import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { toast } from "react-hot-toast";
-import { updateGeometryPointsComment } from "./updateGeometryPointsComment";
+import { applyGeometryCommentUpdate } from "./applyGeometryCommentUpdate";
 
 export default function Form({
   setAction,
@@ -46,48 +46,17 @@ export default function Form({
     setLoading(true);
 
     try {
-      const validUpdatedPoints = await updateGeometryPointsComment({
-        points: selectedGeometry.points,
+      await applyGeometryCommentUpdate({
+        selectedGeometry,
+        selectedPlan,
         comment,
-      });
-
-      if (validUpdatedPoints.length === 0) {
-        toast.error("Failed to update points");
-        return;
-      }
-
-      toast.success("Geometry updated successfully");
-      resetFeatures();
-      setAction("form");
-
-      const updatedGeometry = {
-        ...selectedGeometry,
-        points: validUpdatedPoints,
-      };
-
-      setSelectedGeometry(updatedGeometry);
-
-      if (selectedPlan) {
-        setSelectedPlan({
-          ...selectedPlan,
-          geometries: selectedPlan.geometries.map((geom) =>
-            geom.id === selectedGeometry.id ? updatedGeometry : geom
-          ),
-          points_data: selectedPlan.points_data.map((point) => {
-            const updatedPoint = validUpdatedPoints.find((p) => p.id === point.id);
-            return updatedPoint || point;
-          }),
-        });
-      }
-
-      logAction({
-        message: "User clicked 'Update' button",
-        step: "Second step - Edit geometry",
-        newData: {
-          geometry_id: selectedGeometry.id,
-          comment,
-          specifiek_letten_op: comment,
-        },
+        setSelectedGeometry,
+        setSelectedPlan,
+        resetFeatures,
+        setAction,
+        logAction,
+        onSuccessToast: () => toast.success("Geometry updated successfully"),
+        onFailureToast: () => toast.error("Failed to update points"),
       });
     } catch (error) {
       toast.error("Failed to update geometry");

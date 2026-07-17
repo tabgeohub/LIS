@@ -1,46 +1,28 @@
-import type { PointPlanImageRow } from "api-hooks/planImages";
-import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
-import { pointPlanImagesToAttachments } from "api-hooks/planImages";
-import type { FinishedFlightPlanType } from "Types/finished_plans";
+import {
+  buildFirstImageUrlByPlanId,
+  resolveTimesliderActiveImages,
+  resolveTimesliderPlanEmptyFlags,
+  type BuildTimesliderPageViewInput,
+} from "./buildTimesliderPageViewParts";
 
-type ImageHookResult = {
-  images: PointPlanImageRow[];
-  loading: boolean;
-  error: string | null;
-};
-
-type BuildTimesliderPageViewInput = {
-  ok: boolean;
-  kind: "point" | "geometry";
-  itemId: number;
-  from: string;
-  to: string;
-  displayTitle: string;
-  filteredPlans: FinishedFlightPlanType[];
-  allPlans: FinishedFlightPlanType[];
-  selectedPlan: FinishedFlightPlanType | null;
-  planIds: number[];
-  pointResult: ImageHookResult;
-  geometryResult: ImageHookResult;
-  plansLoading: boolean;
-  plansError: string | null;
-  needsAuth: boolean;
-  queryReason: string;
-};
+export type { BuildTimesliderPageViewInput } from "./buildTimesliderPageViewParts";
 
 export function buildTimesliderPageView(input: BuildTimesliderPageViewInput) {
-  const activeImageResult =
-    input.kind === "point" ? input.pointResult : input.geometryResult;
-  const imageRows = activeImageResult.images;
-  const firstImageUrlByPlanId = buildFirstImageUrlByPlanId(imageRows);
+  const { imageRows, images, imagesLoading, imagesError } =
+    resolveTimesliderActiveImages({
+      kind: input.kind,
+      selectedPlan: input.selectedPlan,
+      pointResult: input.pointResult,
+      geometryResult: input.geometryResult,
+    });
 
-  const rowsForSelectedPlan = input.selectedPlan
-    ? imageRows.filter((row) => row.plan_id === input.selectedPlan!.id)
-    : [];
-
-  const images = pointPlanImagesToAttachments(rowsForSelectedPlan);
-  const imagesLoading = activeImageResult.loading;
-  const imagesError = activeImageResult.error;
+  const emptyFlags = resolveTimesliderPlanEmptyFlags({
+    ok: input.ok,
+    plansLoading: input.plansLoading,
+    plansError: input.plansError,
+    allPlansLength: input.allPlans.length,
+    filteredPlansLength: input.filteredPlans.length,
+  });
 
   return {
     queryError: input.ok ? null : input.queryReason,
@@ -56,26 +38,9 @@ export function buildTimesliderPageView(input: BuildTimesliderPageViewInput) {
     plansError: input.plansError,
     needsAuth: input.needsAuth,
     images,
-    firstImageUrlByPlanId,
+    firstImageUrlByPlanId: buildFirstImageUrlByPlanId(imageRows),
     imagesLoading,
     imagesError,
-    noPlansInRange:
-      input.ok && !input.plansLoading && !input.plansError && input.allPlans.length === 0,
-    noMatchingPlans:
-      input.ok &&
-      !input.plansLoading &&
-      !input.plansError &&
-      input.allPlans.length > 0 &&
-      input.filteredPlans.length === 0,
+    ...emptyFlags,
   };
-}
-
-function buildFirstImageUrlByPlanId(imageRows: PointPlanImageRow[]) {
-  const urls: Record<number, string> = {};
-  for (const row of imageRows) {
-    if (!urls[row.plan_id] && row.url) {
-      urls[row.plan_id] = attachmentDisplayUrl(row.url);
-    }
-  }
-  return urls;
 }

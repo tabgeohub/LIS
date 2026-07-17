@@ -1,6 +1,13 @@
-import { extractGrantError, type GrantErrorDetails } from "./grantError";
+import { extractGrantError } from "./grantError";
 import { logAuth2ClassifierDebug } from "./auth2ClassifierDebug";
 import { logAuthSecurityEvent } from "./authSecurityLog";
+import {
+  describeGrantErrorForClassifierDebug,
+  hasExplicitOtpRejectedSignal,
+  hasExplicitOtpRequiredSignal,
+  hasExplicitPasswordRejectedSignal,
+  normalizeGrantError,
+} from "./grantFailureSignals";
 
 export function getOtpParamName(): string {
   return process.env.KC_OTP_PARAM_NAME || "otp";
@@ -46,48 +53,6 @@ export type ClassifyStep2DebugContext = {
   loginStep: "otp" | "password";
 };
 
-function normalizeGrantError(details: GrantErrorDetails): string {
-  return [details.error, details.error_description, details.message]
-    .map((value) => String(value || "").trim().toLowerCase())
-    .join("|");
-}
-
-function hasExplicitOtpRequiredSignal(normalized: string): boolean {
-  const patterns = [
-    "otp missing",
-    "missing otp",
-    "otp required",
-    "totp required",
-    "missing totp",
-    "authenticator code required",
-    "authenticator-code is required",
-    "authenticator code is missing",
-    "authenticator-code is missing",
-    "multi-factor",
-    "two-factor",
-  ];
-
-  return patterns.some((pattern) => normalized.includes(pattern));
-}
-
-function hasExplicitOtpRejectedSignal(normalized: string): boolean {
-  return (
-    normalized.includes("invalid totp") ||
-    normalized.includes("invalid otp") ||
-    normalized.includes("wrong totp") ||
-    normalized.includes("wrong otp") ||
-    normalized.includes("totp validation")
-  );
-}
-
-function hasExplicitPasswordRejectedSignal(normalized: string): boolean {
-  return (
-    normalized.includes("invalid password") ||
-    normalized.includes("wrong password") ||
-    normalized.includes("incorrect password")
-  );
-}
-
 export function classifyGrantFailure(
   error: unknown,
   options: { otpWasSent: boolean }
@@ -121,18 +86,6 @@ export function classifyGrantFailure(
   return "unknown";
 }
 
-export function describeGrantErrorForClassifierDebug(error: unknown): {
-  errorCode: string | null;
-  errorDescription: string | null;
-} {
-  const details = extractGrantError(error);
-
-  return {
-    errorCode: details.error ?? null,
-    errorDescription: details.error_description ?? null,
-  };
-}
-
 /**
  * Step 2 only: classify OTP login failure from the real grant error.
  *
@@ -150,20 +103,12 @@ export function classifyStep2OtpLoginFailure(
   const realGrant = describeGrantErrorForClassifierDebug(originalError);
   const normalized = normalizeGrantError(extractGrantError(originalError));
 
-  let result: Step2FailureKind;
-
-  if (explicitKind === "invalid_otp") {
-    result = "otp_incorrect";
-  } else if (hasExplicitPasswordRejectedSignal(normalized)) {
-    result = "password_incorrect";
-  } else if (
-    explicitKind === "ambiguous_invalid_grant" ||
-    explicitKind === "unknown"
-  ) {
-    result = "password_or_otp_incorrect";
-  } else {
-    result = "password_or_otp_incorrect";
-  }
+  const result: Step2FailureKind =
+    explicitKind === "invalid_otp"
+      ? "otp_incorrect"
+      : hasExplicitPasswordRejectedSignal(normalized)
+        ? "password_incorrect"
+        : "password_or_otp_incorrect";
 
   logAuth2ClassifierDebug("auth2.login.step2_classify", {
     hasOtp: debugContext?.hasOtp ?? null,

@@ -1,15 +1,5 @@
-import {
-  createPointGraphics,
-  type PointData,
-} from "./createPointGraphic";
-
-const BLUE_POINT_SYMBOL = {
-  color: "blue",
-  size: 10,
-  style: "circle" as const,
-  outlineColor: "white",
-  outlineWidth: 1,
-};
+import { placeBluePointGraphics } from "./placeBluePointGraphics";
+import type { PointData } from "./createPointGraphic";
 
 export function removeOwnedBluePointGraphics(
   mapView: __esri.MapView | null,
@@ -31,26 +21,17 @@ export function syncBluePointGraphics(input: {
   pointsGraphicsLayer: __esri.GraphicsLayer | null;
   ownedGraphics: __esri.Graphic[];
 }): __esri.Graphic[] {
-  let ownedGraphics = removeOwnedBluePointGraphics(
+  const cleared = removeOwnedBluePointGraphics(
     input.mapView,
     input.ownedGraphics
   );
   input.pointsGraphicsLayer?.removeAll();
 
-  if (!input.points.length) return ownedGraphics;
-
-  const graphics = createPointGraphics(input.points, {
-    symbolOptions: BLUE_POINT_SYMBOL,
-    transformCoordinates: true,
+  const placed = placeBluePointGraphics({
+    points: input.points,
+    mapView: input.mapView,
+    pointsGraphicsLayer: input.pointsGraphicsLayer,
   });
-  if (!graphics.length) return ownedGraphics;
 
-  if (input.pointsGraphicsLayer) {
-    input.pointsGraphicsLayer.addMany(graphics);
-  } else if (input.mapView) {
-    input.mapView.graphics.addMany(graphics);
-    ownedGraphics = graphics;
-  }
-
-  return ownedGraphics;
+  return placed.length ? placed : cleared;
 }

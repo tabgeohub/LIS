@@ -3,11 +3,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { usePathPointState } from "@helpers/ZustandStates/pathPointState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { parsePlanPath } from "./pathPlanUtils";
-import {
-  addSelectedPathHighlight,
-  clearSelectedPathHighlights,
-} from "./pathPointGraphics";
-import { resolveSelectedPathPoint } from "./resolveSelectedPathPoint";
+import { handlePathPointMapClick } from "./handlePathPointMapClick";
 
 const MAX_CLICK_DISTANCE_M = 20;
 
@@ -28,26 +24,16 @@ export default function usePathPointHandlerClick() {
     const handle = mapView.on("click", (event) => {
       if (!redGraphicsLayer || !event.mapPoint) return;
 
-      map.reorder(redGraphicsLayer, map.layers.length - 1);
-
-      const selection = resolveSelectedPathPoint({
+      handlePathPointMapClick({
+        map,
+        redGraphicsLayer,
         plan: selectedPlan,
         planPath,
         latitude: Number(event.mapPoint.latitude),
         longitude: Number(event.mapPoint.longitude),
         maxDistanceM: MAX_CLICK_DISTANCE_M,
+        setSelectedPathPoint,
       });
-
-      if (!selection) {
-        setSelectedPathPoint(null);
-        clearSelectedPathHighlights(redGraphicsLayer);
-        return;
-      }
-
-      const { nearest, ...selectedPathPoint } = selection;
-      setSelectedPathPoint(selectedPathPoint);
-
-      addSelectedPathHighlight(redGraphicsLayer, nearest);
     });
 
     return () => handle.remove();
