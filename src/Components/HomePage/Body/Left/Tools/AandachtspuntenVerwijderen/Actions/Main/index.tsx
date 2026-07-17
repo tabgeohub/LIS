@@ -7,8 +7,8 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
-import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
 import { sortPointsWithSelectedFirst } from "./sortDeletePoints";
+import { attachDeletePointMapClick } from "./attachDeletePointMapClick";
 
 export default function Main() {
   const { points } = usePointsStore();
@@ -30,38 +30,12 @@ export default function Main() {
 
   useEffect(() => {
     if (!mapView || !pointsGraphicsLayer) return;
-
-    const clickGuard = createDebouncedClickGuard();
-
-    const clickHandler = mapView.on("click", async (event) => {
-      if (clickGuard.shouldSkip()) return;
-
-      try {
-        event.stopPropagation();
-        const hitTestResults = await mapView.hitTest(event, {
-          include: [pointsGraphicsLayer],
-        });
-
-        const pointAttributes = (
-          hitTestResults.results.find(
-            (result) => (result as __esri.GraphicHit).graphic
-          ) as __esri.GraphicHit | undefined
-        )?.graphic?.attributes;
-
-        if (!pointAttributes?.id) return;
-
-        const clickedPoint = pointsRef.current.find(
-          (p) => p.id === pointAttributes.id
-        );
-        if (clickedPoint) setSelectedPointsRef.current([clickedPoint]);
-      } catch (error) {
-        console.error("Error handling map click:", error);
-      } finally {
-        clickGuard.finish();
-      }
+    return attachDeletePointMapClick({
+      mapView,
+      pointsGraphicsLayer,
+      getPoints: () => pointsRef.current,
+      setSelectedPoints: (next) => setSelectedPointsRef.current(next),
     });
-
-    return () => clickHandler.remove();
   }, [mapView, pointsGraphicsLayer]);
 
   const sortedPoints = useMemo(

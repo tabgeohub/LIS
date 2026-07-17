@@ -1,89 +1,38 @@
-import { buildFlightPlanSelectColumns } from "./flightPlanColumns";
-import { buildPointsUnnestJoin } from "./flightPlanJoin";
 import {
-  appendRegioFilter,
-  RegioFilterOptions,
-  shouldFilterByRegio,
-} from "../shared/regioFilter";
-import { buildPointJsonObject, PointJsonPreset } from "../points/pointJson";
-import type { FlightPlanColumnPreset } from "./flightPlanColumns";
+  appendFlightPlanWhereClause,
+  buildFlightPlanSelectBody,
+  resolveFlightPlanQueryDefaults,
+  type BuildFlightPlanQueryOptions,
+} from "./buildFlightPlanQueryParts";
 
-export type BuildFlightPlanQueryOptions = {
-  planTable?: "lis.flightPlans" | "lis.template_plans";
-  planAlias?: string;
-  columnPreset: FlightPlanColumnPreset;
-  pointPreset: PointJsonPreset;
-  includeGeometryJoin?: boolean;
-  where?: string;
-  params?: unknown[];
-  regio_id?: unknown;
-  regioColumn?: string;
-  regioFilter?: RegioFilterOptions;
-  groupBy?: string;
-  orderBy?: string;
-};
+export type { BuildFlightPlanQueryOptions } from "./buildFlightPlanQueryParts";
 
 export function buildFlightPlanQuery(
   options: BuildFlightPlanQueryOptions
 ): { query: string; params: unknown[] } {
-  const {
-    planTable = "lis.flightPlans",
-    planAlias = planTable === "lis.template_plans" ? "tp" : "fp",
-    columnPreset,
-    pointPreset,
-    includeGeometryJoin = false,
-    where,
-    params = [],
-    regio_id,
-    regioColumn,
-    regioFilter = {
-      when: "truthy",
-      caseInsensitiveAdmin: true,
-    },
-    groupBy = `${planAlias}.id`,
-    orderBy =
-      columnPreset === "template"
-        ? `${planAlias}.id`
-        : `${planAlias}.created_at DESC`,
-  } = options;
+  const resolved = resolveFlightPlanQueryDefaults(options);
 
-  const planColumns = buildFlightPlanSelectColumns({ preset: columnPreset, planAlias });
-  const pointJson = buildPointJsonObject(pointPreset);
-  const joins = buildPointsUnnestJoin(planAlias, includeGeometryJoin);
+  let query = buildFlightPlanSelectBody({
+    planAlias: resolved.planAlias,
+    columnPreset: resolved.columnPreset,
+    pointPreset: resolved.pointPreset,
+    includeGeometryJoin: resolved.includeGeometryJoin,
+    planTable: resolved.planTable,
+  });
 
-  let query = `
-      SELECT
-        ${planColumns}
-        JSON_AGG(
-          ${pointJson}
-        ) AS points
-      FROM ${planTable} ${planAlias}
-      ${joins}`;
-
-  if (where) {
-    query += `
-      WHERE ${where}`;
-    if (regio_id !== undefined) {
-      query = appendRegioFilter({
-        sql: query,
-        params,
-        regio_id,
-        column: regioColumn ?? `${planAlias}.regio_id`,
-        options: regioFilter,
-      });
-    }
-  } else if (
-    regio_id !== undefined &&
-    shouldFilterByRegio(regio_id, regioFilter)
-  ) {
-    params.push(regio_id);
-    query += `
-      WHERE ${regioColumn ?? `${planAlias}.regio_id`} = $${params.length}`;
-  }
+  query = appendFlightPlanWhereClause({
+    query,
+    params: resolved.params,
+    where: resolved.where,
+    regio_id: resolved.regio_id,
+    regioColumn: resolved.regioColumn,
+    regioFilter: resolved.regioFilter,
+    planAlias: resolved.planAlias,
+  });
 
   query += `
-      GROUP BY ${groupBy}
-      ORDER BY ${orderBy}`;
+      GROUP BY ${resolved.groupBy}
+      ORDER BY ${resolved.orderBy}`;
 
-  return { query, params };
+  return { query, params: resolved.params };
 }

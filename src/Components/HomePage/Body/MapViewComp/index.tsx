@@ -18,6 +18,11 @@ import {
 } from "@helpers/ZustandStates/pathPointState";
 import useFeatureLayerLabels from "hooks/hover-click-handlers/useFeatureLayerLabels";
 import useMapSectionHeight from "./useMapSectionHeight";
+import {
+  attachBottomPanelResizeListeners,
+  beginBottomPanelDrag,
+  type BottomPanelDragState,
+} from "./bottomPanelResize";
 
 export default function MapViewComp({
   mapDiv,
@@ -37,69 +42,42 @@ export default function MapViewComp({
     height: 0,
   });
 
-  // Add labels to FeatureLayers (Strandpalen, Damnummers)
   useFeatureLayerLabels();
 
-  // -------- Resizable bottom panel state (in vh) --------
-  // Default to 90vh if "open all table", else 55vh like before.
   const [panelVh, setPanelVh] = useState<number>(openAllTable ? 90 : 55);
 
-  // Sync when openAllTable toggles
   useEffect(() => {
     setPanelVh(openAllTable ? 90 : 55);
   }, [openAllTable]);
 
-  // Calculate dynamic map section height
   const { containerRef, mapSectionHeight } = useMapSectionHeight({
     openTable,
     panelVh,
   });
 
-  // Clamp helper
-  const clamp = (v: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, v));
-
-  const dragRef = useRef({
+  const dragRef = useRef<BottomPanelDragState>({
     dragging: false,
     startY: 0,
     startVh: 0,
   });
 
-  // Mouse handlers for the resize bar
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    dragRef.current.dragging = true;
-    dragRef.current.startY = e.clientY;
-    dragRef.current.startVh = panelVh;
-    document.body.style.userSelect = "none";
+    beginBottomPanelDrag({
+      dragRef,
+      clientY: e.clientY,
+      panelVh,
+    });
   };
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragRef.current.dragging) return;
+  useEffect(
+    () =>
+      attachBottomPanelResizeListeners({
+        dragRef,
+        setPanelVh,
+      }),
+    []
+  );
 
-      const deltaY = e.clientY - dragRef.current.startY; // px moved
-      const deltaVh = (deltaY / window.innerHeight) * 100;
-
-      // 🔄 invert direction: dragging UP (deltaY negative) should INCREASE height
-      const next = clamp(dragRef.current.startVh - deltaVh, 20, 90);
-      setPanelVh(next);
-    };
-
-    const onUp = () => {
-      if (!dragRef.current.dragging) return;
-      dragRef.current.dragging = false;
-      document.body.style.userSelect = "";
-    };
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, []);
-
-  // Keep track of bottom container size for child components
   useEffect(() => {
     if (!openTable) {
       setBottomDimensions({ width: 0, height: 0 });
@@ -135,7 +113,6 @@ export default function MapViewComp({
       exit="semiVisible"
       className="relative h-full min-w-0 flex-1 overflow-hidden flex flex-col"
     >
-      {/* ---------------- TOP (Map) ---------------- */}
       <div
         className="bg-gray-100 overflow-hidden relative"
         style={{ height: mapSectionHeight }}
@@ -164,7 +141,6 @@ export default function MapViewComp({
           </div>
         )}
 
-        {/* Floating path point detail card */}
         {selectedPathPoint && (
           <PopupDetails
             selectedPathPoint={selectedPathPoint}
@@ -172,7 +148,6 @@ export default function MapViewComp({
           />
         )}
 
-        {/* ---- Resize handle: only show when the bottom panel is open ---- */}
         {openTable && (
           <div
             onMouseDown={onMouseDown}
@@ -182,7 +157,6 @@ export default function MapViewComp({
         )}
       </div>
 
-      {/* ---------------- BOTTOM (Resizable Panel) ---------------- */}
       {openTable && (
         <div
           ref={bottomContainerRef}

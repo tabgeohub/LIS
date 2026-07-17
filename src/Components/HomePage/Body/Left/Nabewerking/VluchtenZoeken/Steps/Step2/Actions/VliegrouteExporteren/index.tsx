@@ -1,14 +1,14 @@
 import { ActionType } from "../..";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import shpwrite from "@mapbox/shp-write";
-import { FeatureCollection, LineString } from "geojson";
-import JSZip from "jszip";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import {
+  buildFlightPathZipBlob,
+  uploadFlightPathZip,
+} from "./exportFlightPathZip";
 
 export default function VliegrouteExporteren({
   setAction,
@@ -44,53 +44,12 @@ export default function VliegrouteExporteren({
       return;
     }
 
-    const zip = new JSZip();
-    const plan = selectedPlan as FinishedFlightPlanType;
-
-    const coords: [number, number][] = plan.path.map((pt) => [
-      pt.longitude,
-      pt.latitude,
-    ]);
-
-    const geojsonFlightPath: FeatureCollection<LineString> = {
-      type: "FeatureCollection",
-      features: [
-        {
-          type: "Feature",
-          geometry: {
-            type: "LineString",
-            coordinates: coords,
-          },
-          properties: {
-            id: plan.id,
-            name: plan.vluchtnummer,
-            date: plan.datum,
-          },
-        },
-      ],
-    };
-
-    const flightPathZip = shpwrite.zip(geojsonFlightPath, {
-      compression: "DEFLATE",
-      outputType: "blob",
-    });
-
-    zip.file("path.zip", flightPathZip);
-    const finalZipBlob = await zip.generateAsync({ type: "blob" });
-    const filename = `path_${plan.vluchtnummer}.zip`;
-
-    const formData = new FormData();
-    formData.append("report", finalZipBlob, filename);
-
     try {
-      const res = await fetch(`${getBackEndUrl()}/api/upload-report`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      const result = await res.json();
-      setDownloadInfo({ url: result.url, filename });
+      const { blob, filename } = await buildFlightPathZipBlob(
+        selectedPlan as FinishedFlightPlanType
+      );
+      const result = await uploadFlightPathZip({ blob, filename });
+      setDownloadInfo(result);
     } catch (error) {
       toast.error(
         content.nabewerking.vluchtenZoeken.step2.exportFlightPath.toasts

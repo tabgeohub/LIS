@@ -84,22 +84,27 @@ Also include other CSV MEDIUM with McCabe ≥ 10 when touching those feature are
 
 | Unit / area | CSV LOC | McCabe | Action |
 | --- | ---: | ---: | --- |
-| `RemovePoint.onSuccess` | 58 | 1 | Code next — extract side-effect blocks |
-| `handleStep2` / `useHandleStep2` | 58 | 5 | Code next |
-| `buildFlightPlanQuery` | 57 | 9 | Code next |
+| `RemovePoint.onSuccess` | 58 | 1 | Applied — `removePointSuccess` |
+| `handleStep2` / `useHandleStep2` | 58 | 5 | Applied — `generateReportZip` |
+| `buildFlightPlanQuery` | 57 | 9 | Applied — `buildFlightPlanQueryParts` |
 | `queryKeys.ts` | 57 | 1 | Accepted — cohesive key catalogue |
-| `useTimesliderImagePageData` | 56 | 1 | Accepted if composition-only; shrink only if mixed |
-| `Main` Aandachtspunten | 55 | 8 | Code next |
-| `MapViewComp` | 54 | 6 | Code next |
-| `exportFlightPath` | 54 | 6 | Code next |
-| `createSessionMiddleware` | 54 | 5 | Code next |
-| `installers.ts` | 55 | 6 | Code next |
-| `fetchArcgisAdminTokenOnce` | 52 | 8 | Code next |
-| `createPointFromImport` | 52 | 7 | Code next |
-| `deleteGeometry` | 51 | 8 | Code next |
-| `getRedisClient` | 50 | 6 | Code next |
-| `fetchTimesliderPlanImages` | 50 | 5 | Code next |
+| `useTimesliderImagePageData` | 56 | 1 | Accepted — composition-only |
+| `usePointsViewController` | 50 | 1 | Accepted — composition-only |
+| `Form` (delete-point Step1) | 53 | 2 | Accepted — form field shell |
+| `verify-regio-apis` | 56 | 5 | Accepted — backend test script |
+| `Main` Aandachtspunten | 55 | 8 | Applied — `attachDeletePointMapClick` |
+| `MapViewComp` | 54 | 6 | Applied — `bottomPanelResize` |
+| `exportFlightPath` | 54 | 6 | Applied — `exportFlightPathZip` |
+| `createSessionMiddleware` | 54 | 5 | Applied — `sessionStoreSetup` |
+| `installers.ts` | 55 | 6 | Applied — `installersHandlers` |
+| `fetchArcgisAdminTokenOnce` | 52 | 8 | Applied — `arcgisAdminTokenFetch` + shared |
+| `createPointFromImport` | 52 | 7 | Applied — `createPointFromImportHelpers` |
+| `deleteGeometry` | 51 | 8 | Applied — `deleteGeometryCascade` |
+| `getRedisClient` | 50 | 6 | Applied — `connectRedisClient` |
+| `fetchTimesliderPlanImages` | 50 | 5 | Applied — `timesliderPlanImagesQuery` |
 | `backend/dockerfile` | 59 | — | Out of scope (Phase 0) |
+
+Phase 1 ≥50 leftovers (`useEditPointCoordinateInputs`, `safeFetchPointAttachments`, `setupClickListener`, `TimesliderItemDetailPage`, `initPolygonDrawer`) were already thinned in Phase 1.
 
 **Exit criteria:** CSV ≥50 MEDIUM TypeScript rows are façades/thin units or explicitly Accepted.
 
@@ -132,7 +137,9 @@ Keep these **Accepted** unless review shows bundled responsibilities:
 - HIGH McCabe-1 catalogues: `nnederlandLayerSpecsPart{1,2,3}`, `voorbereidingTabs`
 - `queryKeys.ts` cohesive React Query key table
 - MEDIUM McCabe-1 declarative tables (`pointColumnKeys`, region coordinates, layer/symbol catalogues)
-- `useTimesliderImagePageData` when it remains pure composition
+- `useTimesliderImagePageData`, `usePointsViewController` when they remain pure composition
+- Delete-point Step1 `Form` when it remains a field-wiring shell
+- `verify-regio-apis` backend verification script
 - Deployment Dockerfiles (out of scope, not Accepted-for-score)
 
 Reopen an Accepted row only if it starts bundling unrelated concerns or executable branching.

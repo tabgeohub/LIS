@@ -1,4 +1,8 @@
-import { createClient, type RedisClientType } from "redis";
+import { type RedisClientType } from "redis";
+import {
+  connectRedisClient,
+  logRedisConnected,
+} from "./connectRedisClient";
 
 let redisClient: RedisClientType | null = null;
 let connectPromise: Promise<RedisClientType | null> | null = null;
@@ -44,41 +48,16 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
 
   if (!connectPromise) {
     connectPromise = (async () => {
-      const client = createClient({ url: process.env.REDIS_URL });
-      client.on("error", (error) => {
-        console.error(
-          JSON.stringify({
-            type: "lis.redis",
-            event: "client_error",
-            message: error.message,
-            ts: new Date().toISOString(),
-          })
-        );
-      });
-
       try {
-        await client.connect();
-        redisClient = client;
-        console.warn(
-          JSON.stringify({
-            type: "lis.redis",
-            event: "connected",
+        const client = await connectRedisClient(process.env.REDIS_URL);
+        if (client) {
+          redisClient = client;
+          logRedisConnected({
             sessions: shouldUseRedisForSessions(),
             rateLimit: shouldUseRedisForRateLimit(),
-            ts: new Date().toISOString(),
-          })
-        );
+          });
+        }
         return client;
-      } catch (error) {
-        console.error(
-          JSON.stringify({
-            type: "lis.redis",
-            event: "connect_failed",
-            message: (error as Error)?.message,
-            ts: new Date().toISOString(),
-          })
-        );
-        return null;
       } finally {
         connectPromise = null;
       }

@@ -1,6 +1,8 @@
 import session from "express-session";
-import { RedisStore } from "connect-redis";
-import { getRedisClient, shouldUseRedisForSessions } from "../redis/getRedisClient";
+import {
+  attachSessionStore,
+  buildBaseSessionOptions,
+} from "./sessionStoreSetup";
 
 /** Default backend session cookie lifetime: 8 hours (28_800_000 ms). */
 const DEFAULT_SESSION_COOKIE_MAX_AGE_MS = 8 * 60 * 60 * 1000;
@@ -32,58 +34,7 @@ function parseSessionCookieMaxAge(): number {
 export async function createSessionMiddleware() {
   const isHttps = (process.env.PUBLIC_APP_BASE_URL || "").startsWith("https");
   const sessionCookieMaxAge = parseSessionCookieMaxAge();
-
-  const options: session.SessionOptions = {
-    name: "lis.sid",
-    secret: process.env.SESSION_SECRET!,
-    resave: false,
-    saveUninitialized: false,
-    rolling: process.env.SESSION_ROLLING !== "false",
-    cookie: {
-      httpOnly: true,
-      sameSite: isHttps ? "none" : "lax",
-      secure: isHttps,
-      maxAge: sessionCookieMaxAge,
-    },
-  };
-
-  if (shouldUseRedisForSessions()) {
-    const redisClient = await getRedisClient();
-    if (redisClient) {
-      options.store = new RedisStore({
-        client: redisClient,
-        prefix: "lis:sess:",
-        ttl: Math.ceil(sessionCookieMaxAge / 1000),
-      });
-
-      console.warn(
-        JSON.stringify({
-          type: "lis.session",
-          event: "store.redis",
-          prefix: "lis:sess:",
-          ttlSec: Math.ceil(sessionCookieMaxAge / 1000),
-          ts: new Date().toISOString(),
-        })
-      );
-    } else {
-      console.error(
-        JSON.stringify({
-          type: "lis.session",
-          event: "store.redis_fallback_memory",
-          reason: "SESSION_STORE=redis but Redis connection failed",
-          ts: new Date().toISOString(),
-        })
-      );
-    }
-  } else {
-    console.warn(
-      JSON.stringify({
-        type: "lis.session",
-        event: "store.memory",
-        ts: new Date().toISOString(),
-      })
-    );
-  }
-
+  const options = buildBaseSessionOptions({ isHttps, sessionCookieMaxAge });
+  await attachSessionStore(options, sessionCookieMaxAge);
   return session(options);
 }

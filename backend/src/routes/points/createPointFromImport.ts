@@ -1,23 +1,16 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import {
-  importPointsInTransaction,
+  parseImportRequestBody,
   rollbackImportPointsTransaction,
-} from "../../helpers/points/createPointFromImportDb";
-import {
-  normalizeImportRows,
-  parseReturnMode,
-} from "../../helpers/points/importPointRowNormalization";
+  runImportPointsTransaction,
+} from "./createPointFromImportHelpers";
 
 export async function createPointFromImport(
   req: Request,
   res: Response
 ): Promise<void> {
-  const { rows, returnMode } = (req.body ?? {}) as {
-    rows?: unknown;
-    returnMode?: unknown;
-  };
-  const mode = parseReturnMode(returnMode);
+  const { rows, mode } = parseImportRequestBody(req.body);
 
   if (!Array.isArray(rows) || rows.length === 0) {
     res.status(400).json({
@@ -27,35 +20,24 @@ export async function createPointFromImport(
     return;
   }
 
-  const normalized = normalizeImportRows(rows);
-  if (normalized.length === 0) {
-    res.status(400).json({
-      ok: false,
-      message: "No valid rows after normalization.",
-    });
-    return;
-  }
-
   const client = await pool.connect();
   try {
-    await client.query("BEGIN");
-    const result = await importPointsInTransaction(client, {
-      normalized,
-      rawRows: rows,
-      mode,
-    });
-    await client.query("COMMIT");
+    const outcome = await runImportPointsTransaction({ client, rows, mode });
+    if (!outcome.ok) {
+      res.status(400).json({ ok: false, message: outcome.message });
+      return;
+    }
 
     res.status(201).json({
       ok: true,
-      created: result.createdPoints.length,
-      existing: result.existingPoints.length,
+      created: outcome.result.createdPoints.length,
+      existing: outcome.result.existingPoints.length,
       total: rows.length,
-      points: result.points,
-      createdPoints: result.createdPoints,
-      existingPoints: result.existingPoints,
-      message: "Import verwerkt.",
-      returnMode: mode,
+      points: outcome.result.points,
+      createdPoints: outcome.result.createdPoints,
+      existingPoints: outcome.result.existingPoints,
+      message: outcome.message,
+      returnMode: outcome.returnMode,
     });
   } catch (err) {
     await rollbackImportPointsTransaction(client);
