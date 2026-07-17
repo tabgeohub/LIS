@@ -7,7 +7,7 @@ import type {
   BaseGeometryData,
   GeometryPoint,
   GeometrySymbolOptions,
-} from "./createGeometryGraphic";
+} from "./geometryGraphicTypes";
 
 export function pointsToCoordinates(
   points: GeometryPoint[],

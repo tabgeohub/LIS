@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import {
-  FlightPlanFormFieldSetters,
-  FlightPlanFormFieldValues,
-} from "hooks/zustand/shared/flightPlanFormFields";
+import { FlightPlanFormFieldSetters } from "hooks/zustand/shared/flightPlanFormFields";
 import {
   FlightPlanFormSource,
   populateFormFromPlan,
 } from "./populateFormFromPlan";
+
+export type { FlightPlanPayloadFields } from "./buildFlightPlanPayloadFields";
+export { buildFlightPlanPayloadFields } from "./buildFlightPlanPayloadFields";
 
 export function usePopulateFlightPlanFormEffect(
   selectedPlan: FlightPlanFormSource | null | undefined,
@@ -16,34 +16,4 @@ export function usePopulateFlightPlanFormEffect(
     if (!selectedPlan) return;
     populateFormFromPlan(selectedPlan, setters);
   }, [selectedPlan]);
-}
-
-export type FlightPlanPayloadFields = FlightPlanFormFieldValues & {
-  vluchtnummer?: string;
-};
-
-export function buildFlightPlanPayloadFields(
-  fields: FlightPlanPayloadFields
-): {
-  omschrijving: string;
-  waarnemer: string;
-  piloot: string;
-  datum: string;
-  vliegduur: string;
-  luchtvaartuig: string;
-  passagiers: number | null | undefined;
-  hoofdthema: string;
-  aanvullende: string;
-} {
-  return {
-    omschrijving: fields.omschrijving,
-    waarnemer: fields.waarnemer,
-    piloot: fields.piloot,
-    datum: fields.datum,
-    vliegduur: fields.geplandeVliegduur,
-    luchtvaartuig: fields.typeLuchtvaartuig,
-    passagiers: fields.aantalPassagiers,
-    hoofdthema: fields.doelEnHoofdthema,
-    aanvullende: fields.aanvullendeInfo,
-  };
 }

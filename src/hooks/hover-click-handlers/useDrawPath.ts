@@ -6,6 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import usePathPointHandlerClick from "./usePathPointHandlerClick";
 import { usePathLoadingReady } from "./usePathLoadingReady";
 import { syncSelectedPlanPathLayer } from "./syncSelectedPlanPathLayer";
+import {
+  buildPathLoadingReadyInput,
+  isPathLayerReady,
+} from "./pathLoadingReadyInput";
 
 export default function useDrawPath(finishedPlanLoading: boolean = false) {
   const { selectedPlan } = useFinishedPlansState();
@@ -27,25 +31,16 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
     [mapView, redGraphicsLayer, selectedPlan, pointsGraphicsLayer]
   );
 
-  const pathLayerReady = !!(
-    featureLayerRef.current &&
-    mapView?.map?.layers.includes(featureLayerRef.current)
+  usePathLoadingReady(
+    buildPathLoadingReadyInput({
+      loadingPath,
+      setLoadingPath,
+      finishedPlanLoading,
+      selectedPlan,
+      pathLayerReady: isPathLayerReady(featureLayerRef.current, mapView),
+      pointsGraphicsLayer,
+    })
   );
-
-  usePathLoadingReady({
-    loadingPath,
-    setLoadingPath,
-    finishedPlanLoading,
-    hasPath:
-      !!selectedPlan?.path &&
-      Array.isArray(selectedPlan.path) &&
-      selectedPlan.path.length > 0,
-    pathLayerReady,
-    pointsGraphicsLayer,
-    expectedPointsCount: Array.isArray(selectedPlan?.points_data)
-      ? selectedPlan.points_data.length
-      : 0,
-  });
 
   return { loadingPath };
 }

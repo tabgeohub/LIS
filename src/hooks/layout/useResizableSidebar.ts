@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
   beginSidebarResizeDrag,
-  computeSidebarWidthFromDrag,
-  endSidebarResizeDrag,
   type ResizeHandleSide,
   type SidebarDragState,
 } from "./sidebarResizeMath";
+import {
+  attachSidebarResizeListeners,
+  initialSidebarWidthPx,
+} from "./sidebarResizeListeners";
 
 export type { ResizeHandleSide } from "./sidebarResizeMath";
 
@@ -14,10 +16,7 @@ export function useResizableSidebar(
   handleSide: ResizeHandleSide
 ) {
   const [sidebarWidthPx, setSidebarWidthPx] = useState(() =>
-    Math.round(
-      (typeof window !== "undefined" ? window.innerWidth : 1200) *
-        initialWidthRatio
-    )
+    initialSidebarWidthPx(initialWidthRatio)
   );
 
   const dragRef = useRef<SidebarDragState>({
@@ -26,27 +25,15 @@ export function useResizableSidebar(
     startWidth: 0,
   });
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragRef.current.dragging) return;
-      setSidebarWidthPx(
-        computeSidebarWidthFromDrag({
-          handleSide,
-          drag: dragRef.current,
-          clientX: e.clientX,
-        })
-      );
-    };
-
-    const onUp = () => endSidebarResizeDrag(dragRef);
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [handleSide]);
+  useEffect(
+    () =>
+      attachSidebarResizeListeners({
+        handleSide,
+        dragRef,
+        setSidebarWidthPx,
+      }),
+    [handleSide]
+  );
 
   function onResizeMouseDown(clientX: number) {
     beginSidebarResizeDrag({

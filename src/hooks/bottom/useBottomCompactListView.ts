@@ -7,6 +7,7 @@ import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useTabState } from "@helpers/ZustandStates/tabState";
 import useLogAction from "hooks/useLogAction";
+import { openBottomCompactListView } from "./openBottomCompactListView";
 
 export function useBottomCompactListView(input?: { logMessage?: string }) {
   const logAction = useLogAction();
@@ -18,33 +19,29 @@ export function useBottomCompactListView(input?: { logMessage?: string }) {
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const { selectedTab } = useTabState();
 
-  return useCallback(() => {
-    if (selectedTab === "none") {
-      setSelectedBottomTab("searched");
-      setOpenSearchedTab(true);
-    } else {
-      setSelectedBottomTab("result");
-      setOpenResultTab(true);
-    }
-    setOpenSideBar(true);
-    setOpenAllTable(false);
-    setOpenTable(false);
-
-    if (input?.logMessage) {
-      logAction({
-        message: input.logMessage,
-        step: "Clicked table functions",
-      });
-    }
-  }, [
-    selectedTab,
-    setSelectedBottomTab,
-    setOpenSearchedTab,
-    setOpenResultTab,
-    setOpenSideBar,
-    setOpenAllTable,
-    setOpenTable,
-    logAction,
-    input?.logMessage,
-  ]);
+  return useCallback(
+    () =>
+      openBottomCompactListView({
+        selectedTab,
+        setSelectedBottomTab,
+        setOpenSearchedTab,
+        setOpenResultTab,
+        setOpenSideBar,
+        setOpenAllTable,
+        setOpenTable,
+        logAction,
+        logMessage: input?.logMessage,
+      }),
+    [
+      selectedTab,
+      setSelectedBottomTab,
+      setOpenSearchedTab,
+      setOpenResultTab,
+      setOpenSideBar,
+      setOpenAllTable,
+      setOpenTable,
+      logAction,
+      input?.logMessage,
+    ]
+  );
 }
