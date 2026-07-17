@@ -4,11 +4,8 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useRef, useState } from "react";
 import usePathPointHandlerClick from "./usePathPointHandlerClick";
-import {
-  addPathLayerBelowPoints,
-  buildPathFeatureLayer,
-} from "./buildPathFeatureLayer";
 import { usePathLoadingReady } from "./usePathLoadingReady";
+import { syncSelectedPlanPathLayer } from "./syncSelectedPlanPathLayer";
 
 export default function useDrawPath(finishedPlanLoading: boolean = false) {
   const { selectedPlan } = useFinishedPlansState();
@@ -18,39 +15,17 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
 
   usePathPointHandlerClick();
 
-  useEffect(() => {
-    if (featureLayerRef.current && mapView?.map) {
-      if (mapView.map.layers.includes(featureLayerRef.current)) {
-        mapView.map.remove(featureLayerRef.current);
-      }
-      featureLayerRef.current = null;
-    }
-
-    if (!selectedPlan || !mapView?.map) {
-      setLoadingPath(false);
-      return;
-    }
-
-    const planPath = selectedPlan.path;
-    if (!planPath || !Array.isArray(planPath) || planPath.length === 0) {
-      setLoadingPath(false);
-      return;
-    }
-
-    setLoadingPath(true);
-    const pathLayer = buildPathFeatureLayer({ selectedPlan, planPath });
-    const map = mapView.map;
-    featureLayerRef.current = pathLayer;
-    addPathLayerBelowPoints({ mapView, pathLayer, pointsGraphicsLayer });
-
-    return () => {
-      if (map.layers.includes(pathLayer)) {
-        map.remove(pathLayer);
-      }
-      featureLayerRef.current = null;
-      setLoadingPath(false);
-    };
-  }, [mapView, redGraphicsLayer, selectedPlan, pointsGraphicsLayer]);
+  useEffect(
+    () =>
+      syncSelectedPlanPathLayer({
+        mapView,
+        selectedPlan,
+        pointsGraphicsLayer,
+        featureLayerRef,
+        setLoadingPath,
+      }),
+    [mapView, redGraphicsLayer, selectedPlan, pointsGraphicsLayer]
+  );
 
   const pathLayerReady = !!(
     featureLayerRef.current &&
@@ -61,7 +36,10 @@ export default function useDrawPath(finishedPlanLoading: boolean = false) {
     loadingPath,
     setLoadingPath,
     finishedPlanLoading,
-    hasPath: !!selectedPlan?.path && Array.isArray(selectedPlan.path) && selectedPlan.path.length > 0,
+    hasPath:
+      !!selectedPlan?.path &&
+      Array.isArray(selectedPlan.path) &&
+      selectedPlan.path.length > 0,
     pathLayerReady,
     pointsGraphicsLayer,
     expectedPointsCount: Array.isArray(selectedPlan?.points_data)

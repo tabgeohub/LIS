@@ -1,24 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  beginSidebarResizeDrag,
+  computeSidebarWidthFromDrag,
+  endSidebarResizeDrag,
+  type ResizeHandleSide,
+  type SidebarDragState,
+} from "./sidebarResizeMath";
 
-export type ResizeHandleSide = "left" | "right";
-
-const MIN_WIDTH_PX = 260;
-
-function getMaxWidthPx() {
-  return Math.max(360, (window.innerWidth * 0.6) | 0);
-}
-
-function clamp(v: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, v));
-}
-
-function getResizeDelta(
-  handleSide: ResizeHandleSide,
-  startX: number,
-  clientX: number
-) {
-  return handleSide === "right" ? clientX - startX : startX - clientX;
-}
+export type { ResizeHandleSide } from "./sidebarResizeMath";
 
 export function useResizableSidebar(
   initialWidthRatio: number,
@@ -31,7 +20,7 @@ export function useResizableSidebar(
     )
   );
 
-  const dragRef = useRef({
+  const dragRef = useRef<SidebarDragState>({
     dragging: false,
     startX: 0,
     startWidth: 0,
@@ -40,26 +29,16 @@ export function useResizableSidebar(
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragRef.current.dragging) return;
-      const deltaX = getResizeDelta(
-        handleSide,
-        dragRef.current.startX,
-        e.clientX
-      );
       setSidebarWidthPx(
-        clamp(
-          dragRef.current.startWidth + deltaX,
-          MIN_WIDTH_PX,
-          getMaxWidthPx()
-        )
+        computeSidebarWidthFromDrag({
+          handleSide,
+          drag: dragRef.current,
+          clientX: e.clientX,
+        })
       );
     };
 
-    const onUp = () => {
-      if (!dragRef.current.dragging) return;
-      dragRef.current.dragging = false;
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
-    };
+    const onUp = () => endSidebarResizeDrag(dragRef);
 
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
@@ -70,11 +49,11 @@ export function useResizableSidebar(
   }, [handleSide]);
 
   function onResizeMouseDown(clientX: number) {
-    dragRef.current.dragging = true;
-    dragRef.current.startX = clientX;
-    dragRef.current.startWidth = sidebarWidthPx;
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = "ew-resize";
+    beginSidebarResizeDrag({
+      dragRef,
+      clientX,
+      sidebarWidthPx,
+    });
   }
 
   return { sidebarWidthPx, onResizeMouseDown };

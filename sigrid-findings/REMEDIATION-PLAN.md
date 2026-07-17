@@ -166,6 +166,8 @@ After the next deploy/export lands beside `all-findings-rijkswaterstaat-otg-lis-
 
 **Architecture wave applied in workspace (await next export):** HIGH hooks thinned via pure helpers (`createHerhalenSelectionHandlers`, `applyCoordinateSystemSync`, `attachMapHoverLifecycle`, yellow sync/hover/plan handler modules). Lookup/regional/search query config moved to sibling non-hook modules under `api-hooks/`. `npm run check:architecture` green; `useLogAction` / `useContent` / Docker untouched.
 
+**MEDIUM independence wave applied in workspace (await next export):** ArcGIS façades thinned (`createPlanBoundingBoxGraphic`, `createGeometryMapGraphics`, `createPointMapGraphics`, `calculateCenterAndZoom`, `bufferGraphics`); `invalidateAfterMutation` split into flight-plan / related-query / store-refresh helpers; MEDIUM hooks thinned (`useDrawPath`, `useResizableSidebar`, `useFeatureLayerPopup`). Public import paths preserved. `check:architecture` + `test:architecture-helpers` green.
+
 ### Accepted architecture findings
 
 These acceptance rules cover every current architecture row not named in the addressed list:

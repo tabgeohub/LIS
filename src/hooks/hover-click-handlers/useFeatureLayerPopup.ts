@@ -1,10 +1,7 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { attachFeatureLayerPopupClick } from "./featureLayerPopupClick";
-import {
-  clearFeatureLayerMarker,
-  createFeatureLayerMarker,
-} from "./featureLayerPopupMarker";
+import { createFeatureLayerPopupMarkerControllers } from "./featureLayerPopupControllers";
 
 export type FeatureLayerPopupData = {
   attributes: import("@helpers/ZustandStates/popUpState").FeatureLayerAttributes;
@@ -18,23 +15,12 @@ export default function useFeatureLayerPopup() {
   const [popupData, setPopupData] = useState<FeatureLayerPopupData>(null);
   const markerGraphicRef = useRef<__esri.Graphic | null>(null);
 
-  const clearMarker = useCallback(() => {
-    clearFeatureLayerMarker({
-      redGraphicsLayer,
-      marker: markerGraphicRef.current,
-    });
-    markerGraphicRef.current = null;
-  }, [redGraphicsLayer]);
-
-  const createMarker = useCallback(
-    (geometry: __esri.Point) => {
-      if (!redGraphicsLayer) return;
-      markerGraphicRef.current = createFeatureLayerMarker({
+  const { clearMarker, createMarker } = useMemo(
+    () =>
+      createFeatureLayerPopupMarkerControllers({
         redGraphicsLayer,
-        geometry,
-        existingMarker: markerGraphicRef.current,
-      });
-    },
+        markerGraphicRef,
+      }),
     [redGraphicsLayer]
   );
 
