@@ -9,6 +9,7 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import { submitEditPointDetails } from "./submitEditPointDetails";
 
 export default function Form({
   setAction,
@@ -41,58 +42,17 @@ export default function Form({
   }, [selectedPoint]);
 
   function handleUpdate() {
-    if (!selectedPoint) return;
-
-    const updatedPoint = {
-      ...selectedPoint,
-      omschrijving: omschrijving,
-      specifiek_letten_op: comment,
-    };
-
-    const payload = {
-      omschrijving: omschrijving,
-      regio_id: selectedPoint.regio_id,
-      xcoordinaat_rd: selectedPoint.xcoordinaat_rd,
-      ycoordinaat_rd: selectedPoint.ycoordinaat_rd,
-      latitude: selectedPoint.latitude,
-      longitude: selectedPoint.longitude,
-      vertrouwelijk: selectedPoint.vertrouwelijk,
-      herhalen: selectedPoint.herhalen,
-      user_id: selectedPoint.user_id,
-      activiteit_id: selectedPoint.activiteit_id,
-      organisatie_id: selectedPoint.organisatie_id,
-      specifiek_letten_op: comment,
-      datum: selectedPoint.datum,
-      id: selectedPoint.id,
-    };
-
-    update({ data: payload, onSuccess: (responseData) => {
-      if (!responseData.result) return;
-
-      if (!selectedPlan) return;
-
-      resetFeatures();
-      setAction("form");
-
-      setSelectedPoint(updatedPoint);
-
-      setSelectedPlan({
-        ...selectedPlan,
-        points_data: [
-          ...selectedPlan.points_data.filter(
-            (point) => point.id !== payload.id
-          ),
-          updatedPoint,
-        ],
-      });
-    },});
-
-    logAction({
-      message: "User clicked 'Update' button",
-      step: "Second step - Edit point",
-      newData: {
-        ...payload,
-      },
+    submitEditPointDetails({
+      selectedPoint,
+      selectedPlan,
+      omschrijving,
+      comment,
+      update,
+      setSelectedPoint,
+      setSelectedPlan,
+      resetFeatures,
+      setAction,
+      logAction,
     });
   }
 

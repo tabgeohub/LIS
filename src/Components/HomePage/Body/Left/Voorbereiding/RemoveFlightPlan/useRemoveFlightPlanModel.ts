@@ -1,24 +1,17 @@
 import { useMemo, useState } from "react";
 import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
 import { useFilterPlans } from "hooks/filters/useFilterPlans";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
-import { useFlightPlansList } from "api-hooks/flightPlans";
 import {
   useRemoveFlightPlanFilterEffects,
   visibleRemovePlans,
 } from "./removeFlightPlanFilterEffects";
+import { useRemoveFlightPlanQuery } from "./useRemoveFlightPlanQuery";
 
 export function useRemoveFlightPlanModel() {
   const store = useDeleteFlightPlan();
   const [showAllPlans, setShowAllPlans] = useState(false);
   const filterPlans = useFilterPlans();
-  const { user } = useAuth();
-  const query = useFlightPlansList({
-    regioId: user.role,
-    userId: user.user_id,
-  });
-  const plans = query.data ?? EMPTY_FLIGHT_PLANS;
+  const { plans, loading, refetch } = useRemoveFlightPlanQuery();
 
   useRemoveFlightPlanFilterEffects({
     plans,
@@ -39,11 +32,8 @@ export function useRemoveFlightPlanModel() {
     showAllPlans,
     setShowAllPlans,
     plans,
-    loading: query.isPending,
+    loading,
     allPlans,
-    refetch: () => {
-      if (user.user_id === undefined || user.user_id === 0) return;
-      query.refetch();
-    },
+    refetch,
   };
 }

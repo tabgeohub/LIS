@@ -1,8 +1,10 @@
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { AttachmentType } from "Types/finished_plans";
+import {
+  createNumberedMarkerGraphic,
+  createNumberedMarkerLabelGraphic,
+} from "./createNumberedMarkerGraphics";
 
 type SortedAttachment = {
   attachment: AttachmentType;
@@ -78,28 +80,7 @@ function createNumberedMarkerPair(input: {
     attachmentId: input.attachmentId,
   };
   return [
-    new Graphic({
-      geometry: input.point,
-      symbol: new SimpleMarkerSymbol({
-        color: [59, 130, 246, 0.9],
-        size: 18,
-        style: "circle",
-        outline: { color: [255, 255, 255, 1], width: 1.5 },
-      }),
-      attributes: { ...attributes, type: "image-numbered-marker" },
-    }),
-    new Graphic({
-      geometry: input.point,
-      symbol: new TextSymbol({
-        text: String(input.displayNumber),
-        color: [255, 255, 255, 1],
-        font: { size: 10, family: "Arial", weight: "bold" },
-        haloColor: [59, 130, 246, 0.8],
-        haloSize: 1,
-        xoffset: 0,
-        yoffset: 0,
-      }),
-      attributes: { ...attributes, type: "image-numbered-marker-label" },
-    }),
+    createNumberedMarkerGraphic(input.point, attributes),
+    createNumberedMarkerLabelGraphic(input.point, attributes),
   ];
 }

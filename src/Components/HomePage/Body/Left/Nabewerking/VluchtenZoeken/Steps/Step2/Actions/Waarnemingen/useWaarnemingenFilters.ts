@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import {
-  filterWaarnemingenGeometries,
-  filterWaarnemingenPoints,
-} from "./waarnemingenFilterHelpers";
+import { useWaarnemingenFilteredCollections } from "./useWaarnemingenFilteredCollections";
 
 export function useWaarnemingenFilters() {
   const {
@@ -15,15 +12,8 @@ export function useWaarnemingenFilters() {
   } = useFinishedPlansState();
   const [value, setValue] = useState("");
   const [openEdit, setOpenEdit] = useState(false);
-
-  const filteredPoints = useMemo(
-    () => filterWaarnemingenPoints(selectedPlan?.points_data, value),
-    [value, selectedPlan?.points_data]
-  );
-  const filteredGeometries = useMemo(
-    () => filterWaarnemingenGeometries(selectedPlan?.geometries, value),
-    [value, selectedPlan?.geometries]
-  );
+  const { filteredPoints, filteredGeometries } =
+    useWaarnemingenFilteredCollections(selectedPlan, value);
 
   useEffect(() => {
     setValue("");

@@ -1,48 +1,23 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
+import { missingFields } from "../../helpers/http/routeResponses";
 import {
-  buildFlightPlanInsertParams,
-  buildFlightPlanInsertSql,
-} from "../../helpers/queries/flight-plans/flightPlanFields";
-import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
-import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
+  insertAndRespondFlightPlan,
+  isValidCreateFlightPlanBody,
+  respondCreateFlightPlanError,
+} from "./createFlightPlanHelpers";
 
 export async function createFlightPlan(
   req: Request,
   res: Response
 ): Promise<void> {
-  if (
-    getMissingFields(req.body, [
-      "vluchtnummer",
-      "waarnemer",
-      "datum",
-      "user_id",
-    ]).length > 0 ||
-    !requireArray(req.body.points)
-  ) {
+  if (!isValidCreateFlightPlanBody(req.body)) {
     missingFields(res);
     return;
   }
 
   try {
-    const result = await pool.query(
-      buildFlightPlanInsertSql(),
-      buildFlightPlanInsertParams(req.body)
-    );
-
-    created({
-      res,
-      result: result.rows[0],
-      message: "Vluchtplan succesvol opgeslagen",
-    });
+    await insertAndRespondFlightPlan(req.body, res);
   } catch (err) {
-    serverError({
-      res,
-      logLabel: "Error creating flight plan:",
-      message: `Failed to create flight plan: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-      err,
-    });
+    respondCreateFlightPlanError(res, err);
   }
 }

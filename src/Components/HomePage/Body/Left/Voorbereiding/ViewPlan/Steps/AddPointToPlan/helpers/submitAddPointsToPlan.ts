@@ -1,73 +1,17 @@
-import { EnrichedPointType, FlightPlanType } from "Types";
-import { Geometry } from "hooks/features/useGeometriesStore";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import {
-  buildUniquePointIds,
-  getGeometryVertexIds,
-  mergeGeometries,
-  resolveStandalonePoints,
-} from "./planSelection";
 import { applyAddPointsToPlanSuccess } from "./applyAddPointsToPlanSuccess";
+import { prepareAddPointsToPlanPayload } from "./prepareAddPointsToPlanPayload";
+import type { SubmitAddPointsToPlanInput } from "./submitAddPointsToPlanTypes";
 
-type SubmitAddPointsToPlanInput = {
-  selectedPlan: FlightPlanType;
-  selectedPointIds: number[];
-  selectedGeometryIds: number[];
-  dbPoints: EnrichedPointType[];
-  dbGeometries: Geometry[];
-  yellowGraphicsLayer: GraphicsLayer | null | undefined;
-  update: (args: {
-    data: { points: number[]; id: number };
-    onSuccess: () => void;
-  }) => void;
-  setSelectedPlan: (plan: FlightPlanType) => void;
-  setPointsTable: (points: EnrichedPointType[]) => void;
-  setGeometriesTable: (geometries: Geometry[]) => void;
-  setGeometries: (geometries: Geometry[]) => void;
-  setOpenTable: (open: boolean) => void;
-  filteredPlans: FlightPlanType[];
-  setFilteredPlans: (plans: FlightPlanType[]) => void;
-  logAction: (input: {
-    message: string;
-    newData?: Record<string, unknown>;
-  }) => void;
-  setStep: (step: number) => void;
-};
+export type { SubmitAddPointsToPlanInput } from "./submitAddPointsToPlanTypes";
 
 export function submitAddPointsToPlan(input: SubmitAddPointsToPlanInput) {
-  const uniquePointIds = buildUniquePointIds({
-    plan: input.selectedPlan,
-    selectedPointIds: input.selectedPointIds,
-    selectedGeometryIds: input.selectedGeometryIds,
-    dbGeometries: input.dbGeometries,
-  });
-
-  const updatedGeometries = mergeGeometries({
-    existing: input.selectedPlan.geometries,
-    newlySelectedIds: input.selectedGeometryIds,
-    allGeometries: input.dbGeometries,
-  });
-
-  const standalonePoints = resolveStandalonePoints({
-    allPointIds: uniquePointIds,
-    dbPoints: input.dbPoints,
-    geometries: updatedGeometries,
-  });
-
-  const vertexIds = getGeometryVertexIds(updatedGeometries);
-  const newlySelectedStandalonePoints = input.dbPoints.filter(
-    (p) => input.selectedPointIds.includes(p.id) && !vertexIds.has(p.id)
-  );
-
+  const prepared = prepareAddPointsToPlanPayload(input);
   input.update({
-    data: { points: uniquePointIds, id: input.selectedPlan.id },
+    data: { points: prepared.uniquePointIds, id: input.selectedPlan.id },
     onSuccess: () =>
       applyAddPointsToPlanSuccess({
         ...input,
-        uniquePointIds,
-        standalonePoints,
-        updatedGeometries,
-        newlySelectedStandalonePoints,
+        ...prepared,
       }),
   });
 }

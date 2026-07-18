@@ -8,32 +8,14 @@ import { upsertRegisteredDevice } from "./upsertRegisteredDevice";
 import { mapGetacDeviceRow } from "./mapGetacDeviceRow";
 import { buildApplyAgentReportQuery } from "./applyAgentReportSql";
 import { buildStaleCommandUpdateSql } from "./staleCommandSql";
+import { GETAC_DEVICES_CREATE_TABLE_SQL } from "./getacDevicesSchemaSql";
 
 let schemaReady: Promise<void> | null = null;
 
 export function ensureDevicesUpdatesSchema(): Promise<void> {
   if (!schemaReady) {
     schemaReady = pool
-      .query(`
-        CREATE TABLE IF NOT EXISTS lis.getac_devices (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          device_token TEXT UNIQUE NOT NULL,
-          hostname TEXT NOT NULL,
-          machine_id TEXT UNIQUE NOT NULL,
-          windows_version TEXT,
-          os_build TEXT,
-          status TEXT NOT NULL DEFAULT 'unknown',
-          pending_update_count INT NOT NULL DEFAULT 0,
-          pending_command TEXT,
-          command_status TEXT,
-          last_error TEXT,
-          last_seen_at TIMESTAMPTZ,
-          last_checked_at TIMESTAMPTZ,
-          last_updated_at TIMESTAMPTZ,
-          registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
-      `)
+      .query(GETAC_DEVICES_CREATE_TABLE_SQL)
       .then(() => undefined)
       .catch((err) => {
         schemaReady = null;

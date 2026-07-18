@@ -1,12 +1,9 @@
 import { Request, Response } from "express";
 import { pool } from "../../../db";
-import { buildFlightPlanQuery } from "../flight-plans/buildFlightPlanQuery";
 import {
-  collectGeometryIds,
-  fetchGeometryDataMap,
-  formatTemplatePlansWithGeometries,
-} from "../geometries/formatPlanGeometries";
-import { resolveRegioFilter } from "../shared/resolveRegioFilter";
+  loadFormattedTemplatePlans,
+  respondTemplateListError,
+} from "./fetchTemplateFlightPlanListHelpers";
 
 export async function findTemplatePlanByName(name: string) {
   return pool.query(`SELECT * FROM lis.template_plans WHERE name = $1`, [name]);
@@ -34,40 +31,9 @@ export async function fetchTemplateFlightPlanList(
   res: Response
 ): Promise<void> {
   try {
-    const regio_id = resolveRegioFilter(req);
-
-    const { query, params } = buildFlightPlanQuery({
-      planTable: "lis.template_plans",
-      planAlias: "tp",
-      columnPreset: "template",
-      pointPreset: "template",
-      includeGeometryJoin: true,
-      regio_id,
-      regioColumn: "tp.regio_id",
-      regioFilter: { caseInsensitiveAdmin: true },
-    });
-
-    const result = await pool.query(query, params);
-
-    const geometryIds = Array.from(collectGeometryIds(result.rows));
-    const geometryDataMap = await fetchGeometryDataMap(pool, geometryIds);
-    const formattedPlans = formatTemplatePlansWithGeometries(
-      result.rows,
-      geometryDataMap
-    );
-
+    const formattedPlans = await loadFormattedTemplatePlans(req);
     res.status(200).json(formattedPlans);
   } catch (err) {
-    console.error(
-      "Error fetching template flight plans:",
-      err instanceof Error ? err.message : String(err)
-    );
-
-    res.status(500).json({
-      result: null,
-      message: `Failed to fetch template flight plans: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-    });
+    respondTemplateListError(res, err);
   }
 }

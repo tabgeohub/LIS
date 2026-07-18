@@ -1,97 +1,49 @@
-# Unit size remediation — Jul 18 rebase (≤30 LOC exit)
+# Unit size remediation — export `20260718(1)` (746 findings)
 
-**Source:** [`unit-size-findings-rijkswaterstaat-otg-lis-20260718.csv`](./unit-size-findings-rijkswaterstaat-otg-lis-20260718.csv)  
+**Source:** [`unit-size-findings-rijkswaterstaat-otg-lis-20260718(1).csv`](./unit-size-findings-rijkswaterstaat-otg-lis-20260718(1).csv)  
 **Scope:** Unit size only  
-**Related:** [`REMEDIATION-PLAN.md`](./REMEDIATION-PLAN.md); [`ARCHITECTURE-PHASES.md`](./ARCHITECTURE-PHASES.md)
+**Hard rule:** leave MEDIUM only by ending at **≤30 LOC** (MEDIUM floor = 31). No Docker / Nginx / schema / HTTP contract edits.
 
-## Scoreboard (July 18 export — pre-fix baseline)
+## Scoreboard (pre-fix baseline)
 
-| Severity | Count | Notes |
-| --- | ---: | --- |
-| HIGH | 5 | Included executable HIGH `buildTimesliderPageShell` (76 / McCabe 16) |
-| MEDIUM | 162 | Floor = **31 LOC** (LOW max = 30) |
-| LOW | 529 | ≤30 LOC |
-| **Total** | **696** | Prior extracts created new fat helpers ≥31 LOC |
+| Band | Prior Jul 18 | This export `(1)` | Delta |
+| --- | ---: | ---: | ---: |
+| HIGH | 5 | **0** | −5 |
+| MEDIUM | 162 | **75** (74 TS + 1 Docker) | −87 |
+| LOW | 529 | **671** | +142 |
+| **Total** | 696 | **746** | +50 |
 
-## Hard rule (score fix)
+## Waves — status
 
-Every unit we touch that should leave MEDIUM/HIGH must end **≤30 LOC**. Prefer several ≤25 LOC pure helpers over one ~40 LOC extract.
+### Wave 0 — Rebaseline — Done
 
-Do **not** edit Dockerfiles / Nginx / deployment / schemas / HTTP contracts.
+This document; `(1)` CSV is source of truth.
 
-## Success metrics (next export after this wave)
+### Wave A — MEDIUM McCabe ≥ 3 → ≤30 — Applied
 
-- HIGH executable = 0
-- MEDIUM TypeScript with McCabe ≥ 3 and LOC ≥ 40 → 0 (except Accepted shells)
-- Net drop in HIGH+MEDIUM TypeScript (baseline was **166**)
+All executable MEDIUM McCabe ≥ 3 thinned to ≤30 façades (FE + BE).  
+**Accepted (skipped):** `verify-regio-apis.ts.testResolveRegioFilter`.
 
----
+### Wave B — McCabe ≤ 2, LOC ≥ 40 → ≤30 — Applied
 
-## Wave 0 — Rebaseline — Done
+Split catalogues / composition: `queryKeys`, timeslider page/range hooks, Forms, Overig layer specs, swagger, ArcGIS token field specs, Zustand/mapView, symbols, regions, AddPointStep, etc.
 
-This document; ≤30 LOC exit rule; Jul 18 CSV as source of truth.
+### Wave C — MEDIUM 31–39, McCabe ≤ 2 — Applied
 
----
+Batched remaining ~35 units (FE + BE finished-plan queries, spoed PDF, middleware, lists, stores, CreateReport pipeline, etc.) to ≤30 LOC.
 
-## Wave 1 — Kill HIGH — Applied
+## Still out of scope
 
-| Unit | CSV LOC | McCabe | Status |
-| --- | ---: | ---: | --- |
-| `buildTimesliderPageShell` | 76 | 16 | Applied — header / plansOverlay / imageViewer builders + types |
-| `nnederlandLayerSpecsPart{1,2,3}` | 78–83 | 1 | Applied — part*a–d chunks; Part barrels ≤10 LOC |
-| `voorbereidingTabs` | 63 | 1 | Applied — part1 + part2; thin barrel |
-| `backend/dockerfile` | 59 | — | Out of scope |
-
----
-
-## Wave 2 — Re-split Applied helpers still ≥31 — Applied
-
-| Unit | CSV LOC | Status |
-| --- | ---: | --- |
-| `generateReportZip` | 57 | Applied — assemble / write / filter helpers |
-| `fetchArcgisAdminTokenOnce` | 56 | Applied — post / parse / request / expiry |
-| `MapViewComp` | 54 | Applied — model / panel / view pieces |
-| `fetchTimesliderPlanImages` | 50 | Applied — parse / fetch / map |
-| `useEditPointCoordinateInputs` | 47 | Applied — coord state / sync effects |
-| `buildAndSendSpoedReport` | 45 | Applied — mail / PDF / error helpers |
-| `setupClickListener` | 44 | Applied — `handleMapClickHit` |
-| `addPlanGeometryHighlights` | 41 | Applied — highlight factory |
-| `applyGeometryCommentUpdate` | 40 | Applied — success / patch helpers |
-| `buildPlanGeometryGraphics` | 38 | Applied — per-geometry graphic |
-| `useTimesliderFlightPlans` | 33 | Applied — load / draw effects |
-| Leftovers (`syncRealmRoleMappings`, `createPointFromImport`, `sessionStoreSetup`, `startPolygonDrawer`, `fetchAttachmentsForPoint`, …) | ≥31 | Applied — same ≤30 rule |
-
----
-
-## Wave 3 — MEDIUM ≥40 LOC, McCabe ≥ 3 — Applied
-
-~39 executable frontend + backend façades thinned to ≤30 LOC (sibling helpers). Skipped Accepted: `verify-regio-apis`, delete-point Step1 `Form` (McCabe 2 shell), McCabe-1 catalogues/composition.
-
----
-
-## Wave 4 — MEDIUM 31–39 LOC, McCabe ≥ 3 — Applied (batched)
-
-- McCabe ≥ 7 band: thinned (FE + BE including `server.ts` orchestration)
-- McCabe 5–6 high-LOC band: 18+ units thinned; several already ≤30 from Waves 2–3 skipped
-- Remaining McCabe 3–4 in 31–39: opportunistic on next touch (lower score weight)
-
----
-
-## Accepted appendix (unchanged intent)
-
-- `queryKeys`, `useTimesliderImagePageData`, `usePointsViewController` when pure composition
-- Delete-point Step1 `Form` field shell
-- `verify-regio-apis` backend script
-- Deployment Dockerfiles (out of scope)
-
----
+- `backend/dockerfile` (deployment)
 
 ## Verification
 
 1. `npm run check:architecture` — passed (this wave)
 2. `npm run test:architecture-helpers` — passed
-3. After deploy: re-export Unit size; compare to Jul 18 — expect HIGH executable gone and HIGH+MEDIUM TS volume down
+3. Next Sigrid export: expect MEDIUM TS near zero (except Accepted script + Docker); HIGH stays 0; raw total may rise from new LOWs — judge by MEDIUM count / Unit size stars
 
-## Related
+## Success metrics (next export)
 
-- Source CSV: [`unit-size-findings-rijkswaterstaat-otg-lis-20260718.csv`](./unit-size-findings-rijkswaterstaat-otg-lis-20260718.csv)
+- MEDIUM TypeScript McCabe ≥ 3 → **0** (except Accepted `verify-regio-apis`)
+- MEDIUM TypeScript LOC ≥ 40 → **0** (Docker excluded)
+- HIGH stays **0**

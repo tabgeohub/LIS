@@ -1,9 +1,6 @@
-import Graphic from "@arcgis/core/Graphic";
-import Point from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { EnrichedPointType, FlightPlanType } from "Types";
+import { EnrichedPointType } from "Types";
 import { SelectFromSourceItemPoint } from "./mapSourceItems";
 
 export type PinRefMap = Map<
@@ -92,74 +89,6 @@ export function findHoverableGraphic(input: {
   return match?.graphic ?? null;
 }
 
-export function createYellowPointGraphic(point: SelectFromSourceItemPoint) {
-  const coords = getPointCoordinates(point as EnrichedPointType);
-  if (!coords) return null;
-
-  const yellow = new SimpleMarkerSymbol({
-    color: "yellow",
-    size: 12,
-    style: "circle",
-    outline: { color: "white", width: 1 },
-  });
-
-  return new Graphic({
-    geometry: new Point({
-      longitude: coords.longitude,
-      latitude: coords.latitude,
-      spatialReference: { wkid: 4326 },
-    }),
-    symbol: yellow,
-    attributes: point,
-  });
-}
-
-export type SubmitSelectedPointsInput = {
-  selectedPlan: FlightPlanType;
-  checkedPoints: SelectFromSourceItemPoint[];
-  dbPoints: EnrichedPointType[];
-  filteredPlans: FlightPlanType[];
-  yellowGraphicsLayer: __esri.GraphicsLayer | null | undefined;
-};
-
-export function buildSubmitSelectedPointsResult(input: SubmitSelectedPointsInput) {
-  const {
-    selectedPlan,
-    checkedPoints,
-    dbPoints,
-    filteredPlans,
-    yellowGraphicsLayer,
-  } = input;
-
-  const mergedIds = [
-    ...selectedPlan.points.map((p) => p.id),
-    ...checkedPoints.map((p) => p.id),
-  ];
-  const uniqueIds = Array.from(new Set(mergedIds));
-  const updatedPoints = dbPoints.filter((p) => uniqueIds.includes(p.id));
-
-  const updatedPlan: FlightPlanType = {
-    ...selectedPlan,
-    points: updatedPoints,
-    pointsObjects: updatedPoints,
-  };
-
-  const updatedFilteredPlans = filteredPlans.map((p) =>
-    p.id === selectedPlan.id
-      ? { ...p, points: updatedPoints, pointsObjects: updatedPoints }
-      : p
-  );
-
-  const yellowGraphics = checkedPoints
-    .map(createYellowPointGraphic)
-    .filter((g): g is Graphic => g !== null);
-
-  yellowGraphics.forEach((graphic) => yellowGraphicsLayer?.add(graphic));
-
-  return {
-    payload: { points: uniqueIds, id: selectedPlan.id },
-    updatedPlan,
-    updatedPoints,
-    updatedFilteredPlans,
-  };
-}
+export { createYellowPointGraphic } from "./createYellowPointGraphic";
+export type { SubmitSelectedPointsInput } from "./submitSelectedPointsTypes";
+export { buildSubmitSelectedPointsResult } from "./buildSubmitSelectedPointsResult";

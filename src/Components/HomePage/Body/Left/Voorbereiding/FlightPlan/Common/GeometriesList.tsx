@@ -1,16 +1,6 @@
-import { useEffect, useMemo } from "react";
-import useLogAction from "hooks/useLogAction";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { Geometry, useGeometriesStore } from "hooks/features/useGeometriesStore";
-import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
-import {
-  getHerhalenFilterFromGeometries,
-  sortGeometriesForSelection,
-  toggleGeometrySelection,
-} from "./geometryHerhalen";
-import { GeometryItemCheckBox } from "./GeometryItemCheckBox";
-import { useGeometryListInteractions } from "./useGeometryListMapClick";
-import { useGeometryListGraphics } from "./useGeometryListGraphics";
+import { Geometry } from "hooks/features/useGeometriesStore";
+import { GeometriesListItems } from "./GeometriesListItems";
+import { useGeometriesListModel } from "./useGeometriesListModel";
 
 export default function GeometriesList({
   selectedGeometries,
@@ -21,65 +11,20 @@ export default function GeometriesList({
   setSelectedGeometries: (value: number[]) => void;
   geometries: Geometry[];
 }) {
-  const logAction = useLogAction();
-  const { mapView, redGraphicsLayer, geometriesGraphicsLayer } = useMapViewState();
-  const { dbGeometries } = useGeometriesStore();
-  const { handleHoveredGeometry, handleRemoveHoveredGeometry } = useGeometryListHover();
-
-  const safeSelectedGeometries = useGeometryListInteractions({
-    geometries,
-    dbGeometries,
+  const model = useGeometriesListModel({
     selectedGeometries,
     setSelectedGeometries,
-    mapView,
-    redGraphicsLayer,
-  });
-
-  const herhalenFilter = getHerhalenFilterFromGeometries(geometries);
-
-  useGeometryListGraphics({
-    mapView,
-    geometriesGraphicsLayer,
     geometries,
-    selectedGeometryIds: safeSelectedGeometries,
   });
-
-  useEffect(() => {
-    const step = herhalenFilter ? 2 : 3;
-    logAction({
-      message: "User is selecting geometries",
-      step: `Step ${step}`,
-      newData: { selectedGeometries: safeSelectedGeometries },
-    });
-  }, [safeSelectedGeometries, herhalenFilter, logAction]);
-
-  function handleGeometryClick(geometry: Geometry) {
-    setSelectedGeometries(
-      toggleGeometrySelection(safeSelectedGeometries, geometry.id)
-    );
-  }
-
-  const sortedGeometries = useMemo(
-    () => sortGeometriesForSelection(geometries, safeSelectedGeometries),
-    [geometries, safeSelectedGeometries]
-  );
 
   return (
-    <>
-      {sortedGeometries.map((geometry) => (
-        <GeometryItemCheckBox
-          key={geometry.id}
-          geometry={geometry}
-          isSelected={safeSelectedGeometries.includes(geometry.id)}
-          onMouseEnter={() => handleHoveredGeometry(geometry)}
-          onMouseLeave={handleRemoveHoveredGeometry}
-          onCheckboxClick={(e) => {
-            e.stopPropagation();
-            handleGeometryClick(geometry);
-          }}
-          onItemClick={() => setSelectedGeometries([geometry.id])}
-        />
-      ))}
-    </>
+    <GeometriesListItems
+      sortedGeometries={model.sortedGeometries}
+      safeSelectedGeometries={model.safeSelectedGeometries}
+      onHover={model.hover.handleHoveredGeometry}
+      onLeave={model.hover.handleRemoveHoveredGeometry}
+      onToggle={model.handleGeometryClick}
+      onSelectOnly={model.selectOnly}
+    />
   );
 }

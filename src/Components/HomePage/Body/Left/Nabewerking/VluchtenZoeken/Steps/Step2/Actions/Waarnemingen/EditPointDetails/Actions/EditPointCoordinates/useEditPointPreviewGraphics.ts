@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { FinishedPointType } from "Types/finished_plans";
-import { updatePreviewGraphics } from "./pointMapGraphics";
+import { scheduleEditPointPreview } from "./scheduleEditPointPreview";
 
 export function useEditPointPreviewGraphics(input: {
   mapView: __esri.MapView | null;
@@ -10,36 +10,14 @@ export function useEditPointPreviewGraphics(input: {
   longitude: number;
   latitude: number;
 }) {
-  const {
-    mapView,
-    redGraphicsLayer,
-    pointsGraphicsLayer,
-    selectedPoint,
-    longitude,
-    latitude,
-  } = input;
-
   useEffect(() => {
-    if (!mapView || !redGraphicsLayer || !pointsGraphicsLayer || !selectedPoint)
-      return;
-    if (!longitude || !latitude) return;
-    const timeoutId = setTimeout(() => {
-      updatePreviewGraphics({
-        mapView,
-        redGraphicsLayer,
-        pointsGraphicsLayer,
-        point: selectedPoint,
-        longitude,
-        latitude,
-      });
-    }, 300);
-    return () => clearTimeout(timeoutId);
+    return scheduleEditPointPreview(input);
   }, [
-    longitude,
-    latitude,
-    mapView,
-    redGraphicsLayer,
-    pointsGraphicsLayer,
-    selectedPoint,
+    input.longitude,
+    input.latitude,
+    input.mapView,
+    input.redGraphicsLayer,
+    input.pointsGraphicsLayer,
+    input.selectedPoint,
   ]);
 }

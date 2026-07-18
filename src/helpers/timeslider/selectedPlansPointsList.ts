@@ -1,7 +1,3 @@
-import Graphic from "@arcgis/core/Graphic";
-import Point from "@arcgis/core/geometry/Point";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import {
   geometryPathFromPoints,
   isPolygonGeometryType,
@@ -15,6 +11,7 @@ import { drawGeometryHoverSkyBlue as drawHover } from "./drawGeometryHoverSkyBlu
 
 export { TIMESLIDER_RIGHT_HOVER_LABEL } from "./timesliderRightHoverLabel";
 import { TIMESLIDER_RIGHT_HOVER_LABEL } from "./timesliderRightHoverLabel";
+export { drawHoverPin } from "./drawHoverPin";
 
 /** One row per point per plan (same point id appears once per plan that contains it). */
 export type PointWithPlan = {
@@ -115,54 +112,6 @@ export function clearRightListHover(layer: __esri.GraphicsLayer) {
     .toArray()
     .filter((g) => g.attributes?.label === TIMESLIDER_RIGHT_HOVER_LABEL)
     .forEach((g) => layer.remove(g));
-}
-
-export function drawHoverPin(input: {
-  layer: __esri.GraphicsLayer;
-  longitude: number;
-  latitude: number;
-  id?: number;
-}) {
-  const geometry = new Point({
-    longitude: input.longitude,
-    latitude: input.latitude,
-    spatialReference: { wkid: 4326 },
-  });
-
-  const outerGraphic = new Graphic({
-    geometry,
-    symbol: new SimpleMarkerSymbol({
-      style: "circle",
-      color: [255, 255, 0, 0],
-      size: 16,
-      outline: {
-        color: "#4ff1ff",
-        width: 3,
-      },
-    }),
-    attributes: {
-      label: TIMESLIDER_RIGHT_HOVER_LABEL,
-      id: input.id,
-      kind: "hover-pin",
-    },
-  });
-
-  const pinGraphic = new Graphic({
-    geometry,
-    symbol: new PictureMarkerSymbol({
-      url: "/pin.png",
-      width: "24px",
-      height: "24px",
-      yoffset: 9,
-    }),
-    attributes: {
-      label: TIMESLIDER_RIGHT_HOVER_LABEL,
-      id: input.id,
-      kind: "hover-pin",
-    },
-  });
-
-  input.layer.addMany([outerGraphic, pinGraphic]);
 }
 
 export function drawGeometryHoverSkyBlue(
