@@ -5,7 +5,8 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
+import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
 
 export default function Buttons({
   setOpenFilter,
@@ -33,15 +34,13 @@ export default function Buttons({
   const handleNext = () => {
     setStep(step + 1);
     resetFilters();
-
-    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
-    setSelectedGraphics([]);
-
-    if (hoveredGraphic) {
-      mapView?.graphics.remove(hoveredGraphic);
-      setHoveredGraphic(null);
-    }
-
+    clearMapSelectionGraphics({
+      mapView,
+      selectedGraphics,
+      setSelectedGraphics,
+      hoveredGraphic,
+      setHoveredGraphic,
+    });
     yellowGraphicsLayer?.graphics.removeAll();
     yellowGeometriesGraphicsLayer?.graphics.removeAll();
   };
@@ -56,21 +55,16 @@ export default function Buttons({
     ]);
 
   return (
-    <WizardButtonBar
-      buttons={[
-        { label: labels.vorige, onClick: withLog("User clicked 'Back' button", handleBack) },
-        {
-          label: labels.filteren,
-          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
-        },
-        { label: labels.volgende, onClick: withLog("User clicked 'Next' button", handleNext) },
-        {
-          label: labels.annuleren,
-          onClick: withLog("User clicked 'Cancel' button", () =>
-            runWizardCleanup([resetFeatures, clear, handleCancel, resetFilters])
-          ),
-        },
-      ]}
+    <FilterStepWizardButtons
+      labels={labels}
+      withLog={withLog}
+      onPrevious={handleBack}
+      previousLogMessage="User clicked 'Back' button"
+      onFilter={() => setOpenFilter(true)}
+      onNext={handleNext}
+      onCancel={() =>
+        runWizardCleanup([resetFeatures, clear, handleCancel, resetFilters])
+      }
     />
   );
 }

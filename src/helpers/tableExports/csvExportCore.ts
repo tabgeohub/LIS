@@ -2,9 +2,13 @@ import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import type { EnrichedPointType, FlightPlanType } from "Types";
 
-/** RFC 4180 cell escaping; quotes also neutralize spreadsheet formulas. */
+/**
+ * RFC 4180 cell escaping; quotes also neutralize spreadsheet formulas / CWE-79
+ * false positives when Semgrep treats CSV builders as HTML strings.
+ */
 export function escapeCsvCell(value: unknown): string {
   const stringValue = String(value ?? "");
+  // Always quote; double embedded quotes per RFC 4180.
   return `"${stringValue.replace(/"/g, '""')}"`;
 }
 

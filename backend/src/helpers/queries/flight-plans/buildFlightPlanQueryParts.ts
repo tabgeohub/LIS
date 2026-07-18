@@ -2,6 +2,7 @@ import { buildFlightPlanSelectColumns } from "./flightPlanColumns";
 import { buildPointsUnnestJoin } from "./flightPlanJoin";
 import {
   appendRegioFilter,
+  assertSafeSqlColumn,
   RegioFilterOptions,
   shouldFilterByRegio,
 } from "../shared/regioFilter";
@@ -119,8 +120,11 @@ export function appendFlightPlanWhereClause(input: {
     shouldFilterByRegio(input.regio_id, input.regioFilter)
   ) {
     input.params.push(input.regio_id);
+    const regioColumn = assertSafeSqlColumn(
+      input.regioColumn ?? `${input.planAlias}.regio_id`
+    );
     query += `
-      WHERE ${input.regioColumn ?? `${input.planAlias}.regio_id`} = $${input.params.length}`;
+      WHERE ${regioColumn} = $${input.params.length}`;
   }
 
   return query;

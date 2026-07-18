@@ -28,12 +28,12 @@ interface AandachtspuntDetailsFieldsProps extends AandachtspuntDetailsValues {
 
 type DefaultLabels = Record<keyof AandachtspuntDetailsFieldState, string>;
 
-function resolveFieldLabel(
-  labels: AandachtspuntDetailsLabels | undefined,
-  key: keyof DefaultLabels,
-  defaults: DefaultLabels
-): string {
-  return labels?.[key] ?? defaults[key];
+function resolveFieldLabel(input: {
+  labels: AandachtspuntDetailsLabels | undefined;
+  key: keyof DefaultLabels;
+  defaults: DefaultLabels;
+}): string {
+  return input.labels?.[input.key] ?? input.defaults[input.key];
 }
 
 function VertrouwelijkCheckbox(input: {
@@ -83,14 +83,22 @@ export default function AandachtspuntDetailsFields({
         hide={hideVertrouwelijk}
         checked={vertrouwelijk}
         setValue={setVertrouwelijk}
-        label={resolveFieldLabel(labels, "vertrouwelijk", defaultLabels)}
+        label={resolveFieldLabel({
+          labels,
+          key: "vertrouwelijk",
+          defaults: defaultLabels,
+        })}
       />
 
       <CheckBoxComp
         checked={herhalen}
         value={herhalen}
         setValue={setHerhalen}
-        label={resolveFieldLabel(labels, "herhalen", defaultLabels)}
+        label={resolveFieldLabel({
+          labels,
+          key: "herhalen",
+          defaults: defaultLabels,
+        })}
       />
 
       {omschrijvingField}
@@ -98,14 +106,22 @@ export default function AandachtspuntDetailsFields({
       {fieldsAfterOmschrijving}
 
       <SelectComp
-        label={resolveFieldLabel(labels, "activiteit", defaultLabels)}
+        label={resolveFieldLabel({
+          labels,
+          key: "activiteit",
+          defaults: defaultLabels,
+        })}
         value={activiteit}
         setValue={setActiviteit}
         options={activities}
       />
 
       <SelectComp
-        label={resolveFieldLabel(labels, "organisatie", defaultLabels)}
+        label={resolveFieldLabel({
+          labels,
+          key: "organisatie",
+          defaults: defaultLabels,
+        })}
         value={organisatie}
         setValue={setOrganisatie}
         options={organizations}
@@ -116,7 +132,11 @@ export default function AandachtspuntDetailsFields({
         <TextAreaComp
           value={specifiekLettenOp}
           setValue={setSpecifiekLettenOp}
-          label={resolveFieldLabel(labels, "specifiekLettenOp", defaultLabels)}
+          label={resolveFieldLabel({
+            labels,
+            key: "specifiekLettenOp",
+            defaults: defaultLabels,
+          })}
         />
       </div>
 

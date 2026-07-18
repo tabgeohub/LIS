@@ -14,7 +14,7 @@ export function useTimesliderRangeBounds(regioId: string | undefined) {
   );
   const maxStep = SLIDER_PARTS;
   const conversions = useMemo(
-    () => createTimesliderConversions(minDate, maxDate, maxStep),
+    () => createTimesliderConversions({ minDate, maxDate, maxStep }),
     [minDate, maxDate, maxStep]
   );
   return { range, loading, maxStep, ...conversions };

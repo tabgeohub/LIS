@@ -16,15 +16,15 @@ export const logoutHandler: RequestHandler = async (req, res) => {
     }
 
     req.session.destroy(() => {
-      logAuthSecurityEvent("auth2.logout.success", {}, req);
+      logAuthSecurityEvent({ event: "auth2.logout.success", meta: {}, req });
       res.json({ success: true });
     });
   } catch (error) {
-    logAuthSecurityEvent(
-      "auth2.logout.error",
-      { message: (error as Error)?.message },
-      req
-    );
+    logAuthSecurityEvent({
+      event: "auth2.logout.error",
+      meta: { message: (error as Error)?.message },
+      req,
+    });
     req.session.destroy(() => {
       res.json({ success: true });
     });

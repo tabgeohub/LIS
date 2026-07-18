@@ -12,32 +12,28 @@ function geometryHerhalenValue(geometry: Geometry): number {
   return geometry.herhalen === true ? 1 : 0;
 }
 
+function matchesActivityFilter(
+  geometry: Geometry,
+  activityFilter: string
+): boolean {
+  if (!activityFilter) return true;
+  return geometry.activiteit === activityFilter;
+}
+
+function matchesTextFilter(geometry: Geometry, filterText: string): boolean {
+  const needle = filterText.trim().toLowerCase();
+  if (!needle) return true;
+  return (geometry.omschrijving || "").toLowerCase().includes(needle);
+}
+
 export function matchesGeometryFilters(
   geometry: Geometry,
   criteria: GeometryFilterCriteria
 ): boolean {
   const herhalenFilter = criteria.herhalen ? 1 : 0;
   if (geometryHerhalenValue(geometry) !== herhalenFilter) return false;
-
-  if (
-    criteria.activityFilter &&
-    criteria.activityFilter !== "" &&
-    geometry.activiteit !== criteria.activityFilter
-  ) {
-    return false;
-  }
-
-  if (
-    criteria.filterText &&
-    criteria.filterText.trim() !== "" &&
-    !(geometry.omschrijving || "")
-      .toLowerCase()
-      .includes(criteria.filterText.toLowerCase())
-  ) {
-    return false;
-  }
-
-  return true;
+  if (!matchesActivityFilter(geometry, criteria.activityFilter)) return false;
+  return matchesTextFilter(geometry, criteria.filterText);
 }
 
 export function filterGeometriesByCriteria(

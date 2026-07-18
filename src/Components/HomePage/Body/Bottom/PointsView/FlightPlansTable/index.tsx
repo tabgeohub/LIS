@@ -11,7 +11,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { showPlanSearchListHover } from "hooks/hover-click-handlers/planHoverClickHandlers";
+import { hoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [
@@ -95,12 +95,12 @@ export default function FlightPlansTable({
   };
 
   const HoveredPlan = (plan: FlightPlanType) => {
-    showPlanSearchListHover({
+    hoverFlightPlanFromOriginalMap({
       plan,
       mapView,
       graphicsLayerHover,
       graphicsLayer,
-      originalGraphic: originalGraphicsMap.current.get(plan.id),
+      originalGraphicsMap,
     });
   };
 

@@ -12,11 +12,11 @@ export const requireAuthClientHeader: RequestHandler = (req, res, next) => {
     return;
   }
 
-  logAuthSecurityEvent(
-    "auth2.client_header.rejected",
-    { endpoint: req.path },
-    req
-  );
+  logAuthSecurityEvent({
+    event: "auth2.client_header.rejected",
+    meta: { endpoint: req.path },
+    req,
+  });
 
   res.status(403).json({
     success: false,

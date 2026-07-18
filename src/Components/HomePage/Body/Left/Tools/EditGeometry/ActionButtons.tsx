@@ -1,15 +1,11 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
 import { MdDelete, MdEdit } from "react-icons/md";
+import type { EditGeometryActionProps } from "./editGeometryActionProps";
 
 export default function ActionButtons({
   geometry,
   onEditClick,
   onDeleteClick,
-}: {
-  geometry: Geometry;
-  onEditClick: (geometry: Geometry) => void;
-  onDeleteClick: (geometry: Geometry) => void;
-}) {
+}: EditGeometryActionProps) {
   return (
     <div className="text-blue-500 text-xs font-medium mt-2.5 flex items-center gap-x-1">
       <span
@@ -38,4 +34,3 @@ export default function ActionButtons({
     </div>
   );
 }
-

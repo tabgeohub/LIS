@@ -10,13 +10,7 @@ type TimesliderPlansOverlayProps = PlansFilterSectionProps & {
 export default function TimesliderPlansOverlay({
   visible,
   blocked,
-  plans,
-  selectedPlanId,
-  onSelectPlan,
-  loading,
-  emptyHint,
-  firstImageUrlByPlanId,
-  imagesLoading,
+  ...sectionProps
 }: TimesliderPlansOverlayProps) {
   return (
     <AnimatePresence>
@@ -30,13 +24,8 @@ export default function TimesliderPlansOverlay({
           className="absolute inset-x-0 top-0 z-30 max-h-[min(45vh,15rem)] overflow-y-auto rounded-b-lg bg-gray-50 px-3 pb-2 pt-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
         >
           <PlansFilterSection
-            plans={blocked ? [] : plans}
-            selectedPlanId={selectedPlanId}
-            onSelectPlan={onSelectPlan}
-            loading={loading}
-            emptyHint={emptyHint}
-            firstImageUrlByPlanId={firstImageUrlByPlanId}
-            imagesLoading={imagesLoading}
+            {...sectionProps}
+            plans={blocked ? [] : sectionProps.plans}
           />
         </motion.div>
       )}

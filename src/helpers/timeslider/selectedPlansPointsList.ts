@@ -120,10 +120,10 @@ export function drawGeometryHoverSkyBlue(
 ) {
   const path = geometryPathFromPoints(geometry.points);
   if (path.length < 2) return;
-  drawHover(
+  drawHover({
     layer,
     geometry,
     path,
-    isPolygonGeometryType(geometry.geometry_type ?? undefined)
-  );
+    isPolygon: isPolygonGeometryType(geometry.geometry_type ?? undefined),
+  });
 }

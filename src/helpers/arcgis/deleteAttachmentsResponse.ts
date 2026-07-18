@@ -24,6 +24,24 @@ export function formatArcgisDeleteError(payload: ArcgisError | undefined): strin
   );
 }
 
+const BENIGN_MISSING_FRAGMENTS = [
+  "cannot find",
+  "not found",
+  "does not exist",
+] as const;
+
+function isBenignMissingAttachmentError(description: string): boolean {
+  const desc = description.toLowerCase();
+  return BENIGN_MISSING_FRAGMENTS.some((fragment) => desc.includes(fragment));
+}
+
+function firstFailedDeleteResult(
+  results: FeatureDeleteAttachmentsResponse["deleteResults"]
+) {
+  if (!Array.isArray(results) || results.length === 0) return undefined;
+  return results.find((r) => r.success === false);
+}
+
 export function assertDeleteAttachmentsSuccess(
   payload: FeatureDeleteAttachmentsResponse
 ): void {
@@ -31,24 +49,13 @@ export function assertDeleteAttachmentsSuccess(
     throw new Error(formatArcgisDeleteError(payload.error));
   }
 
-  const results = payload.deleteResults;
-  if (!Array.isArray(results) || results.length === 0) return;
-
-  const failed = results.find((r) => r.success === false);
+  const failed = firstFailedDeleteResult(payload.deleteResults);
   if (!failed) return;
 
-  const desc = (failed.error?.description || "").toLowerCase();
-  if (
-    desc.includes("cannot find") ||
-    desc.includes("not found") ||
-    desc.includes("does not exist")
-  ) {
-    return;
-  }
+  const description = failed.error?.description || "";
+  if (isBenignMissingAttachmentError(description)) return;
 
-  throw new Error(
-    failed.error?.description || "ArcGIS deleteAttachments mislukt"
-  );
+  throw new Error(description || "ArcGIS deleteAttachments mislukt");
 }
 
 export type { FeatureDeleteAttachmentsResponse };

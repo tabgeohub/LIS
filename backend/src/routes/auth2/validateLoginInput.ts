@@ -20,6 +20,14 @@ function isValidOtp(otp: string | undefined): boolean {
   return !otp || /^\d+$/.test(otp);
 }
 
+function coalesceEmpty(value: unknown): string {
+  return String(value ?? "");
+}
+
+function optionalOtp(otpRaw: string): string | undefined {
+  return otpRaw || undefined;
+}
+
 function extractLoginFields(body: unknown): ParsedLoginInput {
   const record = body as {
     username?: unknown;
@@ -27,12 +35,11 @@ function extractLoginFields(body: unknown): ParsedLoginInput {
     otp?: unknown;
   };
 
-  const username = String(record?.username ?? "").trim();
-  const password = String(record?.password ?? "");
-  const otpRaw = String(record?.otp ?? "").trim();
-  const otp = otpRaw || undefined;
-
-  return { username, password, otp };
+  return {
+    username: coalesceEmpty(record?.username).trim(),
+    password: coalesceEmpty(record?.password),
+    otp: optionalOtp(coalesceEmpty(record?.otp).trim()),
+  };
 }
 
 function isParsedLoginValid(parsed: ParsedLoginInput): boolean {

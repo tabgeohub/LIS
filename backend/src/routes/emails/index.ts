@@ -7,6 +7,7 @@ import { editSingleEmail } from "./updateSingleEmail";
 import { deleteSingleEmail } from "./deleteSingleEmail";
 import { createEmail } from "./createEmail";
 import multer from "multer";
+import { MULTER_SECURITY_LIMITS } from "../../helpers/uploads/multerSecurityLimits";
 import { sendEmail } from "./sendEmail";
 
 dayjs.locale("nl");
@@ -20,7 +21,11 @@ router.post("/", createEmail);
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { files: 50, fileSize: 25 * 1024 * 1024 },
+  limits: {
+    ...MULTER_SECURITY_LIMITS,
+    files: 50,
+    fileSize: 25 * 1024 * 1024,
+  },
 });
 
 // POST /emails/sendEmail

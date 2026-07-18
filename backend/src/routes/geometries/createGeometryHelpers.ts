@@ -3,8 +3,8 @@ import type { PoolClient } from "pg";
 import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,
-  serverError,
 } from "../../helpers/http/routeResponses";
+import { rollbackTransactionWithServerError } from "../../helpers/http/rollbackTransactionWithServerError";
 import {
   getMissingFields,
   requireNonEmptyArray,
@@ -50,13 +50,9 @@ export async function rollbackCreateGeometryError(input: {
   res: Response;
   err: unknown;
 }): Promise<void> {
-  await input.client.query("ROLLBACK");
-  serverError({
-    res: input.res,
+  await rollbackTransactionWithServerError({
+    ...input,
     logLabel: "Error creating geometry:",
-    message: `Error : ${
-      input.err instanceof Error ? input.err.message : String(input.err)
-    }`,
-    err: input.err,
+    messagePrefix: "Error : ",
   });
 }

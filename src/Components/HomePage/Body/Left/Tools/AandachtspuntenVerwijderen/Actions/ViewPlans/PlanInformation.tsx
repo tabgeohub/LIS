@@ -1,5 +1,6 @@
 import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
 import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
+import { goBackFromPlanInformation } from "Components/HomePage/Body/Left/Common/goBackFromPlanInformation";
 
 export default function PlanInformation({
   selectedPlan,
@@ -15,10 +16,7 @@ export default function PlanInformation({
 
       <div className="flex justify-end gap-x-1 text-[12px] !mt-6">
         <button
-          onClick={() => {
-            setStep(1);
-            setSelectedPlan(null);
-          }}
+          onClick={() => goBackFromPlanInformation(setStep, setSelectedPlan)}
           className="gray-button"
         >
           Vorige

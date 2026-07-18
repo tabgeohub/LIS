@@ -3,14 +3,40 @@ import { fetchApi } from "api/fetchApi";
 import { finishedPlanKeys } from "lib/queryKeys";
 import { AttachmentType } from "Types/finished_plans";
 
+function coalesceZero(value: number | undefined): number {
+  return value ?? 0;
+}
+
+function isPositiveId(value: number | undefined): boolean {
+  return value !== undefined && value > 0;
+}
+
+function attachmentsQueryEnabled(input: {
+  planId: number | undefined;
+  pointId: number | undefined;
+  isFinished: boolean;
+}): boolean {
+  return (
+    input.isFinished &&
+    isPositiveId(input.planId) &&
+    isPositiveId(input.pointId)
+  );
+}
+
 export function usePlanPointAttachments(input: {
   planId: number | undefined;
   pointId: number | undefined;
   isFinished: boolean;
 }) {
   return useQuery({
-    queryKey: finishedPlanKeys.attachments(input.planId ?? 0, input.pointId ?? 0),
-    queryFn: () => fetchApi<AttachmentType[]>(`/finished_plans/getAttachmentsPlanSinglePoint?planId=${input.planId}&pointId=${input.pointId}`),
-    enabled: input.isFinished && input.planId !== undefined && input.planId > 0 && input.pointId !== undefined && input.pointId > 0,
+    queryKey: finishedPlanKeys.attachments(
+      coalesceZero(input.planId),
+      coalesceZero(input.pointId)
+    ),
+    queryFn: () =>
+      fetchApi<AttachmentType[]>(
+        `/finished_plans/getAttachmentsPlanSinglePoint?planId=${input.planId}&pointId=${input.pointId}`
+      ),
+    enabled: attachmentsQueryEnabled(input),
   });
 }

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { LegendLayerDefinition } from "../helpers/layerTypes";
 import { useLegendLayers } from "../helpers/useLegendLayers";
+import {
+  toLegendSectionLayoutProps,
+  type LegendSectionLayoutProps,
+  type LegendSectionLayoutSource,
+} from "./legendSectionLayoutProps";
 
+export type { LegendSectionLayoutProps };
 export type LegendSectionProps = {
   initialLayers: LegendLayerDefinition[];
   /** Wrap children in a ParentItem with its own checkbox (Block1/Section2, NNederland). */
@@ -71,90 +77,110 @@ function buildUseLegendLayersOptions(input: {
   };
 }
 
-function useLegendSectionParentState(
-  controlledParentChecked: boolean | undefined,
-  onParentCheckedChange: ((checked: boolean) => void) | undefined
-) {
+function useLegendSectionParentState(input: {
+  controlledParentChecked: boolean | undefined;
+  onParentCheckedChange: ((checked: boolean) => void) | undefined;
+}) {
   const [internalParentChecked, setInternalParentChecked] = useState(false);
   return {
     parentChecked: resolveParentChecked(
-      controlledParentChecked,
+      input.controlledParentChecked,
       internalParentChecked
     ),
     setParentChecked: resolveParentSetter(
-      onParentCheckedChange,
+      input.onParentCheckedChange,
       setInternalParentChecked
     ),
   };
 }
 
-function toLegendSectionLayoutProps(input: {
-  filteredLayers: LegendLayerDefinition[];
-  handleLayerChange: (id: string, checked: boolean) => void;
-  isVisibleForRole: boolean;
-  parentTitle?: string;
+function buildLayoutSource(input: {
+  props: LegendSectionProps;
   parentChecked: boolean;
   setParentChecked: (checked: boolean) => void;
-  externalParentChecked?: boolean;
-  nestedParentTitle?: string;
   nestedParentChecked: boolean;
   setNestedParentChecked: (checked: boolean) => void;
-  gateNestedByRole: boolean;
-}) {
+  layers: ReturnType<typeof useLegendLayers>;
+}): LegendSectionLayoutSource {
   return {
-    layers: input.filteredLayers,
-    handleLayerChange: input.handleLayerChange,
-    parentTitle: input.parentTitle,
+    filteredLayers: input.layers.filteredLayers,
+    handleLayerChange: input.layers.handleLayerChange,
+    isVisibleForRole: input.layers.isVisibleForRole,
+    parentTitle: input.props.parentTitle,
     parentChecked: input.parentChecked,
     setParentChecked: input.setParentChecked,
-    externalParentChecked: input.externalParentChecked,
-    nestedParentTitle: input.nestedParentTitle,
+    externalParentChecked: input.props.externalParentChecked,
+    nestedParentTitle: input.props.nestedParentTitle,
     nestedParentChecked: input.nestedParentChecked,
     setNestedParentChecked: input.setNestedParentChecked,
-    gateNestedByRole: input.gateNestedByRole,
-    isVisibleForRole: input.isVisibleForRole,
+    gateNestedByRole: coalesceFalse(input.props.gateNestedByRole),
   };
 }
 
-export function useLegendSectionModel(props: LegendSectionProps) {
-  const { parentChecked, setParentChecked } = useLegendSectionParentState(
-    props.parentChecked,
-    props.onParentCheckedChange
-  );
-  const [nestedParentChecked, setNestedParentChecked] = useState(false);
+function coalesceFalse(value: boolean | undefined): boolean {
+  return value ?? false;
+}
+
+function useLegendSectionLayers(input: {
+  props: LegendSectionProps;
+  parentChecked: boolean;
+  setParentChecked: (checked: boolean) => void;
+  nestedParentChecked: boolean;
+  setNestedParentChecked: (checked: boolean) => void;
+}) {
   const { gatedByParent, parentGateChecked } = resolveParentGate(
-    props.parentTitle,
-    parentChecked,
-    props.externalParentChecked
+    input.props.parentTitle,
+    input.parentChecked,
+    input.props.externalParentChecked
   );
-  const layers = useLegendLayers(
-    props.initialLayers,
+  return useLegendLayers(
+    input.props.initialLayers,
     buildUseLegendLayersOptions({
       gatedByParent,
       parentGateChecked,
-      nestedParentTitle: props.nestedParentTitle,
-      nestedParentChecked,
-      setNestedParentChecked,
-      syncFromSelectedLayers: props.syncFromSelectedLayers ?? false,
-      setParentChecked,
+      nestedParentTitle: input.props.nestedParentTitle,
+      nestedParentChecked: input.nestedParentChecked,
+      setNestedParentChecked: input.setNestedParentChecked,
+      syncFromSelectedLayers: coalesceFalse(input.props.syncFromSelectedLayers),
+      setParentChecked: input.setParentChecked,
     })
   );
+}
 
+function shouldHideLegendSection(
+  hideWhenEmpty: boolean | undefined,
+  filteredCount: number
+): boolean {
+  return (hideWhenEmpty ?? false) && filteredCount === 0;
+}
+
+export function useLegendSectionModel(props: LegendSectionProps) {
+  const { parentChecked, setParentChecked } = useLegendSectionParentState({
+    controlledParentChecked: props.parentChecked,
+    onParentCheckedChange: props.onParentCheckedChange,
+  });
+  const [nestedParentChecked, setNestedParentChecked] = useState(false);
+  const layers = useLegendSectionLayers({
+    props,
+    parentChecked,
+    setParentChecked,
+    nestedParentChecked,
+    setNestedParentChecked,
+  });
   return {
-    hidden:
-      (props.hideWhenEmpty ?? false) && layers.filteredLayers.length === 0,
-    layoutProps: toLegendSectionLayoutProps({
-      filteredLayers: layers.filteredLayers,
-      handleLayerChange: layers.handleLayerChange,
-      isVisibleForRole: layers.isVisibleForRole,
-      parentTitle: props.parentTitle,
-      parentChecked,
-      setParentChecked,
-      externalParentChecked: props.externalParentChecked,
-      nestedParentTitle: props.nestedParentTitle,
-      nestedParentChecked,
-      setNestedParentChecked,
-      gateNestedByRole: props.gateNestedByRole ?? false,
-    }),
+    hidden: shouldHideLegendSection(
+      props.hideWhenEmpty,
+      layers.filteredLayers.length
+    ),
+    layoutProps: toLegendSectionLayoutProps(
+      buildLayoutSource({
+        props,
+        parentChecked,
+        setParentChecked,
+        nestedParentChecked,
+        setNestedParentChecked,
+        layers,
+      })
+    ),
   };
 }

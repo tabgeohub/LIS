@@ -6,24 +6,18 @@ import {
   maybeUpdateSavedGraphics,
   patchPlanWithUpdatedPoint,
 } from "./patchPlanWithUpdatedPoint";
+import type { PointCoordinateUpdateContext } from "./pointCoordinateUpdateContext";
 
-export function applyPointCoordinateUpdateSuccess(input: {
-  selectedPoint: FinishedPointType;
-  selectedPlan: FinishedFlightPlanType;
-  finalCoords: {
-    longitude: number;
-    latitude: number;
-    xcoordinaat_rd: number;
-    ycoordinaat_rd: number;
-  };
-  setSelectedPoint: (point: FinishedPointType) => void;
-  setSelectedPlan: (plan: FinishedFlightPlanType) => void;
-  mapView: __esri.MapView | null;
-  pointsGraphicsLayer: __esri.GraphicsLayer | null;
-  yellowGraphicsLayer: __esri.GraphicsLayer | null;
-  redGraphicsLayer: __esri.GraphicsLayer | null;
-  setAction: (value: string) => void;
-}) {
+export function applyPointCoordinateUpdateSuccess(
+  input: PointCoordinateUpdateContext & {
+    finalCoords: {
+      longitude: number;
+      latitude: number;
+      xcoordinaat_rd: number;
+      ycoordinaat_rd: number;
+    };
+  }
+) {
   const { updatedPoint, updatedPlan } = patchPlanWithUpdatedPoint(
     input.selectedPlan,
     input.selectedPoint,
@@ -42,3 +36,5 @@ export function applyPointCoordinateUpdateSuccess(input: {
   });
   input.setAction("form");
 }
+
+export type { FinishedFlightPlanType, FinishedPointType };

@@ -38,6 +38,14 @@ export function buildFirstImageUrlByPlanId(imageRows: PointPlanImageRow[]) {
   return urls;
 }
 
+function plansReadyForEmptyCheck(input: {
+  ok: boolean;
+  plansLoading: boolean;
+  plansError: string | null;
+}): boolean {
+  return input.ok && !input.plansLoading && !input.plansError;
+}
+
 export function resolveTimesliderPlanEmptyFlags(input: {
   ok: boolean;
   plansLoading: boolean;
@@ -45,18 +53,11 @@ export function resolveTimesliderPlanEmptyFlags(input: {
   allPlansLength: number;
   filteredPlansLength: number;
 }) {
+  const ready = plansReadyForEmptyCheck(input);
   return {
-    noPlansInRange:
-      input.ok &&
-      !input.plansLoading &&
-      !input.plansError &&
-      input.allPlansLength === 0,
+    noPlansInRange: ready && input.allPlansLength === 0,
     noMatchingPlans:
-      input.ok &&
-      !input.plansLoading &&
-      !input.plansError &&
-      input.allPlansLength > 0 &&
-      input.filteredPlansLength === 0,
+      ready && input.allPlansLength > 0 && input.filteredPlansLength === 0,
   };
 }
 

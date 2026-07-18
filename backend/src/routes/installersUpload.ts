@@ -1,5 +1,6 @@
 import multer from "multer";
 import path from "path";
+import { MULTER_SECURITY_LIMITS } from "../helpers/uploads/multerSecurityLimits";
 import {
   ALLOWED_EXTENSIONS,
   INSTALLERS_DIR,
@@ -16,7 +17,11 @@ const storage = multer.diskStorage({
 
 export const installerUpload = multer({
   storage,
-  limits: { fileSize: MAX_INSTALLER_BYTES, files: 1 },
+  limits: {
+    ...MULTER_SECURITY_LIMITS,
+    fileSize: MAX_INSTALLER_BYTES,
+    files: 1,
+  },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname || "").toLowerCase();
     if (!ALLOWED_EXTENSIONS.has(ext)) {

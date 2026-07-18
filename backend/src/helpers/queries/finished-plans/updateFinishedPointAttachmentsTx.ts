@@ -8,10 +8,9 @@ type AttachmentUpdateInput = {
 };
 
 async function lockFinishedPlanAttachments(
-  client: PoolClient,
-  pointId: number,
-  planId: number
+  input: Pick<AttachmentUpdateInput, "client" | "pointId" | "planId">
 ): Promise<number[] | null> {
+  const { client, pointId, planId } = input;
   const existing = await client.query<{ attachments_id: number[] | null }>(
     `
       SELECT attachments_id
@@ -29,11 +28,9 @@ async function lockFinishedPlanAttachments(
 }
 
 async function applyFinishedPlanAttachmentIds(
-  client: PoolClient,
-  pointId: number,
-  planId: number,
-  attachmentIds: number[]
+  input: AttachmentUpdateInput
 ): Promise<Record<string, unknown>> {
+  const { client, pointId, planId, attachmentIds } = input;
   const result = await client.query(
     `
       UPDATE lis.finished_plans SET attachments_id = $1
@@ -73,7 +70,7 @@ export async function updateFinishedPointAttachmentsTx(
 > {
   const { client, pointId, planId, attachmentIds } = input;
 
-  const oldIds = await lockFinishedPlanAttachments(client, pointId, planId);
+  const oldIds = await lockFinishedPlanAttachments({ client, pointId, planId });
   if (oldIds == null) {
     return {
       ok: false,
@@ -83,12 +80,12 @@ export async function updateFinishedPointAttachmentsTx(
   }
 
   const removed = oldIds.filter((id) => !attachmentIds.includes(id));
-  const row = await applyFinishedPlanAttachmentIds(
+  const row = await applyFinishedPlanAttachmentIds({
     client,
     pointId,
     planId,
-    attachmentIds
-  );
+    attachmentIds,
+  });
   await deleteOrphanedAttachments(client, removed);
 
   return { ok: true, row };

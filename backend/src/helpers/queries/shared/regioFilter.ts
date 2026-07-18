@@ -60,8 +60,19 @@ type BuildRegioMatchClauseInput = {
   options: RegioFilterOptions;
 };
 
+/** Allow only schema-safe SQL identifiers (alias.column or column). */
+const SAFE_SQL_COLUMN = /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$/;
+
+export function assertSafeSqlColumn(column: string): string {
+  if (!SAFE_SQL_COLUMN.test(column)) {
+    throw new Error(`Unsafe SQL column identifier: ${column}`);
+  }
+  return column;
+}
+
 function buildRegioMatchClause(input: BuildRegioMatchClauseInput): string {
-  const { column, paramIndex, options } = input;
+  const column = assertSafeSqlColumn(input.column);
+  const { paramIndex, options } = input;
   const { castAsText = false, compareLowercase = true } = options;
 
   if (compareLowercase || castAsText) {

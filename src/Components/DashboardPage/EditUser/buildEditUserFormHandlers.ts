@@ -1,6 +1,7 @@
 import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
 import { submitEditUser, type EditUserFormData } from "./submitEditUser";
 import { createFormFieldChangeHandler } from "../shared/createFormFieldChangeHandler";
+import { createAsyncFormSubmitHandler } from "../shared/createAsyncFormSubmitHandler";
 
 export function buildEditUserFormHandlers(input: {
   selectedUser: KeycloakUser | null;
@@ -11,16 +12,17 @@ export function buildEditUserFormHandlers(input: {
 }) {
   return {
     onChange: createFormFieldChangeHandler(input.setFormData),
-    onSubmit: async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!input.selectedUser) return;
-      input.setLoading(true);
-      await submitEditUser({
-        selectedUser: input.selectedUser,
-        formData: input.formData,
-        onSuccess: input.handleEditSuccess,
-      });
-      input.setLoading(false);
-    },
+    onSubmit: createAsyncFormSubmitHandler({
+      hasSelection: Boolean(input.selectedUser),
+      setLoading: input.setLoading,
+      submit: async () => {
+        if (!input.selectedUser) return;
+        await submitEditUser({
+          selectedUser: input.selectedUser,
+          formData: input.formData,
+          onSuccess: input.handleEditSuccess,
+        });
+      },
+    }),
   };
 }

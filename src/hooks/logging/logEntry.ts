@@ -13,12 +13,20 @@ export type LogContext = {
   selectedPage: string;
 };
 
+function orEmpty(value: string | undefined): string {
+  return value || "";
+}
+
+function coalesceNull<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
 function resolveLogActionFields(input: LogActionInput) {
   return {
-    message: input.message || "",
-    oldData: input.oldData ?? null,
-    newData: input.newData ?? null,
-    step: input.step ?? null,
+    message: orEmpty(input.message),
+    oldData: coalesceNull(input.oldData),
+    newData: coalesceNull(input.newData),
+    step: coalesceNull(input.step),
   };
 }
 

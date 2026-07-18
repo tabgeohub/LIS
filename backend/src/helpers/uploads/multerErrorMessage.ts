@@ -7,6 +7,7 @@ const MULTER_ERROR_MESSAGES: Record<string, string> = {
   LIMIT_FIELD_KEY: "Form fields exceeded limits.",
   LIMIT_FIELD_VALUE: "Form fields exceeded limits.",
   LIMIT_FIELD_COUNT: "Form fields exceeded limits.",
+  LIMIT_FIELD_NESTING: "Form fields exceeded limits.",
 };
 
 export function mapMulterError(err: unknown): string {

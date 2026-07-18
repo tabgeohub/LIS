@@ -28,44 +28,62 @@ type TimesliderImageViewerProps = {
   onToggleGallery: () => void;
 };
 
-export default function TimesliderImageViewer({
-  blockImages,
-  images,
-  selectedAttachment,
-  selectedIndex,
-  safeIndex,
-  setSelectedIndex,
-  plansLoading,
-  imagesLoading,
-  imagesError,
-  emptyMain,
-  imageNav,
-  galleryOpen,
-  onToggleGallery,
-}: TimesliderImageViewerProps) {
-  const showImages = !blockImages;
-  const showGallery = showImages && galleryOpen;
+function whenShowing<T>(showImages: boolean, value: T, fallback: T): T {
+  return showImages ? value : fallback;
+}
+
+function buildImageIndex(input: {
+  showImages: boolean;
+  imagesLength: number;
+  safeIndex: number;
+}) {
+  if (!input.showImages || input.imagesLength === 0) return undefined;
+  return { current: input.safeIndex + 1, total: input.imagesLength };
+}
+
+function buildGalleryToggle(input: {
+  showImages: boolean;
+  selectedAttachment: AttachmentType | null;
+  galleryOpen: boolean;
+  onToggleGallery: () => void;
+}) {
+  if (!input.showImages || !input.selectedAttachment) return undefined;
+  return { open: input.galleryOpen, onToggle: input.onToggleGallery };
+}
+
+function buildMainImageProps(input: TimesliderImageViewerProps & {
+  showImages: boolean;
+}) {
+  const { showImages } = input;
+  return {
+    attachment: whenShowing(showImages, input.selectedAttachment, null),
+    plansLoading: input.plansLoading,
+    loading: showImages && input.imagesLoading,
+    error: whenShowing(showImages, input.imagesError, null),
+    emptyMessage: input.emptyMain,
+    imageNav: input.imageNav,
+    imageIndex: buildImageIndex({
+      showImages,
+      imagesLength: input.images.length,
+      safeIndex: input.safeIndex,
+    }),
+    galleryToggle: buildGalleryToggle({
+      showImages,
+      selectedAttachment: input.selectedAttachment,
+      galleryOpen: input.galleryOpen,
+      onToggleGallery: input.onToggleGallery,
+    }),
+  };
+}
+
+export default function TimesliderImageViewer(props: TimesliderImageViewerProps) {
+  const showImages = !props.blockImages;
+  const showGallery = showImages && props.galleryOpen;
+  const mainImageProps = buildMainImageProps({ ...props, showImages });
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <MainImageSection
-        attachment={showImages ? selectedAttachment : null}
-        plansLoading={plansLoading}
-        loading={showImages && imagesLoading}
-        error={showImages ? imagesError : null}
-        emptyMessage={emptyMain}
-        imageNav={imageNav}
-        imageIndex={
-          showImages && images.length > 0
-            ? { current: safeIndex + 1, total: images.length }
-            : undefined
-        }
-        galleryToggle={
-          showImages && selectedAttachment
-            ? { open: galleryOpen, onToggle: onToggleGallery }
-            : undefined
-        }
-      />
+      <MainImageSection {...mainImageProps} />
       <motion.div
         initial={false}
         animate={{
@@ -79,10 +97,10 @@ export default function TimesliderImageViewer({
       >
         <div className="h-36">
           <ImagesSelectionSection
-            images={showImages ? images : []}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
-            loading={showImages && imagesLoading}
+            images={showImages ? props.images : []}
+            selectedIndex={props.selectedIndex}
+            onSelect={props.setSelectedIndex}
+            loading={showImages && props.imagesLoading}
           />
         </div>
       </motion.div>

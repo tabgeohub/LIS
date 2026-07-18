@@ -1,17 +1,11 @@
-import { EnrichedPointType } from "Types";
 import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
-import { handleMapClickHit } from "./mapClickHitHandler";
+import {
+  handleMapClickHit,
+  type MapClickListenerBase,
+} from "./mapClickHitHandler";
 import { clearSelectedPointGraphics } from "./pointHitSelection";
 
-export type SetupClickListenerInput = {
-  mapView: __esri.MapView;
-  setClickedPointId: (value: number) => void;
-  setClickedPoint: (value: EnrichedPointType) => void;
-  selectedPointGraphicsLayer: __esri.GraphicsLayer;
-  createNewPoint: boolean;
-  pointsGraphicsLayer?: __esri.GraphicsLayer | null;
-  isTabBlocked?: () => boolean;
-};
+export type SetupClickListenerInput = MapClickListenerBase;
 
 export const setupClickListener = (input: SetupClickListenerInput) => {
   const { mapView, selectedPointGraphicsLayer } = input;
@@ -20,14 +14,8 @@ export const setupClickListener = (input: SetupClickListenerInput) => {
   const clickGuard = createDebouncedClickGuard();
   const clickHandler = mapView.on("click", async (event) => {
     await handleMapClickHit({
-      mapView,
+      ...input,
       event,
-      setClickedPointId: input.setClickedPointId,
-      setClickedPoint: input.setClickedPoint,
-      selectedPointGraphicsLayer,
-      createNewPoint: input.createNewPoint,
-      pointsGraphicsLayer: input.pointsGraphicsLayer,
-      isTabBlocked: input.isTabBlocked,
       shouldSkip: () => clickGuard.shouldSkip(),
       finishGuard: () => clickGuard.finish(),
     });

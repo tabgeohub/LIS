@@ -14,11 +14,11 @@ export const loginHandler: RequestHandler = async (req, res) => {
 
   try {
     const user = await authenticateLogin(req, credentials);
-    logAuthSecurityEvent(
-      "auth2.login.success",
-      { otpUsed: Boolean(credentials.otp) },
-      req
-    );
+    logAuthSecurityEvent({
+      event: "auth2.login.success",
+      meta: { otpUsed: Boolean(credentials.otp) },
+      req,
+    });
     return res.json({ success: true, message: "Login successful", user });
   } catch (error: unknown) {
     return respondToLoginFailure({ req, res, error, credentials });

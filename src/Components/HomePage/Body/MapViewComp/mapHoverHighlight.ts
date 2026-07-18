@@ -29,23 +29,35 @@ export function isMapHoverGraphicHit(
   return HOVER_GEOMETRY_TYPES.has(result.graphic.geometry.type);
 }
 
+const LABEL_ATTRIBUTE_KEYS = [
+  "omschrijving",
+  "name",
+  "label",
+  "title",
+] as const;
+
+const UNKNOWN_LABEL_BY_TYPE: Record<string, string> = {
+  polygon: "Onbekend veelhoek",
+  polyline: "Onbekend lijn",
+};
+
+function firstTruthyAttribute(
+  attributes: Record<string, unknown>,
+  keys: readonly string[]
+): unknown {
+  for (const key of keys) {
+    if (attributes[key]) return attributes[key];
+  }
+  return "";
+}
+
 export function resolveMapHoverLabel(input: {
   geometryType: string;
   attributes: Record<string, unknown>;
 }) {
-  const attrs = input.attributes;
-  const text =
-    attrs.omschrijving ||
-    attrs.name ||
-    attrs.label ||
-    attrs.title ||
-    "";
-
+  const text = firstTruthyAttribute(input.attributes, LABEL_ATTRIBUTE_KEYS);
   if (text) return String(text);
-
-  if (input.geometryType === "polygon") return "Onbekend veelhoek";
-  if (input.geometryType === "polyline") return "Onbekend lijn";
-  return "Onbekend punt";
+  return UNKNOWN_LABEL_BY_TYPE[input.geometryType] ?? "Onbekend punt";
 }
 
 function firstAttribute(

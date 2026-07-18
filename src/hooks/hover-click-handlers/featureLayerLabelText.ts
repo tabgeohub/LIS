@@ -1,19 +1,22 @@
-export function getFeatureLayerLabelText(
-  layerTitle: string,
-  attributes: Record<string, unknown>
-): string {
-  if (layerTitle === "Damnummers") {
-    return String(attributes.Damnr || attributes.damnr || "");
-  }
-
-  if (layerTitle === "Strandpalen") {
-    return String(
+const LABEL_RESOLVERS: Record<
+  string,
+  (attributes: Record<string, unknown>) => string
+> = {
+  Damnummers: (attributes) =>
+    String(attributes.Damnr || attributes.damnr || ""),
+  Strandpalen: (attributes) =>
+    String(
       attributes.OBJECTID ||
         attributes.objectId ||
         attributes.objectid ||
         ""
-    );
-  }
+    ),
+};
 
-  return "";
+export function getFeatureLayerLabelText(
+  layerTitle: string,
+  attributes: Record<string, unknown>
+): string {
+  const resolve = LABEL_RESOLVERS[layerTitle];
+  return resolve ? resolve(attributes) : "";
 }

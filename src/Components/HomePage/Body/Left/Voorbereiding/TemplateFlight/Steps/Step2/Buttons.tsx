@@ -5,7 +5,8 @@ import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
+import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
 
 export default function Buttons({
   setOpenFilter,
@@ -30,15 +31,14 @@ export default function Buttons({
   const { resetFeatures } = useResetFeatures();
   const { withLog, labels } = useWizardButtons("Second step");
 
-  const removeGraphics = () => {
-    selectedGraphics.forEach((g) => mapView?.graphics.remove(g));
-    setSelectedGraphics([]);
-
-    if (hoveredGraphic) {
-      mapView?.graphics.remove(hoveredGraphic);
-      setHoveredGraphic(null);
-    }
-  };
+  const removeGraphics = () =>
+    clearMapSelectionGraphics({
+      mapView,
+      selectedGraphics,
+      setSelectedGraphics,
+      hoveredGraphic,
+      setHoveredGraphic,
+    });
 
   const handleNext = () => {
     setStep(step + 1);
@@ -70,22 +70,14 @@ export default function Buttons({
     ]);
 
   return (
-    <WizardButtonBar
-      buttons={[
-        {
-          label: labels.vorige,
-          onClick: withLog("User clicked 'Previous' button", handlePrevious),
-        },
-        {
-          label: labels.filteren,
-          onClick: withLog("User clicked 'Filter' button", () => setOpenFilter(true)),
-        },
-        { label: labels.volgende, onClick: withLog("User clicked 'Next' button", handleNext) },
-        {
-          label: labels.annuleren,
-          onClick: withLog("User clicked 'Cancel' button", handleCancelClick),
-        },
-      ]}
+    <FilterStepWizardButtons
+      labels={labels}
+      withLog={withLog}
+      onPrevious={handlePrevious}
+      previousLogMessage="User clicked 'Previous' button"
+      onFilter={() => setOpenFilter(true)}
+      onNext={handleNext}
+      onCancel={handleCancelClick}
     />
   );
 }

@@ -12,6 +12,16 @@ export function useTimeRange(regioId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const resolveFetchError = (err: unknown): string =>
+    err instanceof Error ? err.message : String(err);
+
+  const applyTimeRange = (data: TimeRangeResult) => {
+    setRange({
+      from: data.from ?? null,
+      to: data.to ?? null,
+    });
+  };
+
   const fetchTimeRange = useCallback(async () => {
     if (!regioId) {
       setLoading(false);
@@ -24,13 +34,10 @@ export function useTimeRange(regioId: string | undefined) {
       const res = await axios.get<TimeRangeResult>(url, {
         params: { regio_id: regioId },
       });
-      setRange({
-        from: res.data.from ?? null,
-        to: res.data.to ?? null,
-      });
+      applyTimeRange(res.data);
     } catch (err) {
       console.error("Failed to fetch time range:", err);
-      setError(err instanceof Error ? err.message : String(err));
+      setError(resolveFetchError(err));
     } finally {
       setLoading(false);
     }

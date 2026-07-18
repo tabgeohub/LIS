@@ -11,6 +11,29 @@ type CoordSetter = (coords: {
   longitude: number;
 }) => void;
 
+function hitHasFeature(hit: __esri.HitTestResult): boolean {
+  return hit.results.some(
+    (result) => (result as __esri.GraphicHit).graphic
+  );
+}
+
+function removeStalePointGraphic(input: {
+  mapView: __esri.MapView;
+  currentPoint: { x: number; y: number };
+}) {
+  if (input.currentPoint.x === 0 || input.currentPoint.y === 0) return;
+
+  const stale = input.mapView.graphics
+    .toArray()
+    .find(
+      (graphic) =>
+        graphic.geometry?.type === "point" &&
+        graphic.geometry.x === input.currentPoint.x &&
+        graphic.geometry.y === input.currentPoint.y
+    );
+  if (stale) input.mapView.graphics.remove(stale);
+}
+
 export async function handleDeletePointEmptyMapClick(input: {
   event: __esri.ViewClickEvent;
   mapView: __esri.MapView;
@@ -22,12 +45,11 @@ export async function handleDeletePointEmptyMapClick(input: {
   if (!isValidMapClickPoint(input.event.mapPoint)) return;
 
   const hit = await input.mapView.hitTest(input.event);
-  const hasFeature = hit.results.some(
-    (result) => (result as __esri.GraphicHit).graphic
-  );
-  if (hasFeature) return;
+  if (hitHasFeature(hit)) return;
 
-  const { longitude, latitude } = input.event.mapPoint!;
+  const mapPoint = input.event.mapPoint!;
+  const longitude = Number(mapPoint.longitude);
+  const latitude = Number(mapPoint.latitude);
   const transformed = applyWgs84MapClickCoords({ longitude, latitude });
 
   input.setCurrentPoint({ x: longitude, y: latitude });
@@ -38,17 +60,7 @@ export async function handleDeletePointEmptyMapClick(input: {
     longitude,
   });
 
-  if (input.currentPoint.x !== 0 && input.currentPoint.y !== 0) {
-    const stale = input.mapView.graphics
-      .toArray()
-      .find(
-        (graphic) =>
-          graphic.geometry?.type === "point" &&
-          graphic.geometry.x === input.currentPoint.x &&
-          graphic.geometry.y === input.currentPoint.y
-      );
-    if (stale) input.mapView.graphics.remove(stale);
-  }
+  removeStalePointGraphic(input);
 
   input.redGraphicsLayer.removeAll();
   input.redGraphicsLayer.add(createPoint(longitude, latitude));

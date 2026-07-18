@@ -23,13 +23,17 @@ export function logLoginFailure({
   code,
   step2Kind,
 }: LoginFailureLog) {
-  logAuthSecurityEvent("auth2.login.failure", {
-    status,
-    code,
-    otpUsed,
-    ...(step2Kind ? { step2Kind } : {}),
-    message: (error as Error)?.message,
-  }, req);
+  logAuthSecurityEvent({
+    event: "auth2.login.failure",
+    meta: {
+      status,
+      code,
+      otpUsed,
+      ...(step2Kind ? { step2Kind } : {}),
+      message: (error as Error)?.message,
+    },
+    req,
+  });
 }
 
 type Step2OtpFailureInput = {

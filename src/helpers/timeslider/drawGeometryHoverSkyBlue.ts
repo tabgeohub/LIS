@@ -53,12 +53,13 @@ export function createSkyBluePolylineGraphic(
   });
 }
 
-export function drawGeometryHoverSkyBlue(
-  layer: __esri.GraphicsLayer,
-  geometry: FinishedGeometryType,
-  path: number[][],
-  isPolygon: boolean
-) {
+export function drawGeometryHoverSkyBlue(input: {
+  layer: __esri.GraphicsLayer;
+  geometry: FinishedGeometryType;
+  path: number[][];
+  isPolygon: boolean;
+}) {
+  const { layer, geometry, path, isPolygon } = input;
   if (isPolygon && path.length >= 3) {
     layer.add(createSkyBluePolygonGraphic(path, geometry.id));
     return;

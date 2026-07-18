@@ -25,17 +25,21 @@ export function toGeometryFlag(value: unknown): number | null {
   return value !== undefined ? (value ? 1 : 0) : null;
 }
 
+function coalesceNull(value: unknown): unknown {
+  return value ?? null;
+}
+
 export function buildGeometryMetadataValues(
   input: GeometryMetadataInput,
   geometryId: number
 ): unknown[] {
   return [
-    input.omschrijving ?? null,
-    input.organisatie ?? null,
+    coalesceNull(input.omschrijving),
+    coalesceNull(input.organisatie),
     toGeometryFlag(input.vertrouwelijk),
     toGeometryFlag(input.herhalen),
-    input.activiteit ?? null,
-    resolveSpecifiekLettenOp(input) ?? null,
+    coalesceNull(input.activiteit),
+    coalesceNull(resolveSpecifiekLettenOp(input)),
     geometryId,
   ];
 }

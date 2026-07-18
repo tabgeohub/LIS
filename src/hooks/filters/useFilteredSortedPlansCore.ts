@@ -37,22 +37,22 @@ export function useFilteredSortedPlans({
 }
 
 /** Bind store filter fields to useFilteredSortedPlans (shared by VluchtenZoeken / CreateReport). */
-export function useBindFilteredSortedPlans(
-  plans: FinishedFlightPlanType[] | undefined,
-  filterText: string,
+export function useBindFilteredSortedPlans(input: {
+  plans: FinishedFlightPlanType[] | undefined;
+  filterText: string;
   source: {
     periode: string;
     dateFrom: string;
     dateTo: string;
     setFilteredPlans: (plans: FinishedFlightPlanType[]) => void;
-  }
-) {
+  };
+}) {
   useFilteredSortedPlans({
-    plans,
-    filterText,
-    periodFilter: source.periode,
-    dateFrom: source.dateFrom,
-    dateTo: source.dateTo,
-    setFilteredPlans: source.setFilteredPlans,
+    plans: input.plans,
+    filterText: input.filterText,
+    periodFilter: input.source.periode,
+    dateFrom: input.source.dateFrom,
+    dateTo: input.source.dateTo,
+    setFilteredPlans: input.source.setFilteredPlans,
   });
 }

@@ -21,20 +21,33 @@ export function formatPopupFieldName(key: string) {
     .join(" ");
 }
 
+function formatPopupNumber(value: number): string {
+  if (value > 1_000_000_000_000) {
+    return new Date(value).toLocaleString("nl-NL");
+  }
+  return value.toString();
+}
+
+function formatPopupString(value: string): string {
+  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return new Date(value).toLocaleString("nl-NL");
+  }
+  return value;
+}
+
+function formatPopupObject(value: unknown): string {
+  if (typeof value === "object") {
+    return JSON.stringify(value, null, 2);
+  }
+  return String(value);
+}
+
 export function formatPopupValue(value: unknown): string {
   if (value == null) return "";
   if (typeof value === "boolean") return value ? "Ja" : "Nee";
-  if (typeof value === "number") {
-    return value > 1_000_000_000_000
-      ? new Date(value).toLocaleString("nl-NL")
-      : value.toString();
-  }
-  if (typeof value === "string") {
-    return /^\d{4}-\d{2}-\d{2}/.test(value)
-      ? new Date(value).toLocaleString("nl-NL")
-      : value;
-  }
-  return typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+  if (typeof value === "number") return formatPopupNumber(value);
+  if (typeof value === "string") return formatPopupString(value);
+  return formatPopupObject(value);
 }
 
 export function buildPopupDisplayAttributes(

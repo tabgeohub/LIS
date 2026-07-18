@@ -2,7 +2,7 @@ import { MutableRefObject, useEffect } from "react";
 import type { FinishedPointType } from "Types/finished_plans";
 import { restoreOriginalPointGraphic } from "./pointMapGraphics";
 
-function runEditPointCleanup(input: {
+type EditPointCleanupInput = {
   mapView: __esri.MapView | null;
   redGraphicsLayer: __esri.GraphicsLayer | null;
   pointsGraphicsLayer: __esri.GraphicsLayer | null;
@@ -14,7 +14,9 @@ function runEditPointCleanup(input: {
     ycoordinaat_rd: number;
   } | null>;
   clickHandleRef: MutableRefObject<__esri.Handle | null>;
-}) {
+};
+
+function runEditPointCleanup(input: EditPointCleanupInput) {
   input.clickHandleRef.current?.remove();
   input.redGraphicsLayer?.removeAll();
   const original = input.originalCoordsRef.current;
@@ -33,19 +35,7 @@ function runEditPointCleanup(input: {
   });
 }
 
-export function useEditPointCleanup(input: {
-  mapView: __esri.MapView | null;
-  redGraphicsLayer: __esri.GraphicsLayer | null;
-  pointsGraphicsLayer: __esri.GraphicsLayer | null;
-  selectedPoint: FinishedPointType | null;
-  originalCoordsRef: MutableRefObject<{
-    longitude: number;
-    latitude: number;
-    xcoordinaat_rd: number;
-    ycoordinaat_rd: number;
-  } | null>;
-  clickHandleRef: MutableRefObject<__esri.Handle | null>;
-}) {
+export function useEditPointCleanup(input: EditPointCleanupInput) {
   useEffect(() => () => runEditPointCleanup(input), [
     input.redGraphicsLayer,
     input.mapView,

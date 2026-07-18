@@ -12,10 +12,14 @@ export function useFilterAndSortPlans(
   const { periode, dateFrom, dateTo, setFilteredPlans } =
     useFinishedPlansState();
 
-  useBindFilteredSortedPlans(plans, filterTerm, {
-    periode,
-    dateFrom,
-    dateTo,
-    setFilteredPlans,
+  useBindFilteredSortedPlans({
+    plans,
+    filterText: filterTerm,
+    source: {
+      periode,
+      dateFrom,
+      dateTo,
+      setFilteredPlans,
+    },
   });
 }

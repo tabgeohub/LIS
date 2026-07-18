@@ -7,6 +7,31 @@ import {
   type PlanBoundingBoxPoint,
 } from "./planBoundingBoxTypes";
 
+function coalesceSymbolOption<T>(value: T | undefined, fallback: T): T {
+  return value ?? fallback;
+}
+
+function buildBoundingBoxFillSymbol(
+  symbolOptions: NonNullable<CreatePlanBoundingBoxGraphicOptions["symbolOptions"]>
+) {
+  return new SimpleFillSymbol({
+    color: coalesceSymbolOption(
+      symbolOptions.fillColor,
+      DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.fillColor
+    ),
+    outline: {
+      color: coalesceSymbolOption(
+        symbolOptions.outlineColor,
+        DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.outlineColor
+      ),
+      width: coalesceSymbolOption(
+        symbolOptions.outlineWidth,
+        DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.outlineWidth
+      ),
+    },
+  });
+}
+
 /** Graphic outline around all points in a flight plan. */
 export function buildPlanBoundingBoxGraphic(
   points: PlanBoundingBoxPoint[] | null | undefined,
@@ -17,21 +42,9 @@ export function buildPlanBoundingBoxGraphic(
 
   const { symbolOptions = {}, attributes = {} } = options;
 
-  const fillSymbol = new SimpleFillSymbol({
-    color: symbolOptions.fillColor ?? DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.fillColor,
-    outline: {
-      color:
-        symbolOptions.outlineColor ??
-        DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.outlineColor,
-      width:
-        symbolOptions.outlineWidth ??
-        DEFAULT_PLAN_BBOX_SYMBOL_OPTIONS.outlineWidth,
-    },
-  });
-
   return new Graphic({
     geometry: polygon,
-    symbol: fillSymbol,
+    symbol: buildBoundingBoxFillSymbol(symbolOptions),
     attributes,
   });
 }

@@ -2,6 +2,7 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useEffect } from "react";
 import useLogAction from "hooks/useLogAction";
+import { ParentItemRow } from "./ParentItemRow";
 
 export const LayerItem = ({
   layer,
@@ -80,11 +81,7 @@ export const LayerItem = ({
   }, [isDisabled]);
 
   return (
-    <div
-      className={`flex relative items-center justify-between border-b px-3 hover:bg-gray-100 transition-colors ${
-        isDisabled ? "opacity-60 pointer-events-none" : "cursor-pointer"
-      }`}
-    >
+    <ParentItemRow isDisabled={isDisabled}>
       <span className="w-[26px]" />
 
       <label
@@ -103,6 +100,6 @@ export const LayerItem = ({
 
         <span>{layer.title}</span>
       </label>
-    </div>
+    </ParentItemRow>
   );
 };

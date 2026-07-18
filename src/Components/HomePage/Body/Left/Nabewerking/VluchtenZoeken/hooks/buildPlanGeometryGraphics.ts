@@ -22,6 +22,19 @@ function normalizeGeometryType(
   return undefined;
 }
 
+function coalesceUndefined<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
+function planGeometryAttributes(geometry: FinishedGeometryType) {
+  return {
+    geometryId: geometry.id,
+    geometryType: coalesceUndefined(geometry.geometry_type),
+    omschrijving: coalesceUndefined(geometry.geometry_omschrijving),
+    type: "geometry" as const,
+  };
+}
+
 export function graphicFromPlanGeometry(
   geometry: FinishedGeometryType
 ): __esri.Graphic | null {
@@ -31,17 +44,12 @@ export function graphicFromPlanGeometry(
     {
       id: geometry.id,
       geometry_type: normalizeGeometryType(geometry.geometry_type),
-      geometry_omschrijving: geometry.geometry_omschrijving ?? undefined,
+      geometry_omschrijving: coalesceUndefined(geometry.geometry_omschrijving),
       points: geometry.points,
     },
     {
       transformCoordinates: transformPlanGeometryPoint,
-      attributes: {
-        geometryId: geometry.id,
-        geometryType: geometry.geometry_type ?? undefined,
-        omschrijving: geometry.geometry_omschrijving ?? undefined,
-        type: "geometry",
-      },
+      attributes: planGeometryAttributes(geometry),
     }
   );
 }

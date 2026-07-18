@@ -2,14 +2,12 @@ import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFli
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Vluchtnummer from "./Vluchtnummer";
 import FlightPlanStandardFields, {
-  flightPlanStandardSelectProps,
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { useFlightPlanStandardSelectProps } from "hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function FormInputs() {
-  const { pilootOptions, waarnemerOptions, typeLuchtvaartuigOptions } =
-    useFlightPlanFormSelectOptions();
+  const selectProps = useFlightPlanStandardSelectProps();
   const store = useReuseFlightPlan();
   const fields = pickFlightPlanFormFields(store);
 
@@ -19,11 +17,7 @@ export default function FormInputs() {
     <FlightPlanStandardFields
       className="py-4 px-2 space-y-3"
       fields={fields}
-      {...flightPlanStandardSelectProps({
-        pilootOptions,
-        waarnemerOptions,
-        typeLuchtvaartuigOptions,
-      })}
+      {...selectProps}
       header={<Vluchtnummer />}
     />
   );

@@ -53,6 +53,22 @@ export type ClassifyStep2DebugContext = {
   loginStep: "otp" | "password";
 };
 
+const INVALID_CREDENTIAL_FRAGMENTS = [
+  "invalid credentials",
+  "invalid user credentials",
+  "invaliduser credentials",
+] as const;
+
+function hasInvalidCredentialsSignal(normalized: string): boolean {
+  return INVALID_CREDENTIAL_FRAGMENTS.some((fragment) =>
+    normalized.includes(fragment)
+  );
+}
+
+function isAmbiguousGrantError(errorCode: string | undefined): boolean {
+  return errorCode === "invalid_grant" || errorCode === "unauthorized_client";
+}
+
 export function classifyGrantFailure(
   error: unknown,
   options: { otpWasSent: boolean }
@@ -68,18 +84,7 @@ export function classifyGrantFailure(
     return "invalid_otp";
   }
 
-  if (
-    details.error === "invalid_grant" ||
-    details.error === "unauthorized_client"
-  ) {
-    return "ambiguous_invalid_grant";
-  }
-
-  if (
-    normalized.includes("invalid credentials") ||
-    normalized.includes("invalid user credentials") ||
-    normalized.includes("invaliduser credentials")
-  ) {
+  if (isAmbiguousGrantError(details.error) || hasInvalidCredentialsSignal(normalized)) {
     return "ambiguous_invalid_grant";
   }
 
@@ -95,6 +100,19 @@ export function classifyGrantFailure(
  *
  * Step 1 never validates password for OTP users.
  */
+function decideStep2FailureKind(
+  explicitKind: GrantFailureKind,
+  normalized: string
+): Step2FailureKind {
+  if (explicitKind === "invalid_otp") return "otp_incorrect";
+  if (hasExplicitPasswordRejectedSignal(normalized)) return "password_incorrect";
+  return "password_or_otp_incorrect";
+}
+
+function coalesceDebugField<T>(value: T | null | undefined, fallback: T): T {
+  return value ?? fallback;
+}
+
 export function classifyStep2OtpLoginFailure(
   originalError: unknown,
   debugContext?: ClassifyStep2DebugContext
@@ -102,18 +120,12 @@ export function classifyStep2OtpLoginFailure(
   const explicitKind = classifyGrantFailure(originalError, { otpWasSent: true });
   const realGrant = describeGrantErrorForClassifierDebug(originalError);
   const normalized = normalizeGrantError(extractGrantError(originalError));
-
-  const result: Step2FailureKind =
-    explicitKind === "invalid_otp"
-      ? "otp_incorrect"
-      : hasExplicitPasswordRejectedSignal(normalized)
-        ? "password_incorrect"
-        : "password_or_otp_incorrect";
+  const result = decideStep2FailureKind(explicitKind, normalized);
 
   logAuth2ClassifierDebug("auth2.login.step2_classify", {
-    hasOtp: debugContext?.hasOtp ?? null,
-    otpWasSent: debugContext?.otpWasSent ?? true,
-    loginStep: debugContext?.loginStep ?? "otp",
+    hasOtp: coalesceDebugField(debugContext?.hasOtp, null),
+    otpWasSent: coalesceDebugField(debugContext?.otpWasSent, true),
+    loginStep: coalesceDebugField(debugContext?.loginStep, "otp"),
     realGrantErrorCode: realGrant.errorCode,
     realGrantErrorDescription: realGrant.errorDescription,
     explicitGrantFailureKind: explicitKind,
@@ -121,9 +133,12 @@ export function classifyStep2OtpLoginFailure(
     responseStatus: result,
   });
 
-  logAuthSecurityEvent("auth2.login.step2_classify", {
-    explicitKind,
-    result,
+  logAuthSecurityEvent({
+    event: "auth2.login.step2_classify",
+    meta: {
+      explicitKind,
+      result,
+    },
   });
 
   return result;

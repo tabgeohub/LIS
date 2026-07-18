@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { missingFields } from "../../helpers/http/routeResponses";
-import { getMissingFields } from "../../helpers/http/validateBody";
+import { rejectIfMissingFields } from "../../helpers/http/rejectIfMissingFields";
 import {
   buildAttachmentLocation,
   insertAttachmentRow,
@@ -13,10 +12,13 @@ export async function createAttachment(
   const { url, pointId, attachmentId, taken_at, long, lat } = req.body;
 
   if (
-    getMissingFields(req.body, ["pointId", "attachmentId", "taken_at", "url"])
-      .length > 0
+    rejectIfMissingFields(res, req.body, [
+      "pointId",
+      "attachmentId",
+      "taken_at",
+      "url",
+    ])
   ) {
-    missingFields(res);
     return;
   }
 

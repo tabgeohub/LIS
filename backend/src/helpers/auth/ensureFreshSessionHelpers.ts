@@ -31,11 +31,11 @@ export async function refreshSessionTokens(
     req.session.auth = { ...auth, tokenSet: refreshed };
     return { ok: true, refreshed: true };
   } catch (error) {
-    logAuthSecurityEvent(
-      "auth2.refresh.failed",
-      { message: (error as Error)?.message },
-      req
-    );
+    logAuthSecurityEvent({
+      event: "auth2.refresh.failed",
+      meta: { message: (error as Error)?.message },
+      req,
+    });
     delete req.session.auth;
     return { ok: false, reason: "refresh_failed" };
   }

@@ -69,19 +69,33 @@ async function executeReturningUpdate(input: {
   }
 }
 
-export async function runReturningUpdateById(
-  input: RunReturningUpdateByIdInput
-): Promise<void> {
-  const { res, id, runQuery, config } = input;
-
-  if (!requireRouteId(res, id)) {
+async function runIdGatedReturningUpdate(input: {
+  res: Response;
+  id: unknown;
+  runQuery: () => Promise<QueryResult>;
+  config: UpdateExecutionConfig;
+  requireReturnedRow: boolean;
+}): Promise<void> {
+  if (!requireRouteId(input.res, input.id)) {
     return;
   }
 
   await executeReturningUpdate({
-    res,
-    runQuery,
-    config,
+    res: input.res,
+    runQuery: input.runQuery,
+    config: input.config,
+    requireReturnedRow: input.requireReturnedRow,
+  });
+}
+
+export async function runReturningUpdateById(
+  input: RunReturningUpdateByIdInput
+): Promise<void> {
+  await runIdGatedReturningUpdate({
+    res: input.res,
+    id: input.id,
+    runQuery: input.runQuery,
+    config: input.config,
     requireReturnedRow: true,
   });
 }
@@ -101,16 +115,11 @@ export type RunStatusUpdateInput = {
 };
 
 export async function runStatusUpdate(input: RunStatusUpdateInput): Promise<void> {
-  const { res, id, runQuery, config } = input;
-
-  if (!requireRouteId(res, id)) {
-    return;
-  }
-
-  await executeReturningUpdate({
-    res,
-    runQuery,
-    config,
-    requireReturnedRow: Boolean(config.notFoundMessage),
+  await runIdGatedReturningUpdate({
+    res: input.res,
+    id: input.id,
+    runQuery: input.runQuery,
+    config: input.config,
+    requireReturnedRow: Boolean(input.config.notFoundMessage),
   });
 }

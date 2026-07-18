@@ -7,27 +7,37 @@ import { handlePathPointMapClick } from "./handlePathPointMapClick";
 
 const MAX_CLICK_DISTANCE_M = 20;
 
+function canAttachPathClick(input: {
+  mapView: __esri.MapView | null | undefined;
+  redGraphicsLayer: __esri.GraphicsLayer | null | undefined;
+  selectedPlan: unknown;
+}): boolean {
+  return !!input.mapView && !!input.redGraphicsLayer && !!input.selectedPlan;
+}
+
 export default function usePathPointHandlerClick() {
   const { selectedPlan } = useFinishedPlansState();
   const { mapView, redGraphicsLayer } = useMapViewState();
   const { setSelectedPathPoint } = usePathPointState();
 
   useEffect(() => {
-    if (!mapView || !redGraphicsLayer || !selectedPlan) return;
+    if (!canAttachPathClick({ mapView, redGraphicsLayer, selectedPlan })) {
+      return;
+    }
 
     const planPath = parsePlanPath((selectedPlan as { path?: unknown }).path);
     if (planPath.length === 0) return;
 
-    const map = mapView.map;
+    const map = mapView!.map;
     if (!map) return;
 
-    const handle = mapView.on("click", (event) => {
+    const handle = mapView!.on("click", (event) => {
       if (!redGraphicsLayer || !event.mapPoint) return;
 
       handlePathPointMapClick({
         map,
         redGraphicsLayer,
-        plan: selectedPlan,
+        plan: selectedPlan!,
         planPath,
         latitude: Number(event.mapPoint.latitude),
         longitude: Number(event.mapPoint.longitude),

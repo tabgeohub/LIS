@@ -1,7 +1,34 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { parseTimesliderImageQuery } from "./parseTimesliderImageQuery";
+import {
+  parseTimesliderImageQuery,
+  type ParsedTimesliderQuery,
+} from "./parseTimesliderImageQuery";
+
+function buildQueryFields(parsed: ParsedTimesliderQuery) {
+  if (!parsed.ok) {
+    return {
+      ok: false as const,
+      from: "",
+      to: "",
+      itemId: 0,
+      kind: "point" as const,
+      planIdFromQuery: null,
+      queryReason: parsed.reason,
+    };
+  }
+
+  return {
+    ok: true as const,
+    from: parsed.from,
+    to: parsed.to,
+    itemId: parsed.id,
+    kind: parsed.kind,
+    planIdFromQuery: parsed.planId,
+    queryReason: "",
+  };
+}
 
 export function useTimesliderQueryContext() {
   const [searchParams] = useSearchParams();
@@ -10,18 +37,12 @@ export function useTimesliderQueryContext() {
     [searchParams]
   );
   const { user } = useAuth();
-  const ok = parsed.ok;
+  const fields = buildQueryFields(parsed);
 
   return {
-    ok,
-    from: ok ? parsed.from : "",
-    to: ok ? parsed.to : "",
-    itemId: ok ? parsed.id : 0,
-    kind: ok ? parsed.kind : ("point" as const),
-    planIdFromQuery: ok ? parsed.planId : null,
+    ...fields,
     regioId: user?.role,
-    needsAuth: ok && !user?.role,
-    queryReason: ok ? "" : parsed.reason,
+    needsAuth: fields.ok && !user?.role,
     user,
   };
 }

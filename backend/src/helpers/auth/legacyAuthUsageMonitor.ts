@@ -6,38 +6,41 @@ const LEGACY_AUTH_PATHS = new Set([
   "/auth/desktop-ok",
 ]);
 
+function logLegacyUsage(
+  req: Parameters<RequestHandler>[0],
+  extra: Record<string, string> = {}
+) {
+  logAuthSecurityEvent({
+    event: "auth.legacy.usage",
+    meta: { endpoint: req.path, method: req.method, ...extra },
+    req,
+  });
+}
+
+function isDesktopLoginGet(req: Parameters<RequestHandler>[0]): boolean {
+  if (req.path !== "/auth/login" || req.method !== "GET") return false;
+  return String(req.query.mode || "").toLowerCase() === "desktop";
+}
+
+function isLegacyPathGet(req: Parameters<RequestHandler>[0]): boolean {
+  return (
+    LEGACY_AUTH_PATHS.has(req.path) &&
+    req.method === "GET" &&
+    req.path !== "/auth/login"
+  );
+}
+
 /**
  * Logs usage of legacy auth endpoints for deprecation planning (L5).
  * Does not block requests — monitoring only.
  */
 export const legacyAuthUsageMonitor: RequestHandler = (req, _res, next) => {
-  const path = req.path;
-
-  if (path === "/auth/login-direct" && req.method === "POST") {
-    logAuthSecurityEvent(
-      "auth.legacy.usage",
-      { endpoint: path, method: req.method },
-      req
-    );
-  }
-
-  if (path === "/auth/login" && req.method === "GET") {
-    const mode = String(req.query.mode || "").toLowerCase();
-    if (mode === "desktop") {
-      logAuthSecurityEvent(
-        "auth.legacy.usage",
-        { endpoint: path, method: req.method, mode: "desktop" },
-        req
-      );
-    }
-  }
-
-  if (LEGACY_AUTH_PATHS.has(path) && req.method === "GET" && path !== "/auth/login") {
-    logAuthSecurityEvent(
-      "auth.legacy.usage",
-      { endpoint: path, method: req.method },
-      req
-    );
+  if (req.path === "/auth/login-direct" && req.method === "POST") {
+    logLegacyUsage(req);
+  } else if (isDesktopLoginGet(req)) {
+    logLegacyUsage(req, { mode: "desktop" });
+  } else if (isLegacyPathGet(req)) {
+    logLegacyUsage(req);
   }
 
   next();

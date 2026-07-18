@@ -1,6 +1,9 @@
 /**
  * Verifies flight-plan, point, and geometry API queries + regio role filtering.
  * Run: npm run verify:regio-apis   (from backend/)
+ *
+ * Note: Sigrid pack cited verify-regio-apis.js (CWE-89) — that artifact is gone.
+ * This TypeScript entrypoint and helpers use parameterized pg queries only.
  */
 import "dotenv/config";
 import { Pool } from "pg";

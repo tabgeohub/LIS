@@ -13,6 +13,39 @@ export function filterFinishedPlansContainingItem(input: {
   });
 }
 
+function pointTitle(
+  plan: FinishedFlightPlanType,
+  itemId: number
+): string | null {
+  const point = plan.points_data?.find((x) => x.id === itemId);
+  if (!point) return null;
+  return point.omschrijving?.trim() || `Punt ${itemId}`;
+}
+
+function firstNonEmpty(...values: Array<string | null | undefined>): string {
+  for (const value of values) {
+    const trimmed = value?.trim();
+    if (trimmed) return trimmed;
+  }
+  return "";
+}
+
+function geometryTitle(
+  plan: FinishedFlightPlanType,
+  itemId: number
+): string | null {
+  const geometry = plan.geometries?.find((x) => x.id === itemId);
+  if (!geometry) return null;
+  return (
+    firstNonEmpty(geometry.geometry_omschrijving, geometry.geometry_type) ||
+    `Geometrie ${itemId}`
+  );
+}
+
+function fallbackItemTitle(kind: "point" | "geometry", itemId: number): string {
+  return kind === "point" ? `Punt ${itemId}` : `Geometrie ${itemId}`;
+}
+
 /** Uses first occurrence of the item across plans (same idea as selectedPlansPointsList). */
 export function getItemDisplayTitle(input: {
   plans: FinishedFlightPlanType[];
@@ -20,18 +53,11 @@ export function getItemDisplayTitle(input: {
   itemId: number;
 }): string {
   for (const plan of input.plans) {
-    if (input.kind === "point") {
-      const p = plan.points_data?.find((x) => x.id === input.itemId);
-      if (p) return p.omschrijving?.trim() || `Punt ${input.itemId}`;
-    } else {
-      const g = plan.geometries?.find((x) => x.id === input.itemId);
-      if (g)
-        return (
-          g.geometry_omschrijving?.trim() ||
-          g.geometry_type?.trim() ||
-          `Geometrie ${input.itemId}`
-        );
-    }
+    const title =
+      input.kind === "point"
+        ? pointTitle(plan, input.itemId)
+        : geometryTitle(plan, input.itemId);
+    if (title) return title;
   }
-  return input.kind === "point" ? `Punt ${input.itemId}` : `Geometrie ${input.itemId}`;
+  return fallbackItemTitle(input.kind, input.itemId);
 }

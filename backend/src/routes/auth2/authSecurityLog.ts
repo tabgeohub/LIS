@@ -7,20 +7,22 @@ import {
 
 export { hashUsername } from "./authSecurityLogHelpers";
 
-export function logAuthSecurityEvent(
-  event: string,
-  meta: Record<string, unknown> = {},
-  req?: Request
-): void {
-  const safeMeta = sanitizeAuthSecurityMeta(meta);
-  if (req) {
-    safeMeta.ip = getClientIp(req);
+export type LogAuthSecurityEventInput = {
+  event: string;
+  meta?: Record<string, unknown>;
+  req?: Request;
+};
+
+export function logAuthSecurityEvent(input: LogAuthSecurityEventInput): void {
+  const safeMeta = sanitizeAuthSecurityMeta(input.meta ?? {});
+  if (input.req) {
+    safeMeta.ip = getClientIp(input.req);
   }
 
   console.warn(
     JSON.stringify({
       type: "auth2.security",
-      event,
+      event: input.event,
       ...safeMeta,
       ts: new Date().toISOString(),
     })

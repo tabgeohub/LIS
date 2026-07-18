@@ -14,22 +14,31 @@ function firstQueryValue(value: unknown): string | undefined {
   return String(value);
 }
 
+function rolesFromClaims(claims: unknown): string[] | undefined {
+  return (claims as { realm_access?: { roles?: string[] } } | null)
+    ?.realm_access?.roles;
+}
+
+function idTokenClaims(tokenSet: {
+  claims?: () => unknown;
+}): unknown {
+  return typeof tokenSet.claims === "function" ? tokenSet.claims() : {};
+}
+
 export function getSessionRealmRoles(req: Request): string[] {
   const auth = req.session?.auth;
-  if (!auth?.tokenSet?.access_token) {
+  const accessToken = auth?.tokenSet?.access_token;
+  if (!accessToken) {
     return [];
   }
 
-  const idClaims =
-    typeof auth.tokenSet.claims === "function" ? auth.tokenSet.claims() : {};
   const accessClaims = decodeJwtPayload<{
     realm_access?: { roles?: string[] };
-  }>(auth.tokenSet.access_token);
+  }>(accessToken);
 
   return (
-    accessClaims?.realm_access?.roles ??
-    (idClaims as { realm_access?: { roles?: string[] } })?.realm_access
-      ?.roles ??
+    rolesFromClaims(accessClaims) ??
+    rolesFromClaims(idTokenClaims(auth.tokenSet)) ??
     []
   );
 }

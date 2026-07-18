@@ -53,9 +53,12 @@ async function userHasOtpCredential(
   });
 
   if (!response.ok) {
-    logAuthSecurityEvent("auth2.lookup.credentials_failed", {
-      userId,
-      status: response.status,
+    logAuthSecurityEvent({
+      event: "auth2.lookup.credentials_failed",
+      meta: {
+        userId,
+        status: response.status,
+      },
     });
     return null;
   }
@@ -81,9 +84,12 @@ export async function lookupKeycloakUser(
     const hasOtp = await userHasOtpCredential(req, resolved.user.id);
     return { ok: true, userId: resolved.user.id, hasOtp };
   } catch (error) {
-    logAuthSecurityEvent("auth2.lookup.error", {
-      usernameHash: hashUsername(username),
-      message: (error as Error)?.message,
+    logAuthSecurityEvent({
+      event: "auth2.lookup.error",
+      meta: {
+        usernameHash: hashUsername(username),
+        message: (error as Error)?.message,
+      },
     });
     return { ok: false, reason: "lookup_unavailable" };
   }

@@ -5,6 +5,8 @@ import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFin
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { clearFinishedPlanStep2Layers } from "./clearFinishedPlanStep2Layers";
+import { runFinishedPlanStep2ExitCleanup } from "./runFinishedPlanStep2ExitCleanup";
 
 export default function Buttons({
   setAction,
@@ -23,6 +25,21 @@ export default function Buttons({
   } = useMapViewState();
   const handleClear = useHandleClearFinishedPlan();
 
+  const clearOverlayLayers = () =>
+    clearFinishedPlanStep2Layers({
+      graphicsLayer,
+      graphicsLayerHover,
+      redGraphicsLayer,
+      geometriesGraphicsLayer,
+    });
+
+  const exitCleanup = () =>
+    runFinishedPlanStep2ExitCleanup({
+      clearOverlayLayers,
+      resetFeatures,
+      handleClear,
+    });
+
   async function handlePrevious() {
     if (!mapView) return;
 
@@ -31,23 +48,13 @@ export default function Buttons({
       layers.forEach((layer) => mapView.map?.remove(layer));
     }
 
-    graphicsLayer?.removeAll();
-    graphicsLayerHover?.removeAll();
-    redGraphicsLayer?.removeAll();
-    geometriesGraphicsLayer?.removeAll();
-    resetFeatures();
-    handleClear();
+    exitCleanup();
     setStep(1);
   }
 
   function handleCancel() {
     setStep(1);
-    graphicsLayer?.removeAll();
-    graphicsLayerHover?.removeAll();
-    redGraphicsLayer?.removeAll();
-    geometriesGraphicsLayer?.removeAll();
-    resetFeatures();
-    handleClear();
+    exitCleanup();
   }
 
   const step2 = content.nabewerking.vluchtenZoeken.step2;

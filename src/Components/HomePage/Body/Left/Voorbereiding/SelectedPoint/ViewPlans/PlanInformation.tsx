@@ -1,6 +1,7 @@
 import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
 import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
+import { goBackFromPlanInformation } from "Components/HomePage/Body/Left/Common/goBackFromPlanInformation";
 import Images from "./Images";
 
 export default function PlanInformation({
@@ -13,10 +14,7 @@ export default function PlanInformation({
       buttons={
         <>
           <button
-            onClick={() => {
-              setStep(1);
-              setSelectedPlan(null);
-            }}
+            onClick={() => goBackFromPlanInformation(setStep, setSelectedPlan)}
             className="gray-button"
           >
             Vorige

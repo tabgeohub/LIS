@@ -42,21 +42,25 @@ export function buildLogInsertQuery(): string {
       `;
 }
 
+function orFallback<T>(value: unknown, fallback: T): T {
+  return (value as T) || fallback;
+}
+
 export function buildLogInsertValues(
   flightId: number,
   log: LogInsertInput
 ): unknown[] {
   return [
     flightId,
-    log.message || "",
-    log.userId || "",
-    log.userName || "",
-    log.userRole || "",
-    log.planId || 0,
-    log.pointId || 0,
-    log.date || "",
-    log.isOnline || false,
-    log.gpsConnected || false,
+    orFallback(log.message, ""),
+    orFallback(log.userId, ""),
+    orFallback(log.userName, ""),
+    orFallback(log.userRole, ""),
+    orFallback(log.planId, 0),
+    orFallback(log.pointId, 0),
+    orFallback(log.date, ""),
+    orFallback(log.isOnline, false),
+    orFallback(log.gpsConnected, false),
     JSON.stringify(log.oldData),
     JSON.stringify(log.newData),
     JSON.stringify(log.currentLocation),

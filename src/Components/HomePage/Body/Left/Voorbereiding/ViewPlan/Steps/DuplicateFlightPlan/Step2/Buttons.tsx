@@ -5,8 +5,7 @@ import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
-import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { assembleFlightPlanCreateAttributes } from "hooks/flightPlan/assembleFlightPlanCreateAttributes";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -29,11 +28,11 @@ export default function Buttons({
   const { labels } = useWizardButtons("View plan - Duplicate Step 2");
 
   const submitStep2 = () => {
-    const attributes = buildFlightPlanCreateAttributes({
-      fields: pickFlightPlanCreateFields(store),
+    const attributes = assembleFlightPlanCreateAttributes({
+      store,
       points: duplicatedFlightPlan?.points.flatMap((point) => point.id) ?? [],
       basemap: selectedBasemap,
-      layers: selectedLayers.join(","),
+      layers: selectedLayers,
       userId: user?.user_id,
       regioId: user.role,
     });

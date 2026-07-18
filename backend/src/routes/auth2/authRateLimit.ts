@@ -12,11 +12,17 @@ export type { Auth2RateLimiters } from "./authRateLimitHelpers";
 async function resolveAuth2RateLimitStore(): Promise<RedisStore | undefined> {
   const redisClient = await getRedisClient();
   if (!redisClient) {
-    logAuthSecurityEvent("auth2.rate_limit.store", { store: "memory" });
+    logAuthSecurityEvent({
+      event: "auth2.rate_limit.store",
+      meta: { store: "memory" },
+    });
     return undefined;
   }
 
-  logAuthSecurityEvent("auth2.rate_limit.store", { store: "redis" });
+  logAuthSecurityEvent({
+    event: "auth2.rate_limit.store",
+    meta: { store: "redis" },
+  });
   return new RedisStore({
     prefix: "lis:auth2:rl:",
     sendCommand: (...args: string[]) => redisClient.sendCommand(args),

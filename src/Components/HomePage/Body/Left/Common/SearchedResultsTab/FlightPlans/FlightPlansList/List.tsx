@@ -9,7 +9,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { showPlanSearchListHover } from "hooks/hover-click-handlers/planHoverClickHandlers";
+import { hoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
 
 export default function List({
   flightPlansData,
@@ -45,12 +45,12 @@ export default function List({
     useMapViewState();
 
   const HoveredPlan = (plan: FlightPlanType) => {
-    showPlanSearchListHover({
+    hoverFlightPlanFromOriginalMap({
       plan,
       mapView,
       graphicsLayerHover,
       graphicsLayer,
-      originalGraphic: originalGraphicsMap.current.get(String(plan.id)),
+      originalGraphicsMap,
     });
   };
 

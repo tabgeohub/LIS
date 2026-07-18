@@ -7,8 +7,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
-import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
-import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { assembleFlightPlanCreateAttributes } from "hooks/flightPlan/assembleFlightPlanCreateAttributes";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -45,11 +44,11 @@ export default function Buttons() {
       planGeometries: selectedPlan?.geometries ?? [],
     });
 
-    const newPlan = buildFlightPlanCreateAttributes({
-      fields: pickFlightPlanCreateFields(store),
+    const newPlan = assembleFlightPlanCreateAttributes({
+      store,
       points,
       basemap: selectedBasemap,
-      layers: selectedLayers.join(","),
+      layers: selectedLayers,
       userId: user.user_id,
       regioId: user.role,
       copiedFrom: selectedPlan?.id,

@@ -7,10 +7,7 @@ import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFli
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
-import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
-import { collectUniquePlanPointIds } from "hooks/flightPlan/collectUniquePlanPointIds";
-import { runFlightPlanCreateSuccess } from "hooks/flightPlan/runFlightPlanCreateSuccess";
+import { submitCollectedFlightPlanCreate } from "hooks/flightPlan/submitCollectedFlightPlanCreate";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -48,7 +45,9 @@ export default function Buttons({
   const { dbGeometries } = useGeometriesStore();
 
   const handleSubmit = () => {
-    const uniquePointIds = collectUniquePlanPointIds({
+    submitCollectedFlightPlanCreate({
+      create,
+      store,
       pointIds: [
         ...(Array.isArray(selectedPoints) ? selectedPoints : []),
         ...(Array.isArray(selectedPoints2) ? selectedPoints2 : []),
@@ -58,29 +57,17 @@ export default function Buttons({
         ...(Array.isArray(selectedGeometries2) ? selectedGeometries2 : []),
       ],
       geometries: dbGeometries,
-    });
-
-    const attributes = buildFlightPlanCreateAttributes({
-      fields: pickFlightPlanCreateFields(store),
-      points: uniquePointIds,
       basemap: basemapString,
-      layers: selectedLayers.join(","),
+      layers: selectedLayers,
       userId: user?.user_id,
       regioId: user?.role ?? "",
-    });
-
-    logStep("User clicked 'Save' button to save flight plan data", {
-      ...attributes,
-    });
-
-    create({
-      data: attributes,
-      onSuccess: () =>
-        runFlightPlanCreateSuccess({
-          onCleanup: () => {
-            clear();
-            clearGraphics();
-          },
+      onCleanup: () => {
+        clear();
+        clearGraphics();
+      },
+      beforeCreate: (attributes) =>
+        logStep("User clicked 'Save' button to save flight plan data", {
+          ...attributes,
         }),
     });
   };

@@ -21,18 +21,22 @@ export function parseTimesliderRange(
     : { minDate: maxDate, maxDate: minDate };
 }
 
-export function createTimesliderConversions(
-  minDate: Date,
-  maxDate: Date,
-  maxStep = SLIDER_PARTS
-) {
-  const totalMs = Math.max(1, differenceInMilliseconds(maxDate, minDate));
+export function createTimesliderConversions(input: {
+  minDate: Date;
+  maxDate: Date;
+  maxStep?: number;
+}) {
+  const maxStep = input.maxStep ?? SLIDER_PARTS;
+  const totalMs = Math.max(
+    1,
+    differenceInMilliseconds(input.maxDate, input.minDate)
+  );
   return {
     stepIndexToDate: (stepIndex: number) =>
-      new Date(minDate.getTime() + (stepIndex / maxStep) * totalMs),
+      new Date(input.minDate.getTime() + (stepIndex / maxStep) * totalMs),
     dateToStepIndex: (date: Date) => {
       const step = Math.round(
-        ((date.getTime() - minDate.getTime()) / totalMs) * maxStep
+        ((date.getTime() - input.minDate.getTime()) / totalMs) * maxStep
       );
       return Math.max(0, Math.min(maxStep, step));
     },

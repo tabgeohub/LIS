@@ -26,12 +26,6 @@ export function useEditPointCoordinateSubmit(input: {
     submitPointCoordinateUpdate({
       selectedPoint: input.selectedPoint,
       selectedPlan: input.selectedPlan,
-      coordinateSystem: input.values.coordinateSystem,
-      longitude: input.values.longitude,
-      latitude: input.values.latitude,
-      xcoordinaat_rd: input.values.xcoordinaat_rd,
-      ycoordinaat_rd: input.values.ycoordinaat_rd,
-      update,
       setSelectedPoint: input.setSelectedPoint,
       setSelectedPlan: input.setSelectedPlan,
       mapView: input.mapView,
@@ -39,6 +33,12 @@ export function useEditPointCoordinateSubmit(input: {
       yellowGraphicsLayer: input.yellowGraphicsLayer,
       redGraphicsLayer: input.redGraphicsLayer,
       setAction: input.setAction,
+      coordinateSystem: input.values.coordinateSystem,
+      longitude: input.values.longitude,
+      latitude: input.values.latitude,
+      xcoordinaat_rd: input.values.xcoordinaat_rd,
+      ycoordinaat_rd: input.values.ycoordinaat_rd,
+      update,
       logAction,
     });
   }

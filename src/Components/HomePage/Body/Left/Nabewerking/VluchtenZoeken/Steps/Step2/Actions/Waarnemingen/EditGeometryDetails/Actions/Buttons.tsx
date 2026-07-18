@@ -2,15 +2,13 @@ import { useContent } from "hooks/useContent";
 import { FinishedGeometryType } from "Types/finished_plans";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import type { EditObservationButtonsProps } from "../../common/editObservationFormProps";
 
 export default function Buttons({
   setAction,
   setOpenEdit,
   handleUpdate,
-}: {
-  setAction: (value: string) => void;
-  setOpenEdit: (value: boolean) => void;
-  handleUpdate: () => void;
+}: EditObservationButtonsProps & {
   selectedGeometry?: FinishedGeometryType;
 }) {
   const { withLog, labels } = useWizardButtons("Second step - Edit geometry");

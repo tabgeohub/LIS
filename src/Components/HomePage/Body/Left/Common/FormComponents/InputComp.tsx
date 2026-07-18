@@ -16,6 +16,96 @@ export type InputCompProps = {
   inputClassName?: string;
 };
 
+function TextInputField(props: {
+  value: string;
+  setValue?: (value: string) => void;
+  inputType: "text" | "number" | "date";
+  disabled: boolean;
+  inputClassName: string;
+  min?: string;
+}) {
+  return (
+    <input
+      value={props.value}
+      onChange={(e) => props.setValue?.(e.target.value)}
+      type={props.inputType}
+      min={props.min}
+      className={`inputClass col-span-4 ${props.inputClassName}`}
+      disabled={props.disabled}
+    />
+  );
+}
+
+function DatePickerField(props: {
+  value: string;
+  setValue?: (value: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="relative col-span-4">
+      <DatePicker
+        selected={props.value ? dayjs(props.value).toDate() : null}
+        onChange={(date: Date | null) =>
+          props.setValue?.(date ? dayjs(date).format("YYYY-MM-DD") : "")
+        }
+        dateFormat="dd/MM/yyyy"
+        placeholderText="dd/mm/jjjj"
+        className="inputClass cursor-pointer"
+        disabled={props.disabled}
+      />
+
+      <FaRegCalendarAlt
+        className="absolute right-[10px] cursor-pointer top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+        size={16}
+      />
+    </div>
+  );
+}
+
+function resolveInputField(props: InputCompProps & {
+  type: string;
+  disabled: boolean;
+  nativeDate: boolean;
+  inputClassName: string;
+}) {
+  if (props.type === "text" || props.type === "number") {
+    return (
+      <TextInputField
+        value={props.value}
+        setValue={props.setValue}
+        inputType={props.type}
+        disabled={props.disabled}
+        inputClassName={props.inputClassName}
+      />
+    );
+  }
+
+  if (props.type === "date" && props.nativeDate) {
+    return (
+      <TextInputField
+        value={props.value}
+        setValue={props.setValue}
+        inputType="date"
+        disabled={props.disabled}
+        inputClassName={props.inputClassName}
+        min={props.min}
+      />
+    );
+  }
+
+  if (props.type === "date") {
+    return (
+      <DatePickerField
+        value={props.value}
+        setValue={props.setValue}
+        disabled={props.disabled}
+      />
+    );
+  }
+
+  return null;
+}
+
 export default function InputComp({
   label,
   value,
@@ -31,60 +121,18 @@ export default function InputComp({
     <div className="grid grid-cols-6 gap-x-2 items-center">
       <p className="col-span-2 labelClass">
         {label}
-
         {required && <span className="text-gray-500"> *</span>}
       </p>
-
-      {type === "text" && (
-        <input
-          value={value}
-          onChange={(e) => setValue && setValue(e.target.value)}
-          type="text"
-          className={`inputClass col-span-4 ${inputClassName}`}
-          disabled={disabled}
-        />
-      )}
-
-      {type === "date" && nativeDate && (
-        <input
-          disabled={disabled}
-          value={value}
-          onChange={(event) => setValue?.(event.target.value)}
-          type="date"
-          min={min}
-          className={`inputClass col-span-4 ${inputClassName}`}
-        />
-      )}
-
-      {type === "date" && !nativeDate && (
-        <div className="relative col-span-4">
-          <DatePicker
-            selected={value ? dayjs(value).toDate() : null}
-            onChange={(date: Date | null) =>
-              setValue && setValue(date ? dayjs(date).format("YYYY-MM-DD") : "")
-            }
-            dateFormat="dd/MM/yyyy"
-            placeholderText="dd/mm/jjjj"
-            className="inputClass cursor-pointer"
-            disabled={disabled}
-          />
-
-          <FaRegCalendarAlt
-            className="absolute right-[10px] cursor-pointer top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-            size={16}
-          />
-        </div>
-      )}
-
-      {type === "number" && (
-        <input
-          value={value}
-          onChange={(e) => setValue && setValue(e.target.value)}
-          type="number"
-          className={`inputClass col-span-4 ${inputClassName}`}
-          disabled={disabled}
-        />
-      )}
+      {resolveInputField({
+        label,
+        value,
+        setValue,
+        type,
+        disabled,
+        nativeDate,
+        min,
+        inputClassName,
+      })}
     </div>
   );
 }

@@ -19,11 +19,11 @@ function respondMissingVerifyFields(res: Response) {
 }
 
 function respondVerifyError(req: Request, res: Response, error: unknown) {
-  logAuthSecurityEvent(
-    "auth2.verify.error",
-    { message: (error as Error)?.message },
-    req
-  );
+  logAuthSecurityEvent({
+    event: "auth2.verify.error",
+    meta: { message: (error as Error)?.message },
+    req,
+  });
   return res.status(500).json({
     success: false,
     status: "error",

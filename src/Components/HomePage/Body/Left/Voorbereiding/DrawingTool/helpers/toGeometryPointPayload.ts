@@ -13,12 +13,17 @@ export type GeometryPointContext = {
   specifiekLettenOp: string;
 };
 
+export type BuildGeometryPointFieldsInput = {
+  wgs84: { longitude: number; latitude: number };
+  pointOrder: number;
+  geometryType: string;
+  ctx: GeometryPointContext;
+};
+
 export function buildGeometryPointFields(
-  wgs84: { longitude: number; latitude: number },
-  pointOrder: number,
-  geometryType: string,
-  ctx: GeometryPointContext
+  input: BuildGeometryPointFieldsInput
 ): GeometryPointPayload {
+  const { wgs84, pointOrder, geometryType, ctx } = input;
   const rdCoords = getTransformedCoordinates({
     fromProjection: "WGS84",
     toProjection: "RD",
@@ -56,10 +61,10 @@ export function toGeometryPointPayload(
 ): GeometryPointPayload | null {
   const wgs84 = webMercatorToWgs84(input.x, input.y);
   if (!wgs84) return null;
-  return buildGeometryPointFields(
+  return buildGeometryPointFields({
     wgs84,
-    input.pointOrder,
-    input.geometryType,
-    input.ctx
-  );
+    pointOrder: input.pointOrder,
+    geometryType: input.geometryType,
+    ctx: input.ctx,
+  });
 }

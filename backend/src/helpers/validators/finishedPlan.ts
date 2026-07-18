@@ -51,32 +51,49 @@ export type IncomingPlan = {
   flightTime?: string | number | null;
 };
 
-export function validateFinishedPlan(
-  raw: unknown
-): { ok: true; plan: IncomingPlan } | { ok: false; reason: string } {
-  if (!raw || typeof raw !== "object")
-    return { ok: false, reason: "Request body must be a JSON object." };
+type ValidateResult =
+  | { ok: true; plan: IncomingPlan }
+  | { ok: false; reason: string };
 
-  const { plan } = raw as { plan?: unknown };
-  if (!plan || typeof plan !== "object")
-    return { ok: false, reason: "`plan` is required and must be an object." };
+function fail(reason: string): ValidateResult {
+  return { ok: false, reason };
+}
 
-  const typedPlan = plan as IncomingPlan;
+function asObject(value: unknown): object | null {
+  if (!value || typeof value !== "object") return null;
+  return value;
+}
 
-  if (typeof typedPlan.id !== "number" || !Number.isInteger(typedPlan.id))
-    return { ok: false, reason: "`plan.id` must be an integer." };
-
-  if (!Array.isArray(typedPlan.points)) {
-    return {
-      ok: false,
-      reason: "`plan.points` must be an array (can be empty if needed).",
-    };
+function validatePlanShell(plan: IncomingPlan): ValidateResult | null {
+  if (typeof plan.id !== "number" || !Number.isInteger(plan.id)) {
+    return fail("`plan.id` must be an integer.");
   }
+  if (!Array.isArray(plan.points)) {
+    return fail("`plan.points` must be an array (can be empty if needed).");
+  }
+  return null;
+}
 
-  for (let i = 0; i < typedPlan.points.length; i++) {
-    const pointResult = validateFinishedPlanPoint(typedPlan.points[i], i);
+function validatePlanPoints(points: IncomingPoint[]): ValidateResult | null {
+  for (let i = 0; i < points.length; i++) {
+    const pointResult = validateFinishedPlanPoint(points[i], i);
     if (!pointResult.ok) return pointResult;
   }
+  return null;
+}
+
+export function validateFinishedPlan(raw: unknown): ValidateResult {
+  if (!asObject(raw)) return fail("Request body must be a JSON object.");
+
+  const { plan } = raw as { plan?: unknown };
+  if (!asObject(plan)) return fail("`plan` is required and must be an object.");
+
+  const typedPlan = plan as IncomingPlan;
+  const shellError = validatePlanShell(typedPlan);
+  if (shellError) return shellError;
+
+  const pointsError = validatePlanPoints(typedPlan.points);
+  if (pointsError) return pointsError;
 
   return { ok: true, plan: typedPlan };
 }

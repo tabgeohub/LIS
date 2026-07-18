@@ -2,26 +2,39 @@ import type { RequestHandler } from "express";
 import { randomUUID } from "crypto";
 import { registerDevice } from "../db";
 
-export const registerAgent: RequestHandler = async (req, res) => {
-  const machineId = String(req.body?.machine_id || "").trim();
-  const hostname = String(req.body?.hostname || "").trim();
-  const windowsVersion = req.body?.windows_version
-    ? String(req.body.windows_version)
-    : undefined;
-  const osBuild = req.body?.os_build ? String(req.body.os_build) : undefined;
+function optionalString(value: unknown): string | undefined {
+  return value ? String(value) : undefined;
+}
 
-  if (!machineId || !hostname) {
+function parseRegisterBody(body: {
+  machine_id?: unknown;
+  hostname?: unknown;
+  windows_version?: unknown;
+  os_build?: unknown;
+}) {
+  return {
+    machineId: String(body?.machine_id || "").trim(),
+    hostname: String(body?.hostname || "").trim(),
+    windowsVersion: optionalString(body?.windows_version),
+    osBuild: optionalString(body?.os_build),
+  };
+}
+
+export const registerAgent: RequestHandler = async (req, res) => {
+  const parsed = parseRegisterBody(req.body ?? {});
+
+  if (!parsed.machineId || !parsed.hostname) {
     res.status(400).json({ error: "machine_id and hostname are required" });
     return;
   }
 
   try {
     const { device, deviceToken } = await registerDevice({
-      machineId,
-      hostname,
+      machineId: parsed.machineId,
+      hostname: parsed.hostname,
       deviceToken: randomUUID(),
-      windowsVersion,
-      osBuild,
+      windowsVersion: parsed.windowsVersion,
+      osBuild: parsed.osBuild,
     });
 
     res.status(201).json({

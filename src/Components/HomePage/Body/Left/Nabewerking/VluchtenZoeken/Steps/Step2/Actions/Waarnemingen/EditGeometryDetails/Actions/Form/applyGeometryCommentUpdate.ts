@@ -3,21 +3,14 @@ import type {
   FinishedGeometryType,
   FinishedPointType,
 } from "Types/finished_plans";
+import type { ObservationEditCallbacks } from "../../../common/observationEditCallbacks";
 import { updateGeometryPointsComment } from "./updateGeometryPointsComment";
 
-export type ApplyGeometryCommentUpdateInput = {
+export type ApplyGeometryCommentUpdateInput = ObservationEditCallbacks & {
   selectedGeometry: FinishedGeometryType;
   selectedPlan: FinishedFlightPlanType | null;
   comment: string;
   setSelectedGeometry: (geometry: FinishedGeometryType) => void;
-  setSelectedPlan: (plan: FinishedFlightPlanType) => void;
-  resetFeatures: () => void;
-  setAction: (value: string) => void;
-  logAction: (input: {
-    message: string;
-    step: string;
-    newData?: unknown;
-  }) => void;
   onSuccessToast: () => void;
   onFailureToast: () => void;
 };

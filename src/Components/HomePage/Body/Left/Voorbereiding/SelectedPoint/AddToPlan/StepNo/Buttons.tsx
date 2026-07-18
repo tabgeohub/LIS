@@ -1,10 +1,9 @@
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import useLogAction from "hooks/useLogAction";
 import { useUpdateData } from "utils/useUpdateData";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
+import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
 
 export default function Buttons({
   setSubStep,
@@ -39,31 +38,22 @@ export default function Buttons({
   }
 
   return (
-    <WizardButtonBar
-      className={WIZARD_BUTTON_BAR_CLASS}
-      buttons={[
-        {
-          label: "Vorige",
-          onClick: () => {
-            setStep(1);
-            logAction({
-              message: "User clicked 'Back' button",
-              step: "Add to plan - Step no",
-            });
-          },
-        },
-        { label: "Volgende", onClick: handleSubmit },
-        {
-          label: "Annuleren",
-          onClick: () => {
-            cancelToKaartlagenlijst();
-            logAction({
-              message: "User clicked 'Cancel' button",
-              step: "Add to plan - Step no",
-            });
-          },
-        },
-      ]}
+    <AddToPlanWizardButtonBar
+      onBack={() => {
+        setStep(1);
+        logAction({
+          message: "User clicked 'Back' button",
+          step: "Add to plan - Step no",
+        });
+      }}
+      onNext={handleSubmit}
+      onCancel={() => {
+        cancelToKaartlagenlijst();
+        logAction({
+          message: "User clicked 'Cancel' button",
+          step: "Add to plan - Step no",
+        });
+      }}
     />
   );
 }

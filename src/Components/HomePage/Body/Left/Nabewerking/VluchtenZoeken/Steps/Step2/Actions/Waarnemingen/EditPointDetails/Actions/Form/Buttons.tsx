@@ -2,15 +2,13 @@ import DeletePoint from "../DeletePoint";
 import { FinishedPointType } from "Types/finished_plans";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import type { EditObservationButtonsProps } from "../../../common/editObservationFormProps";
 
 export default function Buttons({
   setAction,
   setOpenEdit,
   handleUpdate,
-}: {
-  setAction: (value: string) => void;
-  setOpenEdit: (value: boolean) => void;
-  handleUpdate: () => void;
+}: EditObservationButtonsProps & {
   selectedPoint?: FinishedPointType;
 }) {
   const { withLog, labels, content } = useWizardButtons("Second step - Form");

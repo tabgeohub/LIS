@@ -18,12 +18,13 @@ export const BLUE_BUFFER_SYMBOL = new SimpleFillSymbol({
 
 export type BufferUnit = "kilometers" | "meters";
 
-export function addBufferedGraphics(
-  graphicsLayer: GraphicsLayer,
-  buffered: __esri.Geometry | __esri.Geometry[],
-  symbol: SimpleFillSymbol,
-  id: number
-) {
+export function addBufferedGraphics(input: {
+  graphicsLayer: GraphicsLayer;
+  buffered: __esri.Geometry | __esri.Geometry[];
+  symbol: SimpleFillSymbol;
+  id: number;
+}) {
+  const { graphicsLayer, buffered, symbol, id } = input;
   const addGraphic = (geometry: __esri.Geometry) => {
     graphicsLayer.add(
       new Graphic({ geometry, symbol, attributes: { id } })

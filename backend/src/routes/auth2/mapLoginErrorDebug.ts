@@ -15,6 +15,16 @@ function shouldLogMapLoginErrorDebug(
   return Boolean(context.otpWasSent && finalDecision);
 }
 
+function coalesceNull<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
+function coalesceOtpStep(
+  loginStep: MapLoginErrorDebugContext["loginStep"]
+): "password" | "otp" {
+  return loginStep ?? "otp";
+}
+
 function buildMapLoginErrorDebugPayload(input: {
   error: unknown;
   context: MapLoginErrorDebugContext;
@@ -23,11 +33,11 @@ function buildMapLoginErrorDebugPayload(input: {
 }) {
   const realError = extractGrantError(input.error);
   return {
-    hasOtp: input.context.hasOtp ?? null,
+    hasOtp: coalesceNull(input.context.hasOtp),
     otpWasSent: input.context.otpWasSent,
-    loginStep: input.context.loginStep ?? "otp",
-    realGrantErrorCode: realError.error ?? null,
-    realGrantErrorDescription: realError.error_description ?? null,
+    loginStep: coalesceOtpStep(input.context.loginStep),
+    realGrantErrorCode: coalesceNull(realError.error),
+    realGrantErrorDescription: coalesceNull(realError.error_description),
     explicitGrantFailureKind: input.kind,
     finalDecision: input.finalDecision,
     responseStatus: input.finalDecision,

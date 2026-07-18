@@ -1,18 +1,14 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
 import { TbPolygon, TbLine } from "react-icons/tb";
 import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
 import ActionButtons from "./ActionButtons";
-import { geometryDisplayName, geometryTypeDutchLabel } from "./EditForm/helpers/labels";
+import { geometryDisplayName } from "./EditForm/helpers/labels";
+import type { EditGeometryActionProps } from "./editGeometryActionProps";
 
 export default function SingleGeometry({
   geometry,
   onEditClick,
   onDeleteClick,
-}: {
-  geometry: Geometry;
-  onEditClick: (geometry: Geometry) => void;
-  onDeleteClick: (geometry: Geometry) => void;
-}) {
+}: EditGeometryActionProps) {
   const { handleHoveredGeometry, handleRemoveHoveredGeometry } =
     useGeometryListHover();
   const geometryTypeLabel = geometry.type === "polygon" ? "Veelhoek" : "Lijn";
@@ -48,4 +44,3 @@ export default function SingleGeometry({
     </div>
   );
 }
-

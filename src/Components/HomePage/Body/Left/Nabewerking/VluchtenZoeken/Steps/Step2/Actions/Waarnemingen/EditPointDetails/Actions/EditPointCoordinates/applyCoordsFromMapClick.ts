@@ -1,22 +1,8 @@
-import useLogAction from "hooks/useLogAction";
 import { coordsFromMapClick } from "./coordinateFinalize";
 import { showRedMarkerAt } from "./pointMapGraphics";
-import type { EditPointMapClickInput } from "./editPointMapClickTypes";
+import type { ApplyEditPointMapClickInput } from "./editPointMapClickTypes";
 
-export function applyCoordsFromMapClick(input: {
-  event: __esri.ViewClickEvent;
-  mapView: __esri.MapView;
-  redGraphicsLayer: __esri.GraphicsLayer;
-  coordinateSystem: string;
-  setters: Pick<
-    EditPointMapClickInput,
-    | "setLongitude"
-    | "setLatitude"
-    | "setXCoordinaat_rd"
-    | "setYCoordinaat_rd"
-  >;
-  logAction: ReturnType<typeof useLogAction>;
-}) {
+export function applyCoordsFromMapClick(input: ApplyEditPointMapClickInput) {
   const { event, mapView, redGraphicsLayer, coordinateSystem, setters } =
     input;
   const next = coordsFromMapClick({

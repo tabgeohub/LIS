@@ -1,10 +1,9 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
+import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
 
 export default function Buttons({
   setSubStep,
@@ -34,16 +33,10 @@ export default function Buttons({
   }
 
   return (
-    <WizardButtonBar
-      className={WIZARD_BUTTON_BAR_CLASS}
-      buttons={[
-        { label: "Vorige", onClick: () => setStep(1) },
-        { label: "Volgende", onClick: handleSubmit },
-        {
-          label: "Annuleren",
-          onClick: cancelToKaartlagenlijst,
-        },
-      ]}
+    <AddToPlanWizardButtonBar
+      onBack={() => setStep(1)}
+      onNext={handleSubmit}
+      onCancel={cancelToKaartlagenlijst}
     />
   );
 }

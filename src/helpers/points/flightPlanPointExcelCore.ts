@@ -5,11 +5,25 @@ export type FlightPlanPointExportRow = {
   [Key in (typeof POINT_EXPORT_COLUMNS)[number]]: string | number | undefined;
 };
 
-export function normalizeJaNee(value: unknown): "ja" | "nee" {
-  if (typeof value === "boolean") return value ? "ja" : "nee";
-  if (typeof value === "number") return value === 1 ? "ja" : "nee";
+const TRUTHY_JA_VALUES = new Set(["1", "true", "ja", "yes"]);
+
+function jaNeeFromBoolean(value: boolean): "ja" | "nee" {
+  return value ? "ja" : "nee";
+}
+
+function jaNeeFromNumber(value: number): "ja" | "nee" {
+  return value === 1 ? "ja" : "nee";
+}
+
+function jaNeeFromString(value: unknown): "ja" | "nee" {
   const normalized = String(value ?? "").trim().toLowerCase();
-  return ["1", "true", "ja", "yes"].includes(normalized) ? "ja" : "nee";
+  return TRUTHY_JA_VALUES.has(normalized) ? "ja" : "nee";
+}
+
+export function normalizeJaNee(value: unknown): "ja" | "nee" {
+  if (typeof value === "boolean") return jaNeeFromBoolean(value);
+  if (typeof value === "number") return jaNeeFromNumber(value);
+  return jaNeeFromString(value);
 }
 
 export function normalizeExportNumber(value: unknown): number | "" {

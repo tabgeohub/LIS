@@ -2,20 +2,9 @@ import { ReactNode } from "react";
 import { LegendLayerDefinition } from "../helpers/layerTypes";
 import { LayerItem } from "./LayerItem";
 import { ParentItem } from "./ParentItem";
+import type { LegendSectionLayoutProps } from "./legendSectionLayoutProps";
 
-export type LegendSectionLayoutProps = {
-  layers: LegendLayerDefinition[];
-  handleLayerChange: (id: string, checked: boolean) => void;
-  parentTitle?: string;
-  parentChecked: boolean;
-  setParentChecked: (checked: boolean) => void;
-  externalParentChecked?: boolean;
-  nestedParentTitle?: string;
-  nestedParentChecked: boolean;
-  setNestedParentChecked: (checked: boolean) => void;
-  gateNestedByRole: boolean;
-  isVisibleForRole: boolean;
-};
+export type { LegendSectionLayoutProps };
 
 function isLegendChildDisabled(
   parentTitle: string | undefined,

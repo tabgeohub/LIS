@@ -47,15 +47,15 @@ function createRateLimitHandler(
   endpoint: "verify-credentials" | "login"
 ): Options["handler"] {
   return (req, res, _next, options) => {
-    logAuthSecurityEvent(
-      "auth2.rate_limited",
-      {
+    logAuthSecurityEvent({
+      event: "auth2.rate_limited",
+      meta: {
         endpoint,
         limit: options.max,
         windowMs: options.windowMs,
       },
-      req
-    );
+      req,
+    });
     res.status(429).json({
       success: false,
       code: "TOO_MANY_REQUESTS",

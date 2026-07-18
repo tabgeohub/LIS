@@ -5,8 +5,8 @@ import {
   missingFields,
   notFound,
   okResult,
-  serverError,
 } from "../../helpers/http/routeResponses";
+import { rollbackTransactionWithServerError } from "../../helpers/http/rollbackTransactionWithServerError";
 import { requireArray } from "../../helpers/http/validateBody";
 import { updateFinishedPointAttachmentsTx } from "../../helpers/queries/finished-plans/updateFinishedPointAttachmentsTx";
 
@@ -69,13 +69,9 @@ export async function rollbackAttachmentUpdateError(input: {
   res: Response;
   err: unknown;
 }): Promise<void> {
-  await input.client.query("ROLLBACK");
-  serverError({
-    res: input.res,
+  await rollbackTransactionWithServerError({
+    ...input,
     logLabel: "Error updating point:",
-    message: `Failed to update point: ${
-      input.err instanceof Error ? input.err.message : String(input.err)
-    }`,
-    err: input.err,
+    messagePrefix: "Failed to update point: ",
   });
 }

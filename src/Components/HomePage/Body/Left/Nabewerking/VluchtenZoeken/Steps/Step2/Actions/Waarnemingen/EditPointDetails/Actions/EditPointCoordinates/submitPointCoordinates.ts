@@ -5,9 +5,15 @@ import type {
 import type { UpdateInput } from "utils/useUpdateData";
 import { applyPointCoordinateUpdateSuccess } from "./applyPointCoordinateUpdateSuccess";
 import { buildPointCoordinatePayload } from "./buildPointCoordinatePayload";
+import {
+  pickPointCoordinateUpdateContext,
+  type PointCoordinateUpdateContext,
+} from "./pointCoordinateUpdateContext";
 
-type SubmitPointCoordinatesInput = {
-  selectedPoint: FinishedPointType;
+type SubmitPointCoordinatesInput = Omit<
+  PointCoordinateUpdateContext,
+  "selectedPlan"
+> & {
   selectedPlan: FinishedFlightPlanType | null;
   coordinateSystem: string;
   longitude: number;
@@ -15,13 +21,6 @@ type SubmitPointCoordinatesInput = {
   xcoordinaat_rd: number;
   ycoordinaat_rd: number;
   update: (input: UpdateInput<unknown>) => Promise<void>;
-  setSelectedPoint: (point: FinishedPointType) => void;
-  setSelectedPlan: (plan: FinishedFlightPlanType) => void;
-  mapView: __esri.MapView | null;
-  pointsGraphicsLayer: __esri.GraphicsLayer | null;
-  yellowGraphicsLayer: __esri.GraphicsLayer | null;
-  redGraphicsLayer: __esri.GraphicsLayer | null;
-  setAction: (value: string) => void;
   logAction: (entry: {
     message: string;
     step: string;
@@ -46,16 +45,11 @@ export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) 
     onSuccess: (responseData) => {
       if (!responseData.result || !input.selectedPlan) return;
       applyPointCoordinateUpdateSuccess({
-        selectedPoint: input.selectedPoint,
-        selectedPlan: input.selectedPlan,
+        ...pickPointCoordinateUpdateContext({
+          ...input,
+          selectedPlan: input.selectedPlan,
+        }),
         finalCoords,
-        setSelectedPoint: input.setSelectedPoint,
-        setSelectedPlan: input.setSelectedPlan,
-        mapView: input.mapView,
-        pointsGraphicsLayer: input.pointsGraphicsLayer,
-        yellowGraphicsLayer: input.yellowGraphicsLayer,
-        redGraphicsLayer: input.redGraphicsLayer,
-        setAction: input.setAction,
       });
     },
   });
@@ -66,3 +60,5 @@ export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) 
     newData: { coordinateSystem: input.coordinateSystem, ...finalCoords },
   });
 }
+
+export type { FinishedFlightPlanType, FinishedPointType };

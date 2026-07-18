@@ -2,9 +2,10 @@ import type {
   FinishedFlightPlanType,
   FinishedPointType,
 } from "Types/finished_plans";
+import type { ObservationEditCallbacks } from "../../../common/observationEditCallbacks";
 import type { EditPointDetailsPayload } from "./editPointDetailsPayload";
 
-export type SubmitEditPointDetailsInput = {
+export type SubmitEditPointDetailsInput = ObservationEditCallbacks & {
   selectedPoint: FinishedPointType | null;
   selectedPlan: FinishedFlightPlanType | null;
   omschrijving: string;
@@ -14,12 +15,4 @@ export type SubmitEditPointDetailsInput = {
     onSuccess: (responseData: { result?: unknown }) => void;
   }) => void;
   setSelectedPoint: (point: FinishedPointType) => void;
-  setSelectedPlan: (plan: FinishedFlightPlanType) => void;
-  resetFeatures: () => void;
-  setAction: (value: string) => void;
-  logAction: (input: {
-    message: string;
-    step: string;
-    newData?: Record<string, unknown>;
-  }) => void;
 };

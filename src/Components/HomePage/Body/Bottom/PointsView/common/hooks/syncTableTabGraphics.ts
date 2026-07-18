@@ -7,6 +7,7 @@ import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeo
 import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { addPlanStarGraphic } from "@helpers/ArcGISHelpers/planStarGraphics";
+import type { TableTabGraphicsData } from "./useMapGraphicsTypes";
 
 type GraphicsContext = {
   graphicsLayer: __esri.GraphicsLayer | null;
@@ -103,16 +104,9 @@ const TAB_GRAPHICS_SYNC: Record<
     }),
 };
 
-export function syncTableTabGraphics(input: {
-  tab: string;
-  ctx: GraphicsContext;
-  pointsTable: EnrichedPointType[];
-  geometriesTable: Geometry[];
-  flightPlans: FlightPlanType[];
-  starredPoints: EnrichedPointType[];
-  starredGeometries: Geometry[];
-  starredPlans: FlightPlanType[];
-}) {
+export function syncTableTabGraphics(
+  input: TableTabGraphicsData & { ctx: GraphicsContext }
+) {
   input.ctx.graphicsLayer?.removeAll();
   input.ctx.yellowGraphicsLayer?.graphics.removeAll();
   TAB_GRAPHICS_SYNC[input.tab]?.(input);

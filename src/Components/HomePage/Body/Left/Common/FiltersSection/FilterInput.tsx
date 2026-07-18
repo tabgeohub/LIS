@@ -8,27 +8,18 @@ type FilterInputProps = Omit<InputCompProps, "nativeDate" | "min"> & {
 };
 
 export function FilterInput({
-  label,
-  value,
-  setValue,
-  required = false,
-  type = "text",
-  disabled = false,
   minToday = true,
+  inputClassName = "!w-[75%]",
+  ...props
 }: FilterInputProps) {
   const today = minToday ? new Date().toISOString().split("T")[0] : "";
 
   return (
     <InputComp
-      label={label}
-      value={value}
-      setValue={setValue}
-      required={required}
-      type={type}
-      disabled={disabled}
+      {...props}
       nativeDate
       min={today}
-      inputClassName="!w-[75%]"
+      inputClassName={inputClassName}
     />
   );
 }

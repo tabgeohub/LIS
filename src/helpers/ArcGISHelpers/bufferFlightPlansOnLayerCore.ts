@@ -41,11 +41,11 @@ export function bufferFlightPlansOnLayer(
     });
     if (!buffered) return;
 
-    addBufferedGraphics(
-      input.graphicsLayer,
+    addBufferedGraphics({
+      graphicsLayer: input.graphicsLayer,
       buffered,
-      BLUE_BUFFER_SYMBOL,
-      plan.id
-    );
+      symbol: BLUE_BUFFER_SYMBOL,
+      id: plan.id,
+    });
   });
 }

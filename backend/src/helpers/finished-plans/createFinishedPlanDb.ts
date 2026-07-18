@@ -23,17 +23,27 @@ const NEW_POINT_NULLABLE_FIELDS: PointCoreColumn[] = [
   "specifiek_letten_op",
 ];
 
+function coalesceNull<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
+function coalesceFalse(value: unknown): boolean {
+  return (value as boolean | null | undefined) ?? false;
+}
+
 function buildNewPointOverrides(
   point: FinishedPlanPoint,
   userId: number
 ): Partial<Record<PointCoreColumn, unknown>> {
   const overrides: Partial<Record<PointCoreColumn, unknown>> = {
     user_id: userId,
-    vertrouwelijk: point.vertrouwelijk ?? false,
-    herhalen: point.herhalen ?? false,
+    vertrouwelijk: coalesceFalse(point.vertrouwelijk),
+    herhalen: coalesceFalse(point.herhalen),
   };
   for (const field of NEW_POINT_NULLABLE_FIELDS) {
-    overrides[field] = (point as Record<string, unknown>)[field] ?? null;
+    overrides[field] = coalesceNull(
+      (point as Record<string, unknown>)[field]
+    );
   }
   return overrides;
 }
@@ -199,6 +209,19 @@ class FinishedPlanWriter {
     }
   }
 
+  private finishedRowParams(point: FinishedPlanPoint, realPointId: number) {
+    return [
+      realPointId,
+      this.plan.id,
+      this.resolveOrder(point),
+      this.attachmentIdsByPointId[realPointId] ?? [],
+      point.comment ?? "",
+      "bezocht",
+      coalesceNull(point.spoed),
+      coalesceNull(point.sendToEmail),
+    ];
+  }
+
   private async insertFinishedRow(point: FinishedPlanPoint): Promise<void> {
     const realPointId = this.realIdOf(point);
     await this.assertPointExists(realPointId);
@@ -206,16 +229,7 @@ class FinishedPlanWriter {
     await this.client.query(
       `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        realPointId,
-        this.plan.id,
-        this.resolveOrder(point),
-        this.attachmentIdsByPointId[realPointId] ?? [],
-        point.comment ?? "",
-        "bezocht",
-        point.spoed ?? null,
-        point.sendToEmail ?? null,
-      ]
+      this.finishedRowParams(point, realPointId)
     );
   }
 

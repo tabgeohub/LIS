@@ -31,16 +31,41 @@ function resolvePlansEmptyHint(input: TimesliderPageStatusInput) {
   return input.plansError ?? undefined;
 }
 
+type EmptyMainRule = {
+  matches: (input: TimesliderPageStatusInput) => boolean;
+  message: (input: TimesliderPageStatusInput) => string;
+};
+
+const EMPTY_MAIN_RULES: EmptyMainRule[] = [
+  {
+    matches: (input) => input.invalidQuery,
+    message: (input) => input.queryError ?? "Ongeldige link.",
+  },
+  {
+    matches: (input) => input.needsAuth,
+    message: () => "Log in om afbeeldingen te bekijken.",
+  },
+  {
+    matches: (input) => !!input.plansError,
+    message: (input) => input.plansError!,
+  },
+  {
+    matches: (input) => input.noPlansInRange,
+    message: () => "Geen voltooide plannen in deze periode.",
+  },
+  {
+    matches: (input) => input.noMatchingPlans,
+    message: () => "Dit item komt niet voor in de plannen van deze periode.",
+  },
+  {
+    matches: (input) => !input.imagesLoading && input.imagesLength === 0,
+    message: () => "Geen afbeeldingen voor deze selectie.",
+  },
+];
+
 function resolveEmptyMainMessage(input: TimesliderPageStatusInput) {
-  if (input.invalidQuery) return input.queryError ?? "Ongeldige link.";
-  if (input.needsAuth) return "Log in om afbeeldingen te bekijken.";
-  if (input.plansError) return input.plansError;
-  if (input.noPlansInRange) return "Geen voltooide plannen in deze periode.";
-  if (input.noMatchingPlans) {
-    return "Dit item komt niet voor in de plannen van deze periode.";
-  }
-  if (!input.imagesLoading && input.imagesLength === 0) {
-    return "Geen afbeeldingen voor deze selectie.";
+  for (const rule of EMPTY_MAIN_RULES) {
+    if (rule.matches(input)) return rule.message(input);
   }
   return null;
 }

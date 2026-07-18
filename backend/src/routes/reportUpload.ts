@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { mapMulterError } from "../helpers/uploads/multerErrorMessage";
+import { MULTER_SECURITY_LIMITS } from "../helpers/uploads/multerSecurityLimits";
 import { buildReportUploadResponse } from "../helpers/uploads/reportUploadResponse";
 
 const router = express.Router();
@@ -33,6 +34,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
+    ...MULTER_SECURITY_LIMITS,
     fileSize: Number(process.env.MAX_UPLOAD_BYTES || 20 * 1024 * 1024 * 1024),
     files: 1,
     parts: 2000,
@@ -80,12 +82,15 @@ router.post("/", (req, res, next) => {
   });
 });
 
-export function uploadErrorHandler(
-  err: unknown,
-  _req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction
-) {
+export type UploadErrorHandlerInput = {
+  err: unknown;
+  req: express.Request;
+  res: express.Response;
+  next: express.NextFunction;
+};
+
+export function uploadErrorHandler(input: UploadErrorHandlerInput) {
+  const { err, res } = input;
   if (err instanceof multer.MulterError) {
     return sendError({
       res,

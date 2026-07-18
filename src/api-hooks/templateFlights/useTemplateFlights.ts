@@ -10,15 +10,22 @@ export type UseTemplateFlightsInput = {
   enabled?: boolean;
 };
 
+function coalesceEmpty(value: string | number | undefined): string | number {
+  return value ?? "";
+}
+
+function isTemplateFlightsEnabled(input: UseTemplateFlightsInput): boolean {
+  if (!(input.enabled ?? true)) return false;
+  if (input.regioId === undefined || input.regioId === "") return false;
+  if (input.userId === undefined || input.userId === 0) return false;
+  return true;
+}
+
 export function useTemplateFlights(input: UseTemplateFlightsInput) {
   return useQuery({
-    queryKey: templateFlightKeys.list(input.regioId ?? ""),
-    queryFn: () => fetchApi<Template[]>(appendRegioQuery("/templateFlight", input.regioId)),
-    enabled:
-      (input.enabled ?? true) &&
-      input.regioId !== undefined &&
-      input.regioId !== "" &&
-      input.userId !== undefined &&
-      input.userId !== 0,
+    queryKey: templateFlightKeys.list(coalesceEmpty(input.regioId)),
+    queryFn: () =>
+      fetchApi<Template[]>(appendRegioQuery("/templateFlight", input.regioId)),
+    enabled: isTemplateFlightsEnabled(input),
   });
 }

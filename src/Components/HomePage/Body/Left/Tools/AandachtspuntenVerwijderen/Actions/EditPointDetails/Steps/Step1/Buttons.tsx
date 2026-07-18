@@ -1,16 +1,10 @@
-import {
-  pickDeletePointFormFields,
-  useDeletePointState,
-} from "hooks/zustand/tools/useDeletePointState";
-import { usePointsStore } from "hooks/features/usePointsStore";
-import { useUpdateData } from "utils/useUpdateData";
+import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 import Loading from "./Loading";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { submitDeletePointDetailsUpdate } from "../../submitDeletePointDetailsUpdate";
+import { useDeletePointDetailsSubmit } from "../../useDeletePointDetailsSubmit";
 
 export default function Buttons({
   setStep,
@@ -20,25 +14,14 @@ export default function Buttons({
   const { withLog, logStep, labels, content } = useWizardButtons(
     "Edit point details - Step 1"
   );
-  const { points, setPoints } = usePointsStore();
-  const { mapView, redGraphicsLayer, yellowGraphicsLayer } = useMapViewState();
-  const formFields = useDeletePointState(pickDeletePointFormFields);
-  const { setMainStep, selectedPoint, clear } = useDeletePointState();
-  const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
-
-  function handleSubmit() {
-    submitDeletePointDetailsUpdate({
-      selectedPoint,
-      formFields,
-      update,
-      points,
-      setPoints,
-      mapView,
-      redGraphicsLayer,
-      yellowGraphicsLayer,
-      onApplied: () => setMainStep("main"),
+  const { setMainStep, clear } = useDeletePointState();
+  const { handleSubmit: submitDetails, loading, selectedPoint } =
+    useDeletePointDetailsSubmit(() => setMainStep("main"), {
+      includeYellowGraphicsLayer: true,
     });
 
+  function handleSubmit() {
+    submitDetails();
     if (selectedPoint) {
       logStep("User clicked 'Save' button", pickPointCoreLogData(selectedPoint));
     }

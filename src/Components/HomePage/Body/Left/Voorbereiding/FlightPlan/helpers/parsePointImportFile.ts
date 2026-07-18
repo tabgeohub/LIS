@@ -33,13 +33,11 @@ function createEmptyPointRow(userId: string): PointImportRow {
   };
 }
 
+const CSV_EXTENSIONS = [".csv.xls", ".csv", ".csv.xlsx"] as const;
+
 export function isCsvFileName(fileName: string): boolean {
   const lower = fileName.toLowerCase();
-  return (
-    lower.endsWith(".csv.xls") ||
-    lower.endsWith(".csv") ||
-    lower.endsWith(".csv.xlsx")
-  );
+  return CSV_EXTENSIONS.some((extension) => lower.endsWith(extension));
 }
 
 export function parseCsvRows(text: string): string[][] {

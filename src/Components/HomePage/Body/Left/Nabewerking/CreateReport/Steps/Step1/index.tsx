@@ -16,11 +16,15 @@ export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
     setFilteredPlans,
   } = useCreateReportState();
 
-  useBindFilteredSortedPlans(plans, filterTerm, {
-    periode,
-    dateFrom,
-    dateTo,
-    setFilteredPlans,
+  useBindFilteredSortedPlans({
+    plans,
+    filterText: filterTerm,
+    source: {
+      periode,
+      dateFrom,
+      dateTo,
+      setFilteredPlans,
+    },
   });
 
   const content = useContent();

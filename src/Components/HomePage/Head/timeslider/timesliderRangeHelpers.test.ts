@@ -23,11 +23,11 @@ describe("timeslider range helpers", () => {
   });
 
   it("converts dates and slider steps", () => {
-    const conversions = createTimesliderConversions(
-      new Date("2025-01-01T00:00:00Z"),
-      new Date("2025-01-11T00:00:00Z"),
-      10
-    );
+    const conversions = createTimesliderConversions({
+      minDate: new Date("2025-01-01T00:00:00Z"),
+      maxDate: new Date("2025-01-11T00:00:00Z"),
+      maxStep: 10,
+    });
     expect(conversions.stepIndexToDate(5).toISOString()).toBe(
       "2025-01-06T00:00:00.000Z"
     );

@@ -26,6 +26,19 @@ export function useEntityPlanImages(input: EntityPlanImagesInput) {
 
     const controller = new AbortController();
 
+    const resolveLoadError = (error: unknown): string => {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.message
+      ) {
+        return String((error.response.data as { message?: string }).message);
+      }
+      return "Afbeeldingen laden mislukt.";
+    };
+
+    const isCanceled = (error: unknown): boolean =>
+      axios.isAxiosError(error) && error.code === "ERR_CANCELED";
+
     const loadImages = async () => {
       setLoading(true);
       setError(null);
@@ -44,13 +57,9 @@ export function useEntityPlanImages(input: EntityPlanImagesInput) {
         );
         setImages(data.images ?? []);
       } catch (error: unknown) {
-        if (axios.isAxiosError(error) && error.code === "ERR_CANCELED") return;
+        if (isCanceled(error)) return;
         setImages([]);
-        setError(
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? String((error.response.data as { message?: string }).message)
-            : "Afbeeldingen laden mislukt."
-        );
+        setError(resolveLoadError(error));
       } finally {
         setLoading(false);
       }

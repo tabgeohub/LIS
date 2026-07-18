@@ -2,10 +2,9 @@ import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/Input
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import FlightPlanStandardFields, {
-  flightPlanStandardSelectProps,
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { useFlightPlanStandardSelectProps } from "hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function Form({
   vluchtnummer,
@@ -14,7 +13,9 @@ export default function Form({
   vluchtnummer: string;
   setVluchtnummer: (value: string) => void;
 }) {
-  const { pilootOptions, waarnemerOptions } = useFlightPlanFormSelectOptions();
+  const selectProps = useFlightPlanStandardSelectProps({
+    typeLuchtvaartuigOptions: [],
+  });
   const viewPlanState = useViewPlanState();
   const fields = pickFlightPlanFormFields(viewPlanState);
   const { user } = useAuth();
@@ -23,11 +24,7 @@ export default function Form({
   return (
     <FlightPlanStandardFields
       fields={fields}
-      {...flightPlanStandardSelectProps({
-        pilootOptions,
-        waarnemerOptions,
-        typeLuchtvaartuigOptions: [],
-      })}
+      {...selectProps}
       geplandeVliegduurDisabled
       typeLuchtvaartuigDisabled
       header={

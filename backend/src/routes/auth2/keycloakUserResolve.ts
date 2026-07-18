@@ -43,9 +43,12 @@ async function fetchExactUsernameUsers(req: Request, username: string) {
     { method: "GET" }
   );
   if (!response.ok) {
-    logAuthSecurityEvent("auth2.lookup.users_failed", {
-      usernameHash: hashUsername(username),
-      status: response.status,
+    logAuthSecurityEvent({
+      event: "auth2.lookup.users_failed",
+      meta: {
+        usernameHash: hashUsername(username),
+        status: response.status,
+      },
     });
     return null;
   }

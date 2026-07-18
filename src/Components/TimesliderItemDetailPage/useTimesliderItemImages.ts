@@ -5,6 +5,23 @@ import {
 } from "api-hooks/planImages";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
+function imagesEnabled(
+  input: {
+    ok: boolean;
+    regioId: string | undefined;
+    planIds: number[];
+  },
+  kind: "point" | "geometry",
+  actualKind: "point" | "geometry"
+): boolean {
+  return (
+    input.ok &&
+    actualKind === kind &&
+    !!input.regioId &&
+    input.planIds.length > 0
+  );
+}
+
 export function useTimesliderItemImages(input: {
   ok: boolean;
   kind: "point" | "geometry";
@@ -17,22 +34,14 @@ export function useTimesliderItemImages(input: {
     pointId: input.itemId,
     planIds: input.planIds,
     regioId: input.regioId,
-    enabled:
-      input.ok &&
-      input.kind === "point" &&
-      !!input.regioId &&
-      input.planIds.length > 0,
+    enabled: imagesEnabled(input, "point", input.kind),
   });
 
   const geometryResult = useGeometryPlanImages({
     geometryId: input.itemId,
     planIds: input.planIds,
     regioId: input.regioId,
-    enabled:
-      input.ok &&
-      input.kind === "geometry" &&
-      !!input.regioId &&
-      input.planIds.length > 0,
+    enabled: imagesEnabled(input, "geometry", input.kind),
   });
 
   const rowsForSelectedPlan = useMemo(() => {

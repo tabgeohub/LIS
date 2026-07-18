@@ -61,19 +61,18 @@ function toStr(value: unknown): string | null {
   return s.length ? s : null;
 }
 
-function normalizeImportRow(row: unknown): NormalizedImportRow | null {
-  if (!row || typeof row !== "object") {
-    return null;
-  }
+function requiredTrimmed(
+  record: Record<string, unknown>,
+  key: string
+): string {
+  return String(record[key] ?? "").trim();
+}
 
-  const record = row as Record<string, unknown>;
-  const omschrijving = String(record.omschrijving ?? "").trim();
-  const user_id = String(record.user_id ?? "").trim();
-
-  if (!omschrijving || !user_id) {
-    return null;
-  }
-
+function buildNormalizedFields(
+  record: Record<string, unknown>,
+  omschrijving: string,
+  user_id: string
+): NormalizedImportRow {
   return {
     omschrijving,
     regio_id: toStr(record.regio_id),
@@ -88,6 +87,22 @@ function normalizeImportRow(row: unknown): NormalizedImportRow | null {
     organisatie_id: toStr(record.organisatie_id),
     specifiek_letten_op: toStr(record.specifiek_letten_op),
   };
+}
+
+function normalizeImportRow(row: unknown): NormalizedImportRow | null {
+  if (!row || typeof row !== "object") {
+    return null;
+  }
+
+  const record = row as Record<string, unknown>;
+  const omschrijving = requiredTrimmed(record, "omschrijving");
+  const user_id = requiredTrimmed(record, "user_id");
+
+  if (!omschrijving || !user_id) {
+    return null;
+  }
+
+  return buildNormalizedFields(record, omschrijving, user_id);
 }
 
 export function normalizeImportRows(

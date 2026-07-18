@@ -9,10 +9,7 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";
 import Fase3 from "./Fase3";
-import { buildFlightPlanCreateAttributes } from "hooks/flightPlan/buildFlightPlanCreateAttributes";
-import { pickFlightPlanCreateFields } from "hooks/flightPlan/pickFlightPlanCreateFields";
-import { collectUniquePlanPointIds } from "hooks/flightPlan/collectUniquePlanPointIds";
-import { runFlightPlanCreateSuccess } from "hooks/flightPlan/runFlightPlanCreateSuccess";
+import { submitCollectedFlightPlanCreate } from "hooks/flightPlan/submitCollectedFlightPlanCreate";
 import type { Template } from "api-hooks/templateFlights/types";
 
 export type FlightPlanTemplate = Template;
@@ -38,30 +35,20 @@ export default function TemplateFlight({
   const { setStep, clear } = store;
 
   const handleSubmit = (points: number[], geometries?: number[]) => {
-    const uniquePointIds = collectUniquePlanPointIds({
+    submitCollectedFlightPlanCreate({
+      create,
+      store,
       pointIds: points,
       geometryIds: geometries,
       geometries: selectedTemplate?.geometries,
-    });
-
-    const attributes = buildFlightPlanCreateAttributes({
-      fields: pickFlightPlanCreateFields(store),
-      points: uniquePointIds,
       basemap: basemapString,
-      layers: selectedLayers.join(","),
+      layers: selectedLayers,
       userId: user?.user_id,
       regioId: user.role,
-    });
-
-    create({
-      data: attributes,
-      onSuccess: () =>
-        runFlightPlanCreateSuccess({
-          onCleanup: () => {
-            clear();
-            clearGraphics();
-          },
-        }),
+      onCleanup: () => {
+        clear();
+        clearGraphics();
+      },
     });
   };
 

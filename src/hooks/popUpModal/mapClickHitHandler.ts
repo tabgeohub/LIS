@@ -4,15 +4,19 @@ import {
   graphicsFromHitTest,
 } from "./pointHitSelection";
 
-export type MapClickHitInput = {
+/** Shared click-listener fields used by setupClickListener + handleMapClickHit. */
+export type MapClickListenerBase = {
   mapView: __esri.MapView;
-  event: __esri.ViewClickEvent;
   setClickedPointId: (value: number) => void;
   setClickedPoint: (value: EnrichedPointType) => void;
   selectedPointGraphicsLayer: __esri.GraphicsLayer;
   createNewPoint: boolean;
   pointsGraphicsLayer?: __esri.GraphicsLayer | null;
   isTabBlocked?: () => boolean;
+};
+
+export type MapClickHitInput = MapClickListenerBase & {
+  event: __esri.ViewClickEvent;
   shouldSkip: () => boolean;
   finishGuard: () => void;
 };

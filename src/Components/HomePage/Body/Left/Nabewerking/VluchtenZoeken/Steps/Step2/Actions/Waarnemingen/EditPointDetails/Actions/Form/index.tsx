@@ -1,5 +1,4 @@
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "./Buttons";
@@ -10,14 +9,13 @@ import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { submitEditPointDetails } from "./submitEditPointDetails";
+import type { EditObservationFormProps } from "../../../common/editObservationFormProps";
+import { ObservationDetailFields } from "../../../common/ObservationDetailFields";
 
 export default function Form({
   setAction,
   setOpenEdit,
-}: {
-  setAction: (value: string) => void;
-  setOpenEdit: (value: boolean) => void;
-}) {
+}: EditObservationFormProps) {
   const logAction = useLogAction();
 
   const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
@@ -65,6 +63,10 @@ export default function Form({
   const isAdHoc =
     selectedPoint?.omschrijving?.toLowerCase().includes("ad hoc") || false;
 
+  const labels =
+    content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails
+      .labels;
+
   return (
     <ScrollButtonsLayout
       buttons={
@@ -106,109 +108,48 @@ export default function Form({
         </p>
       </div>
 
-      <div className="mt-4 space-y-2 px-2">
-        <InputComp
-          value={omschrijving}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.aandachtspunt
-          }
-          setValue={setOmschrijving}
-          disabled={
-            !selectedPoint.omschrijving.toLowerCase().includes("ad hoc")
-          }
-        />
-
-        <InputComp
-          value={selectedPlan?.vluchtnummer || ""}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.vluchtplan
-          }
-          setValue={() => {}}
-          disabled
-        />
-
-        <InputComp
-          value={`${selectedPoint.datum.split("T")[0]} - ${
-            selectedPoint.datum.split("T")[1]
-          }`}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.datum
-          }
-          setValue={() => {}}
-          disabled
-        />
-
-        <InputComp
-          value={selectedPlan?.waarnemer || ""}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.waarnemer
-          }
-          setValue={() => {}}
-          disabled
-        />
-
-        <InputComp
-          value={email}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.emailadres
-          }
-          setValue={setEmail}
-        />
-        <TextAreaComp
-          value={comment}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.aanvullendeInfo
-          }
-          setValue={setComment}
-        />
-
-        <InputComp
-          value={"Finished"}
-          label={
-            content.nabewerking.vluchtenZoeken.step2.waarnemingen
-              .editPointDetails.labels.status
-          }
-          setValue={() => {}}
-          disabled
-        />
-
-        {currentPoint?.spoed && (
+      <ObservationDetailFields
+        vluchtnummer={selectedPlan?.vluchtnummer || ""}
+        datumDisplay={`${selectedPoint.datum.split("T")[0]} - ${
+          selectedPoint.datum.split("T")[1]
+        }`}
+        waarnemer={selectedPlan?.waarnemer || ""}
+        email={email}
+        setEmail={setEmail}
+        comment={comment}
+        setComment={setComment}
+        showSpoed={Boolean(currentPoint?.spoed)}
+        spoedEmail={currentPoint?.spoedemail}
+        leadingFields={
           <InputComp
-            value={String(currentPoint.spoedemail)}
-            label={
-              content.nabewerking.vluchtenZoeken.step2.waarnemingen
-                .editPointDetails.labels.spoedrapport
+            value={omschrijving}
+            label={labels.aandachtspunt}
+            setValue={setOmschrijving}
+            disabled={
+              !selectedPoint.omschrijving.toLowerCase().includes("ad hoc")
             }
-            setValue={() => {}}
-            disabled
           />
-        )}
+        }
+      />
 
-        {isAdHoc && (
-          <button
-            onClick={() => {
-              setAction("editPointCoordinates");
+      {isAdHoc && (
+        <button
+          onClick={() => {
+            setAction("editPointCoordinates");
 
-              logAction({
-                message: "User clicked 'Edit point coordinates' button",
-                step: "Second step - Form",
-              });
-            }}
-            className="gray-button !mt-10"
-          >
-            {
-              content.nabewerking.vluchtenZoeken.step2.waarnemingen
-                .editPointDetails.editPointCoordinatesBtn
-            }
-          </button>
-        )}
-      </div>
+            logAction({
+              message: "User clicked 'Edit point coordinates' button",
+              step: "Second step - Form",
+            });
+          }}
+          className="gray-button !mt-10"
+        >
+          {
+            content.nabewerking.vluchtenZoeken.step2.waarnemingen
+              .editPointDetails.editPointCoordinatesBtn
+          }
+        </button>
+      )}
 
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-500/20 bg-opacity-50 z-10">

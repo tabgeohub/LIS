@@ -29,15 +29,19 @@ const APPLY_AGENT_REPORT_SQL = `
   RETURNING *;
 `;
 
+function coalesceNull(value: unknown): unknown {
+  return value ?? null;
+}
+
 export function buildApplyAgentReportParams(input: ApplyAgentReportParams): unknown[] {
   const { deviceId, report, completedCommand } = input;
   return [
     deviceId,
     resolveReportedDeviceStatus(report),
-    report.windows_version ?? null,
-    report.os_build ?? null,
-    report.pending_update_count ?? null,
-    report.error ?? null,
+    coalesceNull(report.windows_version),
+    coalesceNull(report.os_build),
+    coalesceNull(report.pending_update_count),
+    coalesceNull(report.error),
     completedCommand,
     report.command_completed === true,
   ];

@@ -9,10 +9,11 @@ function stringifyNullableId(id: number | null | undefined): string {
   return id == null ? "" : String(id);
 }
 
-function buildSelectedPathPoint(
-  nearest: NonNullable<ReturnType<typeof findNearestPathPoint>>,
-  plan: FinishedFlightPlanType
-) {
+function buildSelectedPathPoint(input: {
+  nearest: NonNullable<ReturnType<typeof findNearestPathPoint>>;
+  plan: FinishedFlightPlanType;
+}) {
+  const { nearest, plan } = input;
   return {
     longitude: nearest.longitude,
     latitude: nearest.latitude,
@@ -34,5 +35,5 @@ export function resolveSelectedPathPoint(input: {
 }) {
   const nearest = findNearestPathPoint(input);
   if (!nearest) return null;
-  return buildSelectedPathPoint(nearest, input.plan);
+  return buildSelectedPathPoint({ nearest, plan: input.plan });
 }
