@@ -2,9 +2,9 @@ import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/Input
 import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import FlightPlanStandardFields, {
+  flightPlanStandardSelectProps,
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
 import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
 
 export default function Form({
@@ -23,10 +23,11 @@ export default function Form({
   return (
     <FlightPlanStandardFields
       fields={fields}
-      labels={defaultFlightPlanFieldLabels}
-      pilootOptions={pilootOptions}
-      waarnemerOptions={waarnemerOptions}
-      typeLuchtvaartuigOptions={[]}
+      {...flightPlanStandardSelectProps({
+        pilootOptions,
+        waarnemerOptions,
+        typeLuchtvaartuigOptions: [],
+      })}
       geplandeVliegduurDisabled
       typeLuchtvaartuigDisabled
       header={

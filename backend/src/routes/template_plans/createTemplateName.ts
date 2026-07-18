@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import { missingFields, serverError } from "../../helpers/http/routeResponses";
+import { missingFields } from "../../helpers/http/routeResponses";
 import { getMissingFields } from "../../helpers/http/validateBody";
 import {
   ensureTemplateNameAvailable,
 } from "../../helpers/queries/templates/templatePlanHelpers";
+import { respondTemplateCreateError } from "./createTemplateFlightPlanHelpers";
 
 export async function createTemplateName(
   req: Request,
@@ -23,13 +24,6 @@ export async function createTemplateName(
       message: "De vluchttemplate is succesvol opgeslagen",
     });
   } catch (err) {
-    serverError({
-      res,
-      logLabel: "Error creating template flight plan:",
-      message: `Failed to creating template flight plan: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-      err,
-    });
+    respondTemplateCreateError(res, err);
   }
 }

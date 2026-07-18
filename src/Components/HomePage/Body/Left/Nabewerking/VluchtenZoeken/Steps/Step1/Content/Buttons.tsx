@@ -5,6 +5,7 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import {
   calculateCenterAndZoom,
   collectPointsForCenterAndZoom,
+  goToLonLatZoom,
 } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
@@ -34,21 +35,7 @@ export default function Buttons() {
     const points = collectPointsForCenterAndZoom(selectedPlan);
     if (points.length > 0) {
       const { center, zoom } = calculateCenterAndZoom(points);
-      if (
-        Number.isFinite(center.latitude) &&
-        Number.isFinite(center.longitude)
-      ) {
-        mapView.goTo({
-          target: {
-            geometry: {
-              type: "point",
-              x: center.longitude,
-              y: center.latitude,
-            },
-          },
-          zoom,
-        });
-      }
+      goToLonLatZoom(mapView, center, zoom);
     }
   }
 

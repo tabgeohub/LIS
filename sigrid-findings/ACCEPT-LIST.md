@@ -1,62 +1,51 @@
-# Sigrid Accept list — Jul 18 pack (intentional / out of scope)
+# Sigrid Accept list — export `20260718(1)` (Architecture wave)
 
-Use this list for a **Sigrid UI Accept** pass. Do not re-open with code splits unless responsibilities start mixing.
+Use for a **Sigrid UI Accept** pass. Do not rewrite these unless responsibilities start mixing.
 
-Source pack: [`all-findings-rijkswaterstaat-otg-lis-20260718`](./all-findings-rijkswaterstaat-otg-lis-20260718/)
+Source: [`all-findings-rijkswaterstaat-otg-lis-20260718(1)`](./all-findings-rijkswaterstaat-otg-lis-20260718(1)/)
 
-## Unit size (Accept)
-
-| Unit | Why |
-| --- | --- |
-| `backend/dockerfile` | Deployment; out of scope for score |
-| `verify-regio-apis.ts.testResolveRegioFilter` | Backend verification script; cohesive test table |
-
-Ignore Unit size LOW (753) — not a score lever.
-
-## Security (Accept / out of scope)
-
-| Finding | Why |
-| --- | --- |
-| Missing User Instruction (CWE-266) on `dockerfile` / `backend/dockerfile` | Out of scope unless product wants non-root `USER` |
-| CSV XSS (CWE-79) on `csvExport.ts` | Mitigated via `escapeCsvCell` + nosemgrep; CSV not HTML |
-
-CRITICAL SQLi and Reliability dep findings already FIXED in export.
-
-## Component independence (Accept)
-
-Thin intentional façades / lookup hooks (HIGH examples):
-
-- `src/hooks/useLogAction.ts`
-- `src/hooks/useContent.ts` (also Coupling HIGH hub)
-- `src/hooks/consts/useConstSelectOptions.ts`
-- `src/hooks/useGetFlightTimesDistance.ts`
-- `src/helpers/refreshToken.ts`
-- `src/api-hooks/templateFlights/useTemplateFlights.ts`
-- `src/api-hooks/points/usePointLookupQueries.ts`
-- `src/api-hooks/flightPlans/useFlightPlanLookupQueries.ts`
-- `src/api-hooks/finishedPlans/usePlanPointAttachments.ts`
-- `src/api-hooks/consts/useLookupQuery.ts`
-- `src/api-hooks/emails/useEmailsList.ts`
-
-Plus remaining Independence MEDIUM thin api-hooks wrappers unless a module starts bundling unrelated concerns.
-
-## Module coupling (Accept)
+## Component independence HIGH (Accept — intentional façades)
 
 | Module | Why |
 | --- | --- |
-| `useLogAction` / `useContent` | App-wide hubs (high fan-in by design) |
-| `classNames`, `validateMapView`, `coords.ts` | Tiny shared utilities |
+| `src/hooks/useLogAction.ts` | App-wide logging façade |
+| `src/hooks/useContent.ts` | App-wide i18n/content hub |
+| `src/hooks/consts/useConstSelectOptions.ts` | Const lookup façade |
+| `src/hooks/useGetFlightTimesDistance.ts` | Thin query wrapper |
+| `src/helpers/refreshToken.ts` | Auth helper entry |
+| `src/api-hooks/templateFlights/useTemplateFlights.ts` | Domain React Query façade |
+| `src/api-hooks/points/usePointLookupQueries.ts` | Domain React Query façade |
+| `src/api-hooks/flightPlans/useFlightPlanLookupQueries.ts` | Domain React Query façade |
+| `src/api-hooks/finishedPlans/usePlanPointAttachments.ts` | Domain React Query façade |
+| `src/api-hooks/consts/useLookupQuery.ts` | Shared lookup façade |
+| `src/api-hooks/emails/useEmailsList.ts` | Domain React Query façade |
+
+## Module coupling (Accept — hubs / tiny utils)
+
+| Module | Why |
+| --- | --- |
+| `useLogAction` / `useContent` | HIGH fan-in by design |
+| `validateMapView`, EditGeometry `coords.ts` | Tiny shared utilities |
 | `useWizardButtons`, `useConstSelectOptions`, `useResetFeatures` | Cohesive hooks |
 | `nnederlandLayerBuilders` / icon primitives | Layer catalogue builders |
-| `useUpdateData`, `routeResponses`, `authSecurityLog` | Shared HTTP/mutation helpers |
+| `useUpdateData`, `routeResponses`, `authSecurityLog` | Shared HTTP helpers |
 
 ## Component entanglement (Accept)
 
 | Finding | Why |
 | --- | --- |
-| High density on `src/api-hooks` | Expected React Query façade layer |
-| Moderate density on helpers/hooks/HomePage/Timeslider | Normal for this app shape |
+| High density on `src/api-hooks` | Intentional React Query façade layer |
+| Moderate density on helpers/hooks/HomePage/Timeslider | Normal app shape |
 
-## After Accept
+## Unit size / Security (Accept / out of scope)
 
-Re-export from Sigrid and compare Maintainability stars + HIGH/MEDIUM counts — not raw 1.3K total.
+| Finding | Why |
+| --- | --- |
+| `backend/dockerfile` | Deployment |
+| `verify-regio-apis.ts.testResolveRegioFilter` | Verification script |
+| Docker CWE-266 (USER instruction) | Out of scope unless non-root containers required |
+| CSV XSS on `csvExport.ts` | Mitigated via `escapeCsvCell` |
+
+## Do NOT Accept without code (Wave B targets)
+
+Fat Independence MEDIUM “interface modules” under ArcGISHelpers / exports / mutations — consolidate behind façades in code first (see ARCHITECTURE wave B).

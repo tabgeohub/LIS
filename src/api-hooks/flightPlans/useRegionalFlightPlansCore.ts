@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { FlightPlanType } from "Types";
 import { enabledForRegio } from "./enabled";
-import { appendRegioQuery } from "./regioQuery";
+import { appendRegioQuery } from "../shared/regioQuery";
 import {
   FLIGHT_PLAN_REGIO_CONFIG,
   type FlightPlanRegioKind,

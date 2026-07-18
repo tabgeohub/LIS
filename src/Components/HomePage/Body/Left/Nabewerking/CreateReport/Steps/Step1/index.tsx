@@ -3,7 +3,7 @@ import PeriodFilter from "../PeriodFilter";
 import SinglePlan from "./SinglePlan";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useContent } from "hooks/useContent";
-import { useFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
+import { useBindFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
 
 export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
   const { openFilter } = useCreateReportState();
@@ -16,10 +16,8 @@ export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
     setFilteredPlans,
   } = useCreateReportState();
 
-  useFilteredSortedPlans({
-    plans,
-    filterText: filterTerm,
-    periodFilter: periode,
+  useBindFilteredSortedPlans(plans, filterTerm, {
+    periode,
     dateFrom,
     dateTo,
     setFilteredPlans,

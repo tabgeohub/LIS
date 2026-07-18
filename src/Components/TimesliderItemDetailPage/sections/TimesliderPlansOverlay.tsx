@@ -1,17 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { FinishedFlightPlanType } from "Types/finished_plans";
 import PlansFilterSection from "./PlansFilterSection";
+import type { PlansFilterSectionProps } from "./plansFilterSectionProps";
 
-type TimesliderPlansOverlayProps = {
+type TimesliderPlansOverlayProps = PlansFilterSectionProps & {
   visible: boolean;
   blocked: boolean;
-  plans: FinishedFlightPlanType[];
-  selectedPlanId: number | null;
-  onSelectPlan: (plan: FinishedFlightPlanType) => void;
-  loading: boolean;
-  emptyHint?: string;
-  firstImageUrlByPlanId: Record<number, string>;
-  imagesLoading: boolean;
 };
 
 export default function TimesliderPlansOverlay({

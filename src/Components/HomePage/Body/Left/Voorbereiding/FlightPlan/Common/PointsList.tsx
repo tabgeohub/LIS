@@ -1,20 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { EnrichedPointType } from "Types";
+import type { WizardPointsListSelectionProps } from "Components/HomePage/Body/Left/Common/wizardPointsListSelectionProps";
+import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
 import usePointClick from "hooks/hover-click-handlers/usePointClick";
 import { useEffect } from "react";
 import useLogAction from "hooks/useLogAction";
-import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
 import { getPointsSelectionStep } from "hooks/points/pointsSelectionLog";
 
 export default function PointsList({
   selectedPoints,
   setSelectedPoints,
   points,
-}: {
-  selectedPoints: number[];
-  setSelectedPoints: (value: number[]) => void;
-  points: EnrichedPointType[];
-}) {
+}: WizardPointsListSelectionProps) {
   const logAction = useLogAction();
 
   usePointClick(points.filter((point) => selectedPoints.includes(point.id)));

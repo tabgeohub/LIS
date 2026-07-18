@@ -9,11 +9,8 @@ import { useUpdateData } from "utils/useUpdateData";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import useLogAction from "hooks/useLogAction";
-import {
-  buildPointUpdatePayload,
-  pickPointCoreLogData,
-} from "@helpers/points/buildPointUpdatePayload";
-import { applyDeletePointUpdateSuccess } from "../../applyDeletePointUpdateSuccess";
+import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
+import { submitDeletePointDetailsUpdate } from "../../submitDeletePointDetailsUpdate";
 
 export default function Step2({
   setStep,
@@ -37,33 +34,24 @@ export default function Step2({
   const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
 
   function handleSubmit() {
-    if (!selectedPoint) return;
-
-    const newPoint = buildPointUpdatePayload({
-      fields: formFields,
-      id: selectedPoint.id,
-      created_at: selectedPoint.created_at,
+    submitDeletePointDetailsUpdate({
+      selectedPoint,
+      formFields,
+      update,
+      points,
+      setPoints,
+      mapView,
+      redGraphicsLayer,
+      onApplied: () => {
+        setStep(1);
+        if (!selectedPoint) return;
+        logAction({
+          message: "User clicked 'Save' button",
+          step: "Edit point details - Step 2",
+          newData: pickPointCoreLogData(selectedPoint),
+        });
+      },
     });
-
-    update({ data: newPoint, onSuccess: (responseData) => {
-      if (!responseData.result) return;
-
-      applyDeletePointUpdateSuccess({
-        points,
-        result: responseData.result,
-        setPoints,
-        mapView,
-        redGraphicsLayer,
-      });
-
-      setStep(1);
-
-      logAction({
-        message: "User clicked 'Save' button",
-        step: "Edit point details - Step 2",
-        newData: pickPointCoreLogData(selectedPoint),
-      });
-    },});
   }
 
   return (

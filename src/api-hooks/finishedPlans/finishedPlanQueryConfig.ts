@@ -1,7 +1,7 @@
 import { fetchApi } from "api/fetchApi";
 import { finishedPlanKeys } from "lib/queryKeys";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { appendRegioQuery } from "../flightPlans/regioQuery";
+import { appendRegioQuery } from "../shared/regioQuery";
 import { PlanPathRow } from "./types";
 
 export function partialFinishedPlansQuery(regioId: string | number | undefined) {

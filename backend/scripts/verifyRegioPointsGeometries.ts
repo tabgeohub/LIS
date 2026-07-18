@@ -3,6 +3,19 @@ import type { RegioTestReporter } from "./verifyRegioFlightPlanCases";
 
 const ADMIN = "admin";
 
+async function withPoolQuery(
+  query: string,
+  params: unknown[]
+): Promise<unknown[]> {
+  const pool = new Pool();
+  try {
+    const r = await pool.query(query, params);
+    return r.rows;
+  } finally {
+    await pool.end();
+  }
+}
+
 async function runPointsQuery(regio: string | undefined): Promise<unknown[]> {
   const params: unknown[] = [];
   let query = "SELECT id, regio_id FROM lis.points";
@@ -11,13 +24,7 @@ async function runPointsQuery(regio: string | undefined): Promise<unknown[]> {
     query += ` WHERE LOWER(regio_id) = $${params.length}`;
   }
   query += " ORDER BY id DESC LIMIT 5000";
-  const pool = new Pool();
-  try {
-    const r = await pool.query(query, params);
-    return r.rows;
-  } finally {
-    await pool.end();
-  }
+  return withPoolQuery(query, params);
 }
 
 async function runGeometriesQuery(regio: string | undefined): Promise<unknown[]> {
@@ -35,13 +42,7 @@ async function runGeometriesQuery(regio: string | undefined): Promise<unknown[]>
     query += " WHERE " + conditions.join(" AND ");
   }
   query += " ORDER BY g.id DESC LIMIT 5000";
-  const pool = new Pool();
-  try {
-    const r = await pool.query(query, params);
-    return r.rows;
-  } finally {
-    await pool.end();
-  }
+  return withPoolQuery(query, params);
 }
 
 export async function runPointsRegioCheck(input: {

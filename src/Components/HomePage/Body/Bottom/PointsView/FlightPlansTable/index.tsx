@@ -8,14 +8,10 @@ import { TfiMoreAlt } from "react-icons/tfi";
 import { FlightPlanType } from "Types";
 import Data from "./Data";
 import {
-  createPlanBoundingBoxGraphic,
-  getFlightPlanPoints,
-  PLAN_BOUNDING_BOX_SYMBOLS,
-} from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
-import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
+import { showPlanSearchListHover } from "hooks/hover-click-handlers/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [
@@ -99,22 +95,13 @@ export default function FlightPlansTable({
   };
 
   const HoveredPlan = (plan: FlightPlanType) => {
-    if (!mapView || !graphicsLayerHover || !graphicsLayer) return;
-
-    const oldGraphic = originalGraphicsMap.current.get(plan.id);
-    if (oldGraphic) {
-      graphicsLayer.remove(oldGraphic);
-    }
-
-    graphicsLayerHover.removeAll();
-
-    const hoverGraphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
-      symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hoverSearchList,
+    showPlanSearchListHover({
+      plan,
+      mapView,
+      graphicsLayerHover,
+      graphicsLayer,
+      originalGraphic: originalGraphicsMap.current.get(plan.id),
     });
-
-    if (hoverGraphic) {
-      graphicsLayerHover.add(hoverGraphic);
-    }
   };
 
   return (

@@ -11,18 +11,27 @@ interface UseTableScrollWidthParams {
   starredGeometriesLength: number;
 }
 
+function tableLengthSignature(
+  params: Omit<UseTableScrollWidthParams, "tableScrollRef" | "tab">
+) {
+  return [
+    params.pointsTableLength,
+    params.flightPlansLength,
+    params.geometriesTableLength,
+    params.starredPointsLength,
+    params.starredPlansLength,
+    params.starredGeometriesLength,
+  ].join("|");
+}
+
 export const useTableScrollWidth = ({
   tableScrollRef,
   tab,
-  pointsTableLength,
-  flightPlansLength,
-  geometriesTableLength,
-  starredPointsLength,
-  starredPlansLength,
-  starredGeometriesLength,
+  ...tableLengths
 }: UseTableScrollWidthParams) => {
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
   const [scrollContainerWidth, setScrollContainerWidth] = useState(0);
+  const lengthKey = tableLengthSignature(tableLengths);
 
   useEffect(() => {
     const wrapper = tableScrollRef.current;
@@ -46,16 +55,7 @@ export const useTableScrollWidth = ({
     if (tableEl) observer.observe(tableEl);
 
     return () => observer.disconnect();
-  }, [
-    tableScrollRef,
-    tab,
-    pointsTableLength,
-    flightPlansLength,
-    geometriesTableLength,
-    starredPointsLength,
-    starredPlansLength,
-    starredGeometriesLength,
-  ]);
+  }, [tableScrollRef, tab, lengthKey]);
 
   return { tableScrollWidth, scrollContainerWidth };
 };

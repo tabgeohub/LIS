@@ -18,42 +18,33 @@ export default function Buttons({
   update: any;
 }) {
   const content = useContent();
-
-  const {
-    selectedPlan,
-    setSelectedPlan,
-    setStep,
-    filteredPlans,
-    setFilteredPlans,
-  } = useViewPlanAddPointsState();
-
+  const viewPlan = useViewPlanAddPointsState();
   const { dbPoints } = usePointsStore();
   const { dbGeometries, setGeometries } = useGeometriesStore();
   const { yellowGraphicsLayer } = useMapViewState();
   const { setPointsTable, setGeometriesTable, setOpenTable } = useOpenTable();
-
   const logAction = useLogAction();
 
   function handleSubmit() {
-    if (!selectedPlan) return;
+    if (!viewPlan.selectedPlan) return;
 
     submitAddPointsToPlan({
-      selectedPlan,
+      selectedPlan: viewPlan.selectedPlan,
       selectedPointIds,
       selectedGeometryIds,
       dbPoints,
       dbGeometries,
       yellowGraphicsLayer,
       update,
-      setSelectedPlan,
+      setSelectedPlan: viewPlan.setSelectedPlan,
       setPointsTable,
       setGeometriesTable,
       setGeometries,
       setOpenTable,
-      filteredPlans,
-      setFilteredPlans,
+      filteredPlans: viewPlan.filteredPlans,
+      setFilteredPlans: viewPlan.setFilteredPlans,
       logAction,
-      setStep,
+      setStep: viewPlan.setStep,
     });
   }
 
@@ -64,7 +55,7 @@ export default function Buttons({
         {
           label: content.common.vorige,
           onClick: () => {
-            setStep(2);
+            viewPlan.setStep(2);
 
             logAction({
               message: "User clicked 'Next' button",

@@ -1,15 +1,12 @@
 import { useEffect } from "react";
-import type { FinishedPointType } from "Types/finished_plans";
-import { scheduleEditPointPreview } from "./scheduleEditPointPreview";
+import {
+  scheduleEditPointPreview,
+  type ScheduleEditPointPreviewInput,
+} from "./scheduleEditPointPreview";
 
-export function useEditPointPreviewGraphics(input: {
-  mapView: __esri.MapView | null;
-  redGraphicsLayer: __esri.GraphicsLayer | null;
-  pointsGraphicsLayer: __esri.GraphicsLayer | null;
-  selectedPoint: FinishedPointType | null;
-  longitude: number;
-  latitude: number;
-}) {
+export function useEditPointPreviewGraphics(
+  input: ScheduleEditPointPreviewInput
+) {
   useEffect(() => {
     return scheduleEditPointPreview(input);
   }, [

@@ -1,16 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { EnrichedPointType } from "Types";
+import type { WizardPointsListSelectionProps } from "Components/HomePage/Body/Left/Common/wizardPointsListSelectionProps";
 import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
 
 export default function PointsList({
   selectedPoints,
   setSelectedPoints,
   points,
-}: {
-  selectedPoints: number[];
-  setSelectedPoints: (value: number[]) => void;
-  points: EnrichedPointType[];
-}) {
+}: WizardPointsListSelectionProps) {
   return (
     <WizardPointsList
       points={points}

@@ -4,7 +4,10 @@ import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Comm
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import {
+  pickDeletePointCoordinateFields,
+  useDeletePointState,
+} from "hooks/zustand/tools/useDeletePointState";
 import { useState } from "react";
 import { applyDeletePointCoordinatePatch } from "./applyDeletePointCoordinatePatch";
 
@@ -26,7 +29,7 @@ export default function Step2Sub2({
     setYCoordinaat_rd,
     setLatitude,
     setLongitude,
-  } = useDeletePointState();
+  } = useDeletePointState(pickDeletePointCoordinateFields);
 
   useCoordinateSystemSync({
     coordinateSystem,

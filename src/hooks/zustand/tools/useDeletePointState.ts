@@ -95,6 +95,33 @@ export function pickDeletePointFormFields(
   };
 }
 
+export type DeletePointCoordinateFields = Pick<
+  DeletePoint,
+  | "xcoordinaat_rd"
+  | "ycoordinaat_rd"
+  | "latitude"
+  | "longitude"
+  | "setXCoordinaat_rd"
+  | "setYCoordinaat_rd"
+  | "setLatitude"
+  | "setLongitude"
+>;
+
+export function pickDeletePointCoordinateFields(
+  state: DeletePoint
+): DeletePointCoordinateFields {
+  return {
+    xcoordinaat_rd: state.xcoordinaat_rd,
+    ycoordinaat_rd: state.ycoordinaat_rd,
+    latitude: state.latitude,
+    longitude: state.longitude,
+    setXCoordinaat_rd: state.setXCoordinaat_rd,
+    setYCoordinaat_rd: state.setYCoordinaat_rd,
+    setLatitude: state.setLatitude,
+    setLongitude: state.setLongitude,
+  };
+}
+
 const initialState = {
   mainStep: "main" as AandachtspuntenVerwijderenType,
   selectedPoints: [] as EnrichedPointType[],

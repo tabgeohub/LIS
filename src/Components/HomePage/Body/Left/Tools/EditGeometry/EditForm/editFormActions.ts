@@ -15,6 +15,15 @@ type NavInput = {
   setSelectedVertexId: (id: number | null) => void;
 };
 
+type PointDraftUpdateHandlers = {
+  setPointsDraft: Dispatch<SetStateAction<GeometryPointRow[]>>;
+  setPointForm: (form: PointFormState | null) => void;
+  onPointUpdated?: (
+    updatedPoint: GeometryPointRow,
+    allPoints: GeometryPointRow[]
+  ) => void;
+};
+
 export function createEditFormNavigation(input: NavInput) {
   const clear = () => {
     input.setPointForm(null);
@@ -42,16 +51,12 @@ export function createEditFormNavigation(input: NavInput) {
   };
 }
 
-export function applyPointUpdateSuccess(input: {
-  updated: GeometryPointRow;
-  responseData: { result?: GeometryPointRow };
-  setPointsDraft: Dispatch<SetStateAction<GeometryPointRow[]>>;
-  setPointForm: (form: PointFormState | null) => void;
-  onPointUpdated?: (
-    updatedPoint: GeometryPointRow,
-    allPoints: GeometryPointRow[]
-  ) => void;
-}) {
+export function applyPointUpdateSuccess(
+  input: PointDraftUpdateHandlers & {
+    updated: GeometryPointRow;
+    responseData: { result?: GeometryPointRow };
+  }
+) {
   if (!input.responseData?.result) return;
   const nextUpdatedPoint = {
     ...input.updated,
@@ -67,21 +72,17 @@ export function applyPointUpdateSuccess(input: {
   input.setPointForm(pointToForm(nextUpdatedPoint));
 }
 
-export function submitEditFormPoint(input: {
-  e: React.FormEvent;
-  pointForm: PointFormState | null;
-  pointsDraft: GeometryPointRow[];
-  updatePoint: (args: {
-    data: GeometryPointRow;
-    onSuccess: (responseData: { result?: GeometryPointRow }) => void;
-  }) => void;
-  setPointsDraft: Dispatch<SetStateAction<GeometryPointRow[]>>;
-  setPointForm: (form: PointFormState | null) => void;
-  onPointUpdated?: (
-    updatedPoint: GeometryPointRow,
-    allPoints: GeometryPointRow[]
-  ) => void;
-}) {
+export function submitEditFormPoint(
+  input: PointDraftUpdateHandlers & {
+    e: React.FormEvent;
+    pointForm: PointFormState | null;
+    pointsDraft: GeometryPointRow[];
+    updatePoint: (args: {
+      data: GeometryPointRow;
+      onSuccess: (responseData: { result?: GeometryPointRow }) => void;
+    }) => void;
+  }
+) {
   input.e.preventDefault();
   if (input.pointForm == null) return;
   const base = input.pointsDraft.find((p) => p.id === input.pointForm!.id);

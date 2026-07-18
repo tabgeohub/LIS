@@ -1,9 +1,9 @@
 import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
 import FlightPlanStandardFields, {
+  flightPlanStandardSelectProps,
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { defaultFlightPlanFieldLabels } from "hooks/zustand/shared/flightPlanFormFields";
 import { useHydrateDuplicateFlightPlanForm } from "./useHydrateDuplicateFlightPlanForm";
 import { DuplicateFlightPlanFormHeader } from "./DuplicateFlightPlanFormHeader";
 
@@ -19,10 +19,11 @@ export default function Form() {
   return (
     <FlightPlanStandardFields
       fields={fields}
-      labels={defaultFlightPlanFieldLabels}
-      pilootOptions={pilootOptions}
-      waarnemerOptions={waarnemerOptions}
-      typeLuchtvaartuigOptions={typeLuchtvaartuigOptions}
+      {...flightPlanStandardSelectProps({
+        pilootOptions,
+        waarnemerOptions,
+        typeLuchtvaartuigOptions,
+      })}
       header={
         <DuplicateFlightPlanFormHeader
           aanmaker={store.aanmaker}

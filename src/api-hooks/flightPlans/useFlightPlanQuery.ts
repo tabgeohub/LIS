@@ -6,6 +6,4 @@ export {
   useVluchtnummerExists,
   useSearchedFlightPlans,
   usePointFlightPlans,
-  useTemplateFlights,
 } from "./index";
-export type { UseTemplateFlightsInput } from "./index";

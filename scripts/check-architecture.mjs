@@ -43,6 +43,37 @@ const rules = [
   },
 ];
 
+/** Domains under api-hooks that may only import themselves + shared/mutations/consts. */
+const apiHookSharedDomains = new Set(["shared", "mutations", "consts"]);
+
+function apiHookDomain(path) {
+  if (!path.startsWith("api-hooks/")) return null;
+  const segment = path.slice("api-hooks/".length).split("/")[0];
+  return segment || null;
+}
+
+function collectCrossDomainApiHookImports(path, contents) {
+  const domain = apiHookDomain(path);
+  if (!domain || apiHookSharedDomains.has(domain)) return [];
+
+  const importRe =
+    /from\s+["']((?:\.\.\/)+)([A-Za-z0-9_-]+)(?:\/[^"']*)?["']/g;
+  const found = [];
+  let match;
+  while ((match = importRe.exec(contents))) {
+    const targetDomain = match[2];
+    if (
+      targetDomain !== domain &&
+      !apiHookSharedDomains.has(targetDomain)
+    ) {
+      found.push(
+        `${path}: api-hooks domain "${domain}" must not import "${targetDomain}" (use shared/ or own domain)`
+      );
+    }
+  }
+  return found;
+}
+
 const violations = [];
 for (const absolutePath of sourceFiles(sourceRoot)) {
   const path = relative(sourceRoot, absolutePath).replaceAll("\\", "/");
@@ -52,6 +83,7 @@ for (const absolutePath of sourceFiles(sourceRoot)) {
       violations.push(`${path}: ${rule.name}`);
     }
   }
+  violations.push(...collectCrossDomainApiHookImports(path, contents));
 }
 
 if (violations.length) {

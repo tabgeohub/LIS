@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "api/fetchApi";
 import { templateFlightKeys } from "lib/queryKeys";
-import { appendRegioQuery } from "../flightPlans/regioQuery";
+import { appendRegioQuery } from "../shared/regioQuery";
 import { Template } from "./types";
 
 export type UseTemplateFlightsInput = {

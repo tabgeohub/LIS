@@ -1,5 +1,8 @@
 import type { Geometry } from "hooks/features/useGeometriesStore";
-import { calculateCenterAndZoom } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
+import {
+  calculateCenterAndZoom,
+  goToLonLatZoom,
+} from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
 import type { GeometryEditDraft, GeometryPointRow } from "./EditForm";
 
 export function filterGeometriesByTerm(geometries: Geometry[], filterTerm: string) {
@@ -48,16 +51,7 @@ export function zoomMapToGeometryPoints(
   if (points.length === 0) return;
 
   const { center, zoom } = calculateCenterAndZoom(points);
-  mapView.goTo({
-    target: {
-      geometry: {
-        type: "point",
-        x: center.longitude,
-        y: center.latitude,
-      },
-    },
-    zoom,
-  });
+  goToLonLatZoom(mapView, center, zoom);
 }
 
 export function patchGeometryPointInList(input: {

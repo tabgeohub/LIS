@@ -6,14 +6,11 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
 import Loading from "./Loading";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import {
-  buildPointUpdatePayload,
-  pickPointCoreLogData,
-} from "@helpers/points/buildPointUpdatePayload";
+import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { applyDeletePointUpdateSuccess } from "../../applyDeletePointUpdateSuccess";
+import { submitDeletePointDetailsUpdate } from "../../submitDeletePointDetailsUpdate";
 
 export default function Buttons({
   setStep,
@@ -30,32 +27,21 @@ export default function Buttons({
   const { update, loading } = useUpdateData(`/points/${selectedPoint?.id}`);
 
   function handleSubmit() {
-    if (!selectedPoint) return;
-
-    const newPoint = buildPointUpdatePayload({
-      fields: formFields,
-      id: selectedPoint.id,
-      created_at: selectedPoint.created_at,
+    submitDeletePointDetailsUpdate({
+      selectedPoint,
+      formFields,
+      update,
+      points,
+      setPoints,
+      mapView,
+      redGraphicsLayer,
+      yellowGraphicsLayer,
+      onApplied: () => setMainStep("main"),
     });
 
-    update({
-      data: newPoint,
-      onSuccess: (responseData) => {
-        if (!responseData.result) return;
-
-        applyDeletePointUpdateSuccess({
-          points,
-          result: responseData.result,
-          setPoints,
-          mapView,
-          redGraphicsLayer,
-          yellowGraphicsLayer,
-        });
-        setMainStep("main");
-      },
-    });
-
-    logStep("User clicked 'Save' button", pickPointCoreLogData(selectedPoint));
+    if (selectedPoint) {
+      logStep("User clicked 'Save' button", pickPointCoreLogData(selectedPoint));
+    }
   }
 
   const geometrieLabel =

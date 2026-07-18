@@ -1,6 +1,14 @@
-import { POINT_CORE_PAYLOAD_FIELDS } from "./pointCoreFieldKeys";
+import { POINT_CORE_IDENTITY_KEYS } from "./pointCoreIdentityKeys";
 
-export { POINT_CORE_PAYLOAD_FIELDS };
+export const POINT_CORE_PAYLOAD_FIELDS = [
+  ...POINT_CORE_IDENTITY_KEYS,
+  "vertrouwelijk",
+  "herhalen",
+  "user_id",
+  "activiteit_id",
+  "organisatie_id",
+  "specifiek_letten_op",
+] as const;
 
 type PointCorePayloadField = (typeof POINT_CORE_PAYLOAD_FIELDS)[number];
 

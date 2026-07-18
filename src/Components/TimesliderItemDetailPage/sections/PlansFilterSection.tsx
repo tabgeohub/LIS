@@ -1,15 +1,5 @@
 import type { FinishedFlightPlanType } from "Types/finished_plans";
-
-type Props = {
-  plans: FinishedFlightPlanType[];
-  selectedPlanId: number | null;
-  onSelectPlan: (plan: FinishedFlightPlanType) => void;
-  loading: boolean;
-  emptyHint?: string;
-  /** First preview image URL per plan id for this item (point/geometry). */
-  firstImageUrlByPlanId: Record<number, string>;
-  imagesLoading: boolean;
-};
+import type { PlansFilterSectionProps } from "./plansFilterSectionProps";
 
 function planLabel(p: FinishedFlightPlanType) {
   return p.vluchtnummer?.trim() || `Plan ${p.id}`;
@@ -23,7 +13,7 @@ export default function PlansFilterSection({
   emptyHint,
   firstImageUrlByPlanId,
   imagesLoading,
-}: Props) {
+}: PlansFilterSectionProps) {
   return (
     <section
       id="timeslider-item-plans"

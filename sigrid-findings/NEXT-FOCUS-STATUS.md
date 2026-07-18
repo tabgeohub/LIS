@@ -1,40 +1,45 @@
-# Next Sigrid focus — status (Jul 18 pack)
+# Next focus status — Architecture wave (`20260718(1)`)
 
-Baseline: [`all-findings-rijkswaterstaat-otg-lis-20260718`](./all-findings-rijkswaterstaat-otg-lis-20260718/)
+Dashboard baseline: Maintainability **4.1** · Architecture **3.3** (yellow) · OSH 4.7 · Security 4.3 · Reliability 5.5.
 
-## Applied this wave
+## Done this wave
 
-### Security
-- CRITICAL SQLi already **FIXED** in Sigrid export; hardened remaining table-name SQL concat in [`regioPlanAssertions.ts`](../backend/scripts/regioPlanAssertions.ts) and [`entityDeleteHelpers.ts`](../backend/src/helpers/entities/entityDeleteHelpers.ts) (allowlisted literals only).
-- HIGH Docker CWE-266 (**RAW**) — out of scope (no Dockerfile edits).
-- HIGH deps: nodemailer already at 9.0.3; multer/undici current; Puppeteer already has external-request blocking in [`blockExternalPuppeteerRequests.ts`](../backend/src/routes/emails/blockExternalPuppeteerRequests.ts).
-- MEDIUM CSV XSS finding — already mitigated via `escapeCsvCell` + nosemgrep note.
+### Wave A — Accept ledger
+- Recreated [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) for intentional Independence HIGH façades, Coupling hubs, api-hooks entanglement, Docker/Unit size Accept, CSV XSS mitigated.
 
-### Duplication
-- ~**46** HIGH clone findings addressed across two batches (point column keys, flight-plan list handlers, SinglePlan twins, coord-sync clones, form field types, etc.).
-- Cross-layer twins (keycloakUser FE↔BE) left (no shared package).
+### Wave B — Independence consolidation (main lever)
+Thinned fat Independence MEDIUM interface modules to ≤~10 LOC re-export façades; bodies in Core/internal siblings imported only by those façades.
 
-### Unit complexity
-- All **19** MEDIUM complexity units thinned via branch helpers.
+ArcGISHelpers: `centerAndZoomMath`, `geometryMapGraphicFactories`, `pointMapGraphicActions`, `geometryMapGraphicActions`, `bufferPointsOnLayer`, `planBoundingBoxGeometry`, `createGeometryGraphicCore`.
 
-### Unit size / Independence / Coupling
-- Unit size MEDIUM leftovers: Accept in Sigrid UI (`dockerfile`, `verify-regio-apis`).
-- Independence/Coupling hubs (`useLogAction`, `useContent`, thin api-hooks): Accept intentional façades — no code churn.
+Other: `flightPlanPointExcel`, `sortPointsWithSelectionOrder`, shapefile/csv/xlsx exports, `useCreateData` / `useUpdateData`, `flightPlanFormSetters`, plus Unit size leftovers (`applyDeletePointCoordinatePatch`, LegendSection*, `pointCoreFieldKeys`).
+
+### Wave C — api-hooks entanglement follow-up
+- Moved `appendRegioQuery` to `src/api-hooks/shared/regioQuery.ts`.
+- Removed `useTemplateFlights` re-export from `api-hooks/flightPlans` (consumers use `api-hooks/templateFlights`).
+- Extended `scripts/check-architecture.mjs` to forbid cross-domain api-hooks imports (allow `shared` / `mutations` / `consts`).
+
+### Wave D — Maintainability polish
+- Thinned Complexity MEDIUM: `mergeFlightPlanPersistenceFields`, `populateFormFromPlan`, `buildSelectedPathPoint` (key-list / coalesce helpers).
+- Cleared priority within-layer Duplication HIGH clones; skipped FE↔BE twins (`keycloakUser`, `devices`).
+
+### Wave B2 — next-tier Independence MEDIUM (pre-deploy)
+Thinned remaining ~31–47 LOC interface modules to thin façades + Core:
+- ArcGIS/helpers: `planStarGraphics`, `bufferFlightPlansOnLayer`, `pointMapGraphicFactories`, `pointGraphicFactory`, `finishedPlanCentroidMarkers`, `buildPlanBoundingBoxGraphic`, `centerAndZoomFromPlan`, `syncBluePointGraphics`, `geoJsonExport`, `buildCoordinateSyncPatch`
+- Hooks/mutations: `useDeleteData`, `useResizableSidebar`, `useDrawPath`, `useWizardPointsFilterHeader`, `useTimeRange`, result-tab hooks, hover-click handlers, `buildFlightPlanCreateAttributes`, `flightPlanFormLabels`, `useFilteredSortedPlans`, …
+- Extra within-layer dup polish (EditPointDetails submit helper, template name helper, verifyRegio pool query, filter bind helper).
 
 ## Verification
-- `npm run check:architecture` — passed
-- `npm run test:architecture-helpers` — passed
-- `mapLoginError` tests — passed
+- `npm run check:architecture` — pass
+- `npm run test:architecture-helpers` — pass
 
-## Expected next export
-- Complexity MEDIUM → ~0
-- Duplication HIGH → materially lower (~50 left if ~46 cleared; plus ~16 more residual polish)
-- Interfacing MEDIUM → 0 (4 APIs collapsed to options objects)
-- Security CRITICAL stays FIXED; RAW HIGH may remain Docker-only
-- Maintainability stars: hold ≥4.0 / climb on duplication+complexity+interfacing volume drop
+## Before deploy (manual)
+1. Apply Accept list in Sigrid UI (Wave A).
+2. Smoke-test map graphics / wizard points / exports / mutations (façade paths unchanged).
+3. Re-export Sigrid after deploy for Architecture rebaseline.
 
-## Remaining-fixes wave (applied)
-
-- Unit interfacing: 4 MEDIUM → options objects (`comparePointsWithSelectionOrder`, `drawFinishedPlanHighlight`, `toGeometryPointPayload`, `pointsToCoordinates`)
-- Residual duplication: ~16 more within-layer twins
-- Accept list documented: [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) (Sigrid UI; hubs / Docker / Unit size leftovers)
+## Next Sigrid export expectations
+- Architecture trending up from 3.3 (Independence MEDIUM façades thinner across Wave B + B2).
+- Coupling HIGH hubs remain Accept (OK).
+- Maintainability holds ≥ 4.1; Complexity MEDIUM → 0; Duplication HIGH trending down.
+- Do **not** chase remaining Independence LOW / tiny intentional hubs.
