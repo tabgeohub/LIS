@@ -21,6 +21,57 @@ type LegendSectionProps = {
   syncFromSelectedLayers?: boolean;
 };
 
+function resolveParentChecked(
+  controlled: boolean | undefined,
+  internal: boolean
+): boolean {
+  return controlled ?? internal;
+}
+
+function resolveParentSetter(
+  onChange: ((checked: boolean) => void) | undefined,
+  internalSetter: (checked: boolean) => void
+): (checked: boolean) => void {
+  return onChange ?? internalSetter;
+}
+
+function resolveParentGate(
+  parentTitle: string | undefined,
+  parentChecked: boolean,
+  externalParentChecked: boolean | undefined
+): { gatedByParent: boolean; parentGateChecked: boolean | undefined } {
+  const gatedByParent =
+    parentTitle != null || externalParentChecked !== undefined;
+  const parentGateChecked = parentTitle ? parentChecked : externalParentChecked;
+  return { gatedByParent, parentGateChecked };
+}
+
+function buildUseLegendLayersOptions(input: {
+  gatedByParent: boolean;
+  parentGateChecked: boolean | undefined;
+  nestedParentTitle?: string;
+  nestedParentChecked: boolean;
+  setNestedParentChecked: (checked: boolean) => void;
+  syncFromSelectedLayers: boolean;
+  setParentChecked: (checked: boolean) => void;
+}) {
+  return {
+    externalParentChecked: input.gatedByParent
+      ? input.parentGateChecked
+      : undefined,
+    nestedParentChecked: input.nestedParentTitle
+      ? input.nestedParentChecked
+      : undefined,
+    onExternalParentUnchecked: input.nestedParentTitle
+      ? () => input.setNestedParentChecked(false)
+      : undefined,
+    syncFromSelectedLayers: input.syncFromSelectedLayers,
+    onSyncFromSelectedLayers: input.syncFromSelectedLayers
+      ? () => input.setParentChecked(true)
+      : undefined,
+  };
+}
+
 export default function LegendSection({
   initialLayers,
   parentTitle,
@@ -35,27 +86,37 @@ export default function LegendSection({
   const [internalParentChecked, setInternalParentChecked] = useState(false);
   const [nestedParentChecked, setNestedParentChecked] = useState(false);
 
-  const parentChecked = controlledParentChecked ?? internalParentChecked;
-  const setParentChecked = onParentCheckedChange ?? setInternalParentChecked;
+  const parentChecked = resolveParentChecked(
+    controlledParentChecked,
+    internalParentChecked
+  );
+  const setParentChecked = resolveParentSetter(
+    onParentCheckedChange,
+    setInternalParentChecked
+  );
 
-  const gatedByParent = parentTitle != null || externalParentChecked !== undefined;
-  const parentGateChecked = parentTitle ? parentChecked : externalParentChecked;
+  const { gatedByParent, parentGateChecked } = resolveParentGate(
+    parentTitle,
+    parentChecked,
+    externalParentChecked
+  );
 
   const {
     filteredLayers,
     handleLayerChange,
     isVisibleForRole,
-  } = useLegendLayers(initialLayers, {
-    externalParentChecked: gatedByParent ? parentGateChecked : undefined,
-    nestedParentChecked: nestedParentTitle ? nestedParentChecked : undefined,
-    onExternalParentUnchecked: nestedParentTitle
-      ? () => setNestedParentChecked(false)
-      : undefined,
-    syncFromSelectedLayers,
-    onSyncFromSelectedLayers: syncFromSelectedLayers
-      ? () => setParentChecked(true)
-      : undefined,
-  });
+  } = useLegendLayers(
+    initialLayers,
+    buildUseLegendLayersOptions({
+      gatedByParent,
+      parentGateChecked,
+      nestedParentTitle,
+      nestedParentChecked,
+      setNestedParentChecked,
+      syncFromSelectedLayers,
+      setParentChecked,
+    })
+  );
 
   if (hideWhenEmpty && filteredLayers.length === 0) {
     return null;

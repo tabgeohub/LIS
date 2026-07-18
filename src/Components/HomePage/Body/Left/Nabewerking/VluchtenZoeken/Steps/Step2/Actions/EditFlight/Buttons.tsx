@@ -7,6 +7,10 @@ import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import { pickFlightPlanFormValues } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import {
+  mergeFlightPlanPersistenceFields,
+  pickFlightPlanPersistenceFields,
+} from "hooks/flightPlan/pickFlightPlanPersistenceFields";
 
 export default function Buttons({
   setAction,
@@ -32,32 +36,16 @@ export default function Buttons({
     };
 
     update({ data: attributes, onSuccess: (responseData) => {
-      setSelectedPlan({
-        ...selectedPlan,
-        omschrijving: responseData.result.omschrijving,
-        waarnemer: responseData.result.waarnemer,
-        piloot: responseData.result.piloot,
-        datum: responseData.result.datum,
-        vliegduur: responseData.result.vliegduur,
-        luchtvaartuig: responseData.result.luchtvaartuig,
-        passagiers: responseData.result.passagiers,
-        hoofdthema: responseData.result.hoofdthema,
-        aanvullende: responseData.result.aanvullende,
-      });
+      setSelectedPlan(
+        mergeFlightPlanPersistenceFields(selectedPlan, responseData.result)
+      );
       setAction("none");
     },});
 
-    logStep("User clicked 'Save' button to edit flight plan data", {
-      omschrijving: selectedPlan.omschrijving,
-      waarnemer: selectedPlan.waarnemer,
-      piloot: selectedPlan.piloot,
-      datum: selectedPlan.datum,
-      vliegduur: selectedPlan.vliegduur,
-      luchtvaartuig: selectedPlan.luchtvaartuig,
-      passagiers: selectedPlan.passagiers,
-      hoofdthema: selectedPlan.hoofdthema,
-      aanvullende: selectedPlan.aanvullende,
-    });
+    logStep(
+      "User clicked 'Save' button to edit flight plan data",
+      pickFlightPlanPersistenceFields(selectedPlan)
+    );
   }
 
   return (

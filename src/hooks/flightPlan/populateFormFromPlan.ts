@@ -2,18 +2,9 @@ import {
   applyFlightPlanFormValues,
   FlightPlanFormFieldSetters,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import type { FlightPlanPersistenceFields } from "Types";
 
-export type FlightPlanFormSource = {
-  omschrijving?: string;
-  waarnemer?: string;
-  piloot?: string;
-  datum?: string;
-  vliegduur?: string;
-  luchtvaartuig?: string;
-  passagiers?: number | null;
-  hoofdthema?: string;
-  aanvullende?: string;
-};
+export type FlightPlanFormSource = Partial<FlightPlanPersistenceFields>;
 
 export function populateFormFromPlan(
   plan: FlightPlanFormSource,

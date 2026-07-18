@@ -1,17 +1,13 @@
 import { EnrichedPointType } from "Types";
+import type { NewPointCoordSetters } from "@helpers/ArcGISHelpers/newPointEventCoords";
 import { handleEnrichedAddPointClick } from "./handleEnrichedAddPointClick";
 
-export type MapClickInput = {
+export type MapClickInput = NewPointCoordSetters & {
   step: number;
   points: EnrichedPointType[];
   mapClickedNotify: number;
   nearPointToast: string;
   setMapClickedNotify: (value: number) => void;
-  setXCoord: (value: number) => void;
-  setYCoord: (value: number) => void;
-  setLatitude: (value: number) => void;
-  setLongitude: (value: number) => void;
-  setCurrentPoint: (value: { x: number; y: number }) => void;
   setStep: (value: number) => void;
 };
 

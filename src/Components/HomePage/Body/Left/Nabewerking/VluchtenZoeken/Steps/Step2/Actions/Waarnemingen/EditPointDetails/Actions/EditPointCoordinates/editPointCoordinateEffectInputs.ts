@@ -1,5 +1,14 @@
 import type { EditPointCoordinateEffectsInput } from "./editPointCoordinateEffectsTypes";
 
+function pickEditPointMapLayers(input: EditPointCoordinateEffectsInput) {
+  return {
+    mapView: input.mapView,
+    redGraphicsLayer: input.redGraphicsLayer,
+    pointsGraphicsLayer: input.pointsGraphicsLayer,
+    selectedPoint: input.selectedPoint,
+  };
+}
+
 export function toInitialEditPointMarkerInput(
   input: EditPointCoordinateEffectsInput
 ) {
@@ -28,10 +37,7 @@ export function toEditPointPreviewGraphicsInput(
   input: EditPointCoordinateEffectsInput
 ) {
   return {
-    mapView: input.mapView,
-    redGraphicsLayer: input.redGraphicsLayer,
-    pointsGraphicsLayer: input.pointsGraphicsLayer,
-    selectedPoint: input.selectedPoint,
+    ...pickEditPointMapLayers(input),
     longitude: input.longitude,
     latitude: input.latitude,
   };
@@ -41,10 +47,7 @@ export function toEditPointCleanupInput(
   input: EditPointCoordinateEffectsInput
 ) {
   return {
-    mapView: input.mapView,
-    redGraphicsLayer: input.redGraphicsLayer,
-    pointsGraphicsLayer: input.pointsGraphicsLayer,
-    selectedPoint: input.selectedPoint,
+    ...pickEditPointMapLayers(input),
     originalCoordsRef: input.originalCoordsRef,
   };
 }

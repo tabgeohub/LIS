@@ -16,18 +16,21 @@ function allowedRedirectBases(): string[] {
   return [...bases];
 }
 
-/** Validates redirect targets before Express res.redirect (CWE-601). */
-export function isSafeServerRedirectTarget(target: string): boolean {
-  if (typeof target !== "string" || target.length === 0) return false;
+function isSafeRelativeRedirect(target: string): boolean {
+  if (target.startsWith("//")) return false;
+  if (target.includes("\\")) return false;
+  if (target.includes("://")) return false;
+  const pathOnly = target.split("?")[0].split("#")[0];
+  return ALLOWED_INTERNAL_REDIRECTS.has(pathOnly);
+}
 
-  if (target.startsWith("/")) {
-    if (target.startsWith("//")) return false;
-    if (target.includes("\\")) return false;
-    if (target.includes("://")) return false;
-    const pathOnly = target.split("?")[0].split("#")[0];
-    return ALLOWED_INTERNAL_REDIRECTS.has(pathOnly);
-  }
+function isAllowedAbsoluteBase(target: string): boolean {
+  return allowedRedirectBases().some(
+    (base) => target === base || target.startsWith(`${base}/`)
+  );
+}
 
+function isSafeAbsoluteRedirect(target: string): boolean {
   let parsed: URL;
   try {
     parsed = new URL(target);
@@ -35,11 +38,22 @@ export function isSafeServerRedirectTarget(target: string): boolean {
     return false;
   }
 
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return false;
+  }
 
-  return allowedRedirectBases().some((base) => {
-    return target === base || target.startsWith(`${base}/`);
-  });
+  return isAllowedAbsoluteBase(target);
+}
+
+/** Validates redirect targets before Express res.redirect (CWE-601). */
+export function isSafeServerRedirectTarget(target: string): boolean {
+  if (typeof target !== "string" || target.length === 0) return false;
+
+  if (target.startsWith("/")) {
+    return isSafeRelativeRedirect(target);
+  }
+
+  return isSafeAbsoluteRedirect(target);
 }
 
 export function safeServerRedirect(res: Response, target: string): void {

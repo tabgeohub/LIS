@@ -4,27 +4,18 @@ import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/Ch
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
 import { ReactNode } from "react";
+import type {
+  AandachtspuntDetailsFieldState,
+  AandachtspuntDetailsValues,
+} from "./aandachtspuntDetailsValues";
 
-export interface AandachtspuntDetailsValues {
-  vertrouwelijk: boolean;
-  setVertrouwelijk: (value: boolean) => void;
-  herhalen: boolean;
-  setHerhalen: (value: boolean) => void;
-  activiteit: string;
-  setActiviteit: (value: string) => void;
-  organisatie: string;
-  setOrganisatie: (value: string) => void;
-  specifiekLettenOp: string;
-  setSpecifiekLettenOp: (value: string) => void;
-}
+export type {
+  AandachtspuntDetailsValues,
+} from "./aandachtspuntDetailsValues";
 
-export interface AandachtspuntDetailsLabels {
-  vertrouwelijk?: string;
-  herhalen?: string;
-  activiteit?: string;
-  organisatie?: string;
-  specifiekLettenOp?: string;
-}
+export type AandachtspuntDetailsLabels = Partial<
+  Record<keyof AandachtspuntDetailsFieldState, string>
+>;
 
 interface AandachtspuntDetailsFieldsProps extends AandachtspuntDetailsValues {
   omschrijvingField: ReactNode;
@@ -33,6 +24,33 @@ interface AandachtspuntDetailsFieldsProps extends AandachtspuntDetailsValues {
   fieldsAfterOmschrijving?: ReactNode;
   trailingFields?: ReactNode;
   className?: string;
+}
+
+type DefaultLabels = Record<keyof AandachtspuntDetailsFieldState, string>;
+
+function resolveFieldLabel(
+  labels: AandachtspuntDetailsLabels | undefined,
+  key: keyof DefaultLabels,
+  defaults: DefaultLabels
+): string {
+  return labels?.[key] ?? defaults[key];
+}
+
+function VertrouwelijkCheckbox(input: {
+  hide: boolean;
+  checked: boolean;
+  setValue: (value: boolean) => void;
+  label: string;
+}) {
+  if (input.hide) return null;
+  return (
+    <CheckBoxComp
+      checked={input.checked}
+      value={input.checked}
+      setValue={input.setValue}
+      label={input.label}
+    />
+  );
 }
 
 export default function AandachtspuntDetailsFields({
@@ -61,20 +79,18 @@ export default function AandachtspuntDetailsFields({
 
   return (
     <div className={className}>
-      {!hideVertrouwelijk && (
-        <CheckBoxComp
-          checked={vertrouwelijk}
-          value={vertrouwelijk}
-          setValue={setVertrouwelijk}
-          label={labels?.vertrouwelijk ?? defaultLabels.vertrouwelijk}
-        />
-      )}
+      <VertrouwelijkCheckbox
+        hide={hideVertrouwelijk}
+        checked={vertrouwelijk}
+        setValue={setVertrouwelijk}
+        label={resolveFieldLabel(labels, "vertrouwelijk", defaultLabels)}
+      />
 
       <CheckBoxComp
         checked={herhalen}
         value={herhalen}
         setValue={setHerhalen}
-        label={labels?.herhalen ?? defaultLabels.herhalen}
+        label={resolveFieldLabel(labels, "herhalen", defaultLabels)}
       />
 
       {omschrijvingField}
@@ -82,14 +98,14 @@ export default function AandachtspuntDetailsFields({
       {fieldsAfterOmschrijving}
 
       <SelectComp
-        label={labels?.activiteit ?? defaultLabels.activiteit}
+        label={resolveFieldLabel(labels, "activiteit", defaultLabels)}
         value={activiteit}
         setValue={setActiviteit}
         options={activities}
       />
 
       <SelectComp
-        label={labels?.organisatie ?? defaultLabels.organisatie}
+        label={resolveFieldLabel(labels, "organisatie", defaultLabels)}
         value={organisatie}
         setValue={setOrganisatie}
         options={organizations}
@@ -100,7 +116,7 @@ export default function AandachtspuntDetailsFields({
         <TextAreaComp
           value={specifiekLettenOp}
           setValue={setSpecifiekLettenOp}
-          label={labels?.specifiekLettenOp ?? defaultLabels.specifiekLettenOp}
+          label={resolveFieldLabel(labels, "specifiekLettenOp", defaultLabels)}
         />
       </div>
 

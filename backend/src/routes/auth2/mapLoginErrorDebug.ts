@@ -8,16 +8,21 @@ export type MapLoginErrorDebugContext = {
   hasOtp?: boolean | null;
 };
 
-export function logMapLoginErrorClassifierDebug(input: {
+function shouldLogMapLoginErrorDebug(
+  context: MapLoginErrorDebugContext,
+  finalDecision?: Step2FailureKind
+): boolean {
+  return Boolean(context.otpWasSent && finalDecision);
+}
+
+function buildMapLoginErrorDebugPayload(input: {
   error: unknown;
   context: MapLoginErrorDebugContext;
   kind: GrantFailureKind;
-  finalDecision?: Step2FailureKind;
-}): void {
-  if (!input.context.otpWasSent || !input.finalDecision) return;
-
+  finalDecision: Step2FailureKind;
+}) {
   const realError = extractGrantError(input.error);
-  logAuth2ClassifierDebug("auth2.login.map_login_error", {
+  return {
     hasOtp: input.context.hasOtp ?? null,
     otpWasSent: input.context.otpWasSent,
     loginStep: input.context.loginStep ?? "otp",
@@ -26,5 +31,26 @@ export function logMapLoginErrorClassifierDebug(input: {
     explicitGrantFailureKind: input.kind,
     finalDecision: input.finalDecision,
     responseStatus: input.finalDecision,
-  });
+  };
+}
+
+export function logMapLoginErrorClassifierDebug(input: {
+  error: unknown;
+  context: MapLoginErrorDebugContext;
+  kind: GrantFailureKind;
+  finalDecision?: Step2FailureKind;
+}): void {
+  if (!shouldLogMapLoginErrorDebug(input.context, input.finalDecision)) {
+    return;
+  }
+
+  logAuth2ClassifierDebug(
+    "auth2.login.map_login_error",
+    buildMapLoginErrorDebugPayload({
+      error: input.error,
+      context: input.context,
+      kind: input.kind,
+      finalDecision: input.finalDecision!,
+    })
+  );
 }

@@ -1,5 +1,5 @@
 import createPoint from "@helpers/ArcGISHelpers/createPoint";
-import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
+import { transformWgs84ToRd } from "@helpers/geo/transformWgs84ToRd";
 import type { LogActionInput } from "hooks/logging/logEntry";
 
 export function createEditedPointValues<T extends Record<string, unknown>>(
@@ -7,12 +7,7 @@ export function createEditedPointValues<T extends Record<string, unknown>>(
   longitude: number,
   latitude: number
 ) {
-  const transformed = getTransformedCoordinates({
-    fromProjection: "WGS84",
-    toProjection: "RD",
-    x: longitude,
-    y: latitude,
-  });
+  const transformed = transformWgs84ToRd(longitude, latitude);
   return {
     ...values,
     x: transformed.x,

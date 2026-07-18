@@ -1,17 +1,13 @@
 import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
-import { FlightPlanType } from "Types";
 import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
+import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
 import Images from "./Images";
 
 export default function PlanInformation({
   selectedPlan,
   setSelectedPlan,
   setStep,
-}: {
-  selectedPlan: FlightPlanType;
-  setSelectedPlan: (value: FlightPlanType | null) => void;
-  setStep: (value: number) => void;
-}) {
+}: PlanInformationProps) {
   return (
     <ScrollButtonsLayout
       buttons={

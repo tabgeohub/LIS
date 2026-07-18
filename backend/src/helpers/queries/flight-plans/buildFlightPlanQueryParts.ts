@@ -23,34 +23,68 @@ export type BuildFlightPlanQueryOptions = {
   orderBy?: string;
 };
 
+function defaultPlanAlias(
+  planTable: string,
+  planAlias?: string
+): string {
+  if (planAlias) return planAlias;
+  return planTable === "lis.template_plans" ? "tp" : "fp";
+}
+
+function defaultRegioFilter(
+  regioFilter?: RegioFilterOptions
+): RegioFilterOptions {
+  return (
+    regioFilter ?? {
+      when: "truthy" as const,
+      caseInsensitiveAdmin: true,
+    }
+  );
+}
+
+function defaultOrderBy(
+  planAlias: string,
+  columnPreset: FlightPlanColumnPreset,
+  orderBy?: string
+): string {
+  if (orderBy) return orderBy;
+  return columnPreset === "template"
+    ? `${planAlias}.id`
+    : `${planAlias}.created_at DESC`;
+}
+
+function resolveFlightPlanQueryScalars(
+  options: BuildFlightPlanQueryOptions,
+  planAlias: string
+) {
+  return {
+    includeGeometryJoin: options.includeGeometryJoin ?? false,
+    where: options.where,
+    params: options.params ?? [],
+    regio_id: options.regio_id,
+    regioColumn: options.regioColumn,
+    regioFilter: defaultRegioFilter(options.regioFilter),
+    groupBy: options.groupBy ?? `${planAlias}.id`,
+    orderBy: defaultOrderBy(
+      planAlias,
+      options.columnPreset,
+      options.orderBy
+    ),
+  };
+}
+
 export function resolveFlightPlanQueryDefaults(
   options: BuildFlightPlanQueryOptions
 ) {
   const planTable = options.planTable ?? "lis.flightPlans";
-  const planAlias =
-    options.planAlias ??
-    (planTable === "lis.template_plans" ? "tp" : "fp");
+  const planAlias = defaultPlanAlias(planTable, options.planAlias);
 
   return {
     planTable,
     planAlias,
     columnPreset: options.columnPreset,
     pointPreset: options.pointPreset,
-    includeGeometryJoin: options.includeGeometryJoin ?? false,
-    where: options.where,
-    params: options.params ?? [],
-    regio_id: options.regio_id,
-    regioColumn: options.regioColumn,
-    regioFilter: options.regioFilter ?? {
-      when: "truthy" as const,
-      caseInsensitiveAdmin: true,
-    },
-    groupBy: options.groupBy ?? `${planAlias}.id`,
-    orderBy:
-      options.orderBy ??
-      (options.columnPreset === "template"
-        ? `${planAlias}.id`
-        : `${planAlias}.created_at DESC`),
+    ...resolveFlightPlanQueryScalars(options, planAlias),
   };
 }
 

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 import {
@@ -10,40 +10,46 @@ import {
 export { NNEDERLAND_EU_SERVICES } from "./nnederlandLayerSpecEnvelope";
 export { toLegendLayerDefinitions } from "./nnederlandLegendDefinitions";
 
-export function nnFeatureLayerSpec(input: {
+type NnLayerMeta = {
   id: string;
-  serviceName: string;
   title: string;
   icon: ReactNode;
   regio?: string[];
-}): NnLayerSpec {
+};
+
+function wrapNnLayerSpec(
+  meta: NnLayerMeta,
+  layer: FeatureLayer | MapImageLayer
+): NnLayerSpec {
   return nnLayerSpec({
-    id: input.id,
-    title: input.title,
-    icon: input.icon,
-    regio: input.regio,
-    layer: new FeatureLayer({
-      url: nnFeatureLayerUrl(input.serviceName),
-      title: input.title,
-    }),
+    id: meta.id,
+    title: meta.title,
+    icon: meta.icon,
+    regio: meta.regio,
+    layer,
   });
 }
 
-export function nnMapImageLayerSpec(input: {
-  id: string;
-  url: string;
-  title: string;
-  icon: ReactNode;
-  regio?: string[];
-}): NnLayerSpec {
-  return nnLayerSpec({
-    id: input.id,
-    title: input.title,
-    icon: input.icon,
-    regio: input.regio,
-    layer: new MapImageLayer({
+export function nnFeatureLayerSpec(
+  input: NnLayerMeta & { serviceName: string }
+): NnLayerSpec {
+  return wrapNnLayerSpec(
+    input,
+    new FeatureLayer({
+      url: nnFeatureLayerUrl(input.serviceName),
+      title: input.title,
+    })
+  );
+}
+
+export function nnMapImageLayerSpec(
+  input: NnLayerMeta & { url: string }
+): NnLayerSpec {
+  return wrapNnLayerSpec(
+    input,
+    new MapImageLayer({
       url: input.url,
       title: input.title,
-    }),
-  });
+    })
+  );
 }

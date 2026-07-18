@@ -20,7 +20,7 @@ function isValidOtp(otp: string | undefined): boolean {
   return !otp || /^\d+$/.test(otp);
 }
 
-export function parseLoginInput(body: unknown): ParsedLoginInput | null {
+function extractLoginFields(body: unknown): ParsedLoginInput {
   const record = body as {
     username?: unknown;
     password?: unknown;
@@ -32,9 +32,18 @@ export function parseLoginInput(body: unknown): ParsedLoginInput | null {
   const otpRaw = String(record?.otp ?? "").trim();
   const otp = otpRaw || undefined;
 
-  const parsed = { username, password, otp };
-  if (!username || !password) return null;
-  if (exceedsCredentialLimits(parsed) || !isValidOtp(otp)) return null;
+  return { username, password, otp };
+}
+
+function isParsedLoginValid(parsed: ParsedLoginInput): boolean {
+  if (!parsed.username || !parsed.password) return false;
+  if (exceedsCredentialLimits(parsed)) return false;
+  return isValidOtp(parsed.otp);
+}
+
+export function parseLoginInput(body: unknown): ParsedLoginInput | null {
+  const parsed = extractLoginFields(body);
+  if (!isParsedLoginValid(parsed)) return null;
   return parsed;
 }
 

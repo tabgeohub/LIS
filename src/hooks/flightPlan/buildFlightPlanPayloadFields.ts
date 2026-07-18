@@ -1,6 +1,7 @@
 import {
   FlightPlanFormFieldValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import type { FlightPlanPersistenceFields } from "Types";
 
 export type FlightPlanPayloadFields = FlightPlanFormFieldValues & {
   vluchtnummer?: string;
@@ -8,16 +9,8 @@ export type FlightPlanPayloadFields = FlightPlanFormFieldValues & {
 
 export function buildFlightPlanPayloadFields(
   fields: FlightPlanPayloadFields
-): {
-  omschrijving: string;
-  waarnemer: string;
-  piloot: string;
-  datum: string;
-  vliegduur: string;
-  luchtvaartuig: string;
+): Omit<FlightPlanPersistenceFields, "passagiers"> & {
   passagiers: number | null | undefined;
-  hoofdthema: string;
-  aanvullende: string;
 } {
   return {
     omschrijving: fields.omschrijving,

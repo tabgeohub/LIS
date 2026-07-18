@@ -9,20 +9,27 @@ export type GeometryEditDraft = {
   herhalen: boolean;
 };
 
-export function geometryToDraft(g: Geometry): GeometryEditDraft {
-  const spec =
-    (g as { specifiek_letten_op?: string }).specifiek_letten_op ??
-    (g as { specifiekLettenOp?: string }).specifiekLettenOp ??
-    "";
+function stringOrEmpty(value: unknown): string {
+  return value != null ? String(value) : "";
+}
 
+function geometrySpecField(g: Geometry): string {
+  const withSnake = g as { specifiek_letten_op?: string };
+  const withCamel = g as { specifiekLettenOp?: string };
+  return withSnake.specifiek_letten_op ?? withCamel.specifiekLettenOp ?? "";
+}
+
+function flagTruthy(value: unknown): boolean {
+  return Boolean(value === true || value === 1);
+}
+
+export function geometryToDraft(g: Geometry): GeometryEditDraft {
   return {
-    omschrijving: g.omschrijving ?? "",
-    organisatie: g.organisatie != null ? String(g.organisatie) : "",
-    activiteit: g.activiteit != null ? String(g.activiteit) : "",
-    specifiek_letten_op: spec,
-    vertrouwelijk: Boolean(
-      g.vertrouwelijk === true || g.vertrouwelijk === 1
-    ),
-    herhalen: Boolean(g.herhalen === true || g.herhalen === 1),
+    omschrijving: stringOrEmpty(g.omschrijving),
+    organisatie: stringOrEmpty(g.organisatie),
+    activiteit: stringOrEmpty(g.activiteit),
+    specifiek_letten_op: geometrySpecField(g),
+    vertrouwelijk: flagTruthy(g.vertrouwelijk),
+    herhalen: flagTruthy(g.herhalen),
   };
 }

@@ -1,27 +1,55 @@
 /**
  * Sort points with selected items first; among selected, last-clicked appears first.
  */
-function comparePointsWithSelectionOrder(
+function selectionPriority(id: number, selectedPointIds: number[]): number {
+  return selectedPointIds.includes(id) ? 0 : 1;
+}
+
+function compareSelectedReverseOrder(
   aId: number,
   bId: number,
-  selectedPointIds: number[],
-  selectedReverseIndexMap: Map<number, number>,
+  selectedReverseIndexMap: Map<number, number>
+): number {
+  return (
+    (selectedReverseIndexMap.get(aId) ?? 0) -
+    (selectedReverseIndexMap.get(bId) ?? 0)
+  );
+}
+
+function compareOriginalIndex(
+  aId: number,
+  bId: number,
   indexMap: Map<number, number>
 ): number {
-  const isSelected = (id: number) => (selectedPointIds.includes(id) ? 0 : 1);
-  const selOrder = isSelected(aId) - isSelected(bId);
+  return (indexMap.get(aId) ?? 0) - (indexMap.get(bId) ?? 0);
+}
+
+type CompareSelectionOrderInput = {
+  aId: number;
+  bId: number;
+  selectedPointIds: number[];
+  selectedReverseIndexMap: Map<number, number>;
+  indexMap: Map<number, number>;
+};
+
+function comparePointsWithSelectionOrder(
+  input: CompareSelectionOrderInput
+): number {
+  const { aId, bId, selectedPointIds, selectedReverseIndexMap, indexMap } =
+    input;
+  const selOrder =
+    selectionPriority(aId, selectedPointIds) -
+    selectionPriority(bId, selectedPointIds);
   if (selOrder !== 0) return selOrder;
 
   if (
     selectedPointIds.includes(aId) &&
     selectedPointIds.includes(bId)
   ) {
-    const aReverseIndex = selectedReverseIndexMap.get(aId) ?? 0;
-    const bReverseIndex = selectedReverseIndexMap.get(bId) ?? 0;
-    return aReverseIndex - bReverseIndex;
+    return compareSelectedReverseOrder(aId, bId, selectedReverseIndexMap);
   }
 
-  return (indexMap.get(aId) ?? 0) - (indexMap.get(bId) ?? 0);
+  return compareOriginalIndex(aId, bId, indexMap);
 }
 
 export function sortPointsWithSelectionOrder<T extends { id: number }>(
@@ -37,12 +65,12 @@ export function sortPointsWithSelectionOrder<T extends { id: number }>(
   });
 
   return [...points].sort((a, b) =>
-    comparePointsWithSelectionOrder(
-      a.id,
-      b.id,
+    comparePointsWithSelectionOrder({
+      aId: a.id,
+      bId: b.id,
       selectedPointIds,
       selectedReverseIndexMap,
-      indexMap
-    )
+      indexMap,
+    })
   );
 }

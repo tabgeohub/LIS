@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { BuildFlightPlanQueryOptions } from "./buildFlightPlanQuery";
 import { resolveRegioFilter } from "../shared/resolveRegioFilter";
 import {
+  FlightPlanListErrorOptions,
   queryFlightPlanListPayload,
   sendFlightPlanListError,
   splitFlightPlanListInput,
@@ -12,12 +13,7 @@ type FetchFlightPlanListOptions = Omit<
   "regio_id"
 > & {
   useRegioFilter?: boolean;
-  errorLogLabel?: string;
-  errorMessage: string;
-  appendErrorToMessage?: boolean;
-  includeErrorField?: boolean;
-  transform?: (rows: unknown[]) => unknown;
-};
+} & FlightPlanListErrorOptions;
 
 export type RegionalFlightPlanListOptions = Omit<
   FetchFlightPlanListOptions,

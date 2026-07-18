@@ -1,11 +1,11 @@
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useViewPlanAddPointsState } from "../../pickViewPlanAddPointsState";
 import { submitAddPointsToPlan } from "./helpers/submitAddPointsToPlan";
 
 export default function Buttons({
@@ -25,7 +25,7 @@ export default function Buttons({
     setStep,
     filteredPlans,
     setFilteredPlans,
-  } = useViewPlanState();
+  } = useViewPlanAddPointsState();
 
   const { dbPoints } = usePointsStore();
   const { dbGeometries, setGeometries } = useGeometriesStore();

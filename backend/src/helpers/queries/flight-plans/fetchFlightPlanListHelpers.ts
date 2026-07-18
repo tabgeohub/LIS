@@ -9,28 +9,36 @@ export type FetchFlightPlanQueryOptions = BuildFlightPlanQueryOptions & {
   transform?: (rows: unknown[]) => unknown;
 };
 
-type FlightPlanListRawInput = {
-  req: Request;
-  res: Response;
-  useRegioFilter?: boolean;
+/** Shared error/logging options for flight-plan list fetch helpers. */
+export type FlightPlanListErrorOptions = {
   errorLogLabel?: string;
   errorMessage: string;
   appendErrorToMessage?: boolean;
   includeErrorField?: boolean;
   transform?: (rows: unknown[]) => unknown;
-} & Omit<BuildFlightPlanQueryOptions, "regio_id">;
+};
+
+type FlightPlanListResolvedErrorOptions = Required<
+  Pick<
+    FlightPlanListErrorOptions,
+    "errorLogLabel" | "errorMessage" | "appendErrorToMessage" | "includeErrorField"
+  >
+> &
+  Pick<FlightPlanListErrorOptions, "transform">;
+
+type FlightPlanListRawInput = {
+  req: Request;
+  res: Response;
+  useRegioFilter?: boolean;
+} & FlightPlanListErrorOptions &
+  Omit<BuildFlightPlanQueryOptions, "regio_id">;
 
 export type SplitFlightPlanListInput = {
   req: Request;
   res: Response;
   useRegioFilter: boolean;
-  errorLogLabel: string;
-  errorMessage: string;
-  appendErrorToMessage: boolean;
-  includeErrorField: boolean;
-  transform?: (rows: unknown[]) => unknown;
   queryOptions: Omit<BuildFlightPlanQueryOptions, "regio_id">;
-};
+} & FlightPlanListResolvedErrorOptions;
 
 export function splitFlightPlanListInput(
   input: FlightPlanListRawInput
@@ -71,11 +79,7 @@ export async function queryFlightPlanListPayload(
 type FlightPlanListErrorInput = {
   res: Response;
   err: unknown;
-  errorLogLabel: string;
-  errorMessage: string;
-  appendErrorToMessage: boolean;
-  includeErrorField: boolean;
-};
+} & FlightPlanListResolvedErrorOptions;
 
 function buildFlightPlanErrorMessage(
   errorMessage: string,

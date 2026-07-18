@@ -26,20 +26,17 @@ export interface FinishedFlightPlanType {
   attachments: AttachmentType[];
 }
 
-export interface FinishedPointType {
+import type {
+  PointCoreIdentityFields,
+  PointCoreOrgFields,
+} from "./pointCoreFields";
+
+export interface FinishedPointType
+  extends PointCoreIdentityFields,
+    PointCoreOrgFields {
   id: number;
-  omschrijving: string;
-  regio_id: string;
-  xcoordinaat_rd: number;
-  ycoordinaat_rd: number;
-  latitude: number;
-  longitude: number;
   vertrouwelijk: string;
   herhalen: string;
-  user_id: number;
-  activiteit_id: string;
-  organisatie_id: string;
-  specifiek_letten_op: string;
   datum: string;
   order: number;
   point_comment: string;

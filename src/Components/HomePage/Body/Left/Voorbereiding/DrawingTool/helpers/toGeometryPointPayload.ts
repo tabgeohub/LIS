@@ -43,14 +43,23 @@ export function buildGeometryPointFields(
   };
 }
 
+export type ToGeometryPointPayloadInput = {
+  x: number;
+  y: number;
+  pointOrder: number;
+  geometryType: string;
+  ctx: GeometryPointContext;
+};
+
 export function toGeometryPointPayload(
-  x: number,
-  y: number,
-  pointOrder: number,
-  geometryType: string,
-  ctx: GeometryPointContext
+  input: ToGeometryPointPayloadInput
 ): GeometryPointPayload | null {
-  const wgs84 = webMercatorToWgs84(x, y);
+  const wgs84 = webMercatorToWgs84(input.x, input.y);
   if (!wgs84) return null;
-  return buildGeometryPointFields(wgs84, pointOrder, geometryType, ctx);
+  return buildGeometryPointFields(
+    wgs84,
+    input.pointOrder,
+    input.geometryType,
+    input.ctx
+  );
 }

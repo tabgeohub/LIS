@@ -30,12 +30,27 @@ export function resolveArcgisTokenStringFields(
   return resolved;
 }
 
+const ARCGIS_TOKEN_NUMERIC_DEFAULTS = {
+  requestTimeoutMs: 15000,
+  retryCount: 2,
+  retryBaseDelayMs: 400,
+  skewBufferMs: 60000,
+  minTtlMs: 0,
+} as const;
+
+function pickNumericField(
+  config: ArcgisTokenConfig | undefined,
+  key: keyof typeof ARCGIS_TOKEN_NUMERIC_DEFAULTS
+): number {
+  return config?.[key] ?? ARCGIS_TOKEN_NUMERIC_DEFAULTS[key];
+}
+
 export function resolveArcgisTokenNumericFields(config?: ArcgisTokenConfig) {
   return {
-    requestTimeoutMs: config?.requestTimeoutMs ?? 15000,
-    retryCount: config?.retryCount ?? 2,
-    retryBaseDelayMs: config?.retryBaseDelayMs ?? 400,
-    skewBufferMs: config?.skewBufferMs ?? 60000,
-    minTtlMs: config?.minTtlMs ?? 0,
+    requestTimeoutMs: pickNumericField(config, "requestTimeoutMs"),
+    retryCount: pickNumericField(config, "retryCount"),
+    retryBaseDelayMs: pickNumericField(config, "retryBaseDelayMs"),
+    skewBufferMs: pickNumericField(config, "skewBufferMs"),
+    minTtlMs: pickNumericField(config, "minTtlMs"),
   };
 }

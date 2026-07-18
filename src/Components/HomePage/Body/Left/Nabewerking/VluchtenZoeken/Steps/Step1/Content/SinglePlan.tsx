@@ -4,6 +4,8 @@ import { LuWaypoints } from "react-icons/lu";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlanMapHighlight } from "hooks/hover-click-handlers/useFinishedPlanMapHighlight";
 import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
+import FlightPlanClickableRow from "Components/HomePage/Body/Left/Common/FlightPlanClickableRow";
+import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";
 
 export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   const { selectedPlan, setSelectedPlan } = useFinishedPlansState();
@@ -12,19 +14,15 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   const logAction = useLogAction();
 
   return (
-    <div
+    <FlightPlanClickableRow
+      selected={selectedPlan?.id === plan.id}
+      className="relative"
       onClick={() => {
         handleClick(plan, setSelectedPlan);
-        logAction({
-          message: `User clicked on flight plan ${plan.vluchtnummer}`,
-          step: "First step",
-        });
+        logFlightPlanRowClick(logAction, plan.vluchtnummer);
       }}
       onMouseEnter={() => handleHover(plan)}
       onMouseLeave={handleMouseLeave}
-      className={`p-2 hover:bg-gray-100 ${
-        selectedPlan?.id === plan.id && "bg-gray-200"
-      } transition-all cursor-pointer relative`}
     >
       <FlightPlanSummary
         plan={plan}
@@ -37,6 +35,6 @@ export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
           </div>
         }
       />
-    </div>
+    </FlightPlanClickableRow>
   );
 }

@@ -1,6 +1,7 @@
 import { useFormikContext } from "formik";
 import InputFormik from "../../../Common/InputFormik";
 import SelectFormik from "../../../Common/SelectFormik";
+import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Common/editPointStep2Sub2Props";
 import { SpatialReference } from "Types";
 import useLogAction from "hooks/useLogAction";
 import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
@@ -12,10 +13,7 @@ import {
 export default function Step2Sub2({
   setSubStep,
   handleSubmit,
-}: {
-  setSubStep: (value: number) => void;
-  handleSubmit: () => void;
-}) {
+}: EditPointStep2Sub2Props) {
   const logAction = useLogAction();
 
   const { values, setValues } = useFormikContext<{

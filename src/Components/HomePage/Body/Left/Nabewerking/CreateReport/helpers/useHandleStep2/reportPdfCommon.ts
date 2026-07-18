@@ -1,8 +1,9 @@
 import { PDFPointDataType } from "Types";
-import { FinishedFlightPlanType, FinishedPointType } from "Types/finished_plans";
 import { getStaticMapImage } from "./mapImage";
 import { safeFetchPointAttachments } from "./attachments";
 import type { AttachmentWithMeta } from "./types";
+import type { ReportPdfPointContext } from "./reportGenerationPipelineTypes";
+import type { FinishedPointType } from "Types/finished_plans";
 
 export function lookupLabel(
   options: Array<{ label: string; value: string | number }>,
@@ -11,16 +12,7 @@ export function lookupLabel(
   return options.find((option) => option.value === value)?.label || "";
 }
 
-export function buildPdfPointData(input: {
-  selectedPlan: FinishedFlightPlanType;
-  point: FinishedPointType;
-  activities: Array<{ label: string; value: string | number }>;
-  organizations: Array<{ label: string; value: string | number }>;
-  omschrijving: string;
-  aanvullende: string | number;
-  longitude: number;
-  latitude: number;
-}): PDFPointDataType {
+export function buildPdfPointData(input: ReportPdfPointContext): PDFPointDataType {
   const { selectedPlan, point, activities, organizations } = input;
   return {
     datum: selectedPlan.datum,

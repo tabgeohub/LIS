@@ -13,6 +13,7 @@ import {
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { applyDeletePointUpdateSuccess } from "../../applyDeletePointUpdateSuccess";
 
 export default function Buttons({
   setStep,
@@ -42,16 +43,14 @@ export default function Buttons({
       onSuccess: (responseData) => {
         if (!responseData.result) return;
 
-        const updatedPoints = points.map((point) =>
-          point.id === responseData.result.id
-            ? { ...point, ...responseData.result }
-            : point
-        );
-
-        setPoints(updatedPoints);
-        mapView?.graphics.removeAll();
-        redGraphicsLayer?.removeAll();
-        yellowGraphicsLayer?.removeAll();
+        applyDeletePointUpdateSuccess({
+          points,
+          result: responseData.result,
+          setPoints,
+          mapView,
+          redGraphicsLayer,
+          yellowGraphicsLayer,
+        });
         setMainStep("main");
       },
     });

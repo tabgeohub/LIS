@@ -1,15 +1,13 @@
 import { EnrichedPointType } from "Types";
+import {
+  EMPTY_POINT_IDENTITY_FIELDS,
+  EMPTY_POINT_NUMERIC_FLAGS,
+} from "@helpers/points/emptyPointCoreFields";
 
 export const initialPointState: EnrichedPointType = {
   id: 0,
-  omschrijving: "",
-  regio_id: "",
-  xcoordinaat_rd: 0,
-  ycoordinaat_rd: 0,
-  latitude: 0,
-  longitude: 0,
-  herhalen: 0,
-  vertrouwelijk: 0,
+  ...EMPTY_POINT_IDENTITY_FIELDS,
+  ...EMPTY_POINT_NUMERIC_FLAGS,
   user_id: 0,
   activiteit_id: "",
   organisatie_id: "",

@@ -1,16 +1,1 @@
-export const POINT_EXPORT_COLUMNS = [
-  "geometry",
-  "omschrijving",
-  "regio_id",
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
-  "herhalen",
-  "vertrouwelijk",
-  "indiener_id",
-  "activiteit_id",
-  "organisatie_id",
-  "specifiek_letten_op",
-  "datum",
-] as const;
+export { POINT_EXPORT_COLUMNS } from "./pointCoreFieldKeys";

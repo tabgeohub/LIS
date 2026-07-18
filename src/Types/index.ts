@@ -1,19 +1,15 @@
 import type { Geometry } from "./geometry";
+import type {
+  PointCoreIdentityFields,
+  PointCoreOrgFields,
+} from "./pointCoreFields";
 
-export interface EnrichedPointType {
+export interface EnrichedPointType
+  extends PointCoreIdentityFields,
+    PointCoreOrgFields {
   id: number;
-  omschrijving: string;
-  regio_id: string;
-  xcoordinaat_rd: number;
-  ycoordinaat_rd: number;
-  latitude: number;
-  longitude: number;
   herhalen: number;
   vertrouwelijk: number;
-  user_id: number;
-  activiteit_id: string;
-  organisatie_id: string;
-  specifiek_letten_op: string;
   status?: string;
   created_at?: string;
   datum: string;
@@ -26,8 +22,7 @@ export interface EnrichedPointType {
   geometry_omschrijving?: string;
 }
 
-export interface FlightPlanType {
-  vluchtnummer: string;
+export type FlightPlanPersistenceFields = {
   omschrijving: string;
   waarnemer: string;
   piloot: string;
@@ -37,6 +32,10 @@ export interface FlightPlanType {
   passagiers: number;
   hoofdthema: string;
   aanvullende: string;
+};
+
+export interface FlightPlanType extends FlightPlanPersistenceFields {
+  vluchtnummer: string;
   points: EnrichedPointType[];
   geometries?: Geometry[]; // Optional geometries array
   id: number;

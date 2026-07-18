@@ -22,7 +22,11 @@ export async function entityExists(
   table: "lis.points" | "lis.geometries",
   id: number
 ): Promise<boolean> {
-  const result = await pool.query(`SELECT id FROM ${table} WHERE id = $1`, [id]);
+  const sql =
+    table === "lis.geometries"
+      ? "SELECT id FROM lis.geometries WHERE id = $1"
+      : "SELECT id FROM lis.points WHERE id = $1";
+  const result = await pool.query(sql, [id]);
   return (result.rowCount ?? 0) > 0;
 }
 

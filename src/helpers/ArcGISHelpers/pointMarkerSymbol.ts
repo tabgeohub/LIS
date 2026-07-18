@@ -9,17 +9,23 @@ export const DEFAULT_POINT_SYMBOL_OPTIONS: Required<PointSymbolOptions> = {
   outlineWidth: 1,
 };
 
+function pickSymbolOption<K extends keyof Required<PointSymbolOptions>>(
+  options: PointSymbolOptions,
+  key: K
+): Required<PointSymbolOptions>[K] {
+  return (options[key] ??
+    DEFAULT_POINT_SYMBOL_OPTIONS[key]) as Required<PointSymbolOptions>[K];
+}
+
 export function mergePointSymbolOptions(
   symbolOptions: PointSymbolOptions = {}
 ): Required<PointSymbolOptions> {
   return {
-    color: symbolOptions.color ?? DEFAULT_POINT_SYMBOL_OPTIONS.color,
-    size: symbolOptions.size ?? DEFAULT_POINT_SYMBOL_OPTIONS.size,
-    style: symbolOptions.style ?? DEFAULT_POINT_SYMBOL_OPTIONS.style,
-    outlineColor:
-      symbolOptions.outlineColor ?? DEFAULT_POINT_SYMBOL_OPTIONS.outlineColor,
-    outlineWidth:
-      symbolOptions.outlineWidth ?? DEFAULT_POINT_SYMBOL_OPTIONS.outlineWidth,
+    color: pickSymbolOption(symbolOptions, "color"),
+    size: pickSymbolOption(symbolOptions, "size"),
+    style: pickSymbolOption(symbolOptions, "style"),
+    outlineColor: pickSymbolOption(symbolOptions, "outlineColor"),
+    outlineWidth: pickSymbolOption(symbolOptions, "outlineWidth"),
   };
 }
 

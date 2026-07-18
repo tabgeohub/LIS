@@ -2,6 +2,10 @@ import Graphic from "@arcgis/core/Graphic";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Point from "@arcgis/core/geometry/Point";
 import type { FlightPlanType } from "Types";
+import {
+  mergeFlightPlanPersistenceFields,
+  pickFlightPlanPersistenceFields,
+} from "hooks/flightPlan/pickFlightPlanPersistenceFields";
 
 export function buildRemainingPlanPointGraphics(
   points: FlightPlanType["points"]
@@ -37,15 +41,7 @@ export function buildRemovePointPlanAttributes(input: {
   const { selectedPlan, pointIdToRemove } = input;
   return {
     vluchtnummer: selectedPlan.vluchtnummer,
-    omschrijving: selectedPlan.omschrijving,
-    waarnemer: selectedPlan.waarnemer,
-    piloot: selectedPlan.piloot,
-    datum: selectedPlan.datum,
-    vliegduur: selectedPlan.vliegduur,
-    luchtvaartuig: selectedPlan.luchtvaartuig,
-    passagiers: selectedPlan.passagiers,
-    hoofdthema: selectedPlan.hoofdthema,
-    aanvullende: selectedPlan.aanvullende,
+    ...pickFlightPlanPersistenceFields(selectedPlan),
     points: selectedPlan.points
       .filter((point) => point.id !== pointIdToRemove)
       .flatMap((point) => point.id),
@@ -78,16 +74,10 @@ export function applyRemovePointSuccessState(input: {
   input.yellowGraphicsLayer?.removeAll();
 
   input.setSelectedPlan({
-    ...input.selectedPlan,
-    omschrijving: input.responseData.result.omschrijving as string,
-    waarnemer: input.responseData.result.waarnemer as string,
-    piloot: input.responseData.result.piloot as string,
-    datum: input.responseData.result.datum as string,
-    vliegduur: input.responseData.result.vliegduur as string,
-    luchtvaartuig: input.responseData.result.luchtvaartuig as string,
-    passagiers: input.responseData.result.passagiers as number,
-    hoofdthema: input.responseData.result.hoofdthema as string,
-    aanvullende: input.responseData.result.aanvullende as string,
+    ...mergeFlightPlanPersistenceFields(
+      input.selectedPlan,
+      input.responseData.result as Partial<FlightPlanType>
+    ),
     points: remaining,
     pointsObjects: remaining,
   });

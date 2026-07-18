@@ -13,6 +13,7 @@ import {
   buildPointUpdatePayload,
   pickPointCoreLogData,
 } from "@helpers/points/buildPointUpdatePayload";
+import { applyDeletePointUpdateSuccess } from "../../applyDeletePointUpdateSuccess";
 
 export default function Step2({
   setStep,
@@ -47,15 +48,13 @@ export default function Step2({
     update({ data: newPoint, onSuccess: (responseData) => {
       if (!responseData.result) return;
 
-      const updatedPoints = points.map((point) =>
-        point.id === responseData.result.id
-          ? { ...point, ...responseData.result }
-          : point
-      );
-
-      setPoints(updatedPoints);
-      mapView?.graphics.removeAll();
-      redGraphicsLayer?.removeAll();
+      applyDeletePointUpdateSuccess({
+        points,
+        result: responseData.result,
+        setPoints,
+        mapView,
+        redGraphicsLayer,
+      });
 
       setStep(1);
 

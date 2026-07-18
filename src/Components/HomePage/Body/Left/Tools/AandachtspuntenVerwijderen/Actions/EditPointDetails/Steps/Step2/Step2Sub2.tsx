@@ -1,5 +1,6 @@
 import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
+import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Common/editPointStep2Sub2Props";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
@@ -10,10 +11,7 @@ import { applyDeletePointCoordinatePatch } from "./applyDeletePointCoordinatePat
 export default function Step2Sub2({
   setSubStep,
   handleSubmit,
-}: {
-  setSubStep: (value: number) => void;
-  handleSubmit: () => void;
-}) {
+}: EditPointStep2Sub2Props) {
   const logAction = useLogAction();
   const content = useContent();
 
@@ -37,18 +35,7 @@ export default function Step2Sub2({
     latitude,
     longitude,
     patchCoords: (patch) => {
-      applyDeletePointCoordinatePatch({
-        coordinateSystem,
-        patch,
-        xcoordinaat_rd,
-        ycoordinaat_rd,
-        latitude,
-        longitude,
-        setXCoordinaat_rd,
-        setYCoordinaat_rd,
-        setLatitude,
-        setLongitude,
-      });
+      applyDeletePointCoordinatePatch({ coordinateSystem, patch });
 
       logAction({
         message: "User changed coordinate system",

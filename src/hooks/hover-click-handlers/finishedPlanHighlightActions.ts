@@ -10,8 +10,36 @@ export type FinishedPlanMapVariant = "createReport" | "vluchtenZoeken";
 
 function getSymbols(variant: FinishedPlanMapVariant) {
   return variant === "vluchtenZoeken"
-    ? { click: PLAN_BOUNDING_BOX_SYMBOLS.finishedPlanClick, hover: PLAN_BOUNDING_BOX_SYMBOLS.finishedPlanHover }
-    : { click: PLAN_BOUNDING_BOX_SYMBOLS.click, hover: PLAN_BOUNDING_BOX_SYMBOLS.hover };
+    ? {
+        click: PLAN_BOUNDING_BOX_SYMBOLS.finishedPlanClick,
+        hover: PLAN_BOUNDING_BOX_SYMBOLS.finishedPlanHover,
+      }
+    : {
+        click: PLAN_BOUNDING_BOX_SYMBOLS.click,
+        hover: PLAN_BOUNDING_BOX_SYMBOLS.hover,
+      };
+}
+
+type DrawFinishedPlanHighlightInput = {
+  layer: __esri.GraphicsLayer | null;
+  plan: FinishedFlightPlanType;
+  symbol: Parameters<typeof createFinishedPlanBoundingBoxGraphic>[1];
+  markerSymbol: __esri.SimpleMarkerSymbol;
+};
+
+function drawFinishedPlanHighlight(input: DrawFinishedPlanHighlightInput) {
+  if (!input.layer) return;
+  const graphic = createFinishedPlanBoundingBoxGraphic(
+    input.plan,
+    input.symbol
+  );
+  if (!graphic) return;
+  input.layer.add(graphic);
+  addFinishedPlanGeometryCentroidMarkers({
+    layer: input.layer,
+    plan: input.plan,
+    symbol: input.markerSymbol,
+  });
 }
 
 export function createFinishedPlanHighlightActions(input: {
@@ -20,27 +48,28 @@ export function createFinishedPlanHighlightActions(input: {
   hoverLayer: __esri.GraphicsLayer | null;
 }) {
   const symbols = getSymbols(input.variant);
-  const draw = (
-    layer: __esri.GraphicsLayer | null,
-    plan: FinishedFlightPlanType,
-    symbol: Parameters<typeof createFinishedPlanBoundingBoxGraphic>[1],
-    markerSymbol: __esri.SimpleMarkerSymbol
-  ) => {
-    if (!layer) return;
-    const graphic = createFinishedPlanBoundingBoxGraphic(plan, symbol);
-    if (!graphic) return;
-    layer.add(graphic);
-    addFinishedPlanGeometryCentroidMarkers({ layer, plan, symbol: markerSymbol });
-  };
   return {
-    handleClick: (plan: FinishedFlightPlanType, setSelectedPlan: (value: FinishedFlightPlanType | null) => void) => {
+    handleClick: (
+      plan: FinishedFlightPlanType,
+      setSelectedPlan: (value: FinishedFlightPlanType | null) => void
+    ) => {
       if (!input.selectedLayer) return;
       setSelectedPlan(plan);
       input.selectedLayer.removeAll();
-      draw(input.selectedLayer, plan, symbols.click, FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.selected);
+      drawFinishedPlanHighlight({
+        layer: input.selectedLayer,
+        plan,
+        symbol: symbols.click,
+        markerSymbol: FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.selected,
+      });
     },
     handleHover: (plan: FinishedFlightPlanType) =>
-      draw(input.hoverLayer, plan, symbols.hover, FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.hover),
+      drawFinishedPlanHighlight({
+        layer: input.hoverLayer,
+        plan,
+        symbol: symbols.hover,
+        markerSymbol: FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS.hover,
+      }),
     handleMouseLeave: () => input.hoverLayer?.removeAll(),
   };
 }

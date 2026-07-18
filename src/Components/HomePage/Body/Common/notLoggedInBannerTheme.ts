@@ -1,22 +1,12 @@
 import type { Content } from "hooks/useContent";
-
-type BannerTheme = {
-  ring: string;
-  icon: string;
-  button: string;
-  bar: string;
-  title: string;
-  body: string;
-  cta: string;
-  onClick: () => void;
-};
+import type { LoginBannerTheme } from "./LoginBannerTheme";
 
 export function resolveLoginBannerTheme(input: {
   kind: "notLoggedIn" | "noRole";
   content: Content;
   onLogin: () => void;
   onLogout: () => void;
-}): BannerTheme {
+}): LoginBannerTheme {
   if (input.kind === "notLoggedIn") {
     return {
       ring: "ring-red-100",

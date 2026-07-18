@@ -24,7 +24,7 @@ export function createGeometryGraphic(
   const points = geometry.points;
   if (!points?.length) return null;
 
-  const coordinates = pointsToCoordinates(points, transformCoordinates);
+  const coordinates = pointsToCoordinates({ points, transformCoordinates });
   if (coordinates.length === 0) return null;
 
   const finalSymbolOptions = resolveGeometrySymbolOptions(symbolOptions);

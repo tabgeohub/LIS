@@ -9,15 +9,7 @@ import {
 } from "hooks/zustand/shared/flightPlanFormFields";
 
 export type FlightPlanFieldLabels = {
-  omschrijving: string;
-  waarnemer: string;
-  piloot: string;
-  datum: string;
-  geplandeVliegduur: string;
-  typeLuchtvaartuig: string;
-  aantalPassagiers: string;
-  doelEnHoofdthema: string;
-  aanvullendeInfo: string;
+  [K in keyof FlightPlanFormFieldValues]: string;
 };
 
 type SelectOption = { label: string; value: string };

@@ -1,28 +1,15 @@
 import Buttons from "./Buttons";
-import StepContent from "../Common/StepContent";
+import AddPointsVluchtPlanStepContent from "../Common/AddPointsVluchtPlanStepContent";
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 
 export default function Step2() {
-  const {
-    selectedPoints,
-    setSelectedPoints,
-    openFilter,
-    setOpenFilter,
-    filteredPoints,
-    setFilteredPoints,
-    selectedPlan,
-  } = useAddPointStates();
+  const { selectedPoints, setSelectedPoints } = useAddPointStates();
 
   return (
-    <StepContent
+    <AddPointsVluchtPlanStepContent
       herhalen={true}
       selectedPoints={selectedPoints}
       setSelectedPoints={setSelectedPoints}
-      filteredPoints={filteredPoints}
-      setFilteredPoints={setFilteredPoints}
-      openFilter={openFilter}
-      setOpenFilter={setOpenFilter}
-      selectedPlan={selectedPlan}
       buttons={<Buttons />}
     />
   );

@@ -1,4 +1,13 @@
 import SelectButtons from "./SelectButtons";
+import type { StepContentListSelectionProps } from "./stepContentListSelectionProps";
+
+export type AddPointsHeaderProps = Pick<
+  StepContentListSelectionProps,
+  "filterTerm" | "setFilterTerm" | "selectedGeometries" | "setSelectedGeometries"
+> & {
+  herhalen: boolean;
+  filteredGeometries?: { id: number; herhalen: number | string | boolean }[];
+};
 
 export default function Header({
   herhalen,
@@ -7,14 +16,7 @@ export default function Header({
   selectedGeometries,
   setSelectedGeometries,
   filteredGeometries,
-}: {
-  herhalen: boolean;
-  filterTerm: string;
-  setFilterTerm: (value: string) => void;
-  selectedGeometries?: number[];
-  setSelectedGeometries?: (value: number[]) => void;
-  filteredGeometries?: any[];
-}) {
+}: AddPointsHeaderProps) {
   return (
     <>
       <p className="text-gray-800 leading-3 text-[10px]">
@@ -33,7 +35,7 @@ export default function Header({
         onChange={(e) => setFilterTerm(e.target.value)}
       />
 
-      <SelectButtons 
+      <SelectButtons
         herhalen={herhalen}
         selectedGeometries={selectedGeometries}
         setSelectedGeometries={setSelectedGeometries}

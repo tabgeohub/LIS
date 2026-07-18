@@ -1,20 +1,8 @@
 import { EnrichedPointType } from "Types";
 import { pickPointCoreFields } from "./pointColumnKeys";
+import type { PointCorePayloadFields } from "Types/pointCoreFields";
 
-export type PointUpdateFormFields = {
-  omschrijving: string;
-  regio_id: string;
-  xcoordinaat_rd: number;
-  ycoordinaat_rd: number;
-  latitude: number;
-  longitude: number;
-  vertrouwelijk: boolean | number | string;
-  herhalen: boolean | number | string;
-  user_id: number;
-  activiteit_id: string;
-  organisatie_id: string;
-  specifiek_letten_op: string;
-};
+export type PointUpdateFormFields = PointCorePayloadFields;
 
 export function buildPointCorePayload(
   fields: PointUpdateFormFields,

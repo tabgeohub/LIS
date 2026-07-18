@@ -13,18 +13,30 @@ export type LogContext = {
   selectedPage: string;
 };
 
-export function buildLogEntry(input: LogActionInput, context: LogContext) {
+function resolveLogActionFields(input: LogActionInput) {
   return {
     message: input.message || "",
-    userId: context.userId ?? null,
-    userName: context.userName ?? null,
-    userRole: context.userRole ?? null,
-    date: new Date().toISOString(),
     oldData: input.oldData ?? null,
     newData: input.newData ?? null,
     step: input.step ?? null,
+  };
+}
+
+function resolveLogContextFields(context: LogContext) {
+  return {
+    userId: context.userId ?? null,
+    userName: context.userName ?? null,
+    userRole: context.userRole ?? null,
     tab: context.selectedTab,
     page: context.selectedPage,
+  };
+}
+
+export function buildLogEntry(input: LogActionInput, context: LogContext) {
+  return {
+    ...resolveLogActionFields(input),
+    ...resolveLogContextFields(context),
+    date: new Date().toISOString(),
   };
 }
 

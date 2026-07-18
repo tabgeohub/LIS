@@ -3,12 +3,13 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 
 import { useState } from "react";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
 import CancelModal from "Components/HomePage/Body/Common/CancelModal";
-import { buildCoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 import { createNewPoint } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
 import { useContent } from "hooks/useContent";
 import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
 import useCoordinatesWatcher from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/Steps/Step2/useCoordinatesWatcher";
+import { syncEnrichedCoordsForPreview } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/Steps/Step2/syncEnrichedCoordsForPreview";
 
 export default function Step2({
   handleCancel,
@@ -20,47 +21,17 @@ export default function Step2({
   const { redGraphicsLayer } = useMapViewState();
   const [openCancelModal, setOpenCancelModal] = useState(false);
 
-  const {
-    xCoord,
-    yCoord,
-    coordinateSystem,
-    setCoordinateSystem,
-    setCurrentPoint,
-    latitude,
-    setLatitude,
-    longitude,
-    setLongitude,
-    setXCoord,
-    setYCoord,
-  } = useEnrichedPointState();
+  const state = useEnrichedPointState();
+  const coords = pickEnrichedCoordinateControls(state);
 
   function handleUpdate(): void {
     if (!redGraphicsLayer) return;
 
-    let drawLon = longitude;
-    let drawLat = latitude;
-
-    const patch = buildCoordinateSyncPatch({
-      coordinateSystem,
-      rdX: xCoord,
-      rdY: yCoord,
-      latitude,
-      longitude,
-    });
-    if (patch?.longitude !== undefined) {
-      setLongitude(patch.longitude);
-      drawLon = patch.longitude;
-    }
-    if (patch?.latitude !== undefined) {
-      setLatitude(patch.latitude);
-      drawLat = patch.latitude;
-    }
-    if (patch?.rdX !== undefined) setXCoord(patch.rdX);
-    if (patch?.rdY !== undefined) setYCoord(patch.rdY);
+    const { drawLon, drawLat } = syncEnrichedCoordsForPreview(coords);
 
     createNewPoint({
       redGraphicsLayer,
-      setCurrentPoint,
+      setCurrentPoint: state.setCurrentPoint,
       xCoord: drawLon,
       yCoord: drawLat,
     });
@@ -77,16 +48,16 @@ export default function Step2({
       </p>
 
       <CoordinateFields
-        coordinateSystem={coordinateSystem}
-        setCoordinateSystem={setCoordinateSystem}
-        xCoord={xCoord}
-        setXCoord={setXCoord}
-        yCoord={yCoord}
-        setYCoord={setYCoord}
-        longitude={longitude}
-        setLongitude={setLongitude}
-        latitude={latitude}
-        setLatitude={setLatitude}
+        coordinateSystem={coords.coordinateSystem}
+        setCoordinateSystem={state.setCoordinateSystem}
+        xCoord={coords.xCoord}
+        setXCoord={coords.setXCoord}
+        yCoord={coords.yCoord}
+        setYCoord={coords.setYCoord}
+        longitude={coords.longitude}
+        setLongitude={coords.setLongitude}
+        latitude={coords.latitude}
+        setLatitude={coords.setLatitude}
         labels={{
           coordinateSystem:
             content.voorbereiding.vluchtplanInformatie.addPointStep.step2
@@ -114,7 +85,7 @@ export default function Step2({
 
         <button
           onClick={() => setAddPointStep(3)}
-          disabled={xCoord === 0 && yCoord === 0}
+          disabled={coords.xCoord === 0 && coords.yCoord === 0}
           className="gray-button"
         >
           {content.common.volgende}

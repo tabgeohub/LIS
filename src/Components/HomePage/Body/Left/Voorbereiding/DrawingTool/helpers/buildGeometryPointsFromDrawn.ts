@@ -25,16 +25,8 @@ export type GeometryPointPayload = {
   geometry_type: string;
 };
 
-export function buildGeometryPointsFromDrawn(input: {
+export function buildGeometryPointsFromDrawn(input: GeometryPointContext & {
   graphicsDrawn: DrawnShape[];
-  omschrijving: string;
-  userRole: string | undefined;
-  userId: number | undefined;
-  herhalen: boolean;
-  organisatie: string;
-  vertrouwelijk: boolean;
-  activiteit: string;
-  specifiekLettenOp: string;
 }): GeometryPointPayload[] {
   const { graphicsDrawn, ...ctx } = input;
   const points: GeometryPointPayload[] = [];
@@ -42,13 +34,13 @@ export function buildGeometryPointsFromDrawn(input: {
 
   graphicsDrawn.forEach((shape) => {
     shape.points.forEach(([x, y]) => {
-      const payload = toGeometryPointPayload(
+      const payload = toGeometryPointPayload({
         x,
         y,
         pointOrder,
-        shape.type,
-        ctx as GeometryPointContext
-      );
+        geometryType: shape.type,
+        ctx,
+      });
       if (!payload) return;
       points.push(payload);
       pointOrder++;

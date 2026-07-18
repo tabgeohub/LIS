@@ -1,15 +1,11 @@
 import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
-import { FlightPlanType } from "Types";
+import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
 
 export default function PlanInformation({
   selectedPlan,
   setSelectedPlan,
   setStep,
-}: {
-  selectedPlan: FlightPlanType;
-  setSelectedPlan: (value: FlightPlanType | null) => void;
-  setStep: (value: number) => void;
-}) {
+}: PlanInformationProps) {
   return (
     <div className="space-y-3 p-3">
       <PlanInformationFields

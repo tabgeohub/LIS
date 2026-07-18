@@ -9,25 +9,39 @@ export type EditPointCoordinateValues = {
   latitude: number;
 };
 
+function applyRdCoordinatePatch<T extends EditPointCoordinateValues>(
+  values: T,
+  patch: CoordinateSyncPatch
+): T {
+  return {
+    ...values,
+    longitude: patch.longitude ?? values.longitude,
+    latitude: patch.latitude ?? values.latitude,
+  };
+}
+
+function applyWgs84CoordinatePatch<T extends EditPointCoordinateValues>(
+  values: T,
+  patch: CoordinateSyncPatch
+): T {
+  return {
+    ...values,
+    x: patch.rdX ?? values.x,
+    y: patch.rdY ?? values.y,
+  };
+}
+
 /** Returns form values after applying an RD/WGS sync patch (logging stays in the caller). */
 export function nextValuesAfterCoordinatePatch<T extends EditPointCoordinateValues>(
   values: T,
   patch: CoordinateSyncPatch
 ): T {
   if (values.coordinateSystem === "RD") {
-    return {
-      ...values,
-      longitude: patch.longitude ?? values.longitude,
-      latitude: patch.latitude ?? values.latitude,
-    };
+    return applyRdCoordinatePatch(values, patch);
   }
 
   if (values.coordinateSystem === "WGS84") {
-    return {
-      ...values,
-      x: patch.rdX ?? values.x,
-      y: patch.rdY ?? values.y,
-    };
+    return applyWgs84CoordinatePatch(values, patch);
   }
 
   return values;

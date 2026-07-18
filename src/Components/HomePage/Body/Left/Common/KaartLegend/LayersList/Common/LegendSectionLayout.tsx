@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { LegendLayerDefinition } from "../helpers/layerTypes";
 import { LayerItem } from "./LayerItem";
 import { ParentItem } from "./ParentItem";
@@ -16,6 +17,61 @@ type LegendSectionLayoutProps = {
   isVisibleForRole: boolean;
 };
 
+function isLegendChildDisabled(
+  parentTitle: string | undefined,
+  parentChecked: boolean,
+  externalParentChecked: boolean | undefined
+): boolean {
+  const hasParentGate =
+    parentTitle != null || externalParentChecked !== undefined;
+  if (!hasParentGate) return false;
+  return parentTitle ? !parentChecked : externalParentChecked === false;
+}
+
+function isLegendLayerDisabled(
+  childDisabled: boolean,
+  nestedParentTitle: string | undefined,
+  nestedParentChecked: boolean
+): boolean {
+  return childDisabled || Boolean(nestedParentTitle && !nestedParentChecked);
+}
+
+function shouldShowNestedParent(
+  nestedParentTitle: string | undefined,
+  gateNestedByRole: boolean,
+  isVisibleForRole: boolean
+): boolean {
+  return Boolean(nestedParentTitle) && (!gateNestedByRole || isVisibleForRole);
+}
+
+function renderNestedLegendContent(input: {
+  showNestedParent: boolean;
+  nestedParentTitle?: string;
+  nestedParentChecked: boolean;
+  setNestedParentChecked: (checked: boolean) => void;
+  externalParentChecked?: boolean;
+  layerList: ReactNode;
+}): ReactNode {
+  if (!input.showNestedParent) return input.layerList;
+  return (
+    <ParentItem
+      title={input.nestedParentTitle!}
+      checked={input.nestedParentChecked}
+      setChecked={input.setNestedParentChecked}
+      isDisabled={input.externalParentChecked === false}
+    >
+      <div className="pl-8">{input.layerList}</div>
+    </ParentItem>
+  );
+}
+
+function wrapLegendContent(
+  nestedParentTitle: string | undefined,
+  nestedContent: ReactNode
+): ReactNode {
+  return nestedParentTitle ? <>{nestedContent}</> : <div>{nestedContent}</div>;
+}
+
 export default function LegendSectionLayout({
   layers,
   handleLayerChange,
@@ -29,10 +85,16 @@ export default function LegendSectionLayout({
   gateNestedByRole,
   isVisibleForRole,
 }: LegendSectionLayoutProps) {
-  const childDisabled =
-    (parentTitle != null || externalParentChecked !== undefined) &&
-    (parentTitle ? !parentChecked : externalParentChecked === false);
-  const layerDisabled = childDisabled || Boolean(nestedParentTitle && !nestedParentChecked);
+  const childDisabled = isLegendChildDisabled(
+    parentTitle,
+    parentChecked,
+    externalParentChecked
+  );
+  const layerDisabled = isLegendLayerDisabled(
+    childDisabled,
+    nestedParentTitle,
+    nestedParentChecked
+  );
 
   const layerList = layers.map((layer) => (
     <LayerItem
@@ -43,20 +105,19 @@ export default function LegendSectionLayout({
     />
   ));
 
-  const showNestedParent =
-    Boolean(nestedParentTitle) && (!gateNestedByRole || isVisibleForRole);
-  const nestedContent = showNestedParent ? (
-    <ParentItem
-      title={nestedParentTitle!}
-      checked={nestedParentChecked}
-      setChecked={setNestedParentChecked}
-      isDisabled={externalParentChecked === false}
-    >
-      <div className="pl-8">{layerList}</div>
-    </ParentItem>
-  ) : (
-    layerList
+  const showNestedParent = shouldShowNestedParent(
+    nestedParentTitle,
+    gateNestedByRole,
+    isVisibleForRole
   );
+  const nestedContent = renderNestedLegendContent({
+    showNestedParent,
+    nestedParentTitle,
+    nestedParentChecked,
+    setNestedParentChecked,
+    externalParentChecked,
+    layerList,
+  });
 
   if (parentTitle) {
     return (
@@ -70,5 +131,5 @@ export default function LegendSectionLayout({
     );
   }
 
-  return nestedParentTitle ? <>{nestedContent}</> : <div>{nestedContent}</div>;
+  return wrapLegendContent(nestedParentTitle, nestedContent);
 }

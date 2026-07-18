@@ -2,18 +2,9 @@ import Submit from "./Submit";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import RemovePoint from "./RemovePoint";
 import { useContent } from "hooks/useContent";
+import type { EditPointDetailFields } from "./editPointDetailFields";
 
-export default function Buttons({
-  omschrijving,
-  activiteit,
-  organisatie,
-  specifiekLettenOp,
-}: {
-  omschrijving: string;
-  activiteit: string;
-  organisatie: string;
-  specifiekLettenOp: string;
-}) {
+export default function Buttons(fields: EditPointDetailFields) {
   const { setStep } = useViewPlanState();
 
   const content = useContent();
@@ -24,12 +15,7 @@ export default function Buttons({
         {content.common.vorige}
       </button>
 
-      <Submit
-        omschrijving={omschrijving}
-        activiteit={activiteit}
-        organisatie={organisatie}
-        specifiekLettenOp={specifiekLettenOp}
-      />
+      <Submit {...fields} />
 
       <RemovePoint />
     </div>

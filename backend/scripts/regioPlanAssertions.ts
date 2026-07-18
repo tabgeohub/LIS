@@ -39,8 +39,13 @@ export async function assertPlanRegiosWithDb(reporter: RegioTestReporter, input:
     reporter.fail(input.endpoint, "rows returned without plan ids");
     return false;
   }
+  const tableKey = input.table ?? "lis.flightplans";
+  const tableSql =
+    tableKey === "lis.template_plans"
+      ? "lis.template_plans"
+      : "lis.flightplans";
   const result = await input.pool.query(
-    "SELECT id, regio_id FROM " + PLAN_TABLE_BY_KEY[input.table ?? "lis.flightplans"] + " WHERE id = ANY($1::int[])",
+    `SELECT id, regio_id FROM ${tableSql} WHERE id = ANY($1::int[])`,
     [ids]
   );
   return assertPlanRegios(reporter, { ...input, rows: result.rows });

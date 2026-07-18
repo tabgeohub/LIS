@@ -1,20 +1,12 @@
 import type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
+import { applyCoordinateSyncPatchToSetters } from "@helpers/geo/applyCoordinateSyncPatchToSetters";
+import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
 
 export function applyDeletePointCoordinatePatch(input: {
   coordinateSystem: string;
   patch: CoordinateSyncPatch;
-  xcoordinaat_rd: number;
-  ycoordinaat_rd: number;
-  latitude: number;
-  longitude: number;
-  setXCoordinaat_rd: (value: number) => void;
-  setYCoordinaat_rd: (value: number) => void;
-  setLatitude: (value: number) => void;
-  setLongitude: (value: number) => void;
 }): void {
   const {
-    coordinateSystem,
-    patch,
     xcoordinaat_rd,
     ycoordinaat_rd,
     latitude,
@@ -23,19 +15,36 @@ export function applyDeletePointCoordinatePatch(input: {
     setYCoordinaat_rd,
     setLatitude,
     setLongitude,
-  } = input;
+  } = useDeletePointState.getState();
 
-  if (coordinateSystem === "RD") {
-    if (patch.latitude !== undefined) setLatitude(patch.latitude);
-    if (patch.longitude !== undefined) setLongitude(patch.longitude);
+  const setters = {
+    setLongitude,
+    setLatitude,
+    setXCoord: setXCoordinaat_rd,
+    setYCoord: setYCoordinaat_rd,
+  };
+
+  if (input.coordinateSystem === "RD") {
+    applyCoordinateSyncPatchToSetters(
+      {
+        latitude: input.patch.latitude,
+        longitude: input.patch.longitude,
+      },
+      setters
+    );
     setXCoordinaat_rd(xcoordinaat_rd);
     setYCoordinaat_rd(ycoordinaat_rd);
     return;
   }
 
-  if (coordinateSystem === "WGS84") {
-    if (patch.rdX !== undefined) setXCoordinaat_rd(patch.rdX);
-    if (patch.rdY !== undefined) setYCoordinaat_rd(patch.rdY);
+  if (input.coordinateSystem === "WGS84") {
+    applyCoordinateSyncPatchToSetters(
+      {
+        rdX: input.patch.rdX,
+        rdY: input.patch.rdY,
+      },
+      setters
+    );
     setLatitude(latitude);
     setLongitude(longitude);
   }

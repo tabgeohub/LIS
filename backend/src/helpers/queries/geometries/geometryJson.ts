@@ -1,3 +1,5 @@
+import { GEOMETRY_POINT_CORE_KEYS } from "../points/pointCoreColumns";
+
 export type GeometryPointsJsonPreset = "coords" | "full";
 
 const GEOMETRY_POINT_COORDS_KEYS = [
@@ -10,18 +12,7 @@ const GEOMETRY_POINT_COORDS_KEYS = [
 
 const GEOMETRY_POINT_FULL_KEYS = [
   "id",
-  "omschrijving",
-  "regio_id",
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
-  "herhalen",
-  "vertrouwelijk",
-  "user_id",
-  "activiteit_id",
-  "organisatie_id",
-  "specifiek_letten_op",
+  ...GEOMETRY_POINT_CORE_KEYS,
   "geometry_id",
   "status",
   "created_at",

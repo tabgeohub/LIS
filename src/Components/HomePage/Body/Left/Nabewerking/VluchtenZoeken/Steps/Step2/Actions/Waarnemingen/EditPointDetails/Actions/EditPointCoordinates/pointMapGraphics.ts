@@ -91,15 +91,24 @@ export function updatePreviewGraphics(input: {
   longitude: number;
   latitude: number;
 }) {
-  replacePointGraphic({
-    layer: input.pointsGraphicsLayer,
-    point: input.point,
-    longitude: input.longitude,
-    latitude: input.latitude,
-  });
+  replacePointsLayerAt(input);
   showRedMarkerAt({
     redGraphicsLayer: input.redGraphicsLayer,
     mapView: input.mapView,
+    longitude: input.longitude,
+    latitude: input.latitude,
+  });
+}
+
+function replacePointsLayerAt(input: {
+  pointsGraphicsLayer: __esri.GraphicsLayer;
+  point: FinishedPointType;
+  longitude: number;
+  latitude: number;
+}) {
+  replacePointGraphic({
+    layer: input.pointsGraphicsLayer,
+    point: input.point,
     longitude: input.longitude,
     latitude: input.latitude,
   });
@@ -114,12 +123,7 @@ export function updateSavedGraphics(input: {
   longitude: number;
   latitude: number;
 }) {
-  replacePointGraphic({
-    layer: input.pointsGraphicsLayer,
-    point: input.point,
-    longitude: input.longitude,
-    latitude: input.latitude,
-  });
+  replacePointsLayerAt(input);
   replacePointGraphic({
     layer: input.yellowGraphicsLayer,
     point: input.point,

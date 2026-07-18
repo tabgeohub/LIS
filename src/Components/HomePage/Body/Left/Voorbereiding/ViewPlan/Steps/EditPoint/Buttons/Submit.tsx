@@ -2,18 +2,14 @@ import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import { useContent } from "hooks/useContent";
+import type { EditPointDetailFields } from "./editPointDetailFields";
 
 export default function Submit({
   omschrijving,
   activiteit,
   organisatie,
   specifiekLettenOp,
-}: {
-  omschrijving: string;
-  activiteit: string;
-  organisatie: string;
-  specifiekLettenOp: string;
-}) {
+}: EditPointDetailFields) {
   const { clickedPoint, setStep, selectedPlan } = useViewPlanState();
   const { pointsTable } = useOpenTable();
 

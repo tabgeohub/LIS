@@ -1,5 +1,9 @@
 import * as XLSX from "@e965/xlsx";
 import { PointImportRow } from "@helpers/points/pointColumnKeys";
+import {
+  EMPTY_POINT_IDENTITY_FIELDS,
+  EMPTY_POINT_NUMERIC_FLAGS,
+} from "@helpers/points/emptyPointCoreFields";
 
 type NumericColumn =
   | "xcoordinaat_rd"
@@ -20,14 +24,8 @@ function parseNumericCell(value: unknown): number {
 
 function createEmptyPointRow(userId: string): PointImportRow {
   return {
-    omschrijving: "",
-    regio_id: "",
-    xcoordinaat_rd: 0,
-    ycoordinaat_rd: 0,
-    latitude: 0,
-    longitude: 0,
-    herhalen: 0,
-    vertrouwelijk: 0,
+    ...EMPTY_POINT_IDENTITY_FIELDS,
+    ...EMPTY_POINT_NUMERIC_FLAGS,
     user_id: userId,
     activiteit_id: "",
     organisatie_id: "",

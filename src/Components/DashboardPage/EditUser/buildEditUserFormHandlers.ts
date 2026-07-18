@@ -1,5 +1,6 @@
 import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
 import { submitEditUser, type EditUserFormData } from "./submitEditUser";
+import { createFormFieldChangeHandler } from "../shared/createFormFieldChangeHandler";
 
 export function buildEditUserFormHandlers(input: {
   selectedUser: KeycloakUser | null;
@@ -9,10 +10,7 @@ export function buildEditUserFormHandlers(input: {
   handleEditSuccess: (user: KeycloakUser) => void;
 }) {
   return {
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      input.setFormData((prev) => ({ ...prev, [name]: value }));
-    },
+    onChange: createFormFieldChangeHandler(input.setFormData),
     onSubmit: async (e: React.FormEvent) => {
       e.preventDefault();
       if (!input.selectedUser) return;

@@ -9,10 +9,11 @@ import type {
   GeometrySymbolOptions,
 } from "./geometryGraphicTypes";
 
-export function pointsToCoordinates(
-  points: GeometryPoint[],
-  transformCoordinates?: (point: GeometryPoint) => [number, number] | null
-): [number, number][] {
+export function pointsToCoordinates(input: {
+  points: GeometryPoint[];
+  transformCoordinates?: (point: GeometryPoint) => [number, number] | null;
+}): [number, number][] {
+  const { points, transformCoordinates } = input;
   if (!points?.length) return [];
 
   return points

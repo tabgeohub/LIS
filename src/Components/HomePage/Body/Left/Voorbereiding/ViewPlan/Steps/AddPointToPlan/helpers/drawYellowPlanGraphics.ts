@@ -1,8 +1,6 @@
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
+import { createYellowWgs84PointGraphic } from "@helpers/ArcGISHelpers/createYellowWgs84PointGraphic";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { EnrichedPointType } from "Types";
 
@@ -21,24 +19,13 @@ export function drawYellowPoint(
   const coords = getPointCoordinates(point);
   if (!coords || !yellowGraphicsLayer) return;
 
-  const yellow = new SimpleMarkerSymbol({
-    color: "yellow",
-    size: 12,
-    style: "circle",
-    outline: { color: "white", width: 1 },
-  });
-
-  const graphic = new Graphic({
-    geometry: new Point({
+  yellowGraphicsLayer.add(
+    createYellowWgs84PointGraphic({
       longitude: coords.longitude,
       latitude: coords.latitude,
-      spatialReference: { wkid: 4326 },
-    }),
-    symbol: yellow,
-    attributes: point,
-  });
-
-  yellowGraphicsLayer.add(graphic);
+      attributes: point,
+    })
+  );
 }
 
 export function drawYellowGeometries(

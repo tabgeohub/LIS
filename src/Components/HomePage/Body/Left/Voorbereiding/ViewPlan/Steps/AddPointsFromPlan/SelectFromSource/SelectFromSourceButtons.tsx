@@ -1,10 +1,10 @@
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useOpenTable } from "@helpers/ZustandStates/showTable";
 import { useUpdateData } from "utils/useUpdateData";
+import { useViewPlanAddPointsState } from "../../../pickViewPlanAddPointsState";
 import { buildSubmitSelectedPointsResult } from "./helpers/selectFromSourceGraphics";
 import type { SelectFromSourceItem } from "./helpers/mapSourceItems";
 
@@ -28,7 +28,7 @@ export default function SelectFromSourceButtons({
     setStep,
     filteredPlans,
     setFilteredPlans,
-  } = useViewPlanState();
+  } = useViewPlanAddPointsState();
   const { dbPoints } = usePointsStore();
   const { yellowGraphicsLayer } = useMapViewState();
   const { setPointsTable, setGeometriesTable } = useOpenTable();

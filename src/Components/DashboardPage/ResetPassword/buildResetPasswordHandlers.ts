@@ -1,4 +1,5 @@
 import { submitResetPassword } from "./submitResetPassword";
+import { createFormFieldChangeHandler } from "../shared/createFormFieldChangeHandler";
 
 type FormData = { password: string; confirmPassword: string };
 
@@ -10,10 +11,7 @@ export function buildResetPasswordHandlers(input: {
   handleBack: () => void;
 }) {
   return {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      input.setFormData((prev) => ({ ...prev, [name]: value }));
-    },
+    onChange: createFormFieldChangeHandler(input.setFormData),
     onSubmit: async (e: React.FormEvent) => {
       e.preventDefault();
       if (!input.selectedUser) return;

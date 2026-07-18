@@ -1,14 +1,7 @@
-import { Request, Response } from "express";
-import { fetchConstLookup } from "../../helpers/queries/consts/fetchConstLookup";
+import { createConstLookupHandler } from "./createConstLookupHandler";
 
-export async function getLuchtvaartuig(
-  req: Request,
-  res: Response
-): Promise<void> {
-  await fetchConstLookup({
-    res,
-    select: "id, naam",
-    from: "lis.luchtvaartuig",
-    errorLabel: "piloten",
-  });
-}
+export const getLuchtvaartuig = createConstLookupHandler({
+  select: "id, naam",
+  from: "lis.luchtvaartuig",
+  errorLabel: "piloten",
+});

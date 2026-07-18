@@ -48,13 +48,21 @@ export function resolveMapHoverLabel(input: {
   return "Onbekend punt";
 }
 
+function firstAttribute(
+  attributes: Record<string, unknown>,
+  keys: string[],
+  fallback: number
+): unknown {
+  for (const key of keys) {
+    if (attributes[key] != null) return attributes[key];
+  }
+  return fallback;
+}
+
 export function resolveMapHoverId(attributes: Record<string, unknown>) {
-  return (
-    attributes.id ??
-    attributes.geometryId ??
-    attributes.objectid ??
-    attributes.objectId ??
-    attributes.OBJECTID ??
+  return firstAttribute(
+    attributes,
+    ["id", "geometryId", "objectid", "objectId", "OBJECTID"],
     Date.now()
   );
 }

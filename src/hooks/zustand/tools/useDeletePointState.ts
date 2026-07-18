@@ -1,4 +1,5 @@
 import { EnrichedPointType } from "Types";
+import { EMPTY_POINT_COORDINATES } from "@helpers/points/emptyPointCoreFields";
 import { create } from "zustand";
 
 type AandachtspuntenVerwijderenType =
@@ -100,10 +101,7 @@ const initialState = {
   selectedPoint: null as EnrichedPointType | null,
   omschrijving: "",
   regio_id: "",
-  xcoordinaat_rd: 0,
-  ycoordinaat_rd: 0,
-  latitude: 0,
-  longitude: 0,
+  ...EMPTY_POINT_COORDINATES,
   herhalen: false,
   vertrouwelijk: 0,
   user_id: 0,

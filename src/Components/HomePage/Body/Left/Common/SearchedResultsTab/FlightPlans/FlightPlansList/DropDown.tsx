@@ -1,10 +1,4 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useContent } from "hooks/useContent";
 import { addPlanStarGraphics } from "@helpers/ArcGISHelpers/planStarGraphics";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import {
@@ -25,6 +19,7 @@ import {
   exportSearchedFlightPlansXlsx,
 } from "../../shared/searchedResultsExports";
 import SearchedResultsActionsMenu from "../../shared/SearchedResultsActionsMenu";
+import { useSearchedResultsDropdownChrome } from "../../shared/useSearchedResultsDropdownChrome";
 
 export default function DropDown({
   starredPlans,
@@ -38,23 +33,15 @@ export default function DropDown({
   setFase: (value: string) => void;
 }) {
   const { redGraphicsLayer } = useMapViewState();
-  const table = useOpenTable();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { setSelectedTab } = useTabState();
-  const { setOpenSideBar } = useOpeSideBarState();
-  const { setOpenSearchedTab } = useOpenSearchedTab();
-  const labels = useContent().layout.searchResult.listPointFunctions;
-  const noop = () => {};
+  const { table, labels, noop, closeSearchedAndOpenTable } =
+    useSearchedResultsDropdownChrome();
 
   const tableView = () => {
     table.setOpenTable(true);
     table.setPointsTable([]);
     table.setView("points");
     table.setFlightPlans(flightPlansData);
-    setSelectedBottomTab("topTabs");
-    setSelectedTab("none");
-    setOpenSearchedTab(false);
-    setOpenSideBar(false);
+    closeSearchedAndOpenTable();
   };
   const selectAll = () => {
     if (!redGraphicsLayer) return;

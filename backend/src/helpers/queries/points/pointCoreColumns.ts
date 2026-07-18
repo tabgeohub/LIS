@@ -1,16 +1,34 @@
-export const POINT_CORE_COLUMNS = [
+/** Shared point column keys for SQL builders and geometry JSON presets. */
+
+export const POINT_CORE_IDENTITY_KEYS = [
   "omschrijving",
   "regio_id",
   "xcoordinaat_rd",
   "ycoordinaat_rd",
   "latitude",
   "longitude",
-  "vertrouwelijk",
-  "herhalen",
+] as const;
+
+export const POINT_CORE_ORG_KEYS = [
   "user_id",
   "activiteit_id",
   "organisatie_id",
   "specifiek_letten_op",
+] as const;
+
+export const POINT_CORE_COLUMNS = [
+  ...POINT_CORE_IDENTITY_KEYS,
+  "vertrouwelijk",
+  "herhalen",
+  ...POINT_CORE_ORG_KEYS,
+] as const;
+
+/** Display-order keys used in geometry points JSON (herhalen before vertrouwelijk). */
+export const GEOMETRY_POINT_CORE_KEYS = [
+  ...POINT_CORE_IDENTITY_KEYS,
+  "herhalen",
+  "vertrouwelijk",
+  ...POINT_CORE_ORG_KEYS,
 ] as const;
 
 export type PointCoreColumn = (typeof POINT_CORE_COLUMNS)[number];

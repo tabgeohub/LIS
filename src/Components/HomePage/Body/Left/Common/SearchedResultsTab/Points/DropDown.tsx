@@ -1,16 +1,10 @@
 import { starAllPointsOnMap } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
 import {
   downloadCsvFromRows,
   downloadEnrichedPointsShapefile,
   downloadXlsxFromRows,
 } from "@helpers/tableExports/pointsPlansTableExport";
-import { useContent } from "hooks/useContent";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import {
   MdAddCircleOutline,
@@ -25,6 +19,7 @@ import {
 } from "react-icons/md";
 import { EnrichedPointType } from "Types";
 import SearchedResultsActionsMenu from "../shared/SearchedResultsActionsMenu";
+import { useSearchedResultsDropdownChrome } from "../shared/useSearchedResultsDropdownChrome";
 
 export default function DropDown({
   starredPoints,
@@ -40,22 +35,14 @@ export default function DropDown({
   setFase: (value: string) => void;
 }) {
   const { graphicsLayer } = useMapViewState();
-  const table = useOpenTable();
-  const { setSelectedBottomTab } = useSelectedBottomTabState();
-  const { setSelectedTab } = useTabState();
-  const { setOpenSideBar } = useOpeSideBarState();
-  const { setOpenSearchedTab } = useOpenSearchedTab();
-  const labels = useContent().layout.searchResult.listPointFunctions;
-  const noop = () => {};
+  const { table, labels, noop, closeSearchedAndOpenTable } =
+    useSearchedResultsDropdownChrome();
 
   const tableView = () => {
     table.setOpenTable(true);
     table.setPointsTable(pointsData);
-    setSelectedBottomTab("topTabs");
-    setSelectedTab("none");
     table.setView("points");
-    setOpenSearchedTab(false);
-    setOpenSideBar(false);
+    closeSearchedAndOpenTable();
   };
   const selectAll = () => {
     setOpenListPointDiv(false);

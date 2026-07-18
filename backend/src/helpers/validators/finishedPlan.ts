@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { validateFinishedPlanPoint } from "./validateFinishedPlanPoint";
+import type { IncomingPointCoreFields } from "./incomingPointCoreFields";
 
 export type FinishedPlanOkInput = {
   res: Response;
@@ -33,20 +34,8 @@ type FinishedPlanAttachment = {
   lat?: number | null;
 };
 
-export type IncomingPoint = {
+export type IncomingPoint = IncomingPointCoreFields & {
   id: number;
-  omschrijving: string;
-  regio_id?: string;
-  xcoordinaat_rd?: number;
-  ycoordinaat_rd?: number;
-  latitude?: number;
-  longitude?: number;
-  vertrouwelijk?: number;
-  herhalen?: number;
-  user_id?: number;
-  activiteit_id?: string;
-  organisatie_id?: string;
-  specifiek_letten_op?: string;
   attachments?: FinishedPlanAttachment[] | null;
   order?: number | null;
   comment: string | null;

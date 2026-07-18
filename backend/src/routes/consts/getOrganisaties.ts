@@ -1,15 +1,8 @@
-import { Request, Response } from "express";
-import { fetchConstLookup } from "../../helpers/queries/consts/fetchConstLookup";
+import { createConstLookupHandler } from "./createConstLookupHandler";
 
-export async function getOrganisaties(
-  req: Request,
-  res: Response
-): Promise<void> {
-  await fetchConstLookup({
-    res,
-    select: "id, naam",
-    from: "lis.organisaties",
-    orderBy: "naam ASC",
-    errorLabel: "organisaties",
-  });
-}
+export const getOrganisaties = createConstLookupHandler({
+  select: "id, naam",
+  from: "lis.organisaties",
+  orderBy: "naam ASC",
+  errorLabel: "organisaties",
+});

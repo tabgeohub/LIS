@@ -2,18 +2,9 @@
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { handleAddPointStepMapClick } from "./handleAddPointStepMapClick";
+import type { AddPointStepMapClickState } from "./addPointStepMapClickTypes";
 
-export function useAddPointStepMapClick(input: {
-  addPointStep: number;
-  mapClickedNotify: number;
-  setMapClickedNotify: (value: number) => void;
-  setCurrentPoint: (value: { x: number; y: number }) => void;
-  setXCoord: (value: number) => void;
-  setYCoord: (value: number) => void;
-  setLatitude: (value: number) => void;
-  setLongitude: (value: number) => void;
-  setAddPointStep: (value: number) => void;
-}) {
+export function useAddPointStepMapClick(input: AddPointStepMapClickState) {
   const { mapView, redGraphicsLayer } = useMapViewState();
 
   useEffect(() => {
@@ -26,15 +17,7 @@ export function useAddPointStepMapClick(input: {
         handleAddPointStepMapClick({
           event,
           redGraphicsLayer,
-          addPointStep: input.addPointStep,
-          mapClickedNotify: input.mapClickedNotify,
-          setMapClickedNotify: input.setMapClickedNotify,
-          setCurrentPoint: input.setCurrentPoint,
-          setXCoord: input.setXCoord,
-          setYCoord: input.setYCoord,
-          setLatitude: input.setLatitude,
-          setLongitude: input.setLongitude,
-          setAddPointStep: input.setAddPointStep,
+          ...input,
         });
       });
     }

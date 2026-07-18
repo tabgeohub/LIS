@@ -1,18 +1,9 @@
-import { Request, Response } from "express";
-import { fetchRegionalFlightPlanList } from "../../helpers/queries/flight-plans/fetchFlightPlanList";
+import { createRegionalFlightPlanListHandler } from "./createRegionalFlightPlanListHandler";
+import { PARTIAL_FLIGHT_PLAN_LIST_ERROR_OPTIONS } from "./partialFlightPlanListErrorOptions";
 
-export async function getFullPreparedFlightPlans(
-  req: Request,
-  res: Response
-): Promise<void> {
-  await fetchRegionalFlightPlanList({
-    req,
-    res,
-    columnPreset: "prepared",
-    pointPreset: "minimal",
-    where: "fp.status = 'prepared'",
-    errorMessage: "Failed to fetch partial flight plans",
-    appendErrorToMessage: false,
-    includeErrorField: true,
-  });
-}
+export const getFullPreparedFlightPlans = createRegionalFlightPlanListHandler({
+  columnPreset: "prepared",
+  pointPreset: "minimal",
+  where: "fp.status = 'prepared'",
+  ...PARTIAL_FLIGHT_PLAN_LIST_ERROR_OPTIONS,
+});

@@ -6,6 +6,7 @@ import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
 import {
   applyFlightPlanFormValues,
   viewPlanFlightPlanFormDefaults,
+  type FlightPlanFormFieldSetters,
 } from "hooks/zustand/shared/flightPlanFormFields";
 import type { TabType } from "Types";
 
@@ -17,16 +18,7 @@ export function resetViewPlanSession(input: {
   resetFeatures: () => void;
   setOpenTable: (value: boolean) => void;
   setSelectedTab: (value: TabType) => void;
-  setViewPlanState: {
-    setOmschrijving: (value: string) => void;
-    setWaarnemer: (value: string) => void;
-    setPiloot: (value: string) => void;
-    setDatum: (value: string) => void;
-    setGeplandeVliegduur: (value: string) => void;
-    setTypeLuchtvaartuig: (value: string) => void;
-    setAantalPassagiers: (value: number | null | undefined) => void;
-    setDoelEnHoofdthema: (value: string) => void;
-    setAanvullendeInfo: (value: string) => void;
+  setViewPlanState: FlightPlanFormFieldSetters & {
     setOpenFilter: (value: boolean) => void;
     setSelectedPlan: (value: null) => void;
     setStep: (value: number) => void;

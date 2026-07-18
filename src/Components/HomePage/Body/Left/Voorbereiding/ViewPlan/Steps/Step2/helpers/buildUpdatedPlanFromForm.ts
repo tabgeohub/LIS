@@ -1,18 +1,8 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { EnrichedPointType, FlightPlanType } from "Types";
+import type { ViewPlanFormFields } from "./viewPlanFormFields";
 
-export type ViewPlanFormFields = {
-  vluchtnummer: string;
-  omschrijving: string;
-  waarnemer: string;
-  piloot: string;
-  datum: string;
-  geplandeVliegduur: string;
-  typeLuchtvaartuig: string;
-  aantalPassagiers: number;
-  doelEnHoofdthema: string;
-  aanvullendeInfo: string;
-};
+export type { ViewPlanFormFields };
 
 /** All point IDs to persist: standalone (table) + geometry vertices. */
 function collectPointIdsFromTables(

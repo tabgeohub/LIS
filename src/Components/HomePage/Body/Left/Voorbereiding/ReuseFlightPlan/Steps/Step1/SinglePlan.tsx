@@ -5,6 +5,8 @@ import useLogAction from "hooks/useLogAction";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { FlightPlanType } from "Types";
 import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
+import FlightPlanClickableRow from "Components/HomePage/Body/Left/Common/FlightPlanClickableRow";
+import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";
 
 export default function SinglePlan({ plan }: { plan: FlightPlanType }) {
   const { handleClick } = usePlanClick();
@@ -17,19 +19,14 @@ export default function SinglePlan({ plan }: { plan: FlightPlanType }) {
   const content = useContent();
 
   return (
-    <div
+    <FlightPlanClickableRow
+      selected={selectedPlan?.id === plan.id}
       onClick={() => {
         handleClick(plan, setSelectedPlan);
-        logAction({
-          message: `User clicked on flight plan ${plan.vluchtnummer}`,
-          step: "First step",
-        });
+        logFlightPlanRowClick(logAction, plan.vluchtnummer);
       }}
       onMouseEnter={() => handleHover(plan)}
       onMouseLeave={handleMouseLeave}
-      className={`p-2 hover:bg-gray-100 ${
-        selectedPlan?.id === plan.id && "bg-gray-200"
-      } transition-all cursor-pointer`}
     >
       <FlightPlanSummary
         plan={plan}
@@ -40,6 +37,6 @@ export default function SinglePlan({ plan }: { plan: FlightPlanType }) {
           inspectionDate: content.voorbereiding.vluchtplanHergebruiken.step1.inspecteerdatum,
         }}
       />
-    </div>
+    </FlightPlanClickableRow>
   );
 }

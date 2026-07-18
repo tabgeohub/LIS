@@ -1,6 +1,10 @@
 import { create } from "zustand";
+import type {
+  AandachtspuntDetailsFieldState,
+  AandachtspuntDetailsValues,
+} from "Components/HomePage/Body/Left/Common/aandachtspuntDetailsValues";
 
-interface DrawingState {
+interface DrawingState extends AandachtspuntDetailsValues {
   step: number;
   setStep: (value: number) => void;
 
@@ -9,29 +13,23 @@ interface DrawingState {
 
   omschrijving: string;
   setOmschrijving: (value: string) => void;
-  vertrouwelijk: boolean;
-  setVertrouwelijk: (value: boolean) => void;
-  herhalen: boolean;
-  setHerhalen: (value: boolean) => void;
-  activiteit: string;
-  setActiviteit: (value: string) => void;
-  organisatie: string;
-  setOrganisatie: (value: string) => void;
-  specifiekLettenOp: string;
-  setSpecifiekLettenOp: (value: string) => void;
 
   clear: () => void;
 }
 
-const initialState = {
-  step: 1,
-  graphicsDrawn: null as Array<{ type: string; points: number[][] }> | null,
-  omschrijving: "",
+const initialDetails: AandachtspuntDetailsFieldState = {
   vertrouwelijk: false,
   herhalen: false,
   activiteit: "",
   organisatie: "",
   specifiekLettenOp: "",
+};
+
+const initialState = {
+  step: 1,
+  graphicsDrawn: null as Array<{ type: string; points: number[][] }> | null,
+  omschrijving: "",
+  ...initialDetails,
 };
 
 export const useDrawingStore = create<DrawingState>((set) => ({

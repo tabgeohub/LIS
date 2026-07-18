@@ -20,24 +20,56 @@ export function normalizeExportNumber(value: unknown): number | "" {
   return Number.isFinite(parsed) ? parsed : "";
 }
 
+function stringOrEmpty(value: unknown): string {
+  return (value as string | undefined | null) ?? "";
+}
+
+function pointOrPlanField(
+  pointValue: unknown,
+  planValue: unknown
+): string | number {
+  return (pointValue as string | number | undefined | null) ??
+    (planValue as string | number | undefined | null) ??
+    "";
+}
+
+function buildExportGeometry(point: EnrichedPointType): string {
+  return `X: ${point.longitude}, Y: ${point.latitude}`;
+}
+
+function buildExportCoordinateFields(point: EnrichedPointType) {
+  return {
+    xcoordinaat_rd: normalizeExportNumber(point.xcoordinaat_rd),
+    ycoordinaat_rd: normalizeExportNumber(point.ycoordinaat_rd),
+    latitude: normalizeExportNumber(point.latitude),
+    longitude: normalizeExportNumber(point.longitude),
+  };
+}
+
+function buildExportFlagFields(point: EnrichedPointType) {
+  return {
+    herhalen: normalizeJaNee(point.herhalen),
+    vertrouwelijk: normalizeJaNee(point.vertrouwelijk),
+  };
+}
+
 export function mapPointToExportRow(
   point: EnrichedPointType,
   plan: FlightPlanType
 ): FlightPlanPointExportRow {
   return {
-    geometry: `X: ${point.longitude}, Y: ${point.latitude}`,
-    omschrijving: point.omschrijving ?? "",
-    regio_id: point.regio_id ?? "",
-    xcoordinaat_rd: normalizeExportNumber(point.xcoordinaat_rd),
-    ycoordinaat_rd: normalizeExportNumber(point.ycoordinaat_rd),
-    latitude: normalizeExportNumber(point.latitude),
-    longitude: normalizeExportNumber(point.longitude),
-    herhalen: normalizeJaNee(point.herhalen),
-    vertrouwelijk: normalizeJaNee(point.vertrouwelijk),
+    geometry: buildExportGeometry(point),
+    omschrijving: stringOrEmpty(point.omschrijving),
+    regio_id: stringOrEmpty(point.regio_id),
+    ...buildExportCoordinateFields(point),
+    ...buildExportFlagFields(point),
     indiener_id: point.user_id,
-    activiteit_id: point.activiteit_id ?? plan.activiteit_id ?? "",
-    organisatie_id: point.organisatie_id ?? plan.organisatie_id ?? "",
-    specifiek_letten_op: point.specifiek_letten_op ?? "",
+    activiteit_id: pointOrPlanField(point.activiteit_id, plan.activiteit_id),
+    organisatie_id: pointOrPlanField(
+      point.organisatie_id,
+      plan.organisatie_id
+    ),
+    specifiek_letten_op: stringOrEmpty(point.specifiek_letten_op),
     datum: point.created_at,
   };
 }
