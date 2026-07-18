@@ -7,6 +7,7 @@ import { useDeleteData } from "utils/useDeleteData";
 import ConfirmationModal from "./ConfirmationModal";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runMultiPointDelete } from "./runMultiPointDelete";
 
 export default function Buttons() {
   const { withLog, logStep, labels, content } = useWizardButtons("Main step");
@@ -22,37 +23,20 @@ export default function Buttons() {
 
   async function handleDelete() {
     if (selectedPoints.length === 0) return;
-
     setIsDeleting(true);
-
     try {
-      const deletedIds: number[] = [];
-
-      for (const point of selectedPoints) {
-        try {
-          await deleteData({ id: point.id });
-          deletedIds.push(point.id);
-        } catch (error) {
-          console.error(`Error deleting point ${point.id}:`, error);
-        }
-      }
-
-      if (deletedIds.length > 0) {
-        setPoints(points.filter((p) => !deletedIds.includes(p.id)));
-      }
-
-      setSelectedPoints([]);
-      yellowGraphicsLayer?.removeAll();
-      graphicsLayer?.removeAll();
-      graphicsLayerHover?.removeAll();
-      mapView?.graphics.removeAll();
-      setShowConfirmModal(false);
-
-      logStep("User clicked 'Delete' button to delete multiple points", {
-        deletedPoints: selectedPoints
-          .filter((p) => deletedIds.includes(p.id))
-          .map((p) => p.omschrijving),
-        count: deletedIds.length,
+      await runMultiPointDelete({
+        selectedPoints,
+        deleteData,
+        points,
+        setPoints,
+        setSelectedPoints,
+        yellowGraphicsLayer,
+        graphicsLayer,
+        graphicsLayerHover,
+        mapView,
+        setShowConfirmModal,
+        logStep,
       });
     } catch (error) {
       console.error("Error deleting points:", error);

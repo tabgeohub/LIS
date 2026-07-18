@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import {
   entityExists,
   parseRouteEntityId,
-  removePointIdsFromFlightPlans,
   runInTransaction,
   sendDeleteError,
 } from "../../helpers/entities/entityDeleteHelpers";
+import { deletePointInTransaction } from "./deletePointHelpers";
 
 export async function deletePoint(req: Request, res: Response): Promise<void> {
   const pointId = parseRouteEntityId(req.params.id, "point");
@@ -21,33 +21,9 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const result = await runInTransaction(async (client) => {
-      const attachmentsDeleteResult = await client.query(
-        `DELETE FROM lis.attachments WHERE point_id = $1`,
-        [pointId]
-      );
-
-      const finishedPlansDeleteResult = await client.query(
-        `DELETE FROM lis.finished_plans WHERE point_id = $1`,
-        [pointId]
-      );
-
-      const updatedFlightPlans = await removePointIdsFromFlightPlans(client, [
-        pointId,
-      ]);
-
-      const deleteResult = await client.query(
-        "DELETE FROM lis.points WHERE id = $1 RETURNING *",
-        [pointId]
-      );
-
-      return {
-        deletedPoint: deleteResult.rows[0],
-        deletedAttachments: attachmentsDeleteResult.rowCount || 0,
-        deletedFinishedPlans: finishedPlansDeleteResult.rowCount || 0,
-        updatedFlightPlans,
-      };
-    });
+    const result = await runInTransaction((client) =>
+      deletePointInTransaction(client, pointId)
+    );
 
     res.status(200).json({
       message: "Point deleted successfully",

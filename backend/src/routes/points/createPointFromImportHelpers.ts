@@ -6,6 +6,7 @@ import {
   normalizeImportRows,
   parseReturnMode,
 } from "../../helpers/points/importPointRowNormalization";
+import type { Response } from "express";
 import type { PoolClient } from "pg";
 
 export function parseImportRequestBody(body: unknown) {
@@ -43,6 +44,37 @@ export async function runImportPointsTransaction(input: {
     message: "Import verwerkt.",
     returnMode: input.mode,
   };
+}
+
+type ImportSuccess = Extract<
+  Awaited<ReturnType<typeof runImportPointsTransaction>>,
+  { ok: true }
+>;
+
+export function respondImportSuccess(
+  res: Response,
+  outcome: ImportSuccess,
+  total: number
+): void {
+  res.status(201).json({
+    ok: true,
+    created: outcome.result.createdPoints.length,
+    existing: outcome.result.existingPoints.length,
+    total,
+    points: outcome.result.points,
+    createdPoints: outcome.result.createdPoints,
+    existingPoints: outcome.result.existingPoints,
+    message: outcome.message,
+    returnMode: outcome.returnMode,
+  });
+}
+
+export function respondImportError(res: Response, err: unknown): void {
+  console.error("createPointFromImport error:", err);
+  res.status(500).json({
+    ok: false,
+    message: `Error: ${err instanceof Error ? err.message : String(err)}`,
+  });
 }
 
 export { rollbackImportPointsTransaction };

@@ -1,10 +1,7 @@
 import { EnrichedPointType } from "Types";
 import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
-import {
-  applyPointHitSelection,
-  clearSelectedPointGraphics,
-  graphicsFromHitTest,
-} from "./pointHitSelection";
+import { handleMapClickHit } from "./mapClickHitHandler";
+import { clearSelectedPointGraphics } from "./pointHitSelection";
 
 export type SetupClickListenerInput = {
   mapView: __esri.MapView;
@@ -17,49 +14,23 @@ export type SetupClickListenerInput = {
 };
 
 export const setupClickListener = (input: SetupClickListenerInput) => {
-  const {
-    mapView,
-    setClickedPointId,
-    setClickedPoint,
-    selectedPointGraphicsLayer,
-    createNewPoint,
-    pointsGraphicsLayer,
-    isTabBlocked,
-  } = input;
+  const { mapView, selectedPointGraphicsLayer } = input;
+  if (!mapView) return;
 
-  if (!mapView) {
-    return;
-  }
-
-  let clickGuard = createDebouncedClickGuard();
-
+  const clickGuard = createDebouncedClickGuard();
   const clickHandler = mapView.on("click", async (event) => {
-    if (isTabBlocked?.()) return;
-    if (clickGuard.shouldSkip()) return;
-
-    try {
-      const includeLayers = pointsGraphicsLayer
-        ? [pointsGraphicsLayer]
-        : undefined;
-
-      const response = await mapView.hitTest(
-        event,
-        includeLayers ? { include: includeLayers } : undefined
-      );
-
-      if (!createNewPoint) {
-        applyPointHitSelection({
-          clickedGraphics: graphicsFromHitTest(response),
-          setClickedPointId,
-          setClickedPoint,
-          selectedPointGraphicsLayer,
-        });
-      }
-    } catch (error) {
-      console.error("Error querying features:", error);
-    } finally {
-      clickGuard.finish();
-    }
+    await handleMapClickHit({
+      mapView,
+      event,
+      setClickedPointId: input.setClickedPointId,
+      setClickedPoint: input.setClickedPoint,
+      selectedPointGraphicsLayer,
+      createNewPoint: input.createNewPoint,
+      pointsGraphicsLayer: input.pointsGraphicsLayer,
+      isTabBlocked: input.isTabBlocked,
+      shouldSkip: () => clickGuard.shouldSkip(),
+      finishGuard: () => clickGuard.finish(),
+    });
   });
 
   return () => {

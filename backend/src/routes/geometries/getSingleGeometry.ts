@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
+import {
+  fetchGeometryWithPoints,
+  sendGetGeometryError,
+} from "./getSingleGeometryHelpers";
 
 export async function getSingleGeometry(
   req: Request,
@@ -16,13 +19,8 @@ export async function getSingleGeometry(
   }
 
   try {
-    // Get the geometry
-    const geometryResult = await pool.query(
-      `SELECT * FROM lis.geometries WHERE id = $1`,
-      [geometry_id]
-    );
-
-    if (geometryResult.rows.length === 0) {
+    const result = await fetchGeometryWithPoints(geometry_id);
+    if (!result) {
       res.status(404).json({
         result: null,
         message: "Geometry not found",
@@ -30,32 +28,11 @@ export async function getSingleGeometry(
       return;
     }
 
-    const geometry = geometryResult.rows[0];
-
-    // Get all points associated with this geometry
-    const pointsResult = await pool.query(
-      `SELECT * FROM lis.points WHERE geometry_id = $1 ORDER BY id ASC`,
-      [geometry_id]
-    );
-
     res.status(200).json({
-      result: {
-        ...geometry,
-        points: pointsResult.rows,
-      },
+      result,
       message: "Geometry retrieved successfully",
     });
   } catch (err) {
-    console.error(
-      "Error fetching geometry:",
-      err instanceof Error ? err.message : String(err)
-    );
-    res.status(500).json({
-      result: null,
-      message: `Failed to fetch geometry: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-    });
+    sendGetGeometryError(res, err);
   }
 }
-

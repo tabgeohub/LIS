@@ -6,8 +6,8 @@ import { saveAs } from "file-saver";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
 import { IoMdClose } from "react-icons/io";
-import { PDFDocument } from "pdf-lib";
 import { useContent } from "hooks/useContent";
+import { takeMapScreenshotBlob } from "./takeMapScreenshotBlob";
 
 export default function Exporter({
   openExporter,
@@ -17,57 +17,22 @@ export default function Exporter({
   setOpenExporter: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { mapView } = useMapViewState();
-
   const [value, setValue] = useState("png");
   const [inclusief, setInclusief] = useState(false);
-
   const [step, setStep] = useState(1);
-
   const [blob, setBlob] = useState<Blob | null>(null);
-
   const [loading, setLoading] = useState(false);
+  const content = useContent();
 
   const exportMap = async () => {
     setLoading(true);
-
     if (!mapView) {
       console.error("MapView is not initialized");
       setLoading(false);
       return;
     }
-
-    let scale = value === "jpeg" ? 12 : 5;
-    let format = value === "pdf" ? "png" : value;
-
-    const options = {
-      format: format,
-      quality: 1,
-      width: mapView.width * scale,
-      height: mapView.height * scale,
-    };
-
     try {
-      // @ts-ignore
-      const screenshot = await mapView.takeScreenshot(options);
-
-      if (value === "PDF") {
-        const pdfDoc = await PDFDocument.create();
-        const page = pdfDoc.addPage();
-        const { width, height } = page.getSize();
-        const imageBytes = await fetch(screenshot.dataUrl).then((res) =>
-          res.arrayBuffer()
-        );
-        const image = await pdfDoc.embedPng(imageBytes);
-        page.drawImage(image, { x: 0, y: 0, width: width, height: height });
-        const pdfBytes = await pdfDoc.save();
-
-        // @ts-ignore
-        setBlob(new Blob([pdfBytes], { type: "application/pdf" }));
-      } else {
-        const imageBlob = await (await fetch(screenshot.dataUrl)).blob();
-        setBlob(imageBlob);
-      }
-
+      setBlob(await takeMapScreenshotBlob(mapView, value));
       setStep(2);
       setLoading(false);
     } catch (err) {
@@ -83,15 +48,12 @@ export default function Exporter({
     } else {
       console.error("No data available to download.");
     }
-
     setTimeout(() => {
       setBlob(null);
       setStep(1);
       setOpenExporter(false);
     }, 1100);
   };
-
-  const content = useContent();
 
   return (
     <>
@@ -109,7 +71,6 @@ export default function Exporter({
               <IoMdClose className="text-gray-500 text-lg" />
             </button>
           </div>
-
           <div className="w-full h-0.5 bg-gray-300" />
           {!loading && (
             <>
@@ -122,11 +83,9 @@ export default function Exporter({
                   exportMap={exportMap}
                 />
               )}
-
               {step === 2 && <Step3 downloadMap={downloadMap} />}
             </>
           )}
-
           {loading && <Step2 />}
         </div>
       </Modal>

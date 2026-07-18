@@ -2,8 +2,6 @@ import { useTabState } from "@helpers/ZustandStates/tabState";
 import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
 import { toolsTabs } from "./constants";
 import FilterTabs from "./Common/FilterTabs";
-import { ToolsTabsType } from "Types";
-import { IconType } from "react-icons";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useState } from "react";
 import Exporter from "../Body/Left/Tools/Exporter";
@@ -13,6 +11,7 @@ import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "hooks/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
 import { useContent } from "hooks/useContent";
+import { handleToolsTabClick } from "./handleToolsTabClick";
 
 export default function HeadButtonsTools() {
   const { setSelectedTab, setOpenBevragen } = useTabState();
@@ -20,58 +19,10 @@ export default function HeadButtonsTools() {
   const { mapView, graphicsLayer, graphicsLayerHover, redGraphicsLayer } =
     useMapViewState();
   const { resetFeatures } = useResetFeatures();
-
   const [openExporter, setOpenExporter] = useState(false);
   const [openUploader, setOpenUploader] = useState(false);
   const handleClose = useHandleClosePopUp();
-
   const reset = useResetTabs();
-
-  function handleClickTab(item: {
-    id: ToolsTabsType;
-    label: string;
-    icon: IconType;
-    disabled: boolean;
-  }) {
-    if (!item.disabled) {
-      if (item.id === "startgebied") {
-        let opts = {
-          duration: 2000,
-        };
-
-        resetFeatures();
-        graphicsLayer?.removeAll();
-        graphicsLayerHover?.removeAll();
-        redGraphicsLayer?.removeAll();
-
-        mapView?.goTo(
-          {
-            target: [4.9041, 52.3676],
-            zoom: 7,
-          },
-          opts
-        );
-      } else if (item.id === "exporteer") {
-        setOpenExporter(true);
-      } else if (item.id === "uploaden") {
-        setOpenUploader(true);
-      } else if (item.id === "bevragen") {
-        setOpenBevragen(true);
-      } else {
-        setSelectedTab(item.id);
-        setOpenSideBar(true);
-        resetFeatures();
-        graphicsLayer?.removeAll();
-        redGraphicsLayer?.removeAll();
-        graphicsLayerHover?.removeAll();
-      }
-
-      if (item.id !== "bevragen") {
-        setOpenBevragen(false);
-      }
-    }
-  }
-
   const content = useContent();
 
   return (
@@ -83,7 +34,19 @@ export default function HeadButtonsTools() {
               onClick={() => {
                 handleClose();
                 reset();
-                handleClickTab(item);
+                handleToolsTabClick({
+                  item,
+                  mapView,
+                  graphicsLayer,
+                  graphicsLayerHover,
+                  redGraphicsLayer,
+                  resetFeatures,
+                  setOpenExporter,
+                  setOpenUploader,
+                  setOpenBevragen,
+                  setSelectedTab,
+                  setOpenSideBar,
+                });
               }}
               item={item}
             />
@@ -96,7 +59,6 @@ export default function HeadButtonsTools() {
       </div>
 
       <FilterTabs />
-
       <Uploaden openUploader={openUploader} setOpenUploader={setOpenUploader} />
       <Exporter openExporter={openExporter} setOpenExporter={setOpenExporter} />
     </div>

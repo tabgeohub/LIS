@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
-import { fetch } from "undici";
 import { getValidToken } from "../../services/arcgis";
-import { extractTargetUrlFromRequest } from "./proxyShared";
-import { assertAllowedArcgisHost } from "./postProxyTarget";
+import {
+  fetchArcgisGetProxy,
+  resolveArcgisGetProxyTarget,
+  sendArcgisProxyError,
+} from "./arcgisGetProxyHelpers";
 
 export async function handleArcgisTokenRequest(_req: Request, res: Response) {
   try {
@@ -17,36 +19,14 @@ export async function handleArcgisTokenRequest(_req: Request, res: Response) {
 
 export async function handleArcgisGetProxy(req: Request, res: Response) {
   try {
-    const targetUrl = extractTargetUrlFromRequest(req);
-    if (!targetUrl) {
-      return res.status(400).json({ error: "Missing url parameter" });
-    }
+    const targetUrl = resolveArcgisGetProxyTarget(req, res);
+    if (!targetUrl) return;
 
-    const target = assertAllowedArcgisHost(targetUrl);
-    if (!target) {
-      return res
-        .status(400)
-        .json({ error: `Target host not allowed: ${new URL(targetUrl).hostname}` });
-    }
-
-    const { access_token } = await getValidToken();
-    const outgoing = new URL(targetUrl);
-    if (!outgoing.searchParams.has("token")) {
-      outgoing.searchParams.set("token", access_token);
-    }
-
-    const arcgisRes = await fetch(outgoing, {
-      headers: { Accept: "application/json" },
-    });
-
-    res.status(arcgisRes.status);
-    const ct = arcgisRes.headers.get("content-type");
-    if (ct) res.setHeader("content-type", ct);
-    const buf = Buffer.from(await arcgisRes.arrayBuffer());
-    res.send(buf);
+    const proxied = await fetchArcgisGetProxy(targetUrl);
+    res.status(proxied.status);
+    if (proxied.contentType) res.setHeader("content-type", proxied.contentType);
+    res.send(proxied.body);
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Unknown error";
-    console.error("[arcgis] proxy error:", e);
-    res.status(500).json({ error: "Proxy request failed: " + message });
+    sendArcgisProxyError(res, e);
   }
 }

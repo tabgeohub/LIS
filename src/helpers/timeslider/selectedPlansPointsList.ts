@@ -1,24 +1,20 @@
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-import Polyline from "@arcgis/core/geometry/Polyline";
-import Polygon from "@arcgis/core/geometry/Polygon";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import {
-  closePolygonRing,
   geometryPathFromPoints,
   isPolygonGeometryType,
 } from "@helpers/ArcGISHelpers/geometryPathFromPoints";
-import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import {
   FinishedFlightPlanType,
   FinishedPointType,
   FinishedGeometryType,
 } from "Types/finished_plans";
+import { drawGeometryHoverSkyBlue as drawHover } from "./drawGeometryHoverSkyBlue";
 
-export const TIMESLIDER_RIGHT_HOVER_LABEL = "timeslider-right-list-hover";
+export { TIMESLIDER_RIGHT_HOVER_LABEL } from "./timesliderRightHoverLabel";
+import { TIMESLIDER_RIGHT_HOVER_LABEL } from "./timesliderRightHoverLabel";
 
 /** One row per point per plan (same point id appears once per plan that contains it). */
 export type PointWithPlan = {
@@ -175,47 +171,10 @@ export function drawGeometryHoverSkyBlue(
 ) {
   const path = geometryPathFromPoints(geometry.points);
   if (path.length < 2) return;
-
-  const isPolygon = isPolygonGeometryType(geometry.geometry_type ?? undefined);
-
-  if (isPolygon && path.length >= 3) {
-    layer.add(
-      new Graphic({
-        geometry: new Polygon({
-          rings: [closePolygonRing(path)],
-          spatialReference: { wkid: 4326 },
-        }),
-        symbol: new SimpleFillSymbol({
-          color: [79, 241, 255, 0.2],
-          outline: { color: [79, 241, 255, 0.95], width: 3 },
-          style: "solid",
-        }),
-        attributes: {
-          label: TIMESLIDER_RIGHT_HOVER_LABEL,
-          kind: "geometry",
-          geometryId: geometry.id,
-        },
-      })
-    );
-    return;
-  }
-
-  layer.add(
-    new Graphic({
-      geometry: new Polyline({
-        paths: [path],
-        spatialReference: { wkid: 4326 },
-      }),
-      symbol: new SimpleLineSymbol({
-        color: [79, 241, 255, 0.95],
-        width: 3,
-        style: "solid",
-      }),
-      attributes: {
-        label: TIMESLIDER_RIGHT_HOVER_LABEL,
-        kind: "geometry",
-        geometryId: geometry.id,
-      },
-    })
+  drawHover(
+    layer,
+    geometry,
+    path,
+    isPolygonGeometryType(geometry.geometry_type ?? undefined)
   );
 }

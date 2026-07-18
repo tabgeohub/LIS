@@ -1,13 +1,10 @@
-import { EnrichedPointType } from "Types";
 import toast from "react-hot-toast";
 import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
-import { getDistanceInMeters } from "./helpers/getDistanceInMeters";
-
-const NEAR_POINT_THRESHOLD_METERS = 50;
+import { isNearExistingPoint } from "./Steps/Step2/isNearExistingPoint";
 
 export type EnrichedAddPointClickInput = {
   event: __esri.ViewClickEvent;
-  points: EnrichedPointType[];
+  points: import("Types").EnrichedPointType[];
   nearPointToast: string;
   mapClickedNotify: number;
   step: number;
@@ -29,21 +26,12 @@ export function handleEnrichedAddPointClick(
   const lat = input.event.mapPoint.latitude;
   if (!lon || !lat) return;
 
-  const isNear = input.points.some(
-    (p) =>
-      getDistanceInMeters({
-        from: { lat, lon },
-        to: { lat: p.latitude, lon: p.longitude },
-      }) < NEAR_POINT_THRESHOLD_METERS
-  );
-
-  if (isNear) {
+  if (isNearExistingPoint(lon, lat, input.points)) {
     toast.error(input.nearPointToast);
     return;
   }
 
   input.setMapClickedNotify(input.mapClickedNotify + 1);
-
   createNewPointEvent({
     event: input.event,
     redGraphicsLayer: input.redGraphicsLayer,
@@ -53,13 +41,9 @@ export function handleEnrichedAddPointClick(
     setLongitude: input.setLongitude,
     setCurrentPoint: input.setCurrentPoint,
   });
-
   input.logAction({
     message: "User clicked on map to add point",
     newData: { latitude: lat, longitude: lon },
   });
-
-  if (input.step === 1) {
-    input.setStep(3);
-  }
+  if (input.step === 1) input.setStep(3);
 }

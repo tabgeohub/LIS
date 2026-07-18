@@ -1,72 +1,31 @@
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
-import { createKeycloakUser } from "../shared/keycloakUserApi";
 import RoleSelect from "../shared/RoleSelect";
 import { useKeycloakRoles } from "../shared/useKeycloakRoles";
 import PasswordConfirmFields from "../shared/PasswordConfirmFields";
-
-type FormData = {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  role: string;
-};
+import {
+  emptyAddUserForm,
+  submitCreateUser,
+  type AddUserFormData,
+} from "./submitCreateUser";
 
 export default function AddUser() {
   const handleCreateSuccess = useUsersManagementState(
     (state) => state.handleCreateSuccess
   );
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "",
-  });
+  const [formData, setFormData] = useState<AddUserFormData>(emptyAddUserForm);
   const { loadingRoles, filteredRealmRoles } = useKeycloakRoles();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      await createKeycloakUser({
-        username: formData.username,
-        email: formData.email || undefined,
-        password: formData.password,
-        role: formData.role || undefined,
-      });
-
-      toast.success("User created successfully");
-
-      // Reset form
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        role: "",
-      });
-
-      // Navigate to all users table after a short delay
-      setTimeout(() => {
-        handleCreateSuccess();
-      }, 1000);
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to create user");
-    } finally {
-      setLoading(false);
-    }
+    const ok = await submitCreateUser({
+      formData,
+      onSuccess: handleCreateSuccess,
+    });
+    if (ok) setFormData(emptyAddUserForm);
+    setLoading(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

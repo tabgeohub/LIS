@@ -1,6 +1,10 @@
 import { FeatureLayerAttributes } from "@helpers/ZustandStates/popUpState";
 import { isTargetFeatureLayer } from "./featureLayerTargets";
 import type { FeatureLayerPopupData } from "./useFeatureLayerPopup";
+import {
+  buildFeaturePopupData,
+  queryFeaturePopupAttributes,
+} from "./featureLayerPopupQuery";
 
 export function findTargetFeatureHit(results: __esri.MapViewViewHit[]) {
   return results.find((result) => {
@@ -28,38 +32,21 @@ export async function resolveFeaturePopupData(input: {
   screenPoint: { x: number; y: number };
 }): Promise<FeatureLayerPopupData> {
   const objectId = readFeatureObjectId(input.attributes);
-  if (!objectId || !input.layer.title) {
-    return {
-      attributes: input.attributes,
-      layerTitle: input.layer.title ?? "",
-      screenPoint: input.screenPoint,
-      geometry: input.geometry,
-    };
-  }
-
-  try {
-    const query = input.layer.createQuery();
-    query.objectIds = [objectId];
-    query.returnGeometry = false;
-    query.outFields = ["*"];
-
-    const featureSet = await input.layer.queryFeatures(query);
-    if (featureSet.features.length > 0) {
-      return {
-        attributes: featureSet.features[0].attributes as FeatureLayerAttributes,
-        layerTitle: input.layer.title,
-        screenPoint: input.screenPoint,
-        geometry: input.geometry,
-      };
-    }
-  } catch (error) {
-    console.error("Error querying FeatureLayer:", error);
-  }
-
-  return {
+  const base = {
     attributes: input.attributes,
-    layerTitle: input.layer.title,
+    layerTitle: input.layer.title ?? "",
     screenPoint: input.screenPoint,
     geometry: input.geometry,
   };
+  if (!objectId || !input.layer.title) return buildFeaturePopupData(base);
+
+  const queried = await queryFeaturePopupAttributes({
+    layer: input.layer,
+    objectId,
+  });
+  return buildFeaturePopupData({
+    ...base,
+    attributes: queried ?? input.attributes,
+    layerTitle: input.layer.title,
+  });
 }

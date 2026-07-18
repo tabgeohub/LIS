@@ -19,6 +19,37 @@ export function snapshotPointCoords(
   };
 }
 
+export function syncFromRd(
+  xcoordinaat_rd: number,
+  ycoordinaat_rd: number
+): Partial<EditPointCoordSnapshot> | null {
+  if (!xcoordinaat_rd || !ycoordinaat_rd) return null;
+  const transformed = getTransformedCoordinates({
+    fromProjection: "RD",
+    toProjection: "WGS84",
+    x: xcoordinaat_rd,
+    y: ycoordinaat_rd,
+  });
+  return { longitude: transformed.x, latitude: transformed.y };
+}
+
+export function syncFromWgs84(
+  longitude: number,
+  latitude: number
+): Partial<EditPointCoordSnapshot> | null {
+  if (!longitude || !latitude) return null;
+  const transformed = getTransformedCoordinates({
+    fromProjection: "WGS84",
+    toProjection: "RD",
+    x: longitude,
+    y: latitude,
+  });
+  return {
+    xcoordinaat_rd: transformed.x,
+    ycoordinaat_rd: transformed.y,
+  };
+}
+
 export function syncCoordsForCoordinateSystem(input: {
   coordinateSystem: string;
   longitude: number;
@@ -26,36 +57,11 @@ export function syncCoordsForCoordinateSystem(input: {
   xcoordinaat_rd: number;
   ycoordinaat_rd: number;
 }): Partial<EditPointCoordSnapshot> | null {
-  const {
-    coordinateSystem,
-    longitude,
-    latitude,
-    xcoordinaat_rd,
-    ycoordinaat_rd,
-  } = input;
-
-  if (coordinateSystem === "RD" && xcoordinaat_rd && ycoordinaat_rd) {
-    const transformed = getTransformedCoordinates({
-      fromProjection: "RD",
-      toProjection: "WGS84",
-      x: xcoordinaat_rd,
-      y: ycoordinaat_rd,
-    });
-    return { longitude: transformed.x, latitude: transformed.y };
+  if (input.coordinateSystem === "RD") {
+    return syncFromRd(input.xcoordinaat_rd, input.ycoordinaat_rd);
   }
-
-  if (coordinateSystem === "WGS84" && longitude && latitude) {
-    const transformed = getTransformedCoordinates({
-      fromProjection: "WGS84",
-      toProjection: "RD",
-      x: longitude,
-      y: latitude,
-    });
-    return {
-      xcoordinaat_rd: transformed.x,
-      ycoordinaat_rd: transformed.y,
-    };
+  if (input.coordinateSystem === "WGS84") {
+    return syncFromWgs84(input.longitude, input.latitude);
   }
-
   return null;
 }

@@ -36,6 +36,39 @@ export function selectPointsInPolygonRing(
   return selected;
 }
 
+async function ensureProjectionLoaded(): Promise<boolean> {
+  try {
+    if (!projection.isLoaded()) {
+      await projection.load();
+    }
+    return true;
+  } catch (error) {
+    console.error("Failed to load projection module:", error);
+    return false;
+  }
+}
+
+export function attachPolygonCreateHandler(input: {
+  sketchViewModel: SketchViewModel;
+  points: EnrichedPointType[];
+  setPolygonPoints: (points: EnrichedPointType[]) => void;
+}): __esri.Handle {
+  return input.sketchViewModel.on("create", (event) => {
+    if (event.state !== "complete") return;
+    const polygon = event.graphic.geometry as __esri.Polygon;
+    if (!polygon) return;
+
+    const projectedPolygon = projection.project(
+      polygon,
+      new SpatialReference({ wkid: 4326 })
+    ) as Polygon;
+    const ring = projectedPolygon?.rings?.[0];
+    if (!ring) return;
+
+    input.setPolygonPoints(selectPointsInPolygonRing(input.points, ring));
+  });
+}
+
 export async function startPolygonDrawer(input: {
   mapView: __esri.MapView;
   cleanupSketch: () => void;
@@ -46,47 +79,23 @@ export async function startPolygonDrawer(input: {
   setPolygonPoints: (points: EnrichedPointType[]) => void;
 }): Promise<void> {
   if (!input.mapView.map) return;
-  const map = input.mapView.map;
-
-  try {
-    if (!projection.isLoaded()) {
-      await projection.load();
-    }
-  } catch (error) {
-    console.error("Failed to load projection module:", error);
-    return;
-  }
+  if (!(await ensureProjectionLoaded())) return;
 
   input.cleanupSketch();
-
   const graphicsLayer = new GraphicsLayer({ listMode: "hide" });
   input.graphicsLayerRef.current = graphicsLayer;
-  map.add(graphicsLayer);
+  input.mapView.map.add(graphicsLayer);
 
   const sketchViewModel = new SketchViewModel({
     view: input.mapView,
     layer: graphicsLayer,
     defaultCreateOptions: { mode: "click" },
   });
-
   input.sketchRef.current = sketchViewModel;
-
-  input.createHandleRef.current = sketchViewModel.on("create", (event) => {
-    if (event.state !== "complete") return;
-
-    const polygon = event.graphic.geometry as __esri.Polygon;
-    if (!polygon) return;
-
-    const projectedPolygon = projection.project(
-      polygon,
-      new SpatialReference({ wkid: 4326 })
-    ) as Polygon;
-
-    const ring = projectedPolygon?.rings?.[0];
-    if (!ring) return;
-
-    input.setPolygonPoints(selectPointsInPolygonRing(input.points, ring));
+  input.createHandleRef.current = attachPolygonCreateHandler({
+    sketchViewModel,
+    points: input.points,
+    setPolygonPoints: input.setPolygonPoints,
   });
-
   sketchViewModel.create("polygon");
 }

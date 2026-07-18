@@ -1,21 +1,27 @@
+import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
 import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
 import { useTabState } from "@helpers/ZustandStates/tabState";
-import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
 import useLogAction from "hooks/useLogAction";
+import { createAddToPlanStep1Handlers } from "./createAddToPlanStep1Handlers";
 
-export default function Step1({
-  answer,
-  setAnswer,
-  setStep,
-}: {
+type Step1Props = {
   answer: string;
   setAnswer: (value: string) => void;
   setStep: (value: number) => void;
-}) {
-  const logAction = useLogAction();
+};
 
+export default function Step1({ answer, setAnswer, setStep }: Step1Props) {
+  const logAction = useLogAction();
   const { setSelectedTab } = useTabState();
   const { setSelectedBottomTab } = useSelectedBottomTabState();
+  const handlers = createAddToPlanStep1Handlers({
+    answer,
+    setAnswer,
+    setStep,
+    setSelectedTab,
+    setSelectedBottomTab,
+    logAction,
+  });
 
   return (
     <AddToPlanQuestionStep
@@ -25,38 +31,9 @@ export default function Step1({
       nextLabel="Volgende"
       cancelLabel="Annuleren"
       answer={answer}
-      onAnswerChange={(value) => {
-        setAnswer(value);
-
-        logAction({
-          message:
-            value === "radio1"
-              ? "User clicked 'Yes' button"
-              : "User clicked 'No' button",
-          step: "Add to plan - Step 1",
-        });
-      }}
-      onNext={() => {
-        if (answer === "radio2") {
-          setStep(2);
-        } else {
-          setStep(3);
-        }
-
-        logAction({
-          message: "User clicked 'Next' button",
-          step: "Add to plan - Step 1",
-        });
-      }}
-      onCancel={() => {
-        setSelectedTab("none");
-        setSelectedBottomTab("Kaartlagenlijst");
-
-        logAction({
-          message: "User clicked 'Cancel' button",
-          step: "Add to plan - Step 1",
-        });
-      }}
+      onAnswerChange={handlers.onAnswerChange}
+      onNext={handlers.onNext}
+      onCancel={handlers.onCancel}
       radioName="voorbereidingAddToPlan"
     />
   );

@@ -5,6 +5,13 @@ import type { AttachmentWithMeta } from "./types";
 
 const proxyFetchInit: RequestInit = { credentials: "include" };
 
+type AttachmentMeta = {
+  id: number;
+  name?: string;
+  uploadDate?: number | string | null;
+  creationDate?: number | string | null;
+};
+
 function attachmentNameFromUrl(rawUrl: string): string {
   try {
     const u = new URL(rawUrl);
@@ -14,6 +21,28 @@ function attachmentNameFromUrl(rawUrl: string): string {
   }
 }
 
+function takenAtFromAttachmentMeta(att: AttachmentMeta): number | undefined {
+  if (att.uploadDate != null) return new Date(att.uploadDate).getTime();
+  if (att.creationDate != null) return new Date(att.creationDate).getTime();
+  return undefined;
+}
+
+async function fetchOnePointAttachment(
+  featureLayerUrl: string,
+  objectId: number,
+  att: AttachmentMeta
+): Promise<AttachmentWithMeta> {
+  const url = attachmentDisplayUrl(
+    `${featureLayerUrl}/0/${objectId}/attachments/${att.id}`
+  );
+  const fileRes = await fetchWithRetry({ url, options: proxyFetchInit });
+  return {
+    name: att.name || `attachment_${att.id}`,
+    blob: await fileRes.blob(),
+    taken_at: takenAtFromAttachmentMeta(att),
+  };
+}
+
 export async function fetchAttachmentsForPoint(
   featureLayerUrl: string,
   objectId: number
@@ -21,32 +50,16 @@ export async function fetchAttachmentsForPoint(
   const metaUrl = attachmentDisplayUrl(
     `${featureLayerUrl}/0/${objectId}/attachments?f=json`
   );
-  const metadataRes = await fetchWithRetry({ url: metaUrl, options: proxyFetchInit });
-  const metadata = await metadataRes.json();
-
+  const metadata = await (
+    await fetchWithRetry({ url: metaUrl, options: proxyFetchInit })
+  ).json();
   if (!metadata.attachmentInfos) return [];
 
   const attachments = await Promise.allSettled(
-    metadata.attachmentInfos.map(async (att: any) => {
-      const url = attachmentDisplayUrl(
-        `${featureLayerUrl}/0/${objectId}/attachments/${att.id}`
-      );
-      const fileRes = await fetchWithRetry({ url, options: proxyFetchInit });
-      const blob = await fileRes.blob();
-      const takenAt =
-        att.uploadDate != null
-          ? new Date(att.uploadDate).getTime()
-          : att.creationDate != null
-            ? new Date(att.creationDate).getTime()
-            : undefined;
-      return {
-        name: att.name || `attachment_${att.id}`,
-        blob,
-        taken_at: takenAt,
-      };
-    })
+    metadata.attachmentInfos.map((att: AttachmentMeta) =>
+      fetchOnePointAttachment(featureLayerUrl, objectId, att)
+    )
   );
-
   return attachments
     .filter(
       (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>
@@ -55,29 +68,28 @@ export async function fetchAttachmentsForPoint(
     .map((r) => r.value);
 }
 
+async function fetchOneDbAttachment(att: {
+  url: string;
+  taken_at?: number;
+}): Promise<AttachmentWithMeta> {
+  const rawUrl = att.url;
+  const isArcgis = /arcgis\.com/i.test(rawUrl);
+  const res = await fetchWithRetry({
+    url: isArcgis ? attachmentDisplayUrl(rawUrl) : rawUrl,
+    options: isArcgis ? proxyFetchInit : {},
+  });
+  return {
+    name: attachmentNameFromUrl(rawUrl),
+    blob: await res.blob(),
+    taken_at: att.taken_at,
+  };
+}
+
 /** Prefer DB-backed plan attachment URLs so reports match VluchtenZoeken after edits. */
 export async function fetchAttachmentsFromDbUrls(
   list: Array<{ url: string; taken_at?: number }>
 ): Promise<AttachmentWithMeta[]> {
-  const results = await Promise.allSettled(
-    list.map(async (att) => {
-      const rawUrl = att.url;
-      const fetchUrl = /arcgis\.com/i.test(rawUrl)
-        ? attachmentDisplayUrl(rawUrl)
-        : rawUrl;
-      const res = await fetchWithRetry({
-        url: fetchUrl,
-        options: /arcgis\.com/i.test(rawUrl) ? proxyFetchInit : {},
-      });
-      const blob = await res.blob();
-      return {
-        name: attachmentNameFromUrl(rawUrl),
-        blob,
-        taken_at: att.taken_at,
-      };
-    })
-  );
-
+  const results = await Promise.allSettled(list.map(fetchOneDbAttachment));
   return results
     .filter(
       (r): r is PromiseFulfilledResult<AttachmentWithMeta> =>

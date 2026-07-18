@@ -1,36 +1,7 @@
 import type { Request } from "express";
 import { keycloakAdminFetch } from "../keycloak/management/users/keycloakAdminClient";
 import { hashUsername, logAuthSecurityEvent } from "./authSecurityLog";
-
-type KeycloakUserRecord = {
-  id?: string;
-  username?: string;
-  email?: string;
-  enabled?: boolean;
-};
-
-function findUserByIdentity(users: KeycloakUserRecord[], identity: string) {
-  const normalized = identity.toLowerCase();
-  return users.find(
-    (entry) =>
-      entry?.id &&
-      (String(entry.username || "").toLowerCase() === normalized ||
-        String(entry.email || "").toLowerCase() === normalized)
-  );
-}
-
-async function searchKeycloakUser(req: Request, username: string) {
-  const response = await keycloakAdminFetch(
-    req,
-    `/users?search=${encodeURIComponent(username)}&max=20`,
-    { method: "GET" }
-  );
-  if (!response.ok) return undefined;
-  return findUserByIdentity(
-    (await response.json()) as KeycloakUserRecord[],
-    username
-  );
-}
+import { resolveKeycloakUserRecord } from "./keycloakUserResolve";
 
 type KeycloakCredential = {
   type?: string;
@@ -55,9 +26,7 @@ function getOtpCacheTtlMs(): number {
 
 function getCachedOtpStatus(userId: string): boolean | null | undefined {
   const cached = otpCredentialCache.get(userId);
-  if (!cached) {
-    return undefined;
-  }
+  if (!cached) return undefined;
   if (cached.expiresAt <= Date.now()) {
     otpCredentialCache.delete(userId);
     return undefined;
@@ -77,9 +46,7 @@ async function userHasOtpCredential(
   userId: string
 ): Promise<boolean | null> {
   const cached = getCachedOtpStatus(userId);
-  if (cached !== undefined) {
-    return cached;
-  }
+  if (cached !== undefined) return cached;
 
   const response = await keycloakAdminFetch(req, `/users/${userId}/credentials`, {
     method: "GET",
@@ -108,34 +75,11 @@ export async function lookupKeycloakUser(
   username: string
 ): Promise<KeycloakUserLookupResult> {
   try {
-    const response = await keycloakAdminFetch(
-      req,
-      `/users?username=${encodeURIComponent(username)}&exact=true`,
-      { method: "GET" }
-    );
+    const resolved = await resolveKeycloakUserRecord(req, username);
+    if (!resolved.ok) return resolved;
 
-    if (!response.ok) {
-      logAuthSecurityEvent("auth2.lookup.users_failed", {
-        usernameHash: hashUsername(username),
-        status: response.status,
-      });
-      return { ok: false, reason: "lookup_unavailable" };
-    }
-
-    const users = (await response.json()) as KeycloakUserRecord[];
-    let user = findUserByIdentity(users, username);
-    if (!user?.id) user = await searchKeycloakUser(req, username);
-
-    if (!user?.id) {
-      return { ok: false, reason: "not_found" };
-    }
-
-    if (user.enabled === false) {
-      return { ok: false, reason: "not_found" };
-    }
-
-    const hasOtp = await userHasOtpCredential(req, user.id);
-    return { ok: true, userId: user.id, hasOtp };
+    const hasOtp = await userHasOtpCredential(req, resolved.user.id);
+    return { ok: true, userId: resolved.user.id, hasOtp };
   } catch (error) {
     logAuthSecurityEvent("auth2.lookup.error", {
       usernameHash: hashUsername(username),

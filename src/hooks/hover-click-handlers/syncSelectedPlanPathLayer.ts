@@ -1,30 +1,16 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import MapView from "@arcgis/core/views/MapView";
 import {
-  addPathLayerBelowPoints,
-  buildPathFeatureLayer,
-} from "./buildPathFeatureLayer";
+  attachSelectedPlanPathLayer,
+  clearPathFeatureLayer,
+} from "./attachSelectedPlanPathLayer";
 
-type SelectedPlanWithPath = {
-  path?: unknown;
-  [key: string]: unknown;
-};
-
-export function clearPathFeatureLayer(input: {
-  mapView: MapView | null | undefined;
-  featureLayer: FeatureLayer | null;
-}) {
-  if (input.featureLayer && input.mapView?.map) {
-    if (input.mapView.map.layers.includes(input.featureLayer)) {
-      input.mapView.map.remove(input.featureLayer);
-    }
-  }
-}
+export { clearPathFeatureLayer };
 
 /** Build/replace the selected plan path layer; returns cleanup. */
 export function syncSelectedPlanPathLayer(input: {
   mapView: MapView | null | undefined;
-  selectedPlan: SelectedPlanWithPath | null | undefined;
+  selectedPlan: { path?: unknown } | null | undefined;
   pointsGraphicsLayer: __esri.GraphicsLayer | null | undefined;
   featureLayerRef: { current: FeatureLayer | null };
   setLoadingPath: (value: boolean) => void;
@@ -46,24 +32,12 @@ export function syncSelectedPlanPathLayer(input: {
     return;
   }
 
-  input.setLoadingPath(true);
-  const pathLayer = buildPathFeatureLayer({
-    selectedPlan: input.selectedPlan as any,
-    planPath,
-  });
-  const map = input.mapView.map;
-  input.featureLayerRef.current = pathLayer;
-  addPathLayerBelowPoints({
+  return attachSelectedPlanPathLayer({
     mapView: input.mapView,
-    pathLayer,
+    selectedPlan: input.selectedPlan,
+    planPath,
     pointsGraphicsLayer: input.pointsGraphicsLayer,
+    featureLayerRef: input.featureLayerRef,
+    setLoadingPath: input.setLoadingPath,
   });
-
-  return () => {
-    if (map.layers.includes(pathLayer)) {
-      map.remove(pathLayer);
-    }
-    input.featureLayerRef.current = null;
-    input.setLoadingPath(false);
-  };
 }

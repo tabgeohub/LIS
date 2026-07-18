@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import type { FinishedFlightPlanType } from "Types/finished_plans";
-import { sortPlansNewestFirst } from "@helpers/timeslider";
+import {
+  fetchTimesliderPlans,
+  isFetchCanceled,
+} from "./fetchTimesliderPlans";
+
+function resetPlansIdle(
+  setPlans: (p: FinishedFlightPlanType[]) => void,
+  setError: (e: string | null) => void,
+  setLoading: (v: boolean) => void
+) {
+  setPlans([]);
+  setError(null);
+  setLoading(false);
+}
 
 export function useTimesliderPlansFetch(input: {
   enabled: boolean;
@@ -16,36 +27,25 @@ export function useTimesliderPlansFetch(input: {
 
   useEffect(() => {
     if (!input.enabled || !input.regioId) {
-      setPlans([]);
-      setError(null);
-      setLoading(false);
+      resetPlansIdle(setPlans, setError, setLoading);
       return;
     }
-
     const controller = new AbortController();
     setLoading(true);
     setError(null);
-
-    axios
-      .get<FinishedFlightPlanType[]>(
-        `${getBackEndUrl()}/api/timeslider/getFinishedPlansTimeslider`,
-        {
-          params: {
-            regio_id: input.regioId,
-            from: input.from,
-            to: input.to,
-          },
-          signal: controller.signal,
-        }
-      )
-      .then((res) => setPlans(sortPlansNewestFirst(res.data || [])))
+    fetchTimesliderPlans({
+      regioId: input.regioId,
+      from: input.from,
+      to: input.to,
+      signal: controller.signal,
+    })
+      .then(setPlans)
       .catch((e) => {
-        if (axios.isAxiosError(e) && e.code === "ERR_CANCELED") return;
+        if (isFetchCanceled(e)) return;
         setPlans([]);
         setError("Plannen laden mislukt.");
       })
       .finally(() => setLoading(false));
-
     return () => controller.abort();
   }, [input.enabled, input.regioId, input.from, input.to]);
 

@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { pool } from "../../../db";
-import {
-  buildFlightPlanQuery,
-  BuildFlightPlanQueryOptions,
-} from "./buildFlightPlanQuery";
+import { BuildFlightPlanQueryOptions } from "./buildFlightPlanQuery";
 import { resolveRegioFilter } from "../shared/resolveRegioFilter";
+import {
+  queryFlightPlanListPayload,
+  sendFlightPlanListError,
+  splitFlightPlanListInput,
+} from "./fetchFlightPlanListHelpers";
 
 type FetchFlightPlanListOptions = Omit<
   BuildFlightPlanQueryOptions,
@@ -31,40 +32,25 @@ export type FetchFlightPlanListInput = {
 export async function fetchFlightPlanList(
   input: FetchFlightPlanListInput
 ): Promise<void> {
-  const {
-    req,
-    res,
-    useRegioFilter = false,
-    errorLogLabel = "Error fetching flight plans:",
-    errorMessage,
-    appendErrorToMessage = true,
-    includeErrorField = false,
-    transform,
-    ...queryOptions
-  } = input;
-
+  const opts = splitFlightPlanListInput(input);
   try {
-    const regio_id = useRegioFilter ? resolveRegioFilter(req) : undefined;
-
-    const { query, params } = buildFlightPlanQuery({
-      ...queryOptions,
+    const regio_id = opts.useRegioFilter
+      ? resolveRegioFilter(opts.req)
+      : undefined;
+    const payload = await queryFlightPlanListPayload({
+      ...opts.queryOptions,
       regio_id,
+      transform: opts.transform,
     });
-
-    const result = await pool.query(query, params);
-    const payload = transform ? transform(result.rows) : result.rows;
-
-    res.status(200).json(payload);
+    opts.res.status(200).json(payload);
   } catch (err) {
-    const errText = err instanceof Error ? err.message : String(err);
-    console.error(errorLogLabel, errText);
-
-    res.status(500).json({
-      result: null,
-      message: appendErrorToMessage
-        ? `${errorMessage}${errorMessage.endsWith(":") ? " " : ": "}${errText}`
-        : errorMessage,
-      ...(includeErrorField ? { error: errText } : {}),
+    sendFlightPlanListError({
+      res: opts.res,
+      err,
+      errorLogLabel: opts.errorLogLabel,
+      errorMessage: opts.errorMessage,
+      appendErrorToMessage: opts.appendErrorToMessage,
+      includeErrorField: opts.includeErrorField,
     });
   }
 }

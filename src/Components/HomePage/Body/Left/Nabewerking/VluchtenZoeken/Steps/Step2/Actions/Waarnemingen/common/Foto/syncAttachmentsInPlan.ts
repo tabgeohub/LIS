@@ -28,6 +28,34 @@ export function syncPointAttachmentsInPlan(input: {
   return { updatedPlan, updatedPoint };
 }
 
+function buildUpdatedGeometryPoint(input: {
+  selectedGeometry: FinishedGeometryType;
+  pointId: number;
+  newAttachments: AttachmentType[];
+}): {
+  updatedPoint: FinishedPointType;
+  updatedGeometry: FinishedGeometryType;
+} | null {
+  const existingPoint = input.selectedGeometry.points.find(
+    (point) => point.id === input.pointId
+  );
+  if (!existingPoint) return null;
+
+  const updatedPoint: FinishedPointType = {
+    ...existingPoint,
+    attachments: input.newAttachments,
+  };
+  return {
+    updatedPoint,
+    updatedGeometry: {
+      ...input.selectedGeometry,
+      points: input.selectedGeometry.points.map((point) =>
+        point.id === input.pointId ? updatedPoint : point
+      ),
+    },
+  };
+}
+
 export function syncGeometryAttachmentsInPlan(input: {
   selectedPlan: FinishedFlightPlanType;
   selectedGeometry: FinishedGeometryType;
@@ -37,39 +65,25 @@ export function syncGeometryAttachmentsInPlan(input: {
   updatedPlan: FinishedFlightPlanType;
   updatedGeometry: FinishedGeometryType;
 } {
-  const existingPoint = input.selectedGeometry.points.find(
-    (point) => point.id === input.pointId
-  );
-  if (!existingPoint) {
+  const built = buildUpdatedGeometryPoint(input);
+  if (!built) {
     return {
       updatedPlan: input.selectedPlan,
       updatedGeometry: input.selectedGeometry,
     };
   }
 
-  const updatedPoint: FinishedPointType = {
-    ...existingPoint,
-    attachments: input.newAttachments,
+  const { updatedPoint, updatedGeometry } = built;
+  return {
+    updatedGeometry,
+    updatedPlan: {
+      ...input.selectedPlan,
+      geometries: input.selectedPlan.geometries.map((geom) =>
+        geom.id === input.selectedGeometry.id ? updatedGeometry : geom
+      ),
+      points_data: input.selectedPlan.points_data.map((point) =>
+        point.id === input.pointId ? updatedPoint : point
+      ),
+    },
   };
-
-  const updatedPoints = input.selectedGeometry.points.map((point) =>
-    point.id === input.pointId ? updatedPoint : point
-  );
-
-  const updatedGeometry: FinishedGeometryType = {
-    ...input.selectedGeometry,
-    points: updatedPoints,
-  };
-
-  const updatedPlan: FinishedFlightPlanType = {
-    ...input.selectedPlan,
-    geometries: input.selectedPlan.geometries.map((geom) =>
-      geom.id === input.selectedGeometry.id ? updatedGeometry : geom
-    ),
-    points_data: input.selectedPlan.points_data.map((point) =>
-      point.id === input.pointId ? updatedPoint : point
-    ),
-  };
-
-  return { updatedPlan, updatedGeometry };
 }

@@ -2,7 +2,6 @@ import { FINISHED_PLANS_POINTS_CTE } from "../flight-plans/flightPlanJoin";
 import {
   buildAttachmentsLateralJoin,
   buildFinishedPlanDetailsPointJsonbObject,
-  buildFinishedPlanPointJsonbObject,
 } from "../points/pointJson";
 import {
   appendRegioFilter,
@@ -10,19 +9,15 @@ import {
   RegioFilterOptions,
 } from "../shared/regioFilter";
 import { buildSingleFinishedPlanCtes } from "./singleFinishedPlanCtes";
+import {
+  appendFinishedDateRange,
+  appendFinishedRegioAndOrder,
+  buildFinishedPlansSelectBody,
+  DEFAULT_FINISHED_REGIO_FILTER,
+  type BuildFinishedPlansQueryOptions,
+} from "./buildFinishedPlansWithPointsHelpers";
 
-export type BuildFinishedPlansQueryOptions = {
-  params?: unknown[];
-  regio_id?: unknown;
-  regioFilter?: RegioFilterOptions;
-  dateRange?: { from: string; to: string };
-  orderBy?: string;
-};
-
-const DEFAULT_FINISHED_REGIO_FILTER: RegioFilterOptions = {
-  caseInsensitiveAdmin: true,
-  when: "truthy",
-};
+export type { BuildFinishedPlansQueryOptions };
 
 export function buildFinishedPlansWithPointsQuery(
   options: BuildFinishedPlansQueryOptions = {}
@@ -35,50 +30,18 @@ export function buildFinishedPlansWithPointsQuery(
     orderBy,
   } = options;
 
-  const pointJson = buildFinishedPlanPointJsonbObject();
-
-  let whereClause = "WHERE fp.status = 'finished'";
-
-  if (dateRange) {
-    whereClause += `
-        AND fp.datum IS NOT NULL
-        AND fp.datum::date >= $1::date
-        AND fp.datum::date <= $2::date`;
-    params.push(dateRange.from, dateRange.to);
-  }
-
-  let query = `${FINISHED_PLANS_POINTS_CTE}
-      SELECT
-        fp.*,
-        jsonb_agg(
-          jsonb_strip_nulls(
-            ${pointJson}
-          )
-          ORDER BY pt.created_at, pt.id
-        ) AS points_data
-      FROM lis.flightplans fp
-      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
-      JOIN lis.points pt ON pt.id = ppp.point_id
-      LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
-      ${whereClause}`;
-
-  if (regio_id !== undefined) {
-    query = appendRegioFilter({
-      sql: query,
-      params,
-      regio_id,
-      column: "fp.regio_id",
-      options: regioFilter,
-    });
-  }
-
-  query += `
-      GROUP BY fp.id`;
-
-  if (orderBy) {
-    query += `
-      ORDER BY ${orderBy}`;
-  }
+  const whereClause = appendFinishedDateRange(
+    "WHERE fp.status = 'finished'",
+    params,
+    dateRange
+  );
+  const query = appendFinishedRegioAndOrder({
+    query: buildFinishedPlansSelectBody(whereClause),
+    params,
+    regio_id,
+    regioFilter,
+    orderBy,
+  });
 
   return { query, params };
 }

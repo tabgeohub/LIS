@@ -22,21 +22,22 @@ export type FetchTimesliderPlanImagesOptions = {
   failureMessage: string;
 };
 
+function timesliderEntityJoinSql(filter: TimesliderImageFilter): string {
+  if (filter !== "geometry") return "";
+  return `INNER JOIN lis.points p
+        ON p.id = fp.point_id
+        AND p.geometry_id = $1`;
+}
+
+function timesliderEntityWhereSql(filter: TimesliderImageFilter): string {
+  return filter === "geometry" ? "" : "fp.point_id = $1\n        AND ";
+}
+
 export function buildTimesliderPlanImagesQuery(
   options: BuildTimesliderPlanImagesQueryOptions
 ): string {
-  const entityJoin =
-    options.filter === "geometry"
-      ? `INNER JOIN lis.points p
-        ON p.id = fp.point_id
-        AND p.geometry_id = $1`
-      : "";
-
-  const whereEntity =
-    options.filter === "geometry"
-      ? ""
-      : "fp.point_id = $1\n        AND ";
-
+  const entityJoin = timesliderEntityJoinSql(options.filter);
+  const whereEntity = timesliderEntityWhereSql(options.filter);
   return `
       SELECT DISTINCT ON (a.id)
         a.id,
@@ -70,10 +71,6 @@ export function parsePositiveIntQueryParam(
       : Array.isArray(raw)
         ? parseInt(String(raw[0]), 10)
         : NaN;
-
-  if (!Number.isFinite(value) || value <= 0) {
-    return null;
-  }
-
+  if (!Number.isFinite(value) || value <= 0) return null;
   return value;
 }

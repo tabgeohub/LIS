@@ -5,6 +5,7 @@ import {
   getKeycloakAdminBase,
   getKeycloakAdminToken,
 } from "../../../../services/getKeycloakAdminToken";
+import { fetchRoleNamesForOneClient } from "./fetchClientRoleNamesHelpers";
 
 export function getAdminBase(req: Request): string {
   return getKeycloakAdminBase(req);
@@ -70,32 +71,13 @@ export async function fetchClientRoleNamesForUser(
   const clients = await fetchKeycloakClients(adminToken, adminBase);
 
   for (const client of clients) {
-    try {
-      const clientRolesResponse = await fetch(
-        `${adminBase}/users/${userId}/role-mappings/clients/${client.id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (clientRolesResponse.ok) {
-        const clientRolesData = (await clientRolesResponse.json()) as Array<{
-          name: string;
-        }>;
-        if (clientRolesData.length > 0) {
-          clientRoles[client.clientId] = clientRolesData.map((role) => role.name);
-        }
-      }
-    } catch (error) {
-      console.warn(
-        `Failed to fetch client roles for user ${userId} and client ${client.clientId}:`,
-        error
-      );
-    }
+    const names = await fetchRoleNamesForOneClient({
+      userId,
+      adminToken,
+      adminBase,
+      client,
+    });
+    if (names) clientRoles[client.clientId] = names;
   }
 
   return clientRoles;

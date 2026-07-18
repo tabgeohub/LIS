@@ -7,14 +7,11 @@ type AttachmentUpdateInput = {
   attachmentIds: number[];
 };
 
-export async function updateFinishedPointAttachmentsTx(
-  input: AttachmentUpdateInput
-): Promise<
-  | { ok: true; row: Record<string, unknown> }
-  | { ok: false; status: 404; message: string }
-> {
-  const { client, pointId, planId, attachmentIds } = input;
-
+async function lockFinishedPlanAttachments(
+  client: PoolClient,
+  pointId: number,
+  planId: number
+): Promise<number[] | null> {
   const existing = await client.query<{ attachments_id: number[] | null }>(
     `
       SELECT attachments_id
@@ -26,12 +23,17 @@ export async function updateFinishedPointAttachmentsTx(
   );
 
   if (existing.rows.length === 0) {
-    return { ok: false, status: 404, message: "Geen bestaande attachment gevonden." };
+    return null;
   }
+  return existing.rows[0].attachments_id || [];
+}
 
-  const oldIds: number[] = existing.rows[0].attachments_id || [];
-  const removed = oldIds.filter((id) => !attachmentIds.includes(id));
-
+async function applyFinishedPlanAttachmentIds(
+  client: PoolClient,
+  pointId: number,
+  planId: number,
+  attachmentIds: number[]
+): Promise<Record<string, unknown>> {
   const result = await client.query(
     `
       UPDATE lis.finished_plans SET attachments_id = $1
@@ -40,20 +42,54 @@ export async function updateFinishedPointAttachmentsTx(
     `,
     [attachmentIds, pointId, planId]
   );
+  return result.rows[0];
+}
 
-  if (removed.length > 0) {
-    await client.query(
-      `
-        DELETE FROM lis.attachments a
-        WHERE a.id = ANY($1::int[])
-        AND NOT EXISTS (
-          SELECT 1 FROM lis.finished_plans fp
-          WHERE a.id = ANY(fp.attachments_id)
-        )
-      `,
-      [removed]
-    );
+async function deleteOrphanedAttachments(
+  client: PoolClient,
+  removed: number[]
+): Promise<void> {
+  if (removed.length === 0) {
+    return;
+  }
+  await client.query(
+    `
+      DELETE FROM lis.attachments a
+      WHERE a.id = ANY($1::int[])
+      AND NOT EXISTS (
+        SELECT 1 FROM lis.finished_plans fp
+        WHERE a.id = ANY(fp.attachments_id)
+      )
+    `,
+    [removed]
+  );
+}
+
+export async function updateFinishedPointAttachmentsTx(
+  input: AttachmentUpdateInput
+): Promise<
+  | { ok: true; row: Record<string, unknown> }
+  | { ok: false; status: 404; message: string }
+> {
+  const { client, pointId, planId, attachmentIds } = input;
+
+  const oldIds = await lockFinishedPlanAttachments(client, pointId, planId);
+  if (oldIds == null) {
+    return {
+      ok: false,
+      status: 404,
+      message: "Geen bestaande attachment gevonden.",
+    };
   }
 
-  return { ok: true, row: result.rows[0] };
+  const removed = oldIds.filter((id) => !attachmentIds.includes(id));
+  const row = await applyFinishedPlanAttachmentIds(
+    client,
+    pointId,
+    planId,
+    attachmentIds
+  );
+  await deleteOrphanedAttachments(client, removed);
+
+  return { ok: true, row };
 }

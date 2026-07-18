@@ -10,7 +10,9 @@ const YELLOW_SYMBOL = {
   lineWidth: 4,
 };
 
-function toGeometryInput(geometry: NonNullable<FinishedFlightPlanType["geometries"]>[number]) {
+type PlanGeometry = NonNullable<FinishedFlightPlanType["geometries"]>[number];
+
+function toGeometryInput(geometry: PlanGeometry) {
   return {
     id: geometry.id,
     geometry_type: (geometry.geometry_type as "polygon" | "line") || undefined,
@@ -19,41 +21,45 @@ function toGeometryInput(geometry: NonNullable<FinishedFlightPlanType["geometrie
   };
 }
 
+export function pushBaseGeometryGraphic(
+  graphics: Graphic[],
+  geometry: PlanGeometry
+): void {
+  if (!geometry.points?.length) return;
+  const graphic = createGeometryGraphic(toGeometryInput(geometry), {
+    attributes: {
+      geometryId: geometry.id,
+      geometryType: geometry.geometry_type,
+      omschrijving: geometry.geometry_omschrijving,
+      type: "geometry",
+    },
+  });
+  if (graphic) graphics.push(graphic);
+}
+
+export function pushSelectedGeometryGraphic(
+  graphics: Graphic[],
+  geometry: PlanGeometry
+): void {
+  if (!geometry.points?.length) return;
+  const graphic = createGeometryGraphic(toGeometryInput(geometry), {
+    symbolOptions: YELLOW_SYMBOL,
+    attributes: { ...geometry, isSelected: true },
+  });
+  if (graphic) graphics.push(graphic);
+}
+
 export function buildPlanGeometryGraphics(
   selectedPlan: FinishedFlightPlanType,
   selectedGeometries: number[]
 ): Graphic[] {
   const graphics: Graphic[] = [];
-
-  selectedPlan.geometries?.forEach((geometry) => {
-    if (!geometry.points?.length) return;
-
-    const graphic = createGeometryGraphic(toGeometryInput(geometry), {
-      attributes: {
-        geometryId: geometry.id,
-        geometryType: geometry.geometry_type,
-        omschrijving: geometry.geometry_omschrijving,
-        type: "geometry",
-      },
-    });
-
-    if (graphic) graphics.push(graphic);
-  });
-
+  selectedPlan.geometries?.forEach((geometry) =>
+    pushBaseGeometryGraphic(graphics, geometry)
+  );
   if (selectedGeometries.length === 0) return graphics;
-
   selectedPlan.geometries
     ?.filter((geometry) => selectedGeometries.includes(geometry.id))
-    .forEach((geometry) => {
-      if (!geometry.points?.length) return;
-
-      const graphic = createGeometryGraphic(toGeometryInput(geometry), {
-        symbolOptions: YELLOW_SYMBOL,
-        attributes: { ...geometry, isSelected: true },
-      });
-
-      if (graphic) graphics.push(graphic);
-    });
-
+    .forEach((geometry) => pushSelectedGeometryGraphic(graphics, geometry));
   return graphics;
 }

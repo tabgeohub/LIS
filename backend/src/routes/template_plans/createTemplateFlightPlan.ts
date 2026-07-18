@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
-import { created, missingFields, serverError } from "../../helpers/http/routeResponses";
+import { missingFields } from "../../helpers/http/routeResponses";
 import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
+import { ensureTemplateNameAvailable } from "../../helpers/queries/templates/templatePlanHelpers";
 import {
-  ensureTemplateNameAvailable,
-} from "../../helpers/queries/templates/templatePlanHelpers";
+  createAndRespondTemplatePlan,
+  respondTemplateCreateError,
+} from "./createTemplateFlightPlanHelpers";
 
 export async function createTemplateFlightPlan(
   req: Request,
@@ -22,35 +23,8 @@ export async function createTemplateFlightPlan(
 
   try {
     if (!(await ensureTemplateNameAvailable(name, res))) return;
-
-    const result = await pool.query(
-      `INSERT INTO lis.template_plans (
-        points,
-        name,
-        regio_id
-      )
-      VALUES (
-        $1, 
-        $2,
-        $3
-      )
-      RETURNING *;`,
-      [points, name, regio_id]
-    );
-
-    created({
-      res,
-      result: result.rows[0],
-      message: "De vluchttemplate is succesvol opgeslagen",
-    });
+    await createAndRespondTemplatePlan({ res, points, name, regio_id });
   } catch (err) {
-    serverError({
-      res,
-      logLabel: "Error creating template flight plan:",
-      message: `Failed to creating template flight plan: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-      err,
-    });
+    respondTemplateCreateError(res, err);
   }
 }

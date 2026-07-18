@@ -7,7 +7,7 @@ import {
   mergeGeometries,
   resolveStandalonePoints,
 } from "./planSelection";
-import { drawYellowGeometries, drawYellowPoint } from "./drawYellowPlanGraphics";
+import { applyAddPointsToPlanSuccess } from "./applyAddPointsToPlanSuccess";
 
 type SubmitAddPointsToPlanInput = {
   selectedPlan: FlightPlanType;
@@ -60,53 +60,14 @@ export function submitAddPointsToPlan(input: SubmitAddPointsToPlanInput) {
   );
 
   input.update({
-    data: {
-      points: uniquePointIds,
-      id: input.selectedPlan.id,
-    },
-    onSuccess: () => {
-      const updatedPlan: FlightPlanType = {
-        ...input.selectedPlan,
-        points: standalonePoints,
-        pointsObjects: standalonePoints,
-        geometries: updatedGeometries,
-      };
-
-      input.setSelectedPlan(updatedPlan);
-      input.setPointsTable(standalonePoints);
-      input.setGeometriesTable(updatedGeometries);
-      input.setGeometries(updatedGeometries);
-      input.setOpenTable(true);
-
-      newlySelectedStandalonePoints.forEach((point) =>
-        drawYellowPoint(point, input.yellowGraphicsLayer ?? null)
-      );
-
-      drawYellowGeometries(updatedGeometries, input.yellowGraphicsLayer ?? null);
-
-      input.setFilteredPlans(
-        input.filteredPlans.map((p) =>
-          p.id === input.selectedPlan.id
-            ? {
-                ...p,
-                points: standalonePoints,
-                pointsObjects: standalonePoints,
-                geometries: updatedGeometries,
-              }
-            : p
-        )
-      );
-
-      input.logAction({
-        message: "User saved points and geometries to flight plan",
-        newData: {
-          planId: input.selectedPlan.id,
-          pointIds: uniquePointIds,
-          geometryIds: updatedGeometries.map((g) => g.id),
-        },
-      });
-
-      input.setStep(2);
-    },
+    data: { points: uniquePointIds, id: input.selectedPlan.id },
+    onSuccess: () =>
+      applyAddPointsToPlanSuccess({
+        ...input,
+        uniquePointIds,
+        standalonePoints,
+        updatedGeometries,
+        newlySelectedStandalonePoints,
+      }),
   });
 }

@@ -3,8 +3,8 @@ import type {
   FinishedPointType,
 } from "Types/finished_plans";
 import type { UpdateInput } from "utils/useUpdateData";
-import { finalizeCoordinateValues } from "./coordinateFinalize";
-import { updateSavedGraphics } from "./pointMapGraphics";
+import { applyPointCoordinateUpdateSuccess } from "./applyPointCoordinateUpdateSuccess";
+import { buildPointCoordinatePayload } from "./buildPointCoordinatePayload";
 
 type SubmitPointCoordinatesInput = {
   selectedPoint: FinishedPointType;
@@ -30,62 +30,33 @@ type SubmitPointCoordinatesInput = {
 };
 
 export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) {
-  const finalCoords = finalizeCoordinateValues(input.coordinateSystem, {
-    longitude: input.longitude,
-    latitude: input.latitude,
-    xcoordinaat_rd: input.xcoordinaat_rd,
-    ycoordinaat_rd: input.ycoordinaat_rd,
-  });
-
-  const payload = {
-    ...input.selectedPoint,
-    ...finalCoords,
-    regio_id: input.selectedPoint.regio_id,
-    vertrouwelijk: input.selectedPoint.vertrouwelijk,
-    herhalen: input.selectedPoint.herhalen,
-    user_id: input.selectedPoint.user_id,
-    activiteit_id: input.selectedPoint.activiteit_id,
-    organisatie_id: input.selectedPoint.organisatie_id,
-    specifiek_letten_op: input.selectedPoint.specifiek_letten_op,
-    datum: input.selectedPoint.datum,
-    id: input.selectedPoint.id,
-  };
+  const { finalCoords, payload } = buildPointCoordinatePayload(
+    input.selectedPoint,
+    input.coordinateSystem,
+    {
+      longitude: input.longitude,
+      latitude: input.latitude,
+      xcoordinaat_rd: input.xcoordinaat_rd,
+      ycoordinaat_rd: input.ycoordinaat_rd,
+    }
+  );
 
   input.update({
     data: payload,
     onSuccess: (responseData) => {
-    if (!responseData.result || !input.selectedPlan) return;
-
-    const updatedPoint = { ...input.selectedPoint, ...finalCoords };
-    input.setSelectedPoint(updatedPoint);
-    input.setSelectedPlan({
-      ...input.selectedPlan,
-      points_data: [
-        ...input.selectedPlan.points_data.filter(
-          (p) => p.id !== input.selectedPoint.id
-        ),
-        updatedPoint,
-      ],
-    });
-
-    if (
-      input.mapView &&
-      input.pointsGraphicsLayer &&
-      input.yellowGraphicsLayer &&
-      input.redGraphicsLayer
-    ) {
-      updateSavedGraphics({
+      if (!responseData.result || !input.selectedPlan) return;
+      applyPointCoordinateUpdateSuccess({
+        selectedPoint: input.selectedPoint,
+        selectedPlan: input.selectedPlan,
+        finalCoords,
+        setSelectedPoint: input.setSelectedPoint,
+        setSelectedPlan: input.setSelectedPlan,
         mapView: input.mapView,
         pointsGraphicsLayer: input.pointsGraphicsLayer,
         yellowGraphicsLayer: input.yellowGraphicsLayer,
         redGraphicsLayer: input.redGraphicsLayer,
-        point: updatedPoint,
-        longitude: finalCoords.longitude,
-        latitude: finalCoords.latitude,
+        setAction: input.setAction,
       });
-    }
-
-    input.setAction("form");
     },
   });
 

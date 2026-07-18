@@ -11,6 +11,7 @@ import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
+import { collectTemplateFlightPointIds } from "./buildTemplateFlightSubmitIds";
 
 export default function Buttons({
   setOpenFilter,
@@ -52,27 +53,14 @@ export default function Buttons({
     });
 
   const handleSubmit = () => {
-    const safeSelectedGeometries = Array.isArray(selectedGeometries)
-      ? selectedGeometries
-      : [];
-    const safeSelectedGeometries2 = Array.isArray(selectedGeometries2)
-      ? selectedGeometries2
-      : [];
-    const allSelectedGeometryIds = [
-      ...safeSelectedGeometries,
-      ...safeSelectedGeometries2,
-    ];
-    const uniqueSelectedGeometryIds = Array.from(new Set(allSelectedGeometryIds));
-    const selectedGeometryObjects = dbGeometries.filter((geometry) =>
-      uniqueSelectedGeometryIds.includes(geometry.id)
-    );
-    const geometryPointIds = selectedGeometryObjects.flatMap((geometry) =>
-      geometry.points.map((point) => point.id)
-    );
-    const safeSelectedPoints = Array.isArray(selectedPoints) ? selectedPoints : [];
-    const safeSelectedPoints2 = Array.isArray(selectedPoints2) ? selectedPoints2 : [];
-    const allPointIds = [...safeSelectedPoints, ...safeSelectedPoints2, ...geometryPointIds];
-    const uniquePointIds = Array.from(new Set(allPointIds));
+    const { uniquePointIds, uniqueSelectedGeometryIds } =
+      collectTemplateFlightPointIds({
+        selectedGeometries,
+        selectedGeometries2,
+        selectedPoints,
+        selectedPoints2,
+        dbGeometries,
+      });
 
     logStep("User clicked 'Save' button to save flight template data", {
       name,
@@ -81,11 +69,7 @@ export default function Buttons({
     });
 
     create({
-      data: {
-        points: uniquePointIds,
-        name,
-        regio_id: user.role,
-      },
+      data: { points: uniquePointIds, name, regio_id: user.role },
       onSuccess: () => {
         clear();
         clearGraphics();
