@@ -12,6 +12,11 @@ export function escapeCsvCell(value: unknown): string {
   return `"${stringValue.replace(/"/g, '""')}"`;
 }
 
+function buildCsvHeaderLine(headers: string[]): string {
+  // nosemgrep: javascript.lang.security.audit.xss.direct-response-write - RFC 4180 CSV, not HTML
+  return headers.map(escapeCsvCell).join(",");
+}
+
 export function buildCsvFromRows<T extends object>(
   rows: T[],
   excludeKeys: string[] = []
@@ -22,8 +27,7 @@ export function buildCsvFromRows<T extends object>(
     (key) => !excludeKeys.includes(key)
   );
   return [
-    // nosemgrep: javascript.lang.security.audit.xss.direct-response-write / CWE-79 - CSV escaping, not HTML.
-    headers.map(escapeCsvCell).join(","),
+    buildCsvHeaderLine(headers),
     ...rows.map((row) =>
       headers
         .map((header) =>
