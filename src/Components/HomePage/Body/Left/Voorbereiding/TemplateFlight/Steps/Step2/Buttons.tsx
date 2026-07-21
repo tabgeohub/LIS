@@ -7,6 +7,7 @@ import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
+import { createFilterStepAdvanceHandler } from "../../../common/createFilterStepAdvanceHandler";
 
 export default function Buttons({
   setOpenFilter,
@@ -31,21 +32,25 @@ export default function Buttons({
   const { resetFeatures } = useResetFeatures();
   const { withLog, labels } = useWizardButtons("Second step");
 
-  const removeGraphics = () =>
-    clearMapSelectionGraphics({
-      mapView,
-      selectedGraphics,
-      setSelectedGraphics,
-      hoveredGraphic,
-      setHoveredGraphic,
-    });
-
-  const handleNext = () => {
-    setStep(step + 1);
-    resetFilters();
-    removeGraphics();
-    yellowGraphicsLayer?.graphics.removeAll();
+  const selectionGraphics = {
+    mapView,
+    selectedGraphics,
+    setSelectedGraphics,
+    hoveredGraphic,
+    setHoveredGraphic,
   };
+  const clearSelectionGraphics = () =>
+    clearMapSelectionGraphics(selectionGraphics);
+
+  const handleNext = createFilterStepAdvanceHandler({
+    step,
+    setStep,
+    resetFilters,
+    selectionGraphics,
+    afterAdvance: () => {
+      yellowGraphicsLayer?.graphics.removeAll();
+    },
+  });
 
   const handlePrevious = () =>
     runWizardCleanup([
@@ -55,7 +60,7 @@ export default function Buttons({
       () => setSelectedGeometries([]),
       resetFeatures,
       clearGraphics,
-      removeGraphics,
+      clearSelectionGraphics,
     ]);
 
   const handleCancelClick = () =>
@@ -66,7 +71,7 @@ export default function Buttons({
       handleCancel,
       resetFilters,
       clearGraphics,
-      removeGraphics,
+      clearSelectionGraphics,
     ]);
 
   return (

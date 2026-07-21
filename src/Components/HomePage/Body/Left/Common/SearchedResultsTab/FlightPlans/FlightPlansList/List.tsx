@@ -9,7 +9,10 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { hoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
+import {
+  clearHoveredFlightPlanFromOriginalMap,
+  hoverFlightPlanFromOriginalMap,
+} from "hooks/hover-click-handlers/planHoverClickHandlers";
 
 export default function List({
   flightPlansData,
@@ -55,14 +58,12 @@ export default function List({
   };
 
   const handleMouseLeave = (plan: FlightPlanType) => {
-    if (!graphicsLayer || !graphicsLayerHover) return;
-
-    graphicsLayerHover.removeAll();
-
-    const originalGraphic = originalGraphicsMap.current.get(String(plan.id));
-    if (originalGraphic) {
-      graphicsLayer.add(originalGraphic);
-    }
+    clearHoveredFlightPlanFromOriginalMap({
+      plan,
+      graphicsLayerHover,
+      graphicsLayer,
+      originalGraphicsMap,
+    });
   };
 
   const toggleStarPlan = (plan: FlightPlanType) => {

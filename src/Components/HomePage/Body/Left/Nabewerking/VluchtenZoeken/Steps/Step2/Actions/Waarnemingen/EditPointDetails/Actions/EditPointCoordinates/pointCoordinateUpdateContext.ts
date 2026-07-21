@@ -3,10 +3,9 @@ import type {
   FinishedPointType,
 } from "Types/finished_plans";
 
-/** Shared map/plan context for point-coordinate update success + submit. */
-export type PointCoordinateUpdateContext = {
+type PointCoordinateUpdateContextBase = {
   selectedPoint: FinishedPointType;
-  selectedPlan: FinishedFlightPlanType;
+  selectedPlan: FinishedFlightPlanType | null;
   setSelectedPoint: (point: FinishedPointType | null) => void;
   setSelectedPlan: (plan: FinishedFlightPlanType | null) => void;
   mapView: __esri.MapView | null;
@@ -16,9 +15,21 @@ export type PointCoordinateUpdateContext = {
   setAction: (value: string) => void;
 };
 
+/** Shared map/plan context for point-coordinate update submit wiring. */
+export type PointCoordinateUpdateSubmitContext =
+  PointCoordinateUpdateContextBase;
+
+/** Shared map/plan context for point-coordinate update success handling. */
+export type PointCoordinateUpdateContext = Omit<
+  PointCoordinateUpdateContextBase,
+  "selectedPlan"
+> & {
+  selectedPlan: FinishedFlightPlanType;
+};
+
 export function pickPointCoordinateUpdateContext(
-  input: PointCoordinateUpdateContext
-): PointCoordinateUpdateContext {
+  input: PointCoordinateUpdateSubmitContext
+): PointCoordinateUpdateSubmitContext {
   return {
     selectedPoint: input.selectedPoint,
     selectedPlan: input.selectedPlan,

@@ -4,6 +4,7 @@ import { useUpdateData } from "utils/useUpdateData";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
 import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
+import { submitAddToPlanSelection } from "../submitAddToPlanSelection";
 
 export default function Buttons({
   setSubStep,
@@ -17,17 +18,11 @@ export default function Buttons({
   const logAction = useLogAction();
 
   function handleSubmit() {
-    if (selectedPlan === null) return;
-
-    setSubStep(2);
-    update({
-      data: {
-        id: selectedPlan.id,
-        points: [
-          ...selectedPlan.points.flatMap((point) => point.id),
-          clickedPoint?.id,
-        ],
-      },
+    submitAddToPlanSelection({
+      selectedPlan,
+      addedPointIds: [clickedPoint?.id],
+      setSubStep,
+      update,
       onSuccess: () => setSelectedBottomTab("Kaartlagenlijst"),
     });
 

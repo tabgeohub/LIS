@@ -1,34 +1,23 @@
-# Sigrid Accept list — export `20260721`
+﻿# Sigrid Accept List
 
-Use for a **Sigrid UI Accept** pass. No Dockerfile or Nginx edits.
+## Jul21 accepted duplications
 
-Source: [`security-findings-rijkswaterstaat-otg-lis-20260721.csv`](./security-findings-rijkswaterstaat-otg-lis-20260721.csv)
+- `src/Types/keycloakUser.ts` <-> `backend/src/routes/keycloak/management/users/types.ts`
+  Shared FE-BE contract twin kept intentionally aligned across runtimes.
+- `src/Types/devices.ts` <-> `backend/src/routes/devices-updates/types.ts`
+  Shared device payload/type twin accepted as an explicit cross-boundary mirror.
+- `src/Types/installer.ts` <-> `backend/src/routes/installersStorage.ts`
+  Shared installer type twin accepted as a stable transport contract.
+- `src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts` <-> `backend/src/helpers/queries/flight-plans/flightPlanFields.ts`
+  FE-BE persistence field lists intentionally mirror the same stored plan shape.
+- `src/helpers/points/pointCoreIdentityKeys.ts` <-> `backend/src/helpers/queries/points/pointCoreColumns.ts`
+  Point core identity columns are intentionally mirrored between frontend helpers and backend query helpers.
+- `src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/pickDrawingGeometryFormFields.ts` <-> `backend/src/helpers/queries/geometries/createGeometryInsert.ts`
+  Geometry form fields and insert columns intentionally mirror the same persisted shape.
+- `index.html` <-> `public/index.html`
+  Vite and CRA entry shells are intentionally separate and should not be merged.
 
-## Security — Docker CWE-266 (Accept only)
+## Jul21 accepted facades
 
-| Finding | Why |
-| --- | --- |
-| `dockerfile#L22` — Missing USER instruction | Deployment; out of scope unless ops requires non-root |
-| `backend/dockerfile#L4` — Missing USER instruction | Same |
-
-**No changes** to Dockerfiles or Nginx configs.
-
-## Maintainability — Duplication (Accept / out of scope)
-
-| Clone family | Why |
-| --- | --- |
-| FE↔BE `keycloakUser`, `devices`, `installer` types | Needs shared package |
-| FE↔BE `pointCoreColumns` ↔ FE identity keys | Cross-layer twin |
-| FE↔BE flight-plan persistence field lists | Cross-layer twin |
-| `public/index.html` ↔ root `index.html` | CRA vs Vite entry shells |
-
-## Architecture — Independence / Coupling / Entanglement
-
-Accept intentional hubs (`useLogAction`, `useContent`, api-hooks façades), Coupling MEDIUM utils, entanglement on `api-hooks`, and Independence MEDIUM on shared `*Core` bodies — do not re-split for score.
-
-## Code fixes applied (Jul21 recovery — expect FIXED on rescan)
-
-| Finding | Fix |
-| --- | --- |
-| axios HIGH (Security + Reliability) | Bumped to `^1.18.1` in `package.json` / lockfile |
-| `csvExportCore.ts` MEDIUM XSS | `buildCsvHeaderLine` + Semgrep nosemgrep on escaped CSV header |
+- `src/api-hooks/finishedPlans/usePlanPointAttachments.ts`
+  This remains an intentional accepted facade that preserves a stable public import path while delegating implementation elsewhere.

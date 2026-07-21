@@ -4,7 +4,7 @@ import {
   isValidMapClickPoint,
 } from "Components/HomePage/Body/Common/EditPoint/editPointMapClickCoords";
 
-type CoordSetter = (coords: {
+export type DeletePointCoordSetter = (coords: {
   rdX: number;
   rdY: number;
   latitude: number;
@@ -40,7 +40,7 @@ export async function handleDeletePointEmptyMapClick(input: {
   redGraphicsLayer: __esri.GraphicsLayer;
   currentPoint: { x: number; y: number };
   setCurrentPoint: (value: { x: number; y: number }) => void;
-  setCoords: CoordSetter;
+  setCoords: DeletePointCoordSetter;
 }): Promise<void> {
   if (!isValidMapClickPoint(input.event.mapPoint)) return;
 

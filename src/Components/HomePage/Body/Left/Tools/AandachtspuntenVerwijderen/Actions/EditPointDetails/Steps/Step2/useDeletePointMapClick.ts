@@ -1,20 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { handleDeletePointEmptyMapClick } from "./handleDeletePointEmptyMapClick";
-
-type CoordSetter = (coords: {
-  rdX: number;
-  rdY: number;
-  latitude: number;
-  longitude: number;
-}) => void;
+import {
+  handleDeletePointEmptyMapClick,
+  type DeletePointCoordSetter,
+} from "./handleDeletePointEmptyMapClick";
 
 export function useDeletePointMapClick(input: {
   subStep: number;
   currentPoint: { x: number; y: number };
   setCurrentPoint: (value: { x: number; y: number }) => void;
-  setCoords: CoordSetter;
+  setCoords: DeletePointCoordSetter;
 }) {
   const { mapView, redGraphicsLayer } = useMapViewState();
 

@@ -7,11 +7,11 @@ import { applyPointCoordinateUpdateSuccess } from "./applyPointCoordinateUpdateS
 import { buildPointCoordinatePayload } from "./buildPointCoordinatePayload";
 import {
   pickPointCoordinateUpdateContext,
-  type PointCoordinateUpdateContext,
+  type PointCoordinateUpdateSubmitContext,
 } from "./pointCoordinateUpdateContext";
 
 type SubmitPointCoordinatesInput = Omit<
-  PointCoordinateUpdateContext,
+  PointCoordinateUpdateSubmitContext,
   "selectedPlan"
 > & {
   selectedPlan: FinishedFlightPlanType | null;

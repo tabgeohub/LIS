@@ -4,6 +4,7 @@ import { useUpdateData } from "utils/useUpdateData";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
 import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
+import { submitAddToPlanSelection } from "../submitAddToPlanSelection";
 
 export default function Buttons({
   setSubStep,
@@ -17,19 +18,17 @@ export default function Buttons({
   const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
   function handleSubmit() {
-    if (selectedPlan === null) return;
-
-    setSubStep(2);
-    const selectedIds = selectedPlan.points?.map((p) => p.id) || [];
-    const mergedIds = Array.from(new Set([...selectedIds, ...polygonPoints.map((p) => p.id)]));
-
-    update({
-      data: { id: selectedPlan.id, points: mergedIds },
+    submitAddToPlanSelection({
+      selectedPlan,
+      addedPointIds: polygonPoints.map((point) => point.id),
+      setSubStep,
+      update,
       onSuccess: () => setSelectedBottomTab("Kaartlagenlijst"),
+      afterSubmit: () => {
+        yellowGraphicsLayer?.removeAll();
+        setPolygonPoints([]);
+      },
     });
-
-    yellowGraphicsLayer?.removeAll();
-    setPolygonPoints([]);
   }
 
   return (

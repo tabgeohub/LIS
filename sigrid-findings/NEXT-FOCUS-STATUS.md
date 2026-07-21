@@ -1,29 +1,19 @@
-# Next focus status — Security/Reliability recovery (`20260721`)
+﻿# Next focus status — Jul21 polish wave
 
-Dashboard before fix: Maintainability **4.2** · Architecture **3.3** · Security **3.2** · Reliability **2.9**.
+Dashboard after Jul21 export: Maintainability **4.2** · Architecture **3.3** · Security **4.3** · Reliability **5.5**.
 
-## Root cause (Jul21 drop)
+## Done this wave
 
-- **axios@1.17.0** newly flagged (10 CVEs, First Seen 2026-07-21) — drove Security + Reliability down
-- **csvExportCore.ts** MEDIUM XSS — side effect of CSV Core refactor
-- **Docker CWE-266** — unchanged RAW (Accept only; no file edits)
-
-Most prior Security findings (multer, undici, nodemailer, xlsx, puppeteer, redirects, email HTML) are **FIXED** in Jul21 export.
-
-## Applied this wave
-
-| Fix | Files |
-| --- | --- |
-| axios `^1.18.1` | `package.json`, `package-lock.json` (1.18.1 resolved) |
-| csvExportCore Semgrep | `buildCsvHeaderLine` + nosemgrep |
-| Accept ledger | [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) — Docker only; no Docker/Nginx code |
+- Reduced remaining same-component duplication by extracting shared helpers for AddToPlan selection submit, filter-step advance flow, point-coordinate update context, and delete-point map click flow.
+- Finalized `showPlanSearchListHover` as a thin public facade over `showPlanSearchListHoverCore`.
+- Refreshed `ACCEPT-LIST.md` for Jul21 FE-BE duplication twins and intentional facades.
 
 ## Verification
 
 - `npm run check:architecture` — pass
 - `npm run test:architecture-helpers` — pass
 
-## Manual before next export
+## Remaining strategy
 
-1. **Accept Docker** in Sigrid UI per ACCEPT-LIST (no Dockerfile changes).
-2. Re-export Sigrid; expect Security/Reliability stars to recover (axios FIXED, csvExportCore cleared).
+- FE-BE duplication twins stay Accepted unless a shared package is introduced.
+- Architecture MEDIUM `*Core` files remain a separate strategy problem; do not keep splitting files for score.

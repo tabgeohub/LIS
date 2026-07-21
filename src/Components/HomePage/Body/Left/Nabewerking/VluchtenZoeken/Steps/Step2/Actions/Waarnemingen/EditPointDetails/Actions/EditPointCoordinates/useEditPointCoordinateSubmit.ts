@@ -1,21 +1,24 @@
 import useLogAction from "hooks/useLogAction";
 import { useUpdateData } from "utils/useUpdateData";
-import type { FinishedFlightPlanType, FinishedPointType } from "Types/finished_plans";
 import type { EditPointCoordinateValues } from "./useEditPointCoordinateInputs";
 import { submitPointCoordinateUpdate } from "./submitPointCoordinates";
+import {
+  pickPointCoordinateUpdateContext,
+  type PointCoordinateUpdateSubmitContext,
+} from "./pointCoordinateUpdateContext";
 
-export function useEditPointCoordinateSubmit(input: {
-  setAction: (value: string) => void;
-  selectedPoint: FinishedPointType | null;
-  selectedPlan: FinishedFlightPlanType | null;
-  setSelectedPoint: (value: FinishedPointType | null) => void;
-  setSelectedPlan: (value: FinishedFlightPlanType | null) => void;
-  mapView: __esri.MapView | null;
-  pointsGraphicsLayer: __esri.GraphicsLayer | null;
-  yellowGraphicsLayer: __esri.GraphicsLayer | null;
-  redGraphicsLayer: __esri.GraphicsLayer | null;
+type EditPointCoordinateSubmitInput = Omit<
+  PointCoordinateUpdateSubmitContext,
+  "selectedPoint" | "selectedPlan"
+> & {
+  selectedPoint: PointCoordinateUpdateSubmitContext["selectedPoint"] | null;
+  selectedPlan: PointCoordinateUpdateSubmitContext["selectedPlan"];
   values: EditPointCoordinateValues;
-}) {
+};
+
+export function useEditPointCoordinateSubmit(
+  input: EditPointCoordinateSubmitInput
+) {
   const logAction = useLogAction();
   const { update, loading } = useUpdateData(
     `/points/${input.selectedPoint?.id}`
@@ -24,15 +27,11 @@ export function useEditPointCoordinateSubmit(input: {
   function handleSubmit() {
     if (!input.selectedPoint) return;
     submitPointCoordinateUpdate({
-      selectedPoint: input.selectedPoint,
-      selectedPlan: input.selectedPlan,
-      setSelectedPoint: input.setSelectedPoint,
-      setSelectedPlan: input.setSelectedPlan,
-      mapView: input.mapView,
-      pointsGraphicsLayer: input.pointsGraphicsLayer,
-      yellowGraphicsLayer: input.yellowGraphicsLayer,
-      redGraphicsLayer: input.redGraphicsLayer,
-      setAction: input.setAction,
+      ...pickPointCoordinateUpdateContext({
+        ...input,
+        selectedPoint: input.selectedPoint,
+        selectedPlan: input.selectedPlan,
+      }),
       coordinateSystem: input.values.coordinateSystem,
       longitude: input.values.longitude,
       latitude: input.values.latitude,
