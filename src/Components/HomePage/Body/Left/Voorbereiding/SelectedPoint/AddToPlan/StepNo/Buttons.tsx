@@ -1,31 +1,17 @@
 import { usePopUpState } from "@helpers/ZustandStates/popUpState";
 import useLogAction from "hooks/useLogAction";
-import { useUpdateData } from "utils/useUpdateData";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
-import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
 import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
-import { submitAddToPlanSelection } from "../submitAddToPlanSelection";
+import { useAddToPlanStepButtons } from "../useAddToPlanStepButtons";
 
-export default function Buttons({
-  setSubStep,
-  setStep,
-  selectedPlan,
-}: AddToPlanStepButtonsProps) {
-  const { cancelToKaartlagenlijst, setSelectedBottomTab } =
-    useAddToPlanWizardNavigation();
+export default function Buttons(props: AddToPlanStepButtonsProps) {
+  const { setStep, cancelToKaartlagenlijst, submitSelection } =
+    useAddToPlanStepButtons(props);
   const { clickedPoint } = usePopUpState();
-  const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
   const logAction = useLogAction();
 
   function handleSubmit() {
-    submitAddToPlanSelection({
-      selectedPlan,
-      addedPointIds: [clickedPoint?.id],
-      setSubStep,
-      update,
-      onSuccess: () => setSelectedBottomTab("Kaartlagenlijst"),
-    });
-
+    submitSelection({ addedPointIds: [clickedPoint?.id] });
     logAction({
       message: "User clicked 'Add' button",
       step: "Add to plan - Step no",

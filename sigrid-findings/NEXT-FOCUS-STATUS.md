@@ -1,27 +1,35 @@
-# Next focus status — Big Architecture wave (`20260721(1)`)
+# Next focus status — Big Architecture wave + extra pre-deploy polish (`20260721(1)`)
 
 Dashboard baseline: Maintainability **4.2** · Architecture **3.3** (yellow) · OSH 4.7 · Security 4.3 · Reliability 5.5.
 
-## Done this wave
+## Done — plan waves
 
 ### Wave A — Entanglement HIGH cycle break
-- Moved `aandachtspuntDetailsValues` to [`src/helpers/points/aandachtspuntDetailsValues.ts`](../src/helpers/points/aandachtspuntDetailsValues.ts)
-- Moved `FlightPlanFieldLabels` / `flightPlanStandardSelectProps` to [`src/hooks/flightPlan/flightPlanStandardSelectProps.ts`](../src/hooks/flightPlan/flightPlanStandardSelectProps.ts)
-- Hooks no longer import `Components/HomePage/...`
-- Added rule in [`scripts/check-architecture.mjs`](../scripts/check-architecture.mjs): hooks must not import HomePage
+- Moved shared types out of Components (`aandachtspuntDetailsValues`, flight-plan select props)
+- Hooks no longer import `Components/HomePage`
+- Architecture rule enforced in `scripts/check-architecture.mjs`
 
 ### Wave B — Accept ledger
-- Recreated [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) for Independence HIGH hubs, Core MEDIUM, Coupling, FE↔BE Dup, Docker
+- [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) for Independence hubs, Core MEDIUM, Coupling, FE↔BE Dup, Docker
 
 ### Wave C — Maintainability
-- Thinned `verifyCredentialsResponses` (≤30 LOC public units)
-- Thinned TemplateFlight / FlightPlan Step2 Buttons via shared `wizardFilterStepSelection`
-- Reinforced `csvExportCore` Semgrep-safe CSV builders
+- Unit size thins (auth2 verify responses, Step2 Buttons)
+- Same-component Dup polish
+- csvExportCore Semgrep reinforcement
+
+## Extra pre-deploy polish (this session)
+
+- Split `showPlanSearchListHoverCore` into body / hover-from-map / clear siblings (fat Independence HIGH removed)
+- Thinned `useDeletePointState` → façade + Core/types/form-field siblings
+- Thinned `FlightPlanStandardFields` → View sibling
+- Thinned `usePlanPointAttachments`
+- TemplateFlight Step2/Step3 shared cleanup; AddToPlan shared step-buttons hook
 
 ## Verification
-- `npm run check:architecture`
-- `npm run test:architecture-helpers`
+- `npm run check:architecture` — pass
+- `npm run test:architecture-helpers` — pass
 
-## Manual before next export
-1. Apply Accept list in Sigrid UI (Independence hubs + Docker + FE↔BE Dup)
-2. Re-export — expect Entanglement HIGH cycle gone; Architecture may rise above 3.3
+## Before next deploy / Sigrid export
+1. Apply Accept list in Sigrid UI
+2. Smoke-test: drawing store forms, flight-plan forms, plan hover table/list, delete-point wizard, CSV export
+3. Re-export — expect Entanglement HIGH cycle gone; Independence HIGH `showPlanSearchListHoverCore` gone

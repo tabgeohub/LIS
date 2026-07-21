@@ -1,6 +1,6 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { FlightPlanType } from "Types";
-import { createHoverFlightPlanFromOriginalMap } from "./showPlanSearchListHoverCore";
+import { createHoverFlightPlanFromOriginalMap } from "./showPlanSearchListHover";
 
 /** Table/list hover handler bound to current map layers + original graphics map. */
 export function useHoverFlightPlanFromOriginalMap(originalGraphicsMap: {

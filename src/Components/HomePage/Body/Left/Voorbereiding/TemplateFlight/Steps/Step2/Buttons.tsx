@@ -4,12 +4,15 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
 import {
   createWizardFilterStepNext,
   createWizardSelectionGraphicsControls,
 } from "../../../common/wizardFilterStepSelection";
+import {
+  runTemplateFlightCancelCleanup,
+  runTemplateFlightPreviousCleanup,
+} from "../../helpers/templateFlightWizardCleanup";
 
 function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) {
   const store = useTemplateFlightState();
@@ -38,25 +41,27 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
       clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
     }),
     handlePrevious: () =>
-      runWizardCleanup([
-        () => store.setStep(1),
+      runTemplateFlightPreviousCleanup({
+        previousStep: 1,
+        setStep: store.setStep,
         resetFilters,
-        () => store.setSelectedPoints([]),
-        () => store.setSelectedGeometries([]),
+        clearSelectedPoints: () => store.setSelectedPoints([]),
+        clearSelectedGeometries: () => store.setSelectedGeometries([]),
         resetFeatures,
         clearGraphics,
         clearSelectionGraphics,
-      ]),
+      }),
     handleCancelClick: () =>
-      runWizardCleanup([
+      runTemplateFlightCancelCleanup({
         resetFeatures,
-        store.clear,
-        () => store.setSelectedGeometries([]),
+        clear: store.clear,
+        clearBeforeCancel: true,
+        beforeCancel: () => store.setSelectedGeometries([]),
         handleCancel,
         resetFilters,
         clearGraphics,
         clearSelectionGraphics,
-      ]),
+      }),
   };
 }
 

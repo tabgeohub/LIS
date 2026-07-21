@@ -1,29 +1,18 @@
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useUpdateData } from "utils/useUpdateData";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
-import { useAddToPlanWizardNavigation } from "../addToPlanWizardNavigation";
 import { AddToPlanWizardButtonBar } from "../AddToPlanWizardButtonBar";
-import { submitAddToPlanSelection } from "../submitAddToPlanSelection";
+import { useAddToPlanStepButtons } from "../useAddToPlanStepButtons";
 
-export default function Buttons({
-  setSubStep,
-  setStep,
-  selectedPlan,
-}: AddToPlanStepButtonsProps) {
-  const { cancelToKaartlagenlijst, setSelectedBottomTab } =
-    useAddToPlanWizardNavigation();
+export default function Buttons(props: AddToPlanStepButtonsProps) {
+  const { setStep, cancelToKaartlagenlijst, submitSelection } =
+    useAddToPlanStepButtons(props);
   const { setPolygonPoints, polygonPoints } = usePointsStore();
   const { yellowGraphicsLayer } = useMapViewState();
-  const { update } = useUpdateData(`/flightPlans/vluchtplans/points`);
 
   function handleSubmit() {
-    submitAddToPlanSelection({
-      selectedPlan,
+    submitSelection({
       addedPointIds: polygonPoints.map((point) => point.id),
-      setSubStep,
-      update,
-      onSuccess: () => setSelectedBottomTab("Kaartlagenlijst"),
       afterSubmit: () => {
         yellowGraphicsLayer?.removeAll();
         setPolygonPoints([]);

@@ -7,10 +7,13 @@ import { useAuth } from "@helpers/ZustandStates/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
-import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
+import {
+  createTemplateFlightClearSelectionGraphics,
+  runTemplateFlightCancelCleanup,
+  runTemplateFlightPreviousCleanup,
+} from "../../helpers/templateFlightWizardCleanup";
 import { collectTemplateFlightPointIds } from "./buildTemplateFlightSubmitIds";
 
 export default function Buttons({
@@ -27,30 +30,26 @@ export default function Buttons({
   const { create, loading } = useCreateData("/templateFlight");
   const { logStep, labels } = useWizardButtons("Third step");
   const { user } = useAuth();
+  const store = useTemplateFlightState();
   const {
     selectedPoints2,
     selectedPoints,
     setSelectedPoints2,
     setStep,
     clear,
-    selectedGraphics,
-    setSelectedGraphics,
-    hoveredGraphic,
-    setHoveredGraphic,
     selectedGeometries,
     selectedGeometries2,
     setSelectedGeometries2,
-  } = useTemplateFlightState();
+  } = store;
   const { dbGeometries } = useGeometriesStore();
 
-  const clearSelectionGraphics = () =>
-    clearMapSelectionGraphics({
-      mapView,
-      selectedGraphics,
-      setSelectedGraphics,
-      hoveredGraphic,
-      setHoveredGraphic,
-    });
+  const clearSelectionGraphics = createTemplateFlightClearSelectionGraphics({
+    mapView,
+    selectedGraphics: store.selectedGraphics,
+    setSelectedGraphics: store.setSelectedGraphics,
+    hoveredGraphic: store.hoveredGraphic,
+    setHoveredGraphic: store.setHoveredGraphic,
+  });
 
   const handleSubmit = () => {
     const { uniquePointIds, uniqueSelectedGeometryIds } =
@@ -78,25 +77,26 @@ export default function Buttons({
   };
 
   const handlePrevious = () =>
-    runWizardCleanup([
-      () => setStep(2),
+    runTemplateFlightPreviousCleanup({
+      previousStep: 2,
+      setStep,
       resetFilters,
-      () => setSelectedPoints2([]),
-      () => setSelectedGeometries2([]),
+      clearSelectedPoints: () => setSelectedPoints2([]),
+      clearSelectedGeometries: () => setSelectedGeometries2([]),
       resetFeatures,
       clearGraphics,
       clearSelectionGraphics,
-    ]);
+    });
 
   const handleCancelClick = () =>
-    runWizardCleanup([
+    runTemplateFlightCancelCleanup({
       resetFeatures,
+      clear,
       handleCancel,
       resetFilters,
-      clear,
       clearGraphics,
       clearSelectionGraphics,
-    ]);
+    });
 
   return (
     <>

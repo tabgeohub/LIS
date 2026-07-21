@@ -27,6 +27,46 @@ function logVerifyEvent(input: {
   });
 }
 
+function jsonVerifyResponse(
+  res: Response,
+  status: number | undefined,
+  body: object
+) {
+  return status === undefined ? res.json(body) : res.status(status).json(body);
+}
+
+function respondLoggedVerify(input: {
+  req: Request;
+  res: Response;
+  username: string;
+  event: string;
+  meta?: Record<string, unknown>;
+  status?: number;
+  body: object;
+}) {
+  logVerifyEvent({
+    req: input.req,
+    event: input.event,
+    username: input.username,
+    meta: input.meta,
+  });
+  return jsonVerifyResponse(input.res, input.status, input.body);
+}
+
+function logLookupUnavailableIfNeeded(input: {
+  req: Request;
+  username: string;
+  lookup: KeycloakUserLookupResult;
+}) {
+  if (!input.lookup.ok && input.lookup.reason === "lookup_unavailable") {
+    logVerifyEvent({
+      req: input.req,
+      event: "auth2.verify.lookup_unavailable",
+      username: input.username,
+    });
+  }
+}
+
 export function respondToVerifyLookup(input: {
   req: Request;
   res: Response;
@@ -35,30 +75,21 @@ export function respondToVerifyLookup(input: {
   decision: VerifyLookupDecision;
 }): Response | null {
   if (input.decision.kind === "invalid_username") {
-    logVerifyEvent({
-      req: input.req,
+    return respondLoggedVerify({
+      ...input,
       event: "auth2.verify.invalid_username",
-      username: input.username,
-    });
-    return input.res.status(401).json(invalidUsernameResponse());
-  }
-  if (!input.lookup.ok && input.lookup.reason === "lookup_unavailable") {
-    logVerifyEvent({
-      req: input.req,
-      event: "auth2.verify.lookup_unavailable",
-      username: input.username,
+      status: 401,
+      body: invalidUsernameResponse(),
     });
   }
-  if (input.decision.kind === "otp_required") {
-    logVerifyEvent({
-      req: input.req,
-      event: "auth2.verify.otp_required",
-      username: input.username,
-      meta: { hasOtp: true },
-    });
-    return input.res.json(OTP_REQUIRED_RESPONSE);
-  }
-  return null;
+  logLookupUnavailableIfNeeded(input);
+  if (input.decision.kind !== "otp_required") return null;
+  return respondLoggedVerify({
+    ...input,
+    event: "auth2.verify.otp_required",
+    meta: { hasOtp: true },
+    body: OTP_REQUIRED_RESPONSE,
+  });
 }
 
 function respondToGrantFailure(input: {
@@ -72,29 +103,32 @@ function respondToGrantFailure(input: {
   const grant = classifyVerifyGrantFailure(input.error, input.otpStatusUnknown);
   const hasOtp = input.lookup.ok ? input.lookup.hasOtp : "lookup_unavailable";
   if (grant.requiresOtp) {
-    logVerifyEvent({
+    return respondLoggedVerify({
       req: input.req,
-      event: "auth2.verify.otp_required",
+      res: input.res,
       username: input.username,
+      event: "auth2.verify.otp_required",
       meta: {
         hasOtp,
         grantFailureKind: grant.grantFailureKind,
         inferred: grant.grantFailureKind !== "otp_required",
       },
+      body: OTP_REQUIRED_RESPONSE,
     });
-    return input.res.json(OTP_REQUIRED_RESPONSE);
   }
-  logVerifyEvent({
+  return respondLoggedVerify({
     req: input.req,
-    event: "auth2.verify.invalid_password",
+    res: input.res,
     username: input.username,
+    event: "auth2.verify.invalid_password",
     meta: {
       hasOtp,
       grantFailureKind: grant.grantFailureKind,
       message: (input.error as Error)?.message,
     },
+    status: 401,
+    body: invalidPasswordResponse(),
   });
-  return input.res.status(401).json(invalidPasswordResponse());
 }
 
 export async function authenticateOrRespondToVerifyFailure(input: {
