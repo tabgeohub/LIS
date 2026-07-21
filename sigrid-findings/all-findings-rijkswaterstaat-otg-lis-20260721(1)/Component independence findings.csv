@@ -1,5 +1,5 @@
 Description,Severity,Status,First Seen,Issue age,File,Technology,Lines of code
-Interface module with 51 lines of code,HIGH,RAW,2026-07-18,3,src/hooks/hover-click-handlers/showPlanSearchListHover.ts,TypeScript,51
+Interface module with 71 lines of code,HIGH,RAW,2026-07-21,0,src/hooks/hover-click-handlers/showPlanSearchListHoverCore.ts,TypeScript,71
 Interface module with 38 lines of code,HIGH,RAW,2026-07-14,7,src/api-hooks/finishedPlans/usePlanPointAttachments.ts,TypeScript,38
 Interface module with 27 lines of code,HIGH,RAW,2026-07-14,7,src/api-hooks/templateFlights/useTemplateFlights.ts,TypeScript,27
 Interface module with 22 lines of code,HIGH,RAW,2026-07-14,7,src/api-hooks/points/usePointLookupQueries.ts,TypeScript,22

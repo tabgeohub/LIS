@@ -4,28 +4,15 @@ import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponent
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
 import {
-  defaultFlightPlanFieldLabels,
   FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
+import type { FlightPlanFieldLabels } from "hooks/flightPlan/flightPlanStandardSelectProps";
 
-export type FlightPlanFieldLabels = {
-  [K in keyof FlightPlanFormFieldValues]: string;
-};
+export type { FlightPlanFieldLabels } from "hooks/flightPlan/flightPlanStandardSelectProps";
+export { flightPlanStandardSelectProps } from "hooks/flightPlan/flightPlanStandardSelectProps";
 
 type SelectOption = { label: string; value: string };
-
-/** Shared select-option + label props for FlightPlanStandardFields forms. */
-export function flightPlanStandardSelectProps(options: {
-  pilootOptions: SelectOption[];
-  waarnemerOptions: SelectOption[];
-  typeLuchtvaartuigOptions: SelectOption[];
-}) {
-  return {
-    labels: defaultFlightPlanFieldLabels,
-    ...options,
-  };
-}
 
 export type FlightPlanStandardFieldsProps = {
   fields: FlightPlanFormFieldValues & FlightPlanFormFieldSetters;

@@ -29,15 +29,17 @@ export function showPlanSearchListHover(input: {
   }
 }
 
+type OriginalGraphicsMapRef = {
+  current: Map<number, __esri.Graphic> | Map<string, __esri.Graphic>;
+};
+
 /** Resolve original graphic from a map keyed by plan id (number or string). */
 export function hoverFlightPlanFromOriginalMap(input: {
   plan: FlightPlanType;
   mapView: __esri.MapView | null | undefined;
   graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
   graphicsLayer: __esri.GraphicsLayer | null | undefined;
-  originalGraphicsMap: {
-    current: Map<number, __esri.Graphic> | Map<string, __esri.Graphic>;
-  };
+  originalGraphicsMap: OriginalGraphicsMapRef;
 }): void {
   const map = input.originalGraphicsMap.current as Map<
     string | number,
@@ -55,14 +57,29 @@ export function hoverFlightPlanFromOriginalMap(input: {
   });
 }
 
+/** Bind map layers once; returns a per-plan hover handler (table + list). */
+export function createHoverFlightPlanFromOriginalMap(input: {
+  mapView: __esri.MapView | null | undefined;
+  graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
+  graphicsLayer: __esri.GraphicsLayer | null | undefined;
+  originalGraphicsMap: OriginalGraphicsMapRef;
+}): (plan: FlightPlanType) => void {
+  return (plan) =>
+    hoverFlightPlanFromOriginalMap({
+      plan,
+      mapView: input.mapView,
+      graphicsLayerHover: input.graphicsLayerHover,
+      graphicsLayer: input.graphicsLayer,
+      originalGraphicsMap: input.originalGraphicsMap,
+    });
+}
+
 /** Shared cleanup for hover-highlighted flight plan rows. */
 export function clearHoveredFlightPlanFromOriginalMap(input: {
   plan: FlightPlanType;
   graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
   graphicsLayer: __esri.GraphicsLayer | null | undefined;
-  originalGraphicsMap: {
-    current: Map<number, __esri.Graphic> | Map<string, __esri.Graphic>;
-  };
+  originalGraphicsMap: OriginalGraphicsMapRef;
 }): void {
   if (!input.graphicsLayer || !input.graphicsLayerHover) return;
 

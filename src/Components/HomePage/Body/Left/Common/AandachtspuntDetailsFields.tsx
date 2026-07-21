@@ -7,11 +7,11 @@ import { ReactNode } from "react";
 import type {
   AandachtspuntDetailsFieldState,
   AandachtspuntDetailsValues,
-} from "./aandachtspuntDetailsValues";
+} from "@helpers/points/aandachtspuntDetailsValues";
 
 export type {
   AandachtspuntDetailsValues,
-} from "./aandachtspuntDetailsValues";
+} from "@helpers/points/aandachtspuntDetailsValues";
 
 export type AandachtspuntDetailsLabels = Partial<
   Record<keyof AandachtspuntDetailsFieldState, string>

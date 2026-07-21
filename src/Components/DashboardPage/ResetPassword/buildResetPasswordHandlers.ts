@@ -1,6 +1,5 @@
 import { submitResetPassword } from "./submitResetPassword";
-import { createFormFieldChangeHandler } from "../shared/createFormFieldChangeHandler";
-import { createAsyncFormSubmitHandler } from "../shared/createAsyncFormSubmitHandler";
+import { createDashboardFormHandlers } from "../shared/createDashboardFormHandlers";
 
 type FormData = { password: string; confirmPassword: string };
 
@@ -11,21 +10,19 @@ export function buildResetPasswordHandlers(input: {
   setLoading: (value: boolean) => void;
   handleBack: () => void;
 }) {
-  return {
-    onChange: createFormFieldChangeHandler(input.setFormData),
-    onSubmit: createAsyncFormSubmitHandler({
-      hasSelection: Boolean(input.selectedUser),
-      setLoading: input.setLoading,
-      submit: async () => {
-        if (!input.selectedUser) return;
-        const ok = await submitResetPassword({
-          userId: input.selectedUser.id,
-          password: input.formData.password,
-          confirmPassword: input.formData.confirmPassword,
-          onSuccess: input.handleBack,
-        });
-        if (ok) input.setFormData({ password: "", confirmPassword: "" });
-      },
-    }),
-  };
+  return createDashboardFormHandlers({
+    setFormData: input.setFormData,
+    hasSelection: Boolean(input.selectedUser),
+    setLoading: input.setLoading,
+    submit: async () => {
+      if (!input.selectedUser) return;
+      const ok = await submitResetPassword({
+        userId: input.selectedUser.id,
+        password: input.formData.password,
+        confirmPassword: input.formData.confirmPassword,
+        onSuccess: input.handleBack,
+      });
+      if (ok) input.setFormData({ password: "", confirmPassword: "" });
+    },
+  });
 }

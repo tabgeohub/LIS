@@ -1,7 +1,6 @@
 import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
 import { submitEditUser, type EditUserFormData } from "./submitEditUser";
-import { createFormFieldChangeHandler } from "../shared/createFormFieldChangeHandler";
-import { createAsyncFormSubmitHandler } from "../shared/createAsyncFormSubmitHandler";
+import { createDashboardFormHandlers } from "../shared/createDashboardFormHandlers";
 
 export function buildEditUserFormHandlers(input: {
   selectedUser: KeycloakUser | null;
@@ -10,19 +9,17 @@ export function buildEditUserFormHandlers(input: {
   setLoading: (value: boolean) => void;
   handleEditSuccess: (user: KeycloakUser) => void;
 }) {
-  return {
-    onChange: createFormFieldChangeHandler(input.setFormData),
-    onSubmit: createAsyncFormSubmitHandler({
-      hasSelection: Boolean(input.selectedUser),
-      setLoading: input.setLoading,
-      submit: async () => {
-        if (!input.selectedUser) return;
-        await submitEditUser({
-          selectedUser: input.selectedUser,
-          formData: input.formData,
-          onSuccess: input.handleEditSuccess,
-        });
-      },
-    }),
-  };
+  return createDashboardFormHandlers({
+    setFormData: input.setFormData,
+    hasSelection: Boolean(input.selectedUser),
+    setLoading: input.setLoading,
+    submit: async () => {
+      if (!input.selectedUser) return;
+      await submitEditUser({
+        selectedUser: input.selectedUser,
+        formData: input.formData,
+        onSuccess: input.handleEditSuccess,
+      });
+    },
+  });
 }

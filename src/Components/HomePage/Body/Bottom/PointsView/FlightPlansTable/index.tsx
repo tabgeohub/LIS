@@ -11,7 +11,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { hoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
+import { useHoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [
@@ -69,7 +69,7 @@ export default function FlightPlansTable({
   containerWidth?: number;
 }) {
   const { flightPlans } = useOpenTable();
-  const { graphicsLayerHover, graphicsLayer, mapView } = useMapViewState();
+  const { graphicsLayerHover, graphicsLayer } = useMapViewState();
 
   const [visibleColumnsPlans, setVisibleColumnsPlans] =
     useState(allColumnsPlans);
@@ -94,15 +94,8 @@ export default function FlightPlansTable({
     }
   };
 
-  const HoveredPlan = (plan: FlightPlanType) => {
-    hoverFlightPlanFromOriginalMap({
-      plan,
-      mapView,
-      graphicsLayerHover,
-      graphicsLayer,
-      originalGraphicsMap,
-    });
-  };
+  const HoveredPlan = useHoverFlightPlanFromOriginalMap(originalGraphicsMap);
+
 
   return (
     <PointsViewTableFrame containerHeight={containerHeight}>

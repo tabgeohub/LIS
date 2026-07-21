@@ -36,6 +36,11 @@ const rules = [
     forbidden: /from\s+["']hooks\//,
   },
   {
+    name: "hooks must not import HomePage (avoids hooks↔HomePage cycles)",
+    appliesTo: (path) => path.startsWith("hooks/"),
+    forbidden: /from\s+["']Components\/HomePage\//,
+  },
+  {
     name: "pure map helpers must be imported from ArcGISHelpers",
     appliesTo: () => true,
     forbidden:

@@ -5,75 +5,71 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
-import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import { createFilterStepAdvanceHandler } from "../../../common/createFilterStepAdvanceHandler";
+import {
+  createWizardFilterStepNext,
+  createWizardSelectionGraphicsControls,
+} from "../../../common/wizardFilterStepSelection";
+
+function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
+  const { resetFeatures } = useResetFeatures();
+  const { withLog, labels } = useWizardButtons("Second step");
+  const store = useFlightPlanState();
+  const { mapView, yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } =
+    useMapViewState();
+  const resetFilters = usePointsFilterStore((s) => s.resetFilters);
+  const handleCancel = useHandleCancel();
+  const { selectionGraphics, clearSelectionGraphics } =
+    createWizardSelectionGraphicsControls({
+      mapView,
+      selectedGraphics: store.selectedGraphics,
+      setSelectedGraphics: store.setSelectedGraphics,
+      hoveredGraphic: store.hoveredGraphic,
+      setHoveredGraphic: store.setHoveredGraphic,
+    });
+  return {
+    labels,
+    withLog,
+    setOpenFilter,
+    handleNext: createWizardFilterStepNext({
+      step: store.step,
+      setStep: store.setStep,
+      resetFilters,
+      selectionGraphics,
+      clearYellowLayers: () => {
+        yellowGraphicsLayer?.graphics.removeAll();
+        yellowGeometriesGraphicsLayer?.graphics.removeAll();
+      },
+    }),
+    handleBack: () =>
+      runWizardCleanup([
+        () => store.setStep(2),
+        resetFilters,
+        () => store.setSelectedPoints([]),
+        resetFeatures,
+        clearGraphics,
+        clearSelectionGraphics,
+      ]),
+    handleCancel: () =>
+      runWizardCleanup([resetFeatures, store.clear, handleCancel, resetFilters]),
+  };
+}
 
 export default function Buttons({
   setOpenFilter,
 }: {
   setOpenFilter: (value: boolean) => void;
 }) {
-  const { resetFeatures } = useResetFeatures();
-  const { withLog, labels } = useWizardButtons("Second step");
-  const {
-    step,
-    setStep,
-    selectedGraphics,
-    setSelectedGraphics,
-    hoveredGraphic,
-    setHoveredGraphic,
-    setSelectedPoints,
-    clear,
-  } = useFlightPlanState();
-
-  const { mapView, yellowGraphicsLayer, yellowGeometriesGraphicsLayer, clearGraphics } =
-    useMapViewState();
-  const resetFilters = usePointsFilterStore((s) => s.resetFilters);
-  const handleCancel = useHandleCancel();
-
-  const selectionGraphics = {
-      mapView,
-      selectedGraphics,
-      setSelectedGraphics,
-      hoveredGraphic,
-      setHoveredGraphic,
-    };
-  const clearSelectionGraphics = () =>
-    clearMapSelectionGraphics(selectionGraphics);
-
-  const handleNext = createFilterStepAdvanceHandler({
-    step,
-    setStep,
-    resetFilters,
-    selectionGraphics,
-    afterAdvance: () => {
-      yellowGraphicsLayer?.graphics.removeAll();
-      yellowGeometriesGraphicsLayer?.graphics.removeAll();
-    },
-  });
-
-  const handleBack = () =>
-    runWizardCleanup([
-      () => setStep(2),
-      resetFilters,
-      () => setSelectedPoints([]),
-      resetFeatures,
-      clearGraphics,
-      clearSelectionGraphics,
-    ]);
-
+  const actions = useFlightPlanStep2Actions(setOpenFilter);
   return (
     <FilterStepWizardButtons
-      labels={labels}
-      withLog={withLog}
-      onPrevious={handleBack}
+      labels={actions.labels}
+      withLog={actions.withLog}
+      onPrevious={actions.handleBack}
       previousLogMessage="User clicked 'Back' button"
-      onFilter={() => setOpenFilter(true)}
-      onNext={handleNext}
-      onCancel={() =>
-        runWizardCleanup([resetFeatures, clear, handleCancel, resetFilters])
-      }
+      onFilter={() => actions.setOpenFilter(true)}
+      onNext={actions.handleNext}
+      onCancel={actions.handleCancel}
     />
   );
 }

@@ -1,5 +1,5 @@
-import type { FlightPlanFieldLabels } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
 import type { Content } from "hooks/useContent";
+import type { FlightPlanFieldLabels } from "./flightPlanStandardSelectProps";
 
 export function nabewerkingVluchtenZoekenFieldLabels(
   content: Content

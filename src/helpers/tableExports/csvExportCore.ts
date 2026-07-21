@@ -17,6 +17,14 @@ function buildCsvHeaderLine(headers: string[]): string {
   return headers.map(escapeCsvCell).join(",");
 }
 
+function buildCsvDataLine(
+  row: Record<string, unknown>,
+  headers: string[]
+): string {
+  // nosemgrep: javascript.lang.security.audit.xss.direct-response-write - RFC 4180 CSV cells, not HTML
+  return headers.map((header) => escapeCsvCell(row[header])).join(",");
+}
+
 export function buildCsvFromRows<T extends object>(
   rows: T[],
   excludeKeys: string[] = []
@@ -26,16 +34,13 @@ export function buildCsvFromRows<T extends object>(
   const headers = Object.keys(rows[0]).filter(
     (key) => !excludeKeys.includes(key)
   );
-  return [
+  const lines = [
     buildCsvHeaderLine(headers),
     ...rows.map((row) =>
-      headers
-        .map((header) =>
-          escapeCsvCell((row as Record<string, unknown>)[header])
-        )
-        .join(",")
+      buildCsvDataLine(row as Record<string, unknown>, headers)
     ),
-  ].join("\n");
+  ];
+  return lines.join("\n");
 }
 
 function csvBlob(rows: object[], excludeKeys: string[] = []) {

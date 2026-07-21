@@ -4,7 +4,7 @@ import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,
 } from "../../helpers/http/routeResponses";
-import { rollbackTransactionWithServerError } from "../../helpers/http/rollbackTransactionWithServerError";
+import { createRollbackTransactionErrorHandler } from "../../helpers/http/rollbackTransactionWithServerError";
 import {
   getMissingFields,
   requireNonEmptyArray,
@@ -45,14 +45,9 @@ export async function commitAndRespondCreateGeometry(input: {
   });
 }
 
-export async function rollbackCreateGeometryError(input: {
-  client: PoolClient;
-  res: Response;
-  err: unknown;
-}): Promise<void> {
-  await rollbackTransactionWithServerError({
-    ...input,
+export const rollbackCreateGeometryError =
+  createRollbackTransactionErrorHandler({
     logLabel: "Error creating geometry:",
     messagePrefix: "Error : ",
   });
-}
+

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type {
   AandachtspuntDetailsFieldState,
   AandachtspuntDetailsValues,
-} from "Components/HomePage/Body/Left/Common/aandachtspuntDetailsValues";
+} from "@helpers/points/aandachtspuntDetailsValues";
 
 interface DrawingState extends AandachtspuntDetailsValues {
   step: number;

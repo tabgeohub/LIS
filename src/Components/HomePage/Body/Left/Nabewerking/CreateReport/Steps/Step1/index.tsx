@@ -1,32 +1,11 @@
-import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
 import PeriodFilter from "../PeriodFilter";
 import SinglePlan from "./SinglePlan";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useContent } from "hooks/useContent";
-import { useBindFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
+import { useCreateReportFilterAndSortPlans } from "../../hooks/useCreateReportFilterAndSortPlans";
 
 export default function Step1({ plans }: { plans: FinishedFlightPlanType[] }) {
-  const { openFilter } = useCreateReportState();
-  const {
-    periode,
-    dateFrom,
-    dateTo,
-    filteredPlans,
-    filterTerm,
-    setFilteredPlans,
-  } = useCreateReportState();
-
-  useBindFilteredSortedPlans({
-    plans,
-    filterText: filterTerm,
-    source: {
-      periode,
-      dateFrom,
-      dateTo,
-      setFilteredPlans,
-    },
-  });
-
+  const { openFilter, filteredPlans } = useCreateReportFilterAndSortPlans(plans);
   const content = useContent();
 
   return (

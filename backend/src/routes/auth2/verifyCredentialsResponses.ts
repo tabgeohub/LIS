@@ -14,6 +14,19 @@ const OTP_REQUIRED_RESPONSE = {
   message: "Authenticator-code is required",
 };
 
+function logVerifyEvent(input: {
+  req: Request;
+  event: string;
+  username: string;
+  meta?: Record<string, unknown>;
+}) {
+  logAuthSecurityEvent({
+    event: input.event,
+    meta: { usernameHash: hashUsername(input.username), ...input.meta },
+    req: input.req,
+  });
+}
+
 export function respondToVerifyLookup(input: {
   req: Request;
   res: Response;
@@ -21,31 +34,67 @@ export function respondToVerifyLookup(input: {
   lookup: KeycloakUserLookupResult;
   decision: VerifyLookupDecision;
 }): Response | null {
-  const usernameHash = hashUsername(input.username);
   if (input.decision.kind === "invalid_username") {
-    logAuthSecurityEvent({
-      event: "auth2.verify.invalid_username",
-      meta: { usernameHash },
+    logVerifyEvent({
       req: input.req,
+      event: "auth2.verify.invalid_username",
+      username: input.username,
     });
     return input.res.status(401).json(invalidUsernameResponse());
   }
   if (!input.lookup.ok && input.lookup.reason === "lookup_unavailable") {
-    logAuthSecurityEvent({
-      event: "auth2.verify.lookup_unavailable",
-      meta: { usernameHash },
+    logVerifyEvent({
       req: input.req,
+      event: "auth2.verify.lookup_unavailable",
+      username: input.username,
     });
   }
   if (input.decision.kind === "otp_required") {
-    logAuthSecurityEvent({
-      event: "auth2.verify.otp_required",
-      meta: { usernameHash, hasOtp: true },
+    logVerifyEvent({
       req: input.req,
+      event: "auth2.verify.otp_required",
+      username: input.username,
+      meta: { hasOtp: true },
     });
     return input.res.json(OTP_REQUIRED_RESPONSE);
   }
   return null;
+}
+
+function respondToGrantFailure(input: {
+  req: Request;
+  res: Response;
+  username: string;
+  lookup: KeycloakUserLookupResult;
+  error: unknown;
+  otpStatusUnknown: boolean;
+}) {
+  const grant = classifyVerifyGrantFailure(input.error, input.otpStatusUnknown);
+  const hasOtp = input.lookup.ok ? input.lookup.hasOtp : "lookup_unavailable";
+  if (grant.requiresOtp) {
+    logVerifyEvent({
+      req: input.req,
+      event: "auth2.verify.otp_required",
+      username: input.username,
+      meta: {
+        hasOtp,
+        grantFailureKind: grant.grantFailureKind,
+        inferred: grant.grantFailureKind !== "otp_required",
+      },
+    });
+    return input.res.json(OTP_REQUIRED_RESPONSE);
+  }
+  logVerifyEvent({
+    req: input.req,
+    event: "auth2.verify.invalid_password",
+    username: input.username,
+    meta: {
+      hasOtp,
+      grantFailureKind: grant.grantFailureKind,
+      message: (input.error as Error)?.message,
+    },
+  });
+  return input.res.status(401).json(invalidPasswordResponse());
 }
 
 export async function authenticateOrRespondToVerifyFailure(input: {
@@ -58,34 +107,13 @@ export async function authenticateOrRespondToVerifyFailure(input: {
 }) {
   try {
     const user = await authenticatePasswordCredentials(input);
-    return input.res.json({ success: true, status: "authenticated", message: "Login successful", user });
-  } catch (error: unknown) {
-    const grant = classifyVerifyGrantFailure(error, input.otpStatusUnknown);
-    const usernameHash = hashUsername(input.username);
-    const hasOtp = input.lookup.ok ? input.lookup.hasOtp : "lookup_unavailable";
-    if (grant.requiresOtp) {
-      logAuthSecurityEvent({
-        event: "auth2.verify.otp_required",
-        meta: {
-          usernameHash,
-          hasOtp,
-          grantFailureKind: grant.grantFailureKind,
-          inferred: grant.grantFailureKind !== "otp_required",
-        },
-        req: input.req,
-      });
-      return input.res.json(OTP_REQUIRED_RESPONSE);
-    }
-    logAuthSecurityEvent({
-      event: "auth2.verify.invalid_password",
-      meta: {
-        usernameHash,
-        hasOtp,
-        grantFailureKind: grant.grantFailureKind,
-        message: (error as Error)?.message,
-      },
-      req: input.req,
+    return input.res.json({
+      success: true,
+      status: "authenticated",
+      message: "Login successful",
+      user,
     });
-    return input.res.status(401).json(invalidPasswordResponse());
+  } catch (error: unknown) {
+    return respondToGrantFailure({ ...input, error });
   }
 }

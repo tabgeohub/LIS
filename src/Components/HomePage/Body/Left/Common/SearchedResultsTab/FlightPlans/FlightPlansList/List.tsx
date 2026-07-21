@@ -11,7 +11,7 @@ import {
 } from "@helpers/ArcGISHelpers/planStarGraphics";
 import {
   clearHoveredFlightPlanFromOriginalMap,
-  hoverFlightPlanFromOriginalMap,
+  useHoverFlightPlanFromOriginalMap,
 } from "hooks/hover-click-handlers/planHoverClickHandlers";
 
 export default function List({
@@ -47,15 +47,8 @@ export default function List({
   const { graphicsLayerHover, mapView, graphicsLayer, redGraphicsLayer } =
     useMapViewState();
 
-  const HoveredPlan = (plan: FlightPlanType) => {
-    hoverFlightPlanFromOriginalMap({
-      plan,
-      mapView,
-      graphicsLayerHover,
-      graphicsLayer,
-      originalGraphicsMap,
-    });
-  };
+  const HoveredPlan = useHoverFlightPlanFromOriginalMap(originalGraphicsMap);
+
 
   const handleMouseLeave = (plan: FlightPlanType) => {
     clearHoveredFlightPlanFromOriginalMap({

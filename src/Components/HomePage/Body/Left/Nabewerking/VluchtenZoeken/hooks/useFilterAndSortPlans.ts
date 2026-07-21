@@ -9,17 +9,10 @@ export function useFilterAndSortPlans(
   plans: FinishedFlightPlanType[] | undefined,
   filterTerm: string
 ) {
-  const { periode, dateFrom, dateTo, setFilteredPlans } =
-    useFinishedPlansState();
-
+  const finished = useFinishedPlansState();
   useBindFilteredSortedPlans({
     plans,
     filterText: filterTerm,
-    source: {
-      periode,
-      dateFrom,
-      dateTo,
-      setFilteredPlans,
-    },
+    source: finished,
   });
 }

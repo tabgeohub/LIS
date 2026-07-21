@@ -6,7 +6,7 @@ import {
   notFound,
   okResult,
 } from "../../helpers/http/routeResponses";
-import { rollbackTransactionWithServerError } from "../../helpers/http/rollbackTransactionWithServerError";
+import { createRollbackTransactionErrorHandler } from "../../helpers/http/rollbackTransactionWithServerError";
 import { requireArray } from "../../helpers/http/validateBody";
 import { updateFinishedPointAttachmentsTx } from "../../helpers/queries/finished-plans/updateFinishedPointAttachmentsTx";
 
@@ -64,14 +64,9 @@ export async function commitAttachmentUpdate(input: {
   });
 }
 
-export async function rollbackAttachmentUpdateError(input: {
-  client: PoolClient;
-  res: Response;
-  err: unknown;
-}): Promise<void> {
-  await rollbackTransactionWithServerError({
-    ...input,
+export const rollbackAttachmentUpdateError =
+  createRollbackTransactionErrorHandler({
     logLabel: "Error updating point:",
     messagePrefix: "Failed to update point: ",
   });
-}
+
