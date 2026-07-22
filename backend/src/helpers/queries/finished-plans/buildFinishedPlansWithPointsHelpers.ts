@@ -18,16 +18,16 @@ export type BuildFinishedPlansQueryOptions = {
   orderBy?: string;
 };
 
-export function appendFinishedDateRange(
-  whereClause: string,
-  params: unknown[],
-  dateRange?: { from: string; to: string }
-): string {
-  if (!dateRange) {
-    return whereClause;
+export function appendFinishedDateRange(input: {
+  whereClause: string;
+  params: unknown[];
+  dateRange?: { from: string; to: string };
+}): string {
+  if (!input.dateRange) {
+    return input.whereClause;
   }
-  params.push(dateRange.from, dateRange.to);
-  return `${whereClause}
+  input.params.push(input.dateRange.from, input.dateRange.to);
+  return `${input.whereClause}
         AND fp.datum IS NOT NULL
         AND fp.datum::date >= $1::date
         AND fp.datum::date <= $2::date`;

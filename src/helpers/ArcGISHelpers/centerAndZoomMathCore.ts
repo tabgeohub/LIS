@@ -105,11 +105,12 @@ export function calculateCenterAndZoomFromPoints(
 }
 
 /** Shared ArcGIS goTo for lon/lat center + zoom (VluchtenZoeken / EditGeometry). */
-export function goToLonLatZoom(
-  mapView: { goTo: (target: unknown) => unknown },
-  center: { latitude: number; longitude: number },
-  zoom: number
-): void {
+export function goToLonLatZoom(input: {
+  mapView: { goTo: (target: unknown) => unknown };
+  center: { latitude: number; longitude: number };
+  zoom: number;
+}): void {
+  const { mapView, center, zoom } = input;
   if (
     !Number.isFinite(center.latitude) ||
     !Number.isFinite(center.longitude)

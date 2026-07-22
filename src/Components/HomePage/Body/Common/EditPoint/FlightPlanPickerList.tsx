@@ -1,10 +1,7 @@
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
-import { FaCheckCircle } from "react-icons/fa";
 import { FlightPlanType } from "Types";
-
-dayjs.locale("nl");
+import { FlightPlanPickerRow } from "./FlightPlanPickerRow";
 
 export default function FlightPlanPickerList({
   plans,
@@ -48,36 +45,14 @@ export default function FlightPlanPickerList({
           )}
 
           {filteredPlans.map((plan) => (
-            <div
+            <FlightPlanPickerRow
               key={plan.id}
-              onClick={() => onSelectPlan(plan)}
-              className={`text-[14px] px-5 py-1 cursor-pointer transition-all relative ${
-                selectedPlan?.id === plan.id
-                  ? "bg-gray-100"
-                  : "hover:bg-blue-100"
-              }`}
-            >
-              {showFinishedBadge && plan.is_finished && (
-                <FaCheckCircle className="absolute top-1 right-1 text-green-500 text-lg" />
-              )}
-
-              <div className="flex gap-x-2 items-center font-medium">
-                <p>vluchtplan: </p>
-                <p>{plan.vluchtnummer}</p>
-              </div>
-
-              <div className="flex gap-x-2 items-center text-gray-500">
-                <p>datum: </p>
-                <p className="capitalize">
-                  {dayjs(plan.datum).format("DD MMM YYYY")}
-                </p>
-              </div>
-
-              <div className="flex gap-x-2 items-center text-gray-500">
-                <p>{additionalInfoLabel}: </p>
-                <p>{plan.aanvullende}</p>
-              </div>
-            </div>
+              plan={plan}
+              selected={selectedPlan?.id === plan.id}
+              onSelect={() => onSelectPlan(plan)}
+              showFinishedBadge={showFinishedBadge}
+              additionalInfoLabel={additionalInfoLabel}
+            />
           ))}
         </div>
       </ScrollButtonsLayout>

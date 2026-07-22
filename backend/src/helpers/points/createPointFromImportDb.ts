@@ -136,20 +136,30 @@ class ImportPointsWriter {
     return result;
   }
 
+  private resolvePointId(raw: unknown): number | null {
+    const key = omschrijvingKey(raw);
+    return this.existingMap.get(key) ?? this.insertedMap.get(key) ?? null;
+  }
+
+  private collectAllWithResolvedIds(): Array<RawImportRow & { id: number | null }> {
+    return this.rawRows.map((raw) => ({
+      ...(raw as RawImportRow),
+      id: this.resolvePointId(raw),
+    }));
+  }
+
   private pointsForMode(
     mode: ReturnMode
   ): Array<RawImportRow & { id: number | null }> {
-    if (mode === "existing") {
-      return this.collect(this.existingMap);
-    }
-    if (mode === "created") {
-      return this.collect(this.insertedMap);
-    }
-    return this.rawRows.map((raw) => {
-      const key = omschrijvingKey(raw);
-      const id = this.existingMap.get(key) ?? this.insertedMap.get(key) ?? null;
-      return { ...(raw as RawImportRow), id };
-    });
+    const collectors: Record<
+      ReturnMode,
+      () => Array<RawImportRow & { id: number | null }>
+    > = {
+      existing: () => this.collect(this.existingMap),
+      created: () => this.collect(this.insertedMap),
+      all: () => this.collectAllWithResolvedIds(),
+    };
+    return collectors[mode]();
   }
 }
 

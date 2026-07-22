@@ -32,19 +32,33 @@ export function createGeometryGraphic(
     resolveGeometryGraphicAttributes(geometry);
   const graphicAttributes = { ...baseAttributes, ...attributes };
 
-  if (geometryType === "polygon") {
+  return buildGraphicForGeometryType({
+    geometryType,
+    coordinates,
+    symbolOptions: finalSymbolOptions,
+    attributes: graphicAttributes,
+  });
+}
+
+function buildGraphicForGeometryType(input: {
+  geometryType: string | undefined;
+  coordinates: number[][];
+  symbolOptions: ReturnType<typeof resolveGeometrySymbolOptions>;
+  attributes: Record<string, unknown>;
+}): Graphic | null {
+  if (input.geometryType === "polygon") {
     return buildPolygonGraphic({
-      coordinates,
-      symbolOptions: finalSymbolOptions,
-      attributes: graphicAttributes,
+      coordinates: input.coordinates,
+      symbolOptions: input.symbolOptions,
+      attributes: input.attributes,
     });
   }
 
-  if (geometryType === "line") {
+  if (input.geometryType === "line") {
     return buildPolylineGraphic({
-      coordinates,
-      symbolOptions: finalSymbolOptions,
-      attributes: graphicAttributes,
+      coordinates: input.coordinates,
+      symbolOptions: input.symbolOptions,
+      attributes: input.attributes,
     });
   }
 

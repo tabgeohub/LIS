@@ -6,11 +6,11 @@ import type { SubmitEditPointDetailsInput } from "./submitEditPointDetailsTypes"
 
 export function submitEditPointDetails(input: SubmitEditPointDetailsInput) {
   if (!input.selectedPoint) return;
-  const payload = buildEditPointDetailsPayload(
-    input.selectedPoint,
-    input.omschrijving,
-    input.comment
-  );
+  const payload = buildEditPointDetailsPayload({
+    selectedPoint: input.selectedPoint,
+    omschrijving: input.omschrijving,
+    comment: input.comment,
+  });
   input.update({
     data: payload,
     onSuccess: (responseData) => {

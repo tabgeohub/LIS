@@ -29,26 +29,28 @@ type SubmitPointCoordinatesInput = Omit<
 };
 
 export function submitPointCoordinateUpdate(input: SubmitPointCoordinatesInput) {
-  const { finalCoords, payload } = buildPointCoordinatePayload(
-    input.selectedPoint,
-    input.coordinateSystem,
-    {
+  const { finalCoords, payload } = buildPointCoordinatePayload({
+    selectedPoint: input.selectedPoint,
+    coordinateSystem: input.coordinateSystem,
+    coords: {
       longitude: input.longitude,
       latitude: input.latitude,
       xcoordinaat_rd: input.xcoordinaat_rd,
       ycoordinaat_rd: input.ycoordinaat_rd,
-    }
-  );
+    },
+  });
 
   input.update({
     data: payload,
     onSuccess: (responseData) => {
-      if (!responseData.result || !input.selectedPlan) return;
+      const selectedPlan = input.selectedPlan;
+      if (!responseData.result || !selectedPlan) return;
       applyPointCoordinateUpdateSuccess({
         ...pickPointCoordinateUpdateContext({
           ...input,
-          selectedPlan: input.selectedPlan,
+          selectedPlan,
         }),
+        selectedPlan,
         finalCoords,
       });
     },

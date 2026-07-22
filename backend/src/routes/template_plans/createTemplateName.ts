@@ -9,7 +9,7 @@ export async function createTemplateName(
 ): Promise<void> {
   const { name } = req.body;
 
-  if (rejectIfMissingFields(res, req.body, ["name"])) {
+  if (rejectIfMissingFields({ res, body: req.body, fields: ["name"] })) {
     return;
   }
 

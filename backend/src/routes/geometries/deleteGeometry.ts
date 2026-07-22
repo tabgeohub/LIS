@@ -23,7 +23,11 @@ export async function deleteGeometry(req: Request, res: Response): Promise<void>
     }
 
     const result = await runInTransaction(async (client) =>
-      deleteGeometryCascade(client, geometryId, removePointIdsFromFlightPlans)
+      deleteGeometryCascade({
+        client,
+        geometryId,
+        removePointIdsFromFlightPlans,
+      })
     );
 
     res.status(200).json({

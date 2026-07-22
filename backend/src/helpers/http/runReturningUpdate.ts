@@ -42,13 +42,8 @@ async function executeReturningUpdate(input: {
 
   try {
     const result = await runQuery();
-
-    if (
-      requireReturnedRow &&
-      result.rows.length === 0 &&
-      config.notFoundMessage
-    ) {
-      notFound(res, config.notFoundMessage);
+    if (shouldReportNotFound(result, requireReturnedRow, config)) {
+      notFound(res, config.notFoundMessage!);
       return;
     }
 
@@ -58,15 +53,33 @@ async function executeReturningUpdate(input: {
       message: config.successMessage,
     });
   } catch (err) {
-    const errText = err instanceof Error ? err.message : String(err);
-    const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
-    serverError({
-      res,
-      logLabel: config.logLabel,
-      message: `${config.errorMessage}${separator}${errText}`,
-      err,
-    });
+    respondWithUpdateError(res, config, err);
   }
+}
+
+function shouldReportNotFound(
+  result: QueryResult,
+  requireReturnedRow: boolean,
+  config: UpdateExecutionConfig
+): boolean {
+  return Boolean(
+    requireReturnedRow && result.rows.length === 0 && config.notFoundMessage
+  );
+}
+
+function respondWithUpdateError(
+  res: Response,
+  config: UpdateExecutionConfig,
+  err: unknown
+): void {
+  const errText = err instanceof Error ? err.message : String(err);
+  const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
+  serverError({
+    res,
+    logLabel: config.logLabel,
+    message: `${config.errorMessage}${separator}${errText}`,
+    err,
+  });
 }
 
 async function runIdGatedReturningUpdate(input: {

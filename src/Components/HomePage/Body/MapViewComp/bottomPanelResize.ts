@@ -4,8 +4,14 @@ export type BottomPanelDragState = {
   startVh: number;
 };
 
-export function clampPanelVh(v: number, min = 20, max = 90) {
-  return Math.max(min, Math.min(max, v));
+export function clampPanelVh(input: {
+  v: number;
+  min?: number;
+  max?: number;
+}) {
+  const min = input.min ?? 20;
+  const max = input.max ?? 90;
+  return Math.max(min, Math.min(max, input.v));
 }
 
 export function computePanelVhFromDrag(input: {
@@ -15,7 +21,7 @@ export function computePanelVhFromDrag(input: {
 }) {
   const deltaY = input.clientY - input.drag.startY;
   const deltaVh = (deltaY / input.innerHeight) * 100;
-  return clampPanelVh(input.drag.startVh - deltaVh);
+  return clampPanelVh({ v: input.drag.startVh - deltaVh });
 }
 
 export function beginBottomPanelDrag(input: {

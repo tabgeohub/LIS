@@ -43,7 +43,13 @@ export function commitGraphicPosition(input: ApplyGraphicPositionInput) {
 }
 
 export function applyGraphicPositionNext(input: ApplyGraphicPositionInput) {
-  if (isNearExistingPoint(input.longitude, input.latitude, input.points)) {
+  if (
+    isNearExistingPoint({
+      lon: input.longitude,
+      lat: input.latitude,
+      points: input.points,
+    })
+  ) {
     toast.error(input.warning);
     return;
   }

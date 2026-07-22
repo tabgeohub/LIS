@@ -5,14 +5,14 @@ import {
   isFetchCanceled,
 } from "./fetchTimesliderPlans";
 
-function resetPlansIdle(
-  setPlans: (p: FinishedFlightPlanType[]) => void,
-  setError: (e: string | null) => void,
-  setLoading: (v: boolean) => void
-) {
-  setPlans([]);
-  setError(null);
-  setLoading(false);
+function resetPlansIdle(input: {
+  setPlans: (p: FinishedFlightPlanType[]) => void;
+  setError: (e: string | null) => void;
+  setLoading: (v: boolean) => void;
+}) {
+  input.setPlans([]);
+  input.setError(null);
+  input.setLoading(false);
 }
 
 export function useTimesliderPlansFetch(input: {
@@ -27,7 +27,7 @@ export function useTimesliderPlansFetch(input: {
 
   useEffect(() => {
     if (!input.enabled || !input.regioId) {
-      resetPlansIdle(setPlans, setError, setLoading);
+      resetPlansIdle({ setPlans, setError, setLoading });
       return;
     }
     const controller = new AbortController();

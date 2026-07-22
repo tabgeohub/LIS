@@ -36,6 +36,6 @@ describe("timeslider range helpers", () => {
     ).toBe(5);
     expect(normalizeSliderValues([8, 2], 10)).toEqual([2, 2]);
     expect(clampFromStep(10, 5)).toBe(4);
-    expect(clampToStep(0, 5, 10)).toBe(6);
+    expect(clampToStep({ step: 0, fromStep: 5, maxStep: 10 })).toBe(6);
   });
 });

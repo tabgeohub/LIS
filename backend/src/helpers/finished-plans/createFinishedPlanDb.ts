@@ -52,13 +52,17 @@ function resolveAttachmentLocation(
   attachment: FinishedPlanAttachment,
   point: FinishedPlanPoint
 ): string | null {
-  if (attachment.lat != null && attachment.long != null) {
-    return `${attachment.lat},${attachment.long}`;
-  }
-  if (point.latitude != null && point.longitude != null) {
-    return `${point.latitude},${point.longitude}`;
-  }
-  return null;
+  const fromAttachment = formatLatLongPair(attachment.lat, attachment.long);
+  if (fromAttachment) return fromAttachment;
+  return formatLatLongPair(point.latitude, point.longitude);
+}
+
+function formatLatLongPair(
+  lat: number | null | undefined,
+  long: number | null | undefined
+): string | null {
+  if (lat == null || long == null) return null;
+  return `${lat},${long}`;
 }
 
 /**
@@ -179,6 +183,17 @@ class FinishedPlanWriter {
     attachment: FinishedPlanAttachment
   ): Promise<void> {
     const realPointId = this.realIdOf(point);
+    const attId = await this.insertAttachmentRow(realPointId, point, attachment);
+    if (attId) {
+      this.attachmentIdsByPointId[realPointId].push(attId);
+    }
+  }
+
+  private async insertAttachmentRow(
+    realPointId: number,
+    point: FinishedPlanPoint,
+    attachment: FinishedPlanAttachment
+  ): Promise<number | undefined> {
     const ins = await this.client.query(
       `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
        VALUES ($1, $2, $3, $4, $5)
@@ -191,10 +206,7 @@ class FinishedPlanWriter {
         resolveAttachmentLocation(attachment, point),
       ]
     );
-    const attId = ins.rows?.[0]?.id;
-    if (attId) {
-      this.attachmentIdsByPointId[realPointId].push(attId);
-    }
+    return ins.rows?.[0]?.id;
   }
 
   private async insertFinishedRows(): Promise<void> {

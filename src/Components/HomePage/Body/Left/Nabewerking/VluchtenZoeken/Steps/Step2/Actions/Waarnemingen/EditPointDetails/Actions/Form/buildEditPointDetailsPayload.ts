@@ -1,11 +1,12 @@
 import type { FinishedPointType } from "Types/finished_plans";
 import type { EditPointDetailsPayload } from "./editPointDetailsPayload";
 
-export function buildEditPointDetailsPayload(
-  selectedPoint: FinishedPointType,
-  omschrijving: string,
-  comment: string
-): EditPointDetailsPayload {
+export function buildEditPointDetailsPayload(input: {
+  selectedPoint: FinishedPointType;
+  omschrijving: string;
+  comment: string;
+}): EditPointDetailsPayload {
+  const { selectedPoint, omschrijving, comment } = input;
   return {
     omschrijving,
     regio_id: selectedPoint.regio_id,

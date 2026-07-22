@@ -29,29 +29,37 @@ function parseOptionalPlanId(value: string | null) {
     : { ok: true as const, value: parsed };
 }
 
+function isTimesliderKind(
+  kind: string | null
+): kind is "point" | "geometry" {
+  return kind === "point" || kind === "geometry";
+}
+
+function failTimesliderQuery(reason: string): ParsedTimesliderQuery {
+  return { ok: false, reason };
+}
+
 export function parseTimesliderImageQuery(
   searchParams: URLSearchParams
 ): ParsedTimesliderQuery {
   const kind = searchParams.get("kind");
-  const idStr = searchParams.get("id");
+  if (!isTimesliderKind(kind)) {
+    return failTimesliderQuery("Ongeldige link (kind).");
+  }
+
+  const id = parsePositiveId(searchParams.get("id"));
+  if (id === null) {
+    return failTimesliderQuery("Ongeldige link (id).");
+  }
+
   const from = searchParams.get("from");
   const to = searchParams.get("to");
-
-  if (kind !== "point" && kind !== "geometry") {
-    return { ok: false, reason: "Ongeldige link (kind)." };
-  }
-
-  const id = parsePositiveId(idStr);
-  if (id === null) {
-    return { ok: false, reason: "Ongeldige link (id)." };
-  }
-
   if (!hasDateFormat(from) || !hasDateFormat(to)) {
-    return { ok: false, reason: "Ongeldige link (periode)." };
+    return failTimesliderQuery("Ongeldige link (periode).");
   }
 
   const planId = parseOptionalPlanId(searchParams.get("plan_id"));
-  if (!planId.ok) return { ok: false, reason: "Ongeldige link (plan_id)." };
+  if (!planId.ok) return failTimesliderQuery("Ongeldige link (plan_id).");
 
   return { ok: true, kind, id, from, to, planId: planId.value };
 }

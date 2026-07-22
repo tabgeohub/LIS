@@ -1,13 +1,14 @@
 import type { PoolClient } from "pg";
 
-export async function deleteGeometryPointChildren(
-  client: PoolClient,
-  pointIds: number[],
+export async function deleteGeometryPointChildren(input: {
+  client: PoolClient;
+  pointIds: number[];
   removePointIdsFromFlightPlans: (
     client: PoolClient,
     pointIds: number[]
-  ) => Promise<unknown>
-) {
+  ) => Promise<unknown>;
+}) {
+  const { client, pointIds, removePointIdsFromFlightPlans } = input;
   if (pointIds.length === 0) return;
 
   await client.query(
@@ -22,24 +23,25 @@ export async function deleteGeometryPointChildren(
 }
 
 /** Delete child rows for points belonging to a geometry, then the geometry. */
-export async function deleteGeometryCascade(
-  client: PoolClient,
-  geometryId: number,
+export async function deleteGeometryCascade(input: {
+  client: PoolClient;
+  geometryId: number;
   removePointIdsFromFlightPlans: (
     client: PoolClient,
     pointIds: number[]
-  ) => Promise<unknown>
-) {
+  ) => Promise<unknown>;
+}) {
+  const { client, geometryId, removePointIdsFromFlightPlans } = input;
   const pointsResult = await client.query(
     `SELECT id FROM lis.points WHERE geometry_id = $1`,
     [geometryId]
   );
   const pointIds = pointsResult.rows.map((row) => row.id);
-  await deleteGeometryPointChildren(
+  await deleteGeometryPointChildren({
     client,
     pointIds,
-    removePointIdsFromFlightPlans
-  );
+    removePointIdsFromFlightPlans,
+  });
 
   const pointsDeleteResult = await client.query(
     `DELETE FROM lis.points WHERE geometry_id = $1`,

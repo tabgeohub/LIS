@@ -18,19 +18,23 @@ function respondMissingVerifyFields(res: Response) {
   });
 }
 
-function respondVerifyError(req: Request, res: Response, error: unknown) {
+function respondVerifyError(input: {
+  req: Request;
+  res: Response;
+  error: unknown;
+}) {
   logAuthSecurityEvent({
     event: "auth2.verify.error",
-    meta: { message: (error as Error)?.message },
-    req,
+    meta: { message: (input.error as Error)?.message },
+    req: input.req,
   });
-  return res.status(500).json({
+  return input.res.status(500).json({
     success: false,
     status: "error",
     message: "Login failed",
     error:
       process.env.NODE_ENV !== "production"
-        ? (error as Error)?.message
+        ? (input.error as Error)?.message
         : undefined,
   });
 }
@@ -61,6 +65,6 @@ export const verifyCredentialsHandler: RequestHandler = async (req, res) => {
       otpStatusUnknown: decision.otpStatusUnknown,
     });
   } catch (error: unknown) {
-    return respondVerifyError(req, res, error);
+    return respondVerifyError({ req, res, error });
   }
 };

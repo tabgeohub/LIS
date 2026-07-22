@@ -46,6 +46,6 @@ export default function SelectedPointDetails() {
     </div>
     <SelectedPointActions actions={actions} />
     <p className="text-lg text-gray-500 my-2">{labels.details}</p>
-    <SelectedPointDetailsList details={buildSelectedPointDetails(clickedPoint, activities, organizations)} />
+    <SelectedPointDetailsList details={buildSelectedPointDetails({ point: clickedPoint, activities, organizations })} />
   </div>;
 }

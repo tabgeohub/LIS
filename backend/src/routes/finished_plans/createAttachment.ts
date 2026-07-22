@@ -12,12 +12,11 @@ export async function createAttachment(
   const { url, pointId, attachmentId, taken_at, long, lat } = req.body;
 
   if (
-    rejectIfMissingFields(res, req.body, [
-      "pointId",
-      "attachmentId",
-      "taken_at",
-      "url",
-    ])
+    rejectIfMissingFields({
+      res,
+      body: req.body,
+      fields: ["pointId", "attachmentId", "taken_at", "url"],
+    })
   ) {
     return;
   }

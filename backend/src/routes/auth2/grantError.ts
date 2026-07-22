@@ -23,21 +23,16 @@ type GrantErrorLike = {
 function readDirectGrantError(error: unknown) {
   const err = error as GrantErrorLike;
   const messageText = String(err?.message || "");
+  const body = err?.response?.body;
   return {
-    errorCode: err?.error || err?.response?.body?.error || "",
+    errorCode: err?.error || body?.error || "",
     errorDescription:
-      err?.error_description ||
-      err?.response?.body?.error_description ||
-      err?.message ||
-      "",
+      err?.error_description || body?.error_description || err?.message || "",
     messageText,
   };
 }
 
-function readEmbeddedGrantError(messageText: string) {
-  const embeddedJson = messageText.match(/\{[\s\S]*\}/)?.[0];
-  const candidates = [messageText, embeddedJson].filter(Boolean) as string[];
-
+function firstParsedGrantError(candidates: string[]) {
   for (const candidate of candidates) {
     const parsed = tryParseJsonObject(candidate);
     if (parsed) {
@@ -47,8 +42,13 @@ function readEmbeddedGrantError(messageText: string) {
       };
     }
   }
-
   return { errorCode: "", errorDescription: "" };
+}
+
+function readEmbeddedGrantError(messageText: string) {
+  const embeddedJson = messageText.match(/\{[\s\S]*\}/)?.[0];
+  const candidates = [messageText, embeddedJson].filter(Boolean) as string[];
+  return firstParsedGrantError(candidates);
 }
 
 export function extractGrantError(error: unknown): GrantErrorDetails {

@@ -25,9 +25,26 @@ export function buildTimesliderPageStatus(input: TimesliderPageStatusInput) {
   return { blockImages, plansEmptyHint, emptyMain };
 }
 
+type PlansEmptyHintRule = {
+  matches: (input: TimesliderPageStatusInput) => boolean;
+  hint: (input: TimesliderPageStatusInput) => string | undefined;
+};
+
+const PLANS_EMPTY_HINT_RULES: PlansEmptyHintRule[] = [
+  {
+    matches: (input) => input.invalidQuery,
+    hint: (input) => input.queryError ?? undefined,
+  },
+  {
+    matches: (input) => input.needsAuth,
+    hint: () => "Log in om plannen te laden.",
+  },
+];
+
 function resolvePlansEmptyHint(input: TimesliderPageStatusInput) {
-  if (input.invalidQuery) return input.queryError ?? undefined;
-  if (input.needsAuth) return "Log in om plannen te laden.";
+  for (const rule of PLANS_EMPTY_HINT_RULES) {
+    if (rule.matches(input)) return rule.hint(input);
+  }
   return input.plansError ?? undefined;
 }
 

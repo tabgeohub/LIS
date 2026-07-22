@@ -94,8 +94,8 @@ const downloadWithPasswordHandler: RequestHandler<
   const password = String(req.body?.password || "");
   const filename = resolvePasswordDownloadFilename(req, res);
   if (!filename) return;
-  if (sendPasswordGateFailure(res, filename, password)) return;
-  sendVerifiedDownload(res, filename);
+  if (sendPasswordGateFailure({ res, filename, password })) return;
+  sendVerifiedDownload({ res, filename });
 };
 
 router.post(

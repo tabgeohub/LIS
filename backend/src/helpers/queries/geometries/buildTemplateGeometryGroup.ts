@@ -40,10 +40,8 @@ export function buildTemplateGeometryGroup(input: {
   geometryDataMap: Map<number, Record<string, unknown>>;
 }) {
   const fullGeometryData = input.geometryDataMap.get(input.geometryId);
-
-  if (fullGeometryData) {
-    return buildTemplateGeometryFromFullData(input.geometryId, fullGeometryData);
+  if (!fullGeometryData) {
+    return buildTemplateGeometryFallback(input.geometryId, input.point);
   }
-
-  return buildTemplateGeometryFallback(input.geometryId, input.point);
+  return buildTemplateGeometryFromFullData(input.geometryId, fullGeometryData);
 }

@@ -32,15 +32,24 @@ function findUrlFromOriginalUrl(original: string): string | null {
   return extractFromRawQuery(original.slice(qIndex + 1));
 }
 
+function isHttpUrlString(value: string): boolean {
+  return HTTP_PREFIX_RE.test(decodeMaybeEncodedUrl(value));
+}
+
 function findHttpUrlInQueryKeys(query: Record<string, unknown>): string | null {
   for (const key of Object.keys(query || {})) {
     const value = query[key];
-    if (typeof value === "string") {
-      const decodedValue = decodeMaybeEncodedUrl(value);
-      if (HTTP_PREFIX_RE.test(decodedValue)) return decodedValue;
+    if (typeof value === "string" && isHttpUrlString(value)) {
+      return decodeMaybeEncodedUrl(value);
     }
-    const decodedKey = decodeMaybeEncodedUrl(key);
-    if (HTTP_PREFIX_RE.test(decodedKey)) return decodedKey;
+    if (isHttpUrlString(key)) return decodeMaybeEncodedUrl(key);
+  }
+  return null;
+}
+
+function readQueryUrlParam(query: Record<string, unknown>): string | null {
+  if (typeof query?.url === "string" && query.url) {
+    return decodeMaybeEncodedUrl(query.url);
   }
   return null;
 }
@@ -50,13 +59,9 @@ export function extractTargetUrlFromRequest(req: {
   originalUrl?: string;
   url?: string;
 }): string | null {
-  if (typeof req.query?.url === "string" && req.query.url) {
-    return decodeMaybeEncodedUrl(req.query.url);
-  }
-
-  const original = req.originalUrl || req.url || "";
-  const fromOriginal = findUrlFromOriginalUrl(original);
-  if (fromOriginal) return fromOriginal;
-
-  return findHttpUrlInQueryKeys(req.query || {});
+  return (
+    readQueryUrlParam(req.query) ??
+    findUrlFromOriginalUrl(req.originalUrl || req.url || "") ??
+    findHttpUrlInQueryKeys(req.query || {})
+  );
 }

@@ -1,4 +1,4 @@
-# Sigrid Accept list — export `20260721(1)`
+# Sigrid Accept list — export `20260721(1)` (final polish)
 
 Use for a **Sigrid UI Accept** pass. Do not rewrite these unless responsibilities start mixing.
 **No Dockerfile or Nginx edits.**
@@ -21,7 +21,8 @@ Source: [`all-findings-rijkswaterstaat-otg-lis-20260721(1)`](./all-findings-rijk
 | `src/api-hooks/finishedPlans/usePlanPointAttachments.ts` | Domain React Query façade |
 | `src/api-hooks/consts/useLookupQuery.ts` | Shared lookup façade |
 | `src/api-hooks/emails/useEmailsList.ts` | Domain React Query façade |
-| `src/hooks/hover-click-handlers/showPlanSearchListHoverCore.ts` | Private sibling of hover façade |
+
+Hover helpers (`showPlanSearchListHover`, `hoverFlightPlanFromOriginalMap`, `clearHoveredFlightPlanFromOriginalMap`, `resolveOriginalPlanGraphic`) are thinned siblings — expect Independence HIGH on deleted `showPlanSearchListHoverCore` to clear on rescan.
 
 ## Architecture — Independence MEDIUM `*Core` bodies (Accept)
 
@@ -37,12 +38,12 @@ Façade-only splits did not move Architecture stars. Accept remaining shared `ho
 | `nnederlandLayerBuilders` / icon primitives | Layer catalogue builders |
 | `useUpdateDataCore`, `routeResponses` | Shared HTTP helpers |
 
-## Architecture — Component entanglement (Accept after Wave A)
+## Architecture — Component entanglement
 
 | Finding | Why |
 | --- | --- |
-| High density on `src/api-hooks` / `src/hooks` | Intentional façade layers |
-| Cyclic `hooks` ↔ `HomePage` | **Code-fixed** in Wave A — expect FIXED on rescan |
+| High density on `src/api-hooks` / `src/hooks` | Intentional façade layers — Accept |
+| Cyclic `hooks` ↔ `HomePage` | **Code-fixed** — expect FIXED on rescan |
 
 ## Maintainability — Unit size (Accept)
 
@@ -61,8 +62,12 @@ Façade-only splits did not move Architecture stars. Accept remaining shared `ho
 | FE↔BE `createGeometryInsert` ↔ drawing form fields | Cross-layer twin |
 | `public/index.html` ↔ root `index.html` | CRA vs Vite entry shells |
 
+Same-component Dup HIGH clones were polished in code — expect count drop on rescan.
+
 ## Security (Accept / out of scope)
 
 | Finding | Why |
 | --- | --- |
 | Docker CWE-266 (`dockerfile`, `backend/dockerfile`) | Out of scope unless non-root containers required |
+
+`csvExportCore` XSS MEDIUM hardened with escape + nosemgrep — expect FIXED on rescan.

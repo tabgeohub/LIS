@@ -5,6 +5,13 @@ import {
   GalleryLocationButton,
 } from "./ImageGalleryToolbarButtons";
 
+function resolveActiveLocation(
+  attachments: AttachmentType[],
+  activeIndex: number
+): string | undefined {
+  return attachments[activeIndex]?.location;
+}
+
 export function ImageGalleryToolbar(props: {
   attachments: AttachmentType[];
   activeIndex: number;
@@ -12,13 +19,13 @@ export function ImageGalleryToolbar(props: {
   onDelete?: () => void;
   onShowLocation?: (location: string) => void;
 }) {
-  const location = props.attachments[props.activeIndex]?.location;
-  const showLocation = Boolean(props.onShowLocation && location);
+  const location = resolveActiveLocation(props.attachments, props.activeIndex);
+  const canShowLocation = Boolean(props.onShowLocation && location);
 
   return (
     <>
       <GalleryCloseButton onClose={props.onClose} />
-      {showLocation && location && props.onShowLocation && (
+      {canShowLocation && location && props.onShowLocation && (
         <GalleryLocationButton
           location={location}
           onShowLocation={props.onShowLocation}
@@ -27,7 +34,7 @@ export function ImageGalleryToolbar(props: {
       {props.onDelete && (
         <GalleryDeleteButton
           onDelete={props.onDelete}
-          showLocation={showLocation}
+          showLocation={canShowLocation}
         />
       )}
     </>

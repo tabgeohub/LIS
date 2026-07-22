@@ -29,6 +29,24 @@ function addWrappedTable(input: {
   });
 }
 
+function boldCell(content: string) {
+  return { content, styles: { fontStyle: "bold" as const } };
+}
+
+function italicCell(content: string) {
+  return { content, styles: { fontStyle: "italic" as const } };
+}
+
+function pilootLabel(
+  pointData: PDFPointDataType,
+  pilootOptions: { label: string; value: string }[]
+): string {
+  if (pointData.piloot === "") return "-";
+  return (
+    pilootOptions.find((p) => p.value === pointData.piloot)?.label || "-"
+  );
+}
+
 export function addGeneralInfoTable(input: {
   doc: jsPDF;
   pointData: PDFPointDataType;
@@ -41,77 +59,66 @@ export function addGeneralInfoTable(input: {
     textColor: 0,
     body: [
       [
-        { content: "Datum:", styles: { fontStyle: "bold" } },
+        boldCell("Datum:"),
         new Date(input.pointData.datum).toLocaleDateString(),
-        { content: "Piloot:", styles: { fontStyle: "bold" } },
-        input.pointData.piloot !== ""
-          ? input.pilootOptions.find((p) => p.value === input.pointData.piloot)?.label || "-"
-          : "-",
+        boldCell("Piloot:"),
+        pilootLabel(input.pointData, input.pilootOptions),
       ],
       [
-        { content: "Luchtvaartuig:", styles: { fontStyle: "bold" } },
+        boldCell("Luchtvaartuig:"),
         input.pointData.luchtvaartuig || "-",
-        { content: "Waarnemer:", styles: { fontStyle: "bold" } },
+        boldCell("Waarnemer:"),
         input.pointData.waarnemer || "-",
       ],
     ],
   });
 }
 
-export function addCoordinatesTable(doc: jsPDF, pointData: PDFPointDataType) {
-  const coordsStart = doc.lastAutoTable.finalY + 8;
+export function addCoordinatesTable(input: {
+  doc: jsPDF;
+  pointData: PDFPointDataType;
+}) {
+  const coordsStart = input.doc.lastAutoTable.finalY + 8;
   addWrappedTable({
-    doc,
+    doc: input.doc,
     startY: coordsStart,
     body: [
       [
-        { content: "Tijd:", styles: { fontStyle: "bold" } },
-        (pointData as { tijd?: string }).tijd || "-",
+        boldCell("Tijd:"),
+        (input.pointData as { tijd?: string }).tijd || "-",
         "",
         "",
       ],
       [
-        { content: "Coördinaten:", styles: { fontStyle: "bold" } },
-        { content: "RD:", styles: { fontStyle: "italic" } },
-        `X: ${pointData.rdX?.toFixed(3)}  Y: ${pointData.rdY?.toFixed(3)}`,
+        boldCell("Coördinaten:"),
+        italicCell("RD:"),
+        `X: ${input.pointData.rdX?.toFixed(3)}  Y: ${input.pointData.rdY?.toFixed(3)}`,
         "",
       ],
       [
         "",
-        { content: "WGS:", styles: { fontStyle: "italic" } },
-        `NB: ${pointData.lat?.toFixed(3)}  OL: ${pointData.long?.toFixed(3)}`,
+        italicCell("WGS:"),
+        `NB: ${input.pointData.lat?.toFixed(3)}  OL: ${input.pointData.long?.toFixed(3)}`,
         "",
       ],
     ],
   });
 }
 
-export function addDetailTable(doc: jsPDF, pointData: PDFPointDataType) {
-  const detailStart = doc.lastAutoTable.finalY + 8;
+export function addDetailTable(input: {
+  doc: jsPDF;
+  pointData: PDFPointDataType;
+}) {
+  const detailStart = input.doc.lastAutoTable.finalY + 8;
   addWrappedTable({
-    doc,
+    doc: input.doc,
     startY: detailStart,
     body: [
-      [
-        { content: "Activiteit:", styles: { fontStyle: "bold" } },
-        pointData.activiteit || "-",
-      ],
-      [
-        { content: "Organisatie:", styles: { fontStyle: "bold" } },
-        pointData.organisatie || "-",
-      ],
-      [
-        { content: "Regio:", styles: { fontStyle: "bold" } },
-        pointData.regio || "-",
-      ],
-      [
-        { content: "Omschrijving:", styles: { fontStyle: "bold" } },
-        pointData.omschrijving || "-",
-      ],
-      [
-        { content: "Aanvullende informatie:", styles: { fontStyle: "bold" } },
-        pointData.aanvullende || "-",
-      ],
+      [boldCell("Activiteit:"), input.pointData.activiteit || "-"],
+      [boldCell("Organisatie:"), input.pointData.organisatie || "-"],
+      [boldCell("Regio:"), input.pointData.regio || "-"],
+      [boldCell("Omschrijving:"), input.pointData.omschrijving || "-"],
+      [boldCell("Aanvullende informatie:"), input.pointData.aanvullende || "-"],
     ],
   });
 }

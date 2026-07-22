@@ -25,22 +25,23 @@ export type FotoAttachmentDeleteInput = {
   }) => void;
 };
 
-export function commitFotoAttachmentDelete(
-  input: FotoAttachmentDeleteInput,
-  newAttachments: AttachmentType[],
-  newIndex: number
-) {
-  input.update({
+export function commitFotoAttachmentDelete(input: {
+  context: FotoAttachmentDeleteInput;
+  newAttachments: AttachmentType[];
+  newIndex: number;
+}) {
+  const { context, newAttachments, newIndex } = input;
+  context.update({
     data: {
-      point_id: input.attachmentPoint.id,
-      plan_id: input.selectedPlan.id,
+      point_id: context.attachmentPoint.id,
+      plan_id: context.selectedPlan.id,
       attachments_id: newAttachments.flatMap((a) => a.id),
     },
     onSuccess: () => {
-      input.setActiveIndex(newIndex);
-      input.onAttachmentsUpdated(newAttachments);
-      input.setLoading(false);
+      context.setActiveIndex(newIndex);
+      context.onAttachmentsUpdated(newAttachments);
+      context.setLoading(false);
     },
-    onError: () => input.setLoading(false),
+    onError: () => context.setLoading(false),
   });
 }

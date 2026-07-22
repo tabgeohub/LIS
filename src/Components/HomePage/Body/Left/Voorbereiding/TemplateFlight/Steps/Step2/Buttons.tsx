@@ -3,12 +3,8 @@ import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import {
-  createWizardFilterStepNext,
-  createWizardSelectionGraphicsControls,
-} from "../../../common/wizardFilterStepSelection";
+import { useFilterStepWizardSelection } from "../../../common/useFilterStepWizardSelection";
 import {
   runTemplateFlightCancelCleanup,
   runTemplateFlightPreviousCleanup,
@@ -20,26 +16,25 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
   const { resetFeatures } = useResetFeatures();
-  const { withLog, labels } = useWizardButtons("Second step");
-  const { selectionGraphics, clearSelectionGraphics } =
-    createWizardSelectionGraphicsControls({
-      mapView,
-      selectedGraphics: store.selectedGraphics,
-      setSelectedGraphics: store.setSelectedGraphics,
-      hoveredGraphic: store.hoveredGraphic,
-      setHoveredGraphic: store.setHoveredGraphic,
+  const { labels, withLog, clearSelectionGraphics, handleNext } =
+    useFilterStepWizardSelection({
+      selection: {
+        mapView,
+        selectedGraphics: store.selectedGraphics,
+        setSelectedGraphics: store.setSelectedGraphics,
+        hoveredGraphic: store.hoveredGraphic,
+        setHoveredGraphic: store.setHoveredGraphic,
+      },
+      step: store.step,
+      setStep: store.setStep,
+      resetFilters,
+      clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
     });
   return {
     labels,
     withLog,
     setOpenFilter,
-    handleNext: createWizardFilterStepNext({
-      step: store.step,
-      setStep: store.setStep,
-      resetFilters,
-      selectionGraphics,
-      clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
-    }),
+    handleNext,
     handlePrevious: () =>
       runTemplateFlightPreviousCleanup({
         previousStep: 1,

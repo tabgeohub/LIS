@@ -9,19 +9,31 @@ export type NavigateToLocationInput = {
   redGraphicsLayer: GraphicsLayer | null | undefined;
 };
 
+function parseLatLongPair(
+  location: string
+): { lat: number; long: number } | null {
+  const [lat, long] = location.split(",").map(Number);
+  if (isNaN(lat) || isNaN(long)) return null;
+  return { lat, long };
+}
+
+function buildWgs84Point(lat: number, long: number): Point {
+  return new Point({
+    longitude: long,
+    latitude: lat,
+    spatialReference: { wkid: 4326 },
+  });
+}
+
 export function navigateToLocation(input: NavigateToLocationInput) {
   const { location, mapView, redGraphicsLayer } = input;
   if (!location || !mapView) return;
 
   try {
-    const [lat, long] = location.split(",").map(Number);
-    if (isNaN(lat) || isNaN(long)) return;
+    const coords = parseLatLongPair(location);
+    if (!coords) return;
 
-    const point = new Point({
-      longitude: long,
-      latitude: lat,
-      spatialReference: { wkid: 4326 },
-    });
+    const point = buildWgs84Point(coords.lat, coords.long);
     mapView.goTo({ target: point, zoom: 15 });
     if (redGraphicsLayer) replaceImageLocationMarker(redGraphicsLayer, point);
   } catch (error) {

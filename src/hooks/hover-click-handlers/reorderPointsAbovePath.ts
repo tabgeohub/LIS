@@ -1,10 +1,11 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
-export function reorderPointsAbovePath(
-  map: __esri.Map,
-  pathLayer: FeatureLayer,
-  pointsGraphicsLayer?: __esri.GraphicsLayer | null
-) {
+export function reorderPointsAbovePath(input: {
+  map: __esri.Map;
+  pathLayer: FeatureLayer;
+  pointsGraphicsLayer?: __esri.GraphicsLayer | null;
+}) {
+  const { map, pathLayer, pointsGraphicsLayer } = input;
   if (
     !pointsGraphicsLayer ||
     !map.layers.includes(pointsGraphicsLayer) ||

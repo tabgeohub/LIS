@@ -56,6 +56,10 @@ export function clampFromStep(step: number, toStep: number) {
   return Math.max(0, Math.min(step, toStep - 1));
 }
 
-export function clampToStep(step: number, fromStep: number, maxStep: number) {
-  return Math.min(maxStep, Math.max(step, fromStep + 1));
+export function clampToStep(input: {
+  step: number;
+  fromStep: number;
+  maxStep: number;
+}) {
+  return Math.min(input.maxStep, Math.max(input.step, input.fromStep + 1));
 }

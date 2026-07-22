@@ -36,8 +36,8 @@ export default function DropDown({
     setOpenSideBar(false);
   };
 
-  const zoomToPoint = () => zoomMapToFlightPlan(mapView, flightPlan);
-  const goToPoint = () => panMapToFlightPlan(mapView, flightPlan);
+  const zoomToPoint = () => zoomMapToFlightPlan({ mapView, flightPlan });
+  const goToPoint = () => panMapToFlightPlan({ mapView, flightPlan });
 
   const { deleteData } = useDeleteData("/flightPlans");
 

@@ -28,11 +28,12 @@ export function resolvePasswordDownloadFilename(
   });
 }
 
-export function sendPasswordGateFailure(
-  res: Parameters<RequestHandler>[1],
-  filename: string,
-  password: string
-): boolean {
+export function sendPasswordGateFailure(input: {
+  res: Parameters<RequestHandler>[1];
+  filename: string;
+  password: string;
+}): boolean {
+  const { res, filename, password } = input;
   const actionPath = buildDownloadActionPath(filename);
 
   if (!hasPassword(filename)) {
@@ -54,10 +55,11 @@ export function sendPasswordGateFailure(
   return false;
 }
 
-export function sendVerifiedDownload(
-  res: Parameters<RequestHandler>[1],
-  filename: string
-): void {
+export function sendVerifiedDownload(input: {
+  res: Parameters<RequestHandler>[1];
+  filename: string;
+}): void {
+  const { res, filename } = input;
   const filePath = path.join(uploadDir, filename);
   if (!fs.existsSync(filePath)) {
     res.status(404).send("❌ Bestand niet gevonden");

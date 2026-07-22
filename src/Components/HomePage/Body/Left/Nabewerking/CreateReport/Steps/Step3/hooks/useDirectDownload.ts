@@ -13,28 +13,42 @@ type UseDirectDownloadInput = {
   fail: (msg: string) => void;
 };
 
+function toDirectDownloadUrl(fileDownloadUrl: string): string {
+  return fileDownloadUrl.replace(
+    "/api/file-download/",
+    "/api/direct-download/"
+  );
+}
+
+function resolveDownloadErrorMessage(
+  error: unknown,
+  fallback: string
+): string {
+  if (error instanceof Error && error.message.startsWith("Download failed")) {
+    return error.message;
+  }
+  return fallback;
+}
+
 export function useDirectDownload(input: UseDirectDownloadInput) {
   const { downloadInfo, setErrorMsg, fail } = input;
   const content = useContent();
   const [isDownloading, setIsDownloading] = useState(false);
+  const fallbackError =
+    content.nabewerking.createReport.step3.toasts.error ||
+    "Er is iets misgegaan bij het downloaden.";
 
   const handleDirectDownload = async () => {
     if (!downloadInfo?.url || isDownloading) return;
     setIsDownloading(true);
     setErrorMsg(null);
     try {
-      const directUrl = downloadInfo.url.replace(
-        "/api/file-download/",
-        "/api/direct-download/"
+      const blob = await fetchDirectDownloadBlob(
+        toDirectDownloadUrl(downloadInfo.url)
       );
-      const blob = await fetchDirectDownloadBlob(directUrl);
       await downloadBlobAsFile(downloadInfo.filename, blob);
     } catch (e: any) {
-      const msg =
-        e instanceof Error && e.message.startsWith("Download failed")
-          ? e.message
-          : content.nabewerking.createReport.step3.toasts.error ||
-            "Er is iets misgegaan bij het downloaden.";
+      const msg = resolveDownloadErrorMessage(e, fallbackError);
       fail(msg);
       toast.error(msg);
     } finally {

@@ -1,6 +1,7 @@
 import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
 import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
 import { goBackFromPlanInformation } from "Components/HomePage/Body/Left/Common/goBackFromPlanInformation";
+import { formatPlanSpoedLabel } from "Components/HomePage/Body/Left/Common/formatPlanSpoedLabel";
 
 export default function PlanInformation({
   selectedPlan,
@@ -11,7 +12,7 @@ export default function PlanInformation({
     <div className="space-y-3 p-3">
       <PlanInformationFields
         plan={selectedPlan}
-        urgentValue={selectedPlan.spoed ? "Ja" : "Nee"}
+        urgentValue={formatPlanSpoedLabel(selectedPlan.spoed)}
       />
 
       <div className="flex justify-end gap-x-1 text-[12px] !mt-6">

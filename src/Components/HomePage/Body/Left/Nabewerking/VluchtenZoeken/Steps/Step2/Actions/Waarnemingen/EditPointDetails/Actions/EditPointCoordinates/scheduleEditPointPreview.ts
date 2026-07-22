@@ -10,22 +10,39 @@ export type ScheduleEditPointPreviewInput = {
   latitude: number;
 };
 
+function canSchedulePreview(input: ScheduleEditPointPreviewInput): boolean {
+  return Boolean(
+    input.mapView &&
+      input.redGraphicsLayer &&
+      input.pointsGraphicsLayer &&
+      input.selectedPoint &&
+      input.longitude &&
+      input.latitude
+  );
+}
+
 export function scheduleEditPointPreview(
   input: ScheduleEditPointPreviewInput
 ): (() => void) | undefined {
-  const { mapView, redGraphicsLayer, pointsGraphicsLayer, selectedPoint } =
-    input;
-  if (!mapView || !redGraphicsLayer || !pointsGraphicsLayer || !selectedPoint)
-    return;
-  if (!input.longitude || !input.latitude) return;
+  if (!canSchedulePreview(input)) return;
+
+  const {
+    mapView,
+    redGraphicsLayer,
+    pointsGraphicsLayer,
+    selectedPoint,
+    longitude,
+    latitude,
+  } = input;
+
   const timeoutId = setTimeout(() => {
     updatePreviewGraphics({
-      mapView,
-      redGraphicsLayer,
-      pointsGraphicsLayer,
-      point: selectedPoint,
-      longitude: input.longitude,
-      latitude: input.latitude,
+      mapView: mapView!,
+      redGraphicsLayer: redGraphicsLayer!,
+      pointsGraphicsLayer: pointsGraphicsLayer!,
+      point: selectedPoint!,
+      longitude,
+      latitude,
     });
   }, 300);
   return () => clearTimeout(timeoutId);

@@ -40,6 +40,21 @@ type SplitPointsOptions<T> = {
   addPointToGeometry: (group: T, point: RawPoint) => void;
 };
 
+function assignPointToGeometryGroup<T>(
+  point: RawPoint,
+  geometriesMap: Map<number, T>,
+  options: SplitPointsOptions<T>
+): void {
+  const geometryId = point.geometry_id!;
+  if (!geometriesMap.has(geometryId)) {
+    geometriesMap.set(
+      geometryId,
+      options.createGeometryGroup(point, geometryId)
+    );
+  }
+  options.addPointToGeometry(geometriesMap.get(geometryId)!, point);
+}
+
 function splitPointsByGeometry<T>(
   points: RawPoint[],
   options: SplitPointsOptions<T>
@@ -48,20 +63,11 @@ function splitPointsByGeometry<T>(
   const geometriesMap = new Map<number, T>();
 
   points.forEach((point) => {
-    if (point.geometry_id) {
-      const geometryId = point.geometry_id;
-
-      if (!geometriesMap.has(geometryId)) {
-        geometriesMap.set(
-          geometryId,
-          options.createGeometryGroup(point, geometryId)
-        );
-      }
-
-      options.addPointToGeometry(geometriesMap.get(geometryId)!, point);
-    } else {
+    if (!point.geometry_id) {
       standalonePoints.push(stripGeometryFields(point));
+      return;
     }
+    assignPointToGeometryGroup(point, geometriesMap, options);
   });
 
   return {
@@ -70,20 +76,32 @@ function splitPointsByGeometry<T>(
   };
 }
 
+function createPlanGeometryGroup(
+  point: RawPoint,
+  geometryId: number
+): GeometryGroup {
+  return {
+    id: geometryId,
+    type: point.geometry_type ?? null,
+    omschrijving: point.geometry_omschrijving ?? null,
+    points: [],
+  };
+}
+
+function addStrippedPointToGroup(group: GeometryGroup, point: RawPoint): void {
+  group.points.push(stripGeometryFields(point));
+}
+
 export function formatPlansWithGeometries(plans: Record<string, unknown>[]) {
   return plans.map((plan) => {
     const points = (plan.points as RawPoint[] | null) ?? [];
-    const { standalonePoints, geometries } = splitPointsByGeometry<GeometryGroup>(points, {
-      createGeometryGroup: (point, geometryId): GeometryGroup => ({
-        id: geometryId,
-        type: point.geometry_type ?? null,
-        omschrijving: point.geometry_omschrijving ?? null,
-        points: [],
-      }),
-      addPointToGeometry: (group, point) => {
-        group.points.push(stripGeometryFields(point));
-      },
-    });
+    const { standalonePoints, geometries } = splitPointsByGeometry<GeometryGroup>(
+      points,
+      {
+        createGeometryGroup: createPlanGeometryGroup,
+        addPointToGeometry: addStrippedPointToGroup,
+      }
+    );
 
     return {
       ...plan,
@@ -144,6 +162,25 @@ type FinishedGeometryGroup = {
   points: Record<string, unknown>[];
 };
 
+function createFinishedGeometryGroup(
+  point: RawPoint,
+  geometryId: number
+): FinishedGeometryGroup {
+  return {
+    id: geometryId,
+    geometry_type: point.geometry_type ?? null,
+    geometry_omschrijving: point.geometry_omschrijving ?? null,
+    points: [],
+  };
+}
+
+function addStrippedPointToFinishedGroup(
+  group: FinishedGeometryGroup,
+  point: RawPoint
+): void {
+  group.points.push(stripGeometryFields(point));
+}
+
 export function formatFinishedPlansWithGeometries(
   plans: Record<string, unknown>[],
   pointsField = "points_data"
@@ -152,16 +189,9 @@ export function formatFinishedPlansWithGeometries(
     const points = (plan[pointsField] as RawPoint[] | null) ?? [];
     const { standalonePoints, geometries } =
       splitPointsByGeometry<FinishedGeometryGroup>(points, {
-      createGeometryGroup: (point, geometryId): FinishedGeometryGroup => ({
-        id: geometryId,
-        geometry_type: point.geometry_type ?? null,
-        geometry_omschrijving: point.geometry_omschrijving ?? null,
-        points: [],
-      }),
-      addPointToGeometry: (group, point) => {
-        group.points.push(stripGeometryFields(point));
-      },
-    });
+        createGeometryGroup: createFinishedGeometryGroup,
+        addPointToGeometry: addStrippedPointToFinishedGroup,
+      });
 
     return {
       ...plan,

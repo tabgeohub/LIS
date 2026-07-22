@@ -1,57 +1,14 @@
 import type { Request, Response } from "express";
-import { invalidPasswordResponse, invalidUsernameResponse } from "./authErrorResponses";
-import { hashUsername, logAuthSecurityEvent } from "./authSecurityLog";
+import { invalidUsernameResponse } from "./authErrorResponses";
 import type { KeycloakUserLookupResult } from "./keycloakUserLookup";
+import type { VerifyLookupDecision } from "./verifyCredentialsFlow";
 import {
-  authenticatePasswordCredentials,
-  classifyVerifyGrantFailure,
-  VerifyLookupDecision,
-} from "./verifyCredentialsFlow";
+  OTP_REQUIRED_RESPONSE,
+  logVerifyEvent,
+  respondLoggedVerify,
+} from "./verifyLoggedResponse";
 
-const OTP_REQUIRED_RESPONSE = {
-  success: true,
-  status: "otp_required",
-  message: "Authenticator-code is required",
-};
-
-function logVerifyEvent(input: {
-  req: Request;
-  event: string;
-  username: string;
-  meta?: Record<string, unknown>;
-}) {
-  logAuthSecurityEvent({
-    event: input.event,
-    meta: { usernameHash: hashUsername(input.username), ...input.meta },
-    req: input.req,
-  });
-}
-
-function jsonVerifyResponse(
-  res: Response,
-  status: number | undefined,
-  body: object
-) {
-  return status === undefined ? res.json(body) : res.status(status).json(body);
-}
-
-function respondLoggedVerify(input: {
-  req: Request;
-  res: Response;
-  username: string;
-  event: string;
-  meta?: Record<string, unknown>;
-  status?: number;
-  body: object;
-}) {
-  logVerifyEvent({
-    req: input.req,
-    event: input.event,
-    username: input.username,
-    meta: input.meta,
-  });
-  return jsonVerifyResponse(input.res, input.status, input.body);
-}
+export { authenticateOrRespondToVerifyFailure } from "./authenticateOrRespondToVerifyFailure";
 
 function logLookupUnavailableIfNeeded(input: {
   req: Request;
@@ -90,64 +47,4 @@ export function respondToVerifyLookup(input: {
     meta: { hasOtp: true },
     body: OTP_REQUIRED_RESPONSE,
   });
-}
-
-function respondToGrantFailure(input: {
-  req: Request;
-  res: Response;
-  username: string;
-  lookup: KeycloakUserLookupResult;
-  error: unknown;
-  otpStatusUnknown: boolean;
-}) {
-  const grant = classifyVerifyGrantFailure(input.error, input.otpStatusUnknown);
-  const hasOtp = input.lookup.ok ? input.lookup.hasOtp : "lookup_unavailable";
-  if (grant.requiresOtp) {
-    return respondLoggedVerify({
-      req: input.req,
-      res: input.res,
-      username: input.username,
-      event: "auth2.verify.otp_required",
-      meta: {
-        hasOtp,
-        grantFailureKind: grant.grantFailureKind,
-        inferred: grant.grantFailureKind !== "otp_required",
-      },
-      body: OTP_REQUIRED_RESPONSE,
-    });
-  }
-  return respondLoggedVerify({
-    req: input.req,
-    res: input.res,
-    username: input.username,
-    event: "auth2.verify.invalid_password",
-    meta: {
-      hasOtp,
-      grantFailureKind: grant.grantFailureKind,
-      message: (input.error as Error)?.message,
-    },
-    status: 401,
-    body: invalidPasswordResponse(),
-  });
-}
-
-export async function authenticateOrRespondToVerifyFailure(input: {
-  req: Request;
-  res: Response;
-  username: string;
-  password: string;
-  lookup: KeycloakUserLookupResult;
-  otpStatusUnknown: boolean;
-}) {
-  try {
-    const user = await authenticatePasswordCredentials(input);
-    return input.res.json({
-      success: true,
-      status: "authenticated",
-      message: "Login successful",
-      user,
-    });
-  } catch (error: unknown) {
-    return respondToGrantFailure({ ...input, error });
-  }
 }

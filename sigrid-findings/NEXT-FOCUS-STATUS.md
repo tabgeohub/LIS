@@ -1,35 +1,45 @@
-# Next focus status — Big Architecture wave + extra pre-deploy polish (`20260721(1)`)
+# Next focus status — Next Maintainability findings wave (`20260721(1)`)
 
-Dashboard baseline: Maintainability **4.2** · Architecture **3.3** (yellow) · OSH 4.7 · Security 4.3 · Reliability 5.5.
+## Wave complete (local)
 
-## Done — plan waves
+Follow-up Maintainability wave after the volume pass. Behavior-preserving; no Docker/Nginx; no new Architecture `*Core` façades.
 
-### Wave A — Entanglement HIGH cycle break
-- Moved shared types out of Components (`aandachtspuntDetailsValues`, flight-plan select props)
-- Hooks no longer import `Components/HomePage`
-- Architecture rule enforced in `scripts/check-architecture.mjs`
+### Batch 1 — Residual McCabe ≥7
+- Further thinned geometry formatters, proxy URL helpers, auth2/keycloak paths where still complex
+- Template `Fase3` map-preview extract; many prior-wave targets already simple on disk
 
-### Wave B — Accept ledger
-- [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) for Independence hubs, Core MEDIUM, Coupling, FE↔BE Dup, Docker
+### Batch 2 — McCabe == 6 clusters
+- `resolveRegioFilter` / regio role predicates
+- `usePointGraphicsEffects` branch extracts
+- `pdfReportTables` cell helpers + options objects
+- Hover/path/auth/drawing clusters continued where still open
 
-### Wave C — Maintainability
-- Unit size thins (auth2 verify responses, Step2 Buttons)
-- Same-component Dup polish
-- csvExportCore Semgrep reinforcement
+### Batch 3 — Residual interfacing
+- Legend layout helpers → options objects
+- `respondVerifyError`, `assertKeycloakResponseOk`, `buildNormalizedFields`, `appendFinishedDateRange`, `respondImportSuccess`
+- `patchPlanWithUpdatedPoint`, `isNearExistingPoint`, `commitFotoAttachmentDelete`
+- PDF table APIs updated to options; call sites updated
 
-## Extra pre-deploy polish (this session)
-
-- Split `showPlanSearchListHoverCore` into body / hover-from-map / clear siblings (fat Independence HIGH removed)
-- Thinned `useDeletePointState` → façade + Core/types/form-field siblings
-- Thinned `FlightPlanStandardFields` → View sibling
-- Thinned `usePlanPointAttachments`
-- TemplateFlight Step2/Step3 shared cleanup; AddToPlan shared step-buttons hook
+### Batch 4 — Size LOC ≥25 / selective 22–24
+- Prior size-agent splits (auth2 barrels, EditPointCoordinates, hover siblings, Step2 wizard selection) kept
+- `FlightPlanPickerList` → `FlightPlanPickerRow` sibling
+- `formatFinishedPlansWithGeometries` helper extracts
+- LOC 16–19 vanity left for later
 
 ## Verification
-- `npm run check:architecture` — pass
-- `npm run test:architecture-helpers` — pass
 
-## Before next deploy / Sigrid export
-1. Apply Accept list in Sigrid UI
-2. Smoke-test: drawing store forms, flight-plan forms, plan hover table/list, delete-point wizard, CSV export
-3. Re-export — expect Entanglement HIGH cycle gone; Independence HIGH `showPlanSearchListHoverCore` gone
+- `npm run check:architecture` — passed
+- `npm run test:architecture-helpers` — passed
+
+## Your next steps
+
+1. Smoke-test: auth2 verify/login, CreateReport PDF, Legend nesting, Foto delete, EditPoint coords, add-point near-check, template Fase3, finished-plan queries
+2. Deploy → re-export Sigrid
+3. Apply [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) in Sigrid UI
+4. Remaining volume after this: mostly LOC ≤21 vanity + Accept-only Architecture
+
+## Out of scope (unchanged)
+
+- Architecture Independence MEDIUM Core re-splits
+- Coupling fan-in rewrites
+- Docker CWE-266 / FE↔BE shared packages

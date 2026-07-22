@@ -1,16 +1,17 @@
 import type { FinishedPointType } from "Types/finished_plans";
 import { finalizeCoordinateValues } from "./coordinateFinalize";
 
-export function buildPointCoordinatePayload(
-  selectedPoint: FinishedPointType,
-  coordinateSystem: string,
+export function buildPointCoordinatePayload(input: {
+  selectedPoint: FinishedPointType;
+  coordinateSystem: string;
   coords: {
     longitude: number;
     latitude: number;
     xcoordinaat_rd: number;
     ycoordinaat_rd: number;
-  }
-) {
+  };
+}) {
+  const { selectedPoint, coordinateSystem, coords } = input;
   const finalCoords = finalizeCoordinateValues(coordinateSystem, coords);
   return {
     finalCoords,

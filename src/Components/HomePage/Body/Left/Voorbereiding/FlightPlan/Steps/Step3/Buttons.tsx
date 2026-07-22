@@ -13,6 +13,19 @@ import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 
+function mergeIdLists(...lists: Array<unknown>): number[] {
+  return lists.flatMap((list) => (Array.isArray(list) ? list : []));
+}
+
+function removeNonGraphicsLayers(map: __esri.Map | null | undefined): void {
+  const layersToRemove = map?.layers.filter(
+    (layer) => layer.type !== "graphics"
+  );
+  layersToRemove?.forEach((layer) => {
+    map?.remove(layer);
+  });
+}
+
 export default function Buttons({
   setOpenFilter,
   basemapString,
@@ -48,14 +61,8 @@ export default function Buttons({
     submitCollectedFlightPlanCreate({
       create,
       store,
-      pointIds: [
-        ...(Array.isArray(selectedPoints) ? selectedPoints : []),
-        ...(Array.isArray(selectedPoints2) ? selectedPoints2 : []),
-      ],
-      geometryIds: [
-        ...(Array.isArray(selectedGeometries) ? selectedGeometries : []),
-        ...(Array.isArray(selectedGeometries2) ? selectedGeometries2 : []),
-      ],
+      pointIds: mergeIdLists(selectedPoints, selectedPoints2),
+      geometryIds: mergeIdLists(selectedGeometries, selectedGeometries2),
       geometries: dbGeometries,
       basemap: basemapString,
       layers: selectedLayers,
@@ -75,13 +82,7 @@ export default function Buttons({
   const handleSaveClick = () => {
     handleSubmit();
     logStep("User clicked 'Save' button");
-
-    const layersToRemove = map?.layers.filter(
-      (layer) => layer.type !== "graphics"
-    );
-    layersToRemove?.forEach((layer) => {
-      map?.remove(layer);
-    });
+    removeNonGraphicsLayers(map);
   };
 
   return (

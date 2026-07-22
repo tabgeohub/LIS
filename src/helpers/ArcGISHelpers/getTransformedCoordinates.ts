@@ -7,28 +7,24 @@ export type TransformCoordinatesInput = {
   y: number;
 };
 
+const PROJECTION_EPSG: Record<"RD" | "WGS84", string> = {
+  RD: "EPSG:28992",
+  WGS84: "EPSG:4326",
+};
+
+function hasFiniteCoordinates(x: number, y: number): boolean {
+  return isFinite(x) && isFinite(y);
+}
+
 export function getTransformedCoordinates(input: TransformCoordinatesInput) {
   const { fromProjection, toProjection, x, y } = input;
+  const from = PROJECTION_EPSG[fromProjection];
+  const to = PROJECTION_EPSG[toProjection];
 
-  let from;
-  let to;
-
-  if (fromProjection === "RD") {
-    from = "EPSG:28992";
-  } else if (fromProjection === "WGS84") {
-    from = "EPSG:4326";
+  if (!hasFiniteCoordinates(x, y)) {
+    return { x, y };
   }
 
-  if (toProjection === "RD") {
-    to = "EPSG:28992";
-  } else if (toProjection === "WGS84") {
-    to = "EPSG:4326";
-  }
-
-  if (isFinite(x) && isFinite(y)) {
-    const [newX, newY] = proj4(from!, to!, [x, y]);
-    return { x: newX, y: newY };
-  }
-
-  return { x, y };
+  const [newX, newY] = proj4(from, to, [x, y]);
+  return { x: newX, y: newY };
 }

@@ -25,6 +25,6 @@ export function useAddToPlanSketch(step: number) {
     });
   }, [mapView, cleanupSketch, points, setPolygonPoints]);
 
-  useAddToPlanStepSketch(step, initPolygonDrawer, cleanupSketch);
+  useAddToPlanStepSketch({ step, initPolygonDrawer, cleanupSketch });
   useEffect(() => () => cleanupSketch(), [cleanupSketch]);
 }

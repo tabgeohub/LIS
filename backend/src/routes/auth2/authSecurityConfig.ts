@@ -4,13 +4,21 @@
  *
  * OTP step-2 errors remain specific (INVALID_OTP, etc.).
  */
+const TRUTHY_FLAGS = new Set(["true", "1", "yes"]);
+const FALSY_FLAGS = new Set(["false", "0", "no"]);
+
+function parseExplicitBooleanFlag(
+  value: string | undefined
+): boolean | undefined {
+  if (!value) return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (TRUTHY_FLAGS.has(normalized)) return true;
+  if (FALSY_FLAGS.has(normalized)) return false;
+  return undefined;
+}
+
 export function isGenericAuthErrorsEnabled(): boolean {
-  const explicit = process.env.AUTH2_GENERIC_ERRORS?.trim().toLowerCase();
-  if (explicit === "true" || explicit === "1" || explicit === "yes") {
-    return true;
-  }
-  if (explicit === "false" || explicit === "0" || explicit === "no") {
-    return false;
-  }
+  const explicit = parseExplicitBooleanFlag(process.env.AUTH2_GENERIC_ERRORS);
+  if (explicit !== undefined) return explicit;
   return process.env.NODE_ENV === "production";
 }

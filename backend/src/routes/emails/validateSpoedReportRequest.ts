@@ -21,20 +21,25 @@ export function parseSpoedReportRecipients(sendToEmail: string | undefined): str
     .filter(Boolean);
 }
 
+function hasSenderFields(body: SpoedReportBody): boolean {
+  return Boolean(body.senderName && body.senderEmail);
+}
+
+function hasFlightFields(body: SpoedReportBody): boolean {
+  return Boolean(body.flightNumber && body.omschrijving && body.regio_id);
+}
+
 export function validateSpoedReportFields(
   body: SpoedReportBody
 ): SpoedReportValidation | null {
-  const { senderName, senderEmail, flightNumber, omschrijving, regio_id, sendToEmail } =
-    body;
-
-  if (!senderName || !senderEmail) {
+  if (!hasSenderFields(body)) {
     return fail("Missing senderName or senderEmail");
   }
-  if (!flightNumber || !omschrijving || !regio_id) {
+  if (!hasFlightFields(body)) {
     return fail("Missing flightNumber, omschrijving or regio_id");
   }
 
-  const recipients = parseSpoedReportRecipients(sendToEmail);
+  const recipients = parseSpoedReportRecipients(body.sendToEmail);
   if (recipients.length === 0) {
     return fail("No recipients provided in sendToEmail");
   }

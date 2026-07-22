@@ -7,11 +7,12 @@ export function getFlightPlanMapCenter(flightPlan: FlightPlanType) {
   return computeFlightPlanCentroid(getFlightPlanPoints(flightPlan));
 }
 
-export function zoomMapToFlightPlan(
-  mapView: MapView | null | undefined,
-  flightPlan: FlightPlanType,
-  zoom = 8
-) {
+export function zoomMapToFlightPlan(input: {
+  mapView: MapView | null | undefined;
+  flightPlan: FlightPlanType;
+  zoom?: number;
+}) {
+  const { mapView, flightPlan, zoom = 8 } = input;
   if (!mapView) return;
   const center = getFlightPlanMapCenter(flightPlan);
   if (center) {
@@ -19,10 +20,11 @@ export function zoomMapToFlightPlan(
   }
 }
 
-export function panMapToFlightPlan(
-  mapView: MapView | null | undefined,
-  flightPlan: FlightPlanType
-) {
+export function panMapToFlightPlan(input: {
+  mapView: MapView | null | undefined;
+  flightPlan: FlightPlanType;
+}) {
+  const { mapView, flightPlan } = input;
   if (!mapView) return;
   const center = getFlightPlanMapCenter(flightPlan);
   if (center) {

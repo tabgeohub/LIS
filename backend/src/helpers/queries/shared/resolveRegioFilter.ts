@@ -43,15 +43,20 @@ export function getSessionRealmRoles(req: Request): string[] {
   );
 }
 
+function isRwsOrExtRole(role: string): boolean {
+  return role.includes("RWS ") || role.includes("EXT ");
+}
+
+function isAdminRoleName(role: string): boolean {
+  return role.toLowerCase() === "admin";
+}
+
 /** Matches frontend App.tsx role selection. */
 export function pickRegioRoleFromRealmRoles(
   roles: string[]
 ): string | undefined {
   return roles.find(
-    (item) =>
-      item.includes("RWS ") ||
-      item.includes("EXT ") ||
-      item.toLowerCase() === "admin"
+    (item) => isRwsOrExtRole(item) || isAdminRoleName(item)
   );
 }
 
@@ -61,6 +66,16 @@ export function isAdminRegioValue(regio: unknown): boolean {
   }
 
   return regio.toString().toLowerCase() === "admin";
+}
+
+function resolveNonAdminOrQueryRegio(input: {
+  sessionRegio: string | undefined;
+  queryRegio: string | undefined;
+}): string | undefined {
+  if (input.sessionRegio && !isAdminRegioValue(input.sessionRegio)) {
+    return input.sessionRegio;
+  }
+  return input.queryRegio || input.sessionRegio;
 }
 
 /**
@@ -73,13 +88,5 @@ export function resolveRegioFilter(req: Request): string | undefined {
   const queryRegio =
     firstQueryValue(req.query.regio_id) ?? firstQueryValue(req.query.regio);
 
-  if (sessionRegio && !isAdminRegioValue(sessionRegio)) {
-    return sessionRegio;
-  }
-
-  if (queryRegio) {
-    return queryRegio;
-  }
-
-  return sessionRegio;
+  return resolveNonAdminOrQueryRegio({ sessionRegio, queryRegio });
 }

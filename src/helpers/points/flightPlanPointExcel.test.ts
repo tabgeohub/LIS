@@ -48,7 +48,11 @@ describe("flight plan point Excel export", () => {
       organisatie_id: "plan-organisation",
     });
 
-    const buffer = buildXlsxBuffer(rows, "Points", [...POINT_EXPORT_COLUMNS]);
+    const buffer = buildXlsxBuffer({
+      rows,
+      sheetName: "Points",
+      header: [...POINT_EXPORT_COLUMNS],
+    });
     const workbook = XLSX.read(buffer, { type: "array" });
     const sheetRows = XLSX.utils.sheet_to_json<string[]>(
       workbook.Sheets.Points,

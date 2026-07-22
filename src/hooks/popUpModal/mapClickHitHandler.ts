@@ -21,29 +21,41 @@ export type MapClickHitInput = MapClickListenerBase & {
   finishGuard: () => void;
 };
 
+function shouldIgnoreMapClick(input: MapClickHitInput): boolean {
+  return Boolean(input.isTabBlocked?.() || input.shouldSkip());
+}
+
+function hitTestIncludeLayers(
+  pointsGraphicsLayer: __esri.GraphicsLayer | null | undefined
+): __esri.GraphicsLayer[] | undefined {
+  return pointsGraphicsLayer ? [pointsGraphicsLayer] : undefined;
+}
+
+function applySelectionIfNeeded(
+  input: MapClickHitInput,
+  response: __esri.HitTestResult
+): void {
+  if (input.createNewPoint) return;
+  applyPointHitSelection({
+    clickedGraphics: graphicsFromHitTest(response),
+    setClickedPointId: input.setClickedPointId,
+    setClickedPoint: input.setClickedPoint,
+    selectedPointGraphicsLayer: input.selectedPointGraphicsLayer,
+  });
+}
+
 export async function handleMapClickHit(
   input: MapClickHitInput
 ): Promise<void> {
-  if (input.isTabBlocked?.()) return;
-  if (input.shouldSkip()) return;
+  if (shouldIgnoreMapClick(input)) return;
 
   try {
-    const includeLayers = input.pointsGraphicsLayer
-      ? [input.pointsGraphicsLayer]
-      : undefined;
+    const includeLayers = hitTestIncludeLayers(input.pointsGraphicsLayer);
     const response = await input.mapView.hitTest(
       input.event,
       includeLayers ? { include: includeLayers } : undefined
     );
-
-    if (!input.createNewPoint) {
-      applyPointHitSelection({
-        clickedGraphics: graphicsFromHitTest(response),
-        setClickedPointId: input.setClickedPointId,
-        setClickedPoint: input.setClickedPoint,
-        selectedPointGraphicsLayer: input.selectedPointGraphicsLayer,
-      });
-    }
+    applySelectionIfNeeded(input, response);
   } catch (error) {
     console.error("Error querying features:", error);
   } finally {

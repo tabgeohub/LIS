@@ -36,13 +36,23 @@ export function sortGeometriesForSelection(
     selectedIds.map((id, index) => [id, selectedIds.length - 1 - index])
   );
 
-  return [...geometries].sort((a, b) => {
-    const selectionDifference =
-      Number(!selectedSet.has(a.id)) - Number(!selectedSet.has(b.id));
-    if (selectionDifference !== 0) return selectionDifference;
-    const rank = selectedSet.has(a.id) ? selectedRank : originalIndex;
-    return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0);
-  });
+  return [...geometries].sort((a, b) =>
+    compareGeometriesForSelection(a, b, selectedSet, selectedRank, originalIndex)
+  );
+}
+
+function compareGeometriesForSelection(
+  a: Geometry,
+  b: Geometry,
+  selectedSet: Set<number>,
+  selectedRank: Map<number, number>,
+  originalIndex: Map<number, number>
+): number {
+  const selectionDifference =
+    Number(!selectedSet.has(a.id)) - Number(!selectedSet.has(b.id));
+  if (selectionDifference !== 0) return selectionDifference;
+  const rank = selectedSet.has(a.id) ? selectedRank : originalIndex;
+  return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0);
 }
 
 export function toggleGeometrySelection(

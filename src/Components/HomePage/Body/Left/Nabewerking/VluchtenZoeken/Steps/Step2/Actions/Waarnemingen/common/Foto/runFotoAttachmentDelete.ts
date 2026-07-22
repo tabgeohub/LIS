@@ -26,5 +26,9 @@ export async function runFotoAttachmentDelete(
   );
   if (closeGallery) input.setIsOpen(false);
 
-  commitFotoAttachmentDelete(input, newAttachments, newIndex);
+  commitFotoAttachmentDelete({
+    context: input,
+    newAttachments,
+    newIndex,
+  });
 }

@@ -28,8 +28,12 @@ type TimesliderImageViewerProps = {
   onToggleGallery: () => void;
 };
 
-function whenShowing<T>(showImages: boolean, value: T, fallback: T): T {
-  return showImages ? value : fallback;
+function whenShowing<T>(input: {
+  showImages: boolean;
+  value: T;
+  fallback: T;
+}): T {
+  return input.showImages ? input.value : input.fallback;
 }
 
 function buildImageIndex(input: {
@@ -56,10 +60,18 @@ function buildMainImageProps(input: TimesliderImageViewerProps & {
 }) {
   const { showImages } = input;
   return {
-    attachment: whenShowing(showImages, input.selectedAttachment, null),
+    attachment: whenShowing({
+      showImages,
+      value: input.selectedAttachment,
+      fallback: null,
+    }),
     plansLoading: input.plansLoading,
     loading: showImages && input.imagesLoading,
-    error: whenShowing(showImages, input.imagesError, null),
+    error: whenShowing({
+      showImages,
+      value: input.imagesError,
+      fallback: null,
+    }),
     emptyMessage: input.emptyMain,
     imageNav: input.imageNav,
     imageIndex: buildImageIndex({

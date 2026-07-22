@@ -44,11 +44,11 @@ export function useTimesliderInputHandlers(input: {
       );
       input.setValues([
         input.safeValues[0],
-        clampToStep(
-          input.dateToStepIndex(date),
-          input.safeValues[0],
-          input.maxStep
-        ),
+        clampToStep({
+          step: input.dateToStepIndex(date),
+          fromStep: input.safeValues[0],
+          maxStep: input.maxStep,
+        }),
       ]);
     },
     [input]

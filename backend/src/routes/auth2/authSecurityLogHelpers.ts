@@ -11,11 +11,13 @@ const SENSITIVE_KEYS = new Set([
 ]);
 
 export function getClientIp(req: Request): string {
+  return readForwardedClientIp(req) ?? req.ip ?? "unknown";
+}
+
+function readForwardedClientIp(req: Request): string | undefined {
   const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.length > 0) {
-    return forwarded.split(",")[0]?.trim() || req.ip || "unknown";
-  }
-  return req.ip || "unknown";
+  if (typeof forwarded !== "string" || forwarded.length === 0) return undefined;
+  return forwarded.split(",")[0]?.trim() || undefined;
 }
 
 export function hashUsername(username: string): string {

@@ -22,7 +22,7 @@ export function handleEnrichedAddPointClick(
   const lat = input.event.mapPoint.latitude;
   if (!lon || !lat) return;
 
-  if (isNearExistingPoint(lon, lat, input.points)) {
+  if (isNearExistingPoint({ lon, lat, points: input.points })) {
     toast.error(input.nearPointToast);
     return;
   }

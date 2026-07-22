@@ -1,11 +1,12 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { reorderPointsAbovePath } from "./reorderPointsAbovePath";
 
-function addPathLayerAtPointsIndex(
-  map: __esri.Map,
-  pathLayer: FeatureLayer,
-  pointsGraphicsLayer: __esri.GraphicsLayer
-) {
+function addPathLayerAtPointsIndex(input: {
+  map: __esri.Map;
+  pathLayer: FeatureLayer;
+  pointsGraphicsLayer: __esri.GraphicsLayer;
+}) {
+  const { map, pathLayer, pointsGraphicsLayer } = input;
   const pointsLayerIndex = map.layers.indexOf(pointsGraphicsLayer);
   if (pointsLayerIndex >= 0) {
     map.add(pathLayer, pointsLayerIndex);
@@ -23,9 +24,9 @@ export function addPathLayerBelowPoints(input: {
   const map = mapView.map;
   if (!map) return;
   if (pointsGraphicsLayer) {
-    addPathLayerAtPointsIndex(map, pathLayer, pointsGraphicsLayer);
+    addPathLayerAtPointsIndex({ map, pathLayer, pointsGraphicsLayer });
   } else {
     map.add(pathLayer);
   }
-  reorderPointsAbovePath(map, pathLayer, pointsGraphicsLayer);
+  reorderPointsAbovePath({ map, pathLayer, pointsGraphicsLayer });
 }

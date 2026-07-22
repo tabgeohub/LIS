@@ -22,13 +22,13 @@ export default function PlansList() {
 
   const zoomToPoint = () => {
     if (flightPlan) {
-      zoomMapToFlightPlan(mapView, flightPlan);
+      zoomMapToFlightPlan({ mapView, flightPlan });
     }
   };
 
   const goToPoint = () => {
     if (flightPlan) {
-      panMapToFlightPlan(mapView, flightPlan);
+      panMapToFlightPlan({ mapView, flightPlan });
     }
   };
 

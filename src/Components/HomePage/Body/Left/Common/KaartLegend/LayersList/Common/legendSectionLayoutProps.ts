@@ -1,7 +1,7 @@
 import { LegendLayerDefinition } from "../helpers/layerTypes";
 
-/** Shared layout fields used by LegendSection model → layout mapping. */
-type LegendSectionLayoutFields = {
+/** Shared layout props for LegendSection model → layout mapping. */
+export type LegendSectionLayoutProps = {
   handleLayerChange: (id: string, checked: boolean) => void;
   parentTitle?: string;
   parentChecked: boolean;
@@ -12,13 +12,13 @@ type LegendSectionLayoutFields = {
   setNestedParentChecked: (checked: boolean) => void;
   gateNestedByRole: boolean;
   isVisibleForRole: boolean;
-};
-
-export type LegendSectionLayoutProps = LegendSectionLayoutFields & {
   layers: LegendLayerDefinition[];
 };
 
-export type LegendSectionLayoutSource = LegendSectionLayoutFields & {
+export type LegendSectionLayoutSource = Omit<
+  LegendSectionLayoutProps,
+  "layers"
+> & {
   filteredLayers: LegendLayerDefinition[];
 };
 

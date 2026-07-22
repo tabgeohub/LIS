@@ -1,5 +1,30 @@
 import { refreshToken } from "@helpers/refreshToken";
 
+const AUTH_RETRY_STATUSES = new Set([401, 498]);
+
+async function refreshAuthIfNeeded(status: number): Promise<void> {
+  if (!AUTH_RETRY_STATUSES.has(status)) return;
+  try {
+    await refreshToken();
+  } catch {
+    // ignore refresh failures; caller will retry or throw
+  }
+}
+
+function classifyFetchAttempt(res: Response): Error | null {
+  if (AUTH_RETRY_STATUSES.has(res.status)) {
+    return new Error(`Auth ${res.status}`);
+  }
+  if (!res.ok) {
+    return new Error(`HTTP ${res.status}`);
+  }
+  return null;
+}
+
+async function delayBeforeRetry(): Promise<void> {
+  await new Promise((r) => setTimeout(r, 200 + Math.random() * 300));
+}
+
 export async function fetchWithRetry(input: {
   url: string;
   options?: RequestInit;
@@ -7,24 +32,20 @@ export async function fetchWithRetry(input: {
 }): Promise<Response> {
   const { url, options = {}, maxRetries = 2 } = input;
   let lastErr: any;
+
   for (let i = 0; i <= maxRetries; i++) {
     try {
       const res = await fetch(url, options);
-      if (res.status === 401 || res.status === 498) {
-        try {
-          await refreshToken();
-        } catch {}
-        lastErr = new Error(`Auth ${res.status}`);
-      } else if (!res.ok) {
-        lastErr = new Error(`HTTP ${res.status}`);
-      } else {
-        return res;
-      }
+      const attemptError = classifyFetchAttempt(res);
+      if (!attemptError) return res;
+      await refreshAuthIfNeeded(res.status);
+      lastErr = attemptError;
     } catch (e) {
       lastErr = e;
     }
-    await new Promise((r) => setTimeout(r, 200 + Math.random() * 300));
+    await delayBeforeRetry();
   }
+
   throw lastErr;
 }
 

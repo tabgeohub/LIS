@@ -6,16 +6,22 @@ export function getMaxSidebarWidthPx() {
   return Math.max(360, (window.innerWidth * 0.6) | 0);
 }
 
-export function clampSidebarWidth(v: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, v));
+export function clampSidebarWidth(input: {
+  v: number;
+  min: number;
+  max: number;
+}) {
+  return Math.max(input.min, Math.min(input.max, input.v));
 }
 
-export function getSidebarResizeDelta(
-  handleSide: ResizeHandleSide,
-  startX: number,
-  clientX: number
-) {
-  return handleSide === "right" ? clientX - startX : startX - clientX;
+export function getSidebarResizeDelta(input: {
+  handleSide: ResizeHandleSide;
+  startX: number;
+  clientX: number;
+}) {
+  return input.handleSide === "right"
+    ? input.clientX - input.startX
+    : input.startX - input.clientX;
 }
 
 export type SidebarDragState = {
@@ -41,16 +47,16 @@ export function computeSidebarWidthFromDrag(input: {
   drag: SidebarDragState;
   clientX: number;
 }) {
-  const deltaX = getSidebarResizeDelta(
-    input.handleSide,
-    input.drag.startX,
-    input.clientX
-  );
-  return clampSidebarWidth(
-    input.drag.startWidth + deltaX,
-    MIN_SIDEBAR_WIDTH_PX,
-    getMaxSidebarWidthPx()
-  );
+  const deltaX = getSidebarResizeDelta({
+    handleSide: input.handleSide,
+    startX: input.drag.startX,
+    clientX: input.clientX,
+  });
+  return clampSidebarWidth({
+    v: input.drag.startWidth + deltaX,
+    min: MIN_SIDEBAR_WIDTH_PX,
+    max: getMaxSidebarWidthPx(),
+  });
 }
 
 export function endSidebarResizeDrag(dragRef: { current: SidebarDragState }) {

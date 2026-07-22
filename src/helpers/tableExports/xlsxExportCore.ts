@@ -3,19 +3,21 @@ import * as XLSX from "@e965/xlsx";
 import JSZip from "jszip";
 import type { EnrichedPointType, FlightPlanType } from "Types";
 
-export function buildXlsxBuffer<T extends object>(
-  rows: T[],
-  sheetName: string,
-  header?: string[]
-) {
-  const worksheet = XLSX.utils.json_to_sheet(rows, { header });
+export function buildXlsxBuffer<T extends object>(input: {
+  rows: T[];
+  sheetName: string;
+  header?: string[];
+}) {
+  const worksheet = XLSX.utils.json_to_sheet(input.rows, {
+    header: input.header,
+  });
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  XLSX.utils.book_append_sheet(workbook, worksheet, input.sheetName);
   return XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 }
 
 function xlsxBlob(rows: object[], sheetName: string) {
-  return new Blob([buildXlsxBuffer(rows, sheetName)], {
+  return new Blob([buildXlsxBuffer({ rows, sheetName })], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
 }
@@ -40,10 +42,10 @@ export async function exportPointsPlansXlsx(input: {
 
   if (input.points.length && input.plans.length) {
     const zip = new JSZip();
-    zip.file("points_export.xlsx", buildXlsxBuffer(input.points, "Points"));
+    zip.file("points_export.xlsx", buildXlsxBuffer({ rows: input.points, sheetName: "Points" }));
     zip.file(
       "plans_export.xlsx",
-      buildXlsxBuffer(cleanedPlans, "FlightPlans")
+      buildXlsxBuffer({ rows: cleanedPlans, sheetName: "FlightPlans" })
     );
     saveAs(await zip.generateAsync({ type: "blob" }), "exports_xlsx.zip");
   } else if (input.points.length) {

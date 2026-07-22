@@ -8,6 +8,43 @@ export function getAdminTokenTimeoutMs(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 15000;
 }
 
+function logAdminTokenFetchFailure(
+  attempt: number,
+  tokenUrl: string,
+  error: any
+): void {
+  console.error(
+    `[getKeycloakAdminToken] Fetch failed (attempt ${attempt}/2):`,
+    {
+      error: error?.message || String(error),
+      code: error?.code || "UNKNOWN",
+      endpoint: tokenUrl,
+      cause: error?.cause,
+    }
+  );
+}
+
+function throwAdminTokenConnectionError(lastError: unknown): never {
+  const error = lastError as any;
+  throw new Error(
+    `Failed to connect to Keycloak token endpoint: ${error?.message || String(error)} (${error?.code || "UNKNOWN"})`
+  );
+}
+
+async function postAdminTokenOnce(input: {
+  tokenUrl: string;
+  tokenParams: URLSearchParams;
+  timeoutMs: number;
+  fetchImpl?: typeof fetch;
+}): Promise<Response> {
+  return (input.fetchImpl ?? fetch)(input.tokenUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: input.tokenParams,
+    signal: AbortSignal.timeout(input.timeoutMs),
+  });
+}
+
 export async function requestAdminTokenWithRetry(input: {
   tokenUrl: string;
   tokenParams: URLSearchParams;
@@ -17,27 +54,11 @@ export async function requestAdminTokenWithRetry(input: {
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      return await (input.fetchImpl ?? fetch)(input.tokenUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: input.tokenParams,
-        signal: AbortSignal.timeout(input.timeoutMs),
-      });
+      return await postAdminTokenOnce(input);
     } catch (error: any) {
       lastError = error;
-      console.error(
-        `[getKeycloakAdminToken] Fetch failed (attempt ${attempt}/2):`,
-        {
-          error: error?.message || String(error),
-          code: error?.code || "UNKNOWN",
-          endpoint: input.tokenUrl,
-          cause: error?.cause,
-        }
-      );
+      logAdminTokenFetchFailure(attempt, input.tokenUrl, error);
     }
   }
-  const error = lastError as any;
-  throw new Error(
-    `Failed to connect to Keycloak token endpoint: ${error?.message || String(error)} (${error?.code || "UNKNOWN"})`
-  );
+  throwAdminTokenConnectionError(lastError);
 }

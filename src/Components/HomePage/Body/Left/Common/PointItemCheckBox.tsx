@@ -15,6 +15,15 @@ type PointItemCheckBoxProps = {
   showAttachments?: boolean;
 };
 
+type SelectOption = { value: unknown; label: string };
+
+function resolveOptionLabel(
+  options: SelectOption[],
+  value: unknown
+): unknown {
+  return options.find((item) => item.value === value)?.label || value;
+}
+
 export default function PointItemCheckBox({
   point,
   showCheckbox = true,
@@ -24,23 +33,16 @@ export default function PointItemCheckBox({
 }: PointItemCheckBoxProps) {
   const activities = useConstSelectOptions("activiteiten");
   const organizations = useConstSelectOptions("organisaties");
-  const activityLabel =
-    activities.find((item) => item.value === point.activiteit_id)?.label ||
-    point.activiteit_id;
-  const organizationLabel =
-    organizations.find((item) => item.value === point.organisatie_id)?.label ||
-    point.organisatie_id;
   const viewProps = {
     point,
-    activityLabel,
-    organizationLabel,
+    activityLabel: resolveOptionLabel(activities, point.activiteit_id),
+    organizationLabel: resolveOptionLabel(organizations, point.organisatie_id),
     attachmentCount: showAttachments ? countPointAttachments(point) : 0,
     ...events,
   };
 
-  return variant === "compact" ? (
-    <CompactPointItem {...viewProps} />
-  ) : (
-    <DefaultPointItem {...viewProps} showCheckbox={showCheckbox} />
-  );
+  if (variant === "compact") {
+    return <CompactPointItem {...viewProps} />;
+  }
+  return <DefaultPointItem {...viewProps} showCheckbox={showCheckbox} />;
 }

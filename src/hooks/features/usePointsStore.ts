@@ -36,29 +36,42 @@ interface PointsState {
   clearPoints: () => void;
 }
 
+function appendFilterParam(
+  params: Record<string, string | number>,
+  key: string,
+  value: unknown
+): void {
+  if (value === undefined || value === "") return;
+  if (Array.isArray(value)) {
+    if (value.length > 0) params[key] = value.join(",");
+    return;
+  }
+  params[key] = typeof value === "number" ? value : String(value);
+}
+
+function buildPointsQueryParams(
+  filters: PointsFilters
+): Record<string, string | number> {
+  const params: Record<string, string | number> = {};
+  const mergedFilters = {
+    status: ["bezocht", "niet bezocht"],
+    ...filters,
+  };
+  Object.entries(mergedFilters).forEach(([key, value]) => {
+    appendFilterParam(params, key, value);
+  });
+  return params;
+}
+
 async function loadPoints(
   filters: PointsFilters,
   set: (partial: Partial<PointsState>) => void
 ): Promise<void> {
   try {
     const url = `${getBackEndUrl()}/api/points?hasGeometry=false`;
-
-    const params: Record<string, string | number> = {};
-    const mergedFilters = {
-      status: ["bezocht", "niet bezocht"],
-      ...filters,
-    };
-    Object.entries(mergedFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== "") {
-        if (Array.isArray(value)) {
-          if (value.length > 0) params[key] = value.join(",");
-        } else {
-          params[key] = typeof value === "number" ? value : String(value);
-        }
-      }
+    const res = await axios.get<EnrichedPointType[]>(url, {
+      params: buildPointsQueryParams(filters),
     });
-
-    const res = await axios.get<EnrichedPointType[]>(url, { params });
     set({ points: res.data, dbPoints: res.data });
   } catch (error) {
     console.error("Failed to fetch points:", error);

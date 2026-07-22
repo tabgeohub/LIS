@@ -1,5 +1,8 @@
 import { FlightPlanType } from "Types";
-import type { OriginalGraphicsMapRef } from "./hoverFlightPlanFromOriginalMap";
+import {
+  resolveOriginalPlanGraphic,
+  type OriginalGraphicsMapRef,
+} from "./resolveOriginalPlanGraphic";
 
 /** Shared cleanup for hover-highlighted flight plan rows. */
 export function clearHoveredFlightPlanFromOriginalMap(input: {
@@ -12,13 +15,7 @@ export function clearHoveredFlightPlanFromOriginalMap(input: {
 
   input.graphicsLayerHover.removeAll();
 
-  const map = input.originalGraphicsMap.current as Map<
-    string | number,
-    __esri.Graphic
-  >;
-  const originalGraphic =
-    map.get(input.plan.id) ?? map.get(String(input.plan.id));
-
+  const originalGraphic = resolveOriginalPlanGraphic(input);
   if (originalGraphic) {
     input.graphicsLayer.add(originalGraphic);
   }

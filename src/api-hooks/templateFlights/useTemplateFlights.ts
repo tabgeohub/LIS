@@ -14,11 +14,22 @@ function coalesceEmpty(value: string | number | undefined): string | number {
   return value ?? "";
 }
 
+function hasTemplateRegioId(
+  regioId: string | number | undefined
+): boolean {
+  return regioId !== undefined && regioId !== "";
+}
+
+function hasTemplateUserId(userId: number | undefined): boolean {
+  return userId !== undefined && userId !== 0;
+}
+
 function isTemplateFlightsEnabled(input: UseTemplateFlightsInput): boolean {
-  if (!(input.enabled ?? true)) return false;
-  if (input.regioId === undefined || input.regioId === "") return false;
-  if (input.userId === undefined || input.userId === 0) return false;
-  return true;
+  return (
+    (input.enabled ?? true) &&
+    hasTemplateRegioId(input.regioId) &&
+    hasTemplateUserId(input.userId)
+  );
 }
 
 export function useTemplateFlights(input: UseTemplateFlightsInput) {

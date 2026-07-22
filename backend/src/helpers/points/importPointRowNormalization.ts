@@ -68,24 +68,24 @@ function requiredTrimmed(
   return String(record[key] ?? "").trim();
 }
 
-function buildNormalizedFields(
-  record: Record<string, unknown>,
-  omschrijving: string,
-  user_id: string
-): NormalizedImportRow {
+function buildNormalizedFields(input: {
+  record: Record<string, unknown>;
+  omschrijving: string;
+  user_id: string;
+}): NormalizedImportRow {
   return {
-    omschrijving,
-    regio_id: toStr(record.regio_id),
-    xcoordinaat_rd: toNum(record.xcoordinaat_rd),
-    ycoordinaat_rd: toNum(record.ycoordinaat_rd),
-    latitude: toNum(record.latitude),
-    longitude: toNum(record.longitude),
-    vertrouwelijk: to01(record.vertrouwelijk),
-    herhalen: to01(record.herhalen),
-    user_id,
-    activiteit_id: toStr(record.activiteit_id),
-    organisatie_id: toStr(record.organisatie_id),
-    specifiek_letten_op: toStr(record.specifiek_letten_op),
+    omschrijving: input.omschrijving,
+    regio_id: toStr(input.record.regio_id),
+    xcoordinaat_rd: toNum(input.record.xcoordinaat_rd),
+    ycoordinaat_rd: toNum(input.record.ycoordinaat_rd),
+    latitude: toNum(input.record.latitude),
+    longitude: toNum(input.record.longitude),
+    vertrouwelijk: to01(input.record.vertrouwelijk),
+    herhalen: to01(input.record.herhalen),
+    user_id: input.user_id,
+    activiteit_id: toStr(input.record.activiteit_id),
+    organisatie_id: toStr(input.record.organisatie_id),
+    specifiek_letten_op: toStr(input.record.specifiek_letten_op),
   };
 }
 
@@ -102,7 +102,7 @@ function normalizeImportRow(row: unknown): NormalizedImportRow | null {
     return null;
   }
 
-  return buildNormalizedFields(record, omschrijving, user_id);
+  return buildNormalizedFields({ record, omschrijving, user_id });
 }
 
 export function normalizeImportRows(

@@ -38,20 +38,32 @@ export function zoomMapToGeometryPoints(
 ) {
   if (!mapView || !geometry.points?.length) return;
 
-  const points = geometry.points
-    .filter(
-      (p) =>
-        typeof p.latitude === "number" &&
-        typeof p.longitude === "number" &&
-        Number.isFinite(p.latitude) &&
-        Number.isFinite(p.longitude)
-    )
-    .map((p) => ({ latitude: p.latitude, longitude: p.longitude }));
-
+  const points = collectFiniteLatLonPoints(geometry.points);
   if (points.length === 0) return;
 
   const { center, zoom } = calculateCenterAndZoom(points);
-  goToLonLatZoom(mapView, center, zoom);
+  goToLonLatZoom({ mapView, center, zoom });
+}
+
+function hasFiniteLatLon(point: {
+  latitude?: unknown;
+  longitude?: unknown;
+}): point is { latitude: number; longitude: number } {
+  return (
+    typeof point.latitude === "number" &&
+    typeof point.longitude === "number" &&
+    Number.isFinite(point.latitude) &&
+    Number.isFinite(point.longitude)
+  );
+}
+
+function collectFiniteLatLonPoints(
+  points: Geometry["points"]
+): Array<{ latitude: number; longitude: number }> {
+  return points.filter(hasFiniteLatLon).map((p) => ({
+    latitude: p.latitude,
+    longitude: p.longitude,
+  }));
 }
 
 export function patchGeometryPointInList(input: {

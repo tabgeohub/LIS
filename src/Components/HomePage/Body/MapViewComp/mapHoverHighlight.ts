@@ -60,23 +60,23 @@ export function resolveMapHoverLabel(input: {
   return UNKNOWN_LABEL_BY_TYPE[input.geometryType] ?? "Onbekend punt";
 }
 
-function firstAttribute(
-  attributes: Record<string, unknown>,
-  keys: string[],
-  fallback: number
-): unknown {
-  for (const key of keys) {
-    if (attributes[key] != null) return attributes[key];
+function firstAttribute(input: {
+  attributes: Record<string, unknown>;
+  keys: string[];
+  fallback: number;
+}): unknown {
+  for (const key of input.keys) {
+    if (input.attributes[key] != null) return input.attributes[key];
   }
-  return fallback;
+  return input.fallback;
 }
 
 export function resolveMapHoverId(attributes: Record<string, unknown>) {
-  return firstAttribute(
+  return firstAttribute({
     attributes,
-    ["id", "geometryId", "objectid", "objectId", "OBJECTID"],
-    Date.now()
-  );
+    keys: ["id", "geometryId", "objectid", "objectId", "OBJECTID"],
+    fallback: Date.now(),
+  });
 }
 
 export function createMapHoverGraphic(geometry: __esri.Geometry) {

@@ -63,12 +63,19 @@ function matchesFilterText(
   return (point.omschrijving ?? "").toLowerCase().includes(normalizedText);
 }
 
-function matchesPointCriteria(
-  point: EnrichedPointType,
-  criteria: PointFilterCriteria,
-  herhalenValue: number,
-  normalizedText: string
-): boolean {
+type MatchesPointCriteriaOptions = {
+  point: EnrichedPointType;
+  criteria: PointFilterCriteria;
+  herhalenValue: number;
+  normalizedText: string;
+};
+
+function matchesPointCriteria({
+  point,
+  criteria,
+  herhalenValue,
+  normalizedText,
+}: MatchesPointCriteriaOptions): boolean {
   if (Number(point.herhalen) !== herhalenValue) return false;
   if (!matchesActivity(point, criteria.activityFilter)) return false;
   if (!matchesPeriod(point, criteria)) return false;
@@ -83,6 +90,6 @@ export function filterPointsByCriteria(
   const herhalenValue = criteria.herhalen ? 1 : 0;
 
   return points.filter((point) =>
-    matchesPointCriteria(point, criteria, herhalenValue, normalizedText)
+    matchesPointCriteria({ point, criteria, herhalenValue, normalizedText })
   );
 }

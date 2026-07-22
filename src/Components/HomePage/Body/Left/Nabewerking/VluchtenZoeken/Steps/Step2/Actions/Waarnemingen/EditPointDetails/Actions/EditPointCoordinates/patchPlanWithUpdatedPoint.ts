@@ -4,23 +4,23 @@ import type {
 } from "Types/finished_plans";
 import { updateSavedGraphics } from "./pointMapGraphics";
 
-export function patchPlanWithUpdatedPoint(
-  plan: FinishedFlightPlanType,
-  selectedPoint: FinishedPointType,
+export function patchPlanWithUpdatedPoint(input: {
+  plan: FinishedFlightPlanType;
+  selectedPoint: FinishedPointType;
   finalCoords: {
     longitude: number;
     latitude: number;
     xcoordinaat_rd: number;
     ycoordinaat_rd: number;
-  }
-) {
-  const updatedPoint = { ...selectedPoint, ...finalCoords };
+  };
+}) {
+  const updatedPoint = { ...input.selectedPoint, ...input.finalCoords };
   return {
     updatedPoint,
     updatedPlan: {
-      ...plan,
+      ...input.plan,
       points_data: [
-        ...plan.points_data.filter((p) => p.id !== selectedPoint.id),
+        ...input.plan.points_data.filter((p) => p.id !== input.selectedPoint.id),
         updatedPoint,
       ],
     } as FinishedFlightPlanType,

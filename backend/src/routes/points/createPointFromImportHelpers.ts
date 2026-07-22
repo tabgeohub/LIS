@@ -51,21 +51,21 @@ type ImportSuccess = Extract<
   { ok: true }
 >;
 
-export function respondImportSuccess(
-  res: Response,
-  outcome: ImportSuccess,
-  total: number
-): void {
-  res.status(201).json({
+export function respondImportSuccess(input: {
+  res: Response;
+  outcome: ImportSuccess;
+  total: number;
+}): void {
+  input.res.status(201).json({
     ok: true,
-    created: outcome.result.createdPoints.length,
-    existing: outcome.result.existingPoints.length,
-    total,
-    points: outcome.result.points,
-    createdPoints: outcome.result.createdPoints,
-    existingPoints: outcome.result.existingPoints,
-    message: outcome.message,
-    returnMode: outcome.returnMode,
+    created: input.outcome.result.createdPoints.length,
+    existing: input.outcome.result.existingPoints.length,
+    total: input.total,
+    points: input.outcome.result.points,
+    createdPoints: input.outcome.result.createdPoints,
+    existingPoints: input.outcome.result.existingPoints,
+    message: input.outcome.message,
+    returnMode: input.outcome.returnMode,
   });
 }
 

@@ -2,19 +2,12 @@ import type { Request, RequestHandler } from "express";
 import { createHash } from "crypto";
 import { rateLimit, type Options, type Store } from "express-rate-limit";
 import { logAuthSecurityEvent } from "./authSecurityLog";
+import { getClientIp } from "./authSecurityLogHelpers";
 
 export type Auth2RateLimiters = {
   verifyCredentials: RequestHandler;
   login: RequestHandler;
 };
-
-function getClientIp(req: Request): string {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.length > 0) {
-    return forwarded.split(",")[0]?.trim() || req.ip || "unknown";
-  }
-  return req.ip || "unknown";
-}
 
 function hashUsernameForKey(username: string): string {
   return createHash("sha256")

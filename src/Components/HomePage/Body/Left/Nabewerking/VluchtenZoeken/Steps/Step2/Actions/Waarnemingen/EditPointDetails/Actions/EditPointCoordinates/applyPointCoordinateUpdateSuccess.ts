@@ -18,11 +18,11 @@ export function applyPointCoordinateUpdateSuccess(
     };
   }
 ) {
-  const { updatedPoint, updatedPlan } = patchPlanWithUpdatedPoint(
-    input.selectedPlan,
-    input.selectedPoint,
-    input.finalCoords
-  );
+  const { updatedPoint, updatedPlan } = patchPlanWithUpdatedPoint({
+    plan: input.selectedPlan,
+    selectedPoint: input.selectedPoint,
+    finalCoords: input.finalCoords,
+  });
   input.setSelectedPoint(updatedPoint);
   input.setSelectedPlan(updatedPlan);
   maybeUpdateSavedGraphics({

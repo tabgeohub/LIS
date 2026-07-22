@@ -24,25 +24,26 @@ const polygonSymbol = new SimpleFillSymbol({
 
 type PlanGeometry = NonNullable<FinishedFlightPlanType["geometries"]>[number];
 
-function highlightAttrs(
-  plan: FinishedFlightPlanType,
-  geometry: PlanGeometry,
-  geometryType: "polygon" | "line"
-) {
+function highlightAttrs(input: {
+  plan: FinishedFlightPlanType;
+  geometry: PlanGeometry;
+  geometryType: "polygon" | "line";
+}) {
   return {
     label: TIMESLIDER_HIGHLIGHT_LABEL,
     kind: "geometry",
-    geometryType,
-    planId: plan.id,
-    geometryId: geometry.id,
+    geometryType: input.geometryType,
+    planId: input.plan.id,
+    geometryId: input.geometry.id,
   };
 }
 
-export function createPlanGeometryHighlightGraphic(
-  plan: FinishedFlightPlanType,
-  geometry: PlanGeometry,
-  path: number[][]
-): Graphic {
+export function createPlanGeometryHighlightGraphic(input: {
+  plan: FinishedFlightPlanType;
+  geometry: PlanGeometry;
+  path: number[][];
+}): Graphic {
+  const { plan, geometry, path } = input;
   const isPolygon = isPolygonGeometryType(geometry.geometry_type ?? undefined);
   if (isPolygon && path.length >= 3) {
     return new Graphic({
@@ -51,7 +52,7 @@ export function createPlanGeometryHighlightGraphic(
         spatialReference: { wkid: 4326 },
       }),
       symbol: polygonSymbol,
-      attributes: highlightAttrs(plan, geometry, "polygon"),
+      attributes: highlightAttrs({ plan, geometry, geometryType: "polygon" }),
     });
   }
 
@@ -61,6 +62,6 @@ export function createPlanGeometryHighlightGraphic(
       spatialReference: { wkid: 4326 },
     }),
     symbol: lineSymbol,
-    attributes: highlightAttrs(plan, geometry, "line"),
+    attributes: highlightAttrs({ plan, geometry, geometryType: "line" }),
   });
 }

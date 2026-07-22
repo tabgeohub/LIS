@@ -2,18 +2,18 @@ import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import { transformWgs84ToRd } from "@helpers/geo/transformWgs84ToRd";
 import type { LogActionInput } from "hooks/logging/logEntry";
 
-export function createEditedPointValues<T extends Record<string, unknown>>(
-  values: T,
-  longitude: number,
-  latitude: number
-) {
-  const transformed = transformWgs84ToRd(longitude, latitude);
+export function createEditedPointValues<T extends Record<string, unknown>>(input: {
+  values: T;
+  longitude: number;
+  latitude: number;
+}) {
+  const transformed = transformWgs84ToRd(input.longitude, input.latitude);
   return {
-    ...values,
+    ...input.values,
     x: transformed.x,
     y: transformed.y,
-    latitude,
-    longitude,
+    latitude: input.latitude,
+    longitude: input.longitude,
   } as T;
 }
 
@@ -55,7 +55,13 @@ export function createEditPointClickHandler<T extends Record<string, unknown>>(i
     if (!longitude || !latitude) return;
     input.setMapClickedNotify(input.mapClickedNotify + 1);
     input.setCurrentPoint({ x: longitude, y: latitude });
-    input.setValues(createEditedPointValues(input.values, longitude, latitude));
+    input.setValues(
+      createEditedPointValues({
+        values: input.values,
+        longitude,
+        latitude,
+      })
+    );
     replaceEditedPointGraphic({ ...input, longitude, latitude });
     input.logAction({
       message: "User clicked on a point",

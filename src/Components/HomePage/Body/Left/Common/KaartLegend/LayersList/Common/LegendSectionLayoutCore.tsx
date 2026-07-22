@@ -6,31 +6,39 @@ import type { LegendSectionLayoutProps } from "./legendSectionLayoutProps";
 
 export type { LegendSectionLayoutProps };
 
-function isLegendChildDisabled(
-  parentTitle: string | undefined,
-  parentChecked: boolean,
-  externalParentChecked: boolean | undefined
-): boolean {
+function isLegendChildDisabled(input: {
+  parentTitle: string | undefined;
+  parentChecked: boolean;
+  externalParentChecked: boolean | undefined;
+}): boolean {
   const hasParentGate =
-    parentTitle != null || externalParentChecked !== undefined;
+    input.parentTitle != null || input.externalParentChecked !== undefined;
   if (!hasParentGate) return false;
-  return parentTitle ? !parentChecked : externalParentChecked === false;
+  return input.parentTitle
+    ? !input.parentChecked
+    : input.externalParentChecked === false;
 }
 
-function isLegendLayerDisabled(
-  childDisabled: boolean,
-  nestedParentTitle: string | undefined,
-  nestedParentChecked: boolean
-): boolean {
-  return childDisabled || Boolean(nestedParentTitle && !nestedParentChecked);
+function isLegendLayerDisabled(input: {
+  childDisabled: boolean;
+  nestedParentTitle: string | undefined;
+  nestedParentChecked: boolean;
+}): boolean {
+  return (
+    input.childDisabled ||
+    Boolean(input.nestedParentTitle && !input.nestedParentChecked)
+  );
 }
 
-function shouldShowNestedParent(
-  nestedParentTitle: string | undefined,
-  gateNestedByRole: boolean,
-  isVisibleForRole: boolean
-): boolean {
-  return Boolean(nestedParentTitle) && (!gateNestedByRole || isVisibleForRole);
+function shouldShowNestedParent(input: {
+  nestedParentTitle: string | undefined;
+  gateNestedByRole: boolean;
+  isVisibleForRole: boolean;
+}): boolean {
+  return (
+    Boolean(input.nestedParentTitle) &&
+    (!input.gateNestedByRole || input.isVisibleForRole)
+  );
 }
 
 function renderNestedLegendContent(input: {
@@ -54,24 +62,28 @@ function renderNestedLegendContent(input: {
   );
 }
 
-function wrapLegendContent(
-  nestedParentTitle: string | undefined,
-  nestedContent: ReactNode
-): ReactNode {
-  return nestedParentTitle ? <>{nestedContent}</> : <div>{nestedContent}</div>;
+function wrapLegendContent(input: {
+  nestedParentTitle: string | undefined;
+  nestedContent: ReactNode;
+}): ReactNode {
+  return input.nestedParentTitle ? (
+    <>{input.nestedContent}</>
+  ) : (
+    <div>{input.nestedContent}</div>
+  );
 }
 
-function buildLegendLayerList(
-  layers: LegendLayerDefinition[],
-  handleLayerChange: (id: string, checked: boolean) => void,
-  layerDisabled: boolean
-): ReactNode {
-  return layers.map((layer) => (
+function buildLegendLayerList(input: {
+  layers: LegendLayerDefinition[];
+  handleLayerChange: (id: string, checked: boolean) => void;
+  layerDisabled: boolean;
+}): ReactNode {
+  return input.layers.map((layer) => (
     <LayerItem
       key={layer.id}
       layer={layer}
-      onLayerChange={handleLayerChange}
-      isDisabled={layerDisabled}
+      onLayerChange={input.handleLayerChange}
+      isDisabled={input.layerDisabled}
     />
   ));
 }
@@ -83,16 +95,16 @@ function resolveLegendDisabledState(input: {
   nestedParentTitle?: string;
   nestedParentChecked: boolean;
 }) {
-  const childDisabled = isLegendChildDisabled(
-    input.parentTitle,
-    input.parentChecked,
-    input.externalParentChecked
-  );
-  return isLegendLayerDisabled(
+  const childDisabled = isLegendChildDisabled({
+    parentTitle: input.parentTitle,
+    parentChecked: input.parentChecked,
+    externalParentChecked: input.externalParentChecked,
+  });
+  return isLegendLayerDisabled({
     childDisabled,
-    input.nestedParentTitle,
-    input.nestedParentChecked
-  );
+    nestedParentTitle: input.nestedParentTitle,
+    nestedParentChecked: input.nestedParentChecked,
+  });
 }
 
 function renderLegendSectionBody(input: {
@@ -113,22 +125,25 @@ function renderLegendSectionBody(input: {
       </ParentItem>
     );
   }
-  return wrapLegendContent(input.nestedParentTitle, input.nestedContent);
+  return wrapLegendContent({
+    nestedParentTitle: input.nestedParentTitle,
+    nestedContent: input.nestedContent,
+  });
 }
 
 export function LegendSectionLayoutView(props: LegendSectionLayoutProps) {
   const layerDisabled = resolveLegendDisabledState(props);
-  const layerList = buildLegendLayerList(
-    props.layers,
-    props.handleLayerChange,
-    layerDisabled
-  );
+  const layerList = buildLegendLayerList({
+    layers: props.layers,
+    handleLayerChange: props.handleLayerChange,
+    layerDisabled,
+  });
   const nestedContent = renderNestedLegendContent({
-    showNestedParent: shouldShowNestedParent(
-      props.nestedParentTitle,
-      props.gateNestedByRole,
-      props.isVisibleForRole
-    ),
+    showNestedParent: shouldShowNestedParent({
+      nestedParentTitle: props.nestedParentTitle,
+      gateNestedByRole: props.gateNestedByRole,
+      isVisibleForRole: props.isVisibleForRole,
+    }),
     nestedParentTitle: props.nestedParentTitle,
     nestedParentChecked: props.nestedParentChecked,
     setNestedParentChecked: props.setNestedParentChecked,

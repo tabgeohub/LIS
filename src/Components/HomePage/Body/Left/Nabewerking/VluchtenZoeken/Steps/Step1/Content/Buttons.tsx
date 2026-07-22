@@ -35,7 +35,7 @@ export default function Buttons() {
     const points = collectPointsForCenterAndZoom(selectedPlan);
     if (points.length > 0) {
       const { center, zoom } = calculateCenterAndZoom(points);
-      goToLonLatZoom(mapView, center, zoom);
+      goToLonLatZoom({ mapView, center, zoom });
     }
   }
 

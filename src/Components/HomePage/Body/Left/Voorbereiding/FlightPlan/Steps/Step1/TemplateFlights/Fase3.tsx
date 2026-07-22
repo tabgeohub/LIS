@@ -11,6 +11,32 @@ import {
   TemplatePointRow,
 } from "./templateFlightRows";
 
+function collectIds(items: Array<{ id: number }> | null | undefined): number[] {
+  return items?.map((item) => item.id) || [];
+}
+
+function useTemplateFase3MapPreview(selectedTemplate: {
+  points?: Array<{ id: number }>;
+  geometries?: Array<{ id: number }>;
+}) {
+  const templatePoints = selectedTemplate?.points || [];
+  const templateGeometries = selectedTemplate?.geometries || [];
+  const pointIds = collectIds(templatePoints);
+  const geometryIds = collectIds(templateGeometries);
+
+  useDrawYellowMarkers({
+    selectedPointIds: pointIds,
+    points: templatePoints,
+  });
+  useDrawYellowGeometries({
+    selectedGeometryIds: geometryIds,
+    geometries: [],
+    allGeometries: templateGeometries,
+  });
+
+  return { templatePoints, templateGeometries, pointIds, geometryIds };
+}
+
 export default function Fase3({
   setFase,
   selectedTemplate,
@@ -25,21 +51,8 @@ export default function Fase3({
   const { handleHoveredPoint, handleRemoveHoverePoint } = usePointHover();
   const { handleHoveredGeometry, handleRemoveHoveredGeometry } =
     useGeometryListHover();
-
-  useDrawYellowMarkers({
-    selectedPointIds: selectedTemplate?.points?.map((p: any) => p.id) || [],
-    points: selectedTemplate?.points || [],
-  });
-  useDrawYellowGeometries({
-    selectedGeometryIds:
-      selectedTemplate?.geometries?.map((g: any) => g.id) || [],
-    geometries: [],
-    allGeometries: selectedTemplate?.geometries || [],
-  });
-
-  const pointIds = selectedTemplate?.points?.map((p: any) => p.id) || [];
-  const geometryIds =
-    selectedTemplate?.geometries?.map((g: any) => g.id) || [];
+  const { templatePoints, templateGeometries, pointIds, geometryIds } =
+    useTemplateFase3MapPreview(selectedTemplate);
 
   return (
     <ScrollButtonsLayout
@@ -64,7 +77,7 @@ export default function Fase3({
       }
       className="p-2 h-full"
     >
-      {selectedTemplate?.points?.map((point: any, index: number) => (
+      {templatePoints.map((point: any, index: number) => (
         <TemplatePointRow
           key={`point-${index}`}
           point={point}
@@ -72,15 +85,14 @@ export default function Fase3({
           onLeave={handleRemoveHoverePoint}
         />
       ))}
-      {selectedTemplate?.geometries?.length > 0 &&
-        selectedTemplate.geometries.map((geometry: any, index: number) => (
-          <TemplateGeometryRow
-            key={`geometry-${index}`}
-            geometry={geometry}
-            onEnter={() => handleHoveredGeometry(geometry)}
-            onLeave={handleRemoveHoveredGeometry}
-          />
-        ))}
+      {templateGeometries.map((geometry: any, index: number) => (
+        <TemplateGeometryRow
+          key={`geometry-${index}`}
+          geometry={geometry}
+          onEnter={() => handleHoveredGeometry(geometry)}
+          onLeave={handleRemoveHoveredGeometry}
+        />
+      ))}
     </ScrollButtonsLayout>
   );
 }

@@ -18,16 +18,18 @@ function extractUserIdFromLocation(location: string | null): string {
   return userId;
 }
 
-async function assertKeycloakResponseOk(
-  response: Response,
-  forbiddenMessage: string,
-  failurePrefix: string
-) {
-  if (response.ok) return;
+async function assertKeycloakResponseOk(input: {
+  response: Response;
+  forbiddenMessage: string;
+  failurePrefix: string;
+}) {
+  if (input.response.ok) return;
 
-  const text = await response.text();
-  if (response.status === 403) throw new Error(forbiddenMessage);
-  throw new Error(`${failurePrefix} (${response.status}): ${text}`);
+  const text = await input.response.text();
+  if (input.response.status === 403) throw new Error(input.forbiddenMessage);
+  throw new Error(
+    `${input.failurePrefix} (${input.response.status}): ${text}`
+  );
 }
 
 async function createKeycloakUserRecord(
@@ -45,21 +47,23 @@ async function createKeycloakUserRecord(
     }),
   });
 
-  await assertKeycloakResponseOk(
+  await assertKeycloakResponseOk({
     response,
-    "Service account lacks permission to create users. " +
+    forbiddenMessage:
+      "Service account lacks permission to create users. " +
       "Ensure the service account has the 'manage-users' role from the 'realm-management' client assigned.",
-    "Failed to create user"
-  );
+    failurePrefix: "Failed to create user",
+  });
 
   return extractUserIdFromLocation(response.headers.get("Location"));
 }
 
-async function setKeycloakUserPassword(
-  req: Request,
-  userId: string,
-  password: string
-) {
+async function setKeycloakUserPassword(input: {
+  req: Request;
+  userId: string;
+  password: string;
+}) {
+  const { req, userId, password } = input;
   const response = await keycloakAdminFetch(req, `/users/${userId}/reset-password`, {
     method: "PUT",
     body: JSON.stringify({ type: "password", value: password, temporary: false }),
@@ -73,12 +77,13 @@ async function setKeycloakUserPassword(
     /* ignore rollback errors */
   }
 
-  await assertKeycloakResponseOk(
+  await assertKeycloakResponseOk({
     response,
-    "Service account lacks permission to set user passwords. " +
+    forbiddenMessage:
+      "Service account lacks permission to set user passwords. " +
       "Ensure the service account has the 'manage-users' role from the 'realm-management' client assigned.",
-    "Failed to set password"
-  );
+    failurePrefix: "Failed to set password",
+  });
 }
 
 async function clearKeycloakRequiredActions(req: Request, userId: string) {
@@ -111,7 +116,11 @@ export async function createKeycloakUser(
   req: Request
 ): Promise<string> {
   const userId = await createKeycloakUserRecord(req, userData);
-  await setKeycloakUserPassword(req, userId, userData.password);
+  await setKeycloakUserPassword({
+    req,
+    userId,
+    password: userData.password,
+  });
   await clearKeycloakRequiredActions(req, userId);
   return userId;
 }

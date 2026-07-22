@@ -29,7 +29,7 @@ export async function createPointFromImport(
       res.status(400).json({ ok: false, message: outcome.message });
       return;
     }
-    respondImportSuccess(res, outcome, rows.length);
+    respondImportSuccess({ res, outcome, total: rows.length });
   } catch (err) {
     await rollbackImportPointsTransaction(client);
     respondImportError(res, err);

@@ -25,21 +25,24 @@ function buildCsvDataLine(
   return headers.map((header) => escapeCsvCell(row[header])).join(",");
 }
 
-export function buildCsvFromRows<T extends object>(
-  rows: T[],
-  excludeKeys: string[] = []
-) {
-  if (!rows.length) return "";
-
-  const headers = Object.keys(rows[0]).filter(
-    (key) => !excludeKeys.includes(key)
-  );
-  // nosemgrep: javascript.lang.security.audit.xss.direct-response-write - RFC 4180 CSV row pack, not HTML
+function assembleCsvDocument(headers: string[], rows: object[]): string {
+  // nosemgrep: javascript.lang.security.audit.xss.direct-response-write - RFC 4180 CSV document, not HTML
   const dataLines = rows.map((row) =>
     buildCsvDataLine(row as Record<string, unknown>, headers)
   );
   // nosemgrep: javascript.lang.security.audit.xss.direct-response-write - RFC 4180 CSV join, not HTML
   return [buildCsvHeaderLine(headers), ...dataLines].join("\n");
+}
+
+export function buildCsvFromRows<T extends object>(
+  rows: T[],
+  excludeKeys: string[] = []
+) {
+  if (!rows.length) return "";
+  const headers = Object.keys(rows[0]).filter(
+    (key) => !excludeKeys.includes(key)
+  );
+  return assembleCsvDocument(headers, rows);
 }
 
 function csvBlob(rows: object[], excludeKeys: string[] = []) {

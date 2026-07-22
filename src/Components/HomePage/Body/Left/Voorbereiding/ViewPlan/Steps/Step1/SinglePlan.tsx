@@ -31,11 +31,11 @@ export default function SinglePlan({
   const exportExcel = (plan: FlightPlanType) => {
     const columns = [...POINT_EXPORT_COLUMNS] as const;
     const rows = buildFlightPlanPointExportRows(plan);
-    const wbout = buildXlsxBuffer(
+    const wbout = buildXlsxBuffer({
       rows,
-      "Points",
-      columns as unknown as string[]
-    );
+      sheetName: "Points",
+      header: columns as unknown as string[],
+    });
     const blob = new Blob([wbout], { type: "application/octet-stream" });
     saveAs(blob, `${plan.vluchtnummer}.xlsx`);
 

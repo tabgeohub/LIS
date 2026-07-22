@@ -70,6 +70,19 @@ export function syncPinsForSelection(input: {
   });
 }
 
+function isHoverableGraphic(
+  graphic: __esri.Graphic | undefined,
+  pinRefs: PinRefMap,
+  pointsGraphicsLayer: __esri.GraphicsLayer | null | undefined
+): graphic is __esri.Graphic {
+  if (!graphic?.attributes) return false;
+  const id = graphic.attributes.id as number | undefined;
+  const isPin = typeof id === "number" && pinRefs.has(id);
+  const isBluePoint =
+    !!pointsGraphicsLayer && graphic.layer === pointsGraphicsLayer;
+  return isPin || isBluePoint;
+}
+
 export function findHoverableGraphic(input: {
   hitResults: unknown[];
   pinRefs: PinRefMap;
@@ -77,14 +90,9 @@ export function findHoverableGraphic(input: {
 }): __esri.Graphic | null {
   const { hitResults, pinRefs, pointsGraphicsLayer } = input;
 
-  const match = (hitResults as { graphic?: __esri.Graphic }[]).find((r) => {
-    const gr = r.graphic;
-    if (!gr?.attributes) return false;
-    const id = gr.attributes.id as number | undefined;
-    const isPin = typeof id === "number" && pinRefs.has(id);
-    const isBluePoint = !!pointsGraphicsLayer && gr.layer === pointsGraphicsLayer;
-    return isPin || isBluePoint;
-  });
+  const match = (hitResults as { graphic?: __esri.Graphic }[]).find((r) =>
+    isHoverableGraphic(r.graphic, pinRefs, pointsGraphicsLayer)
+  );
 
   return match?.graphic ?? null;
 }

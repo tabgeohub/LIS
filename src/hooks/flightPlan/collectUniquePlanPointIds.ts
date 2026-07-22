@@ -3,6 +3,21 @@ type GeometryWithPoints = {
   points?: { id?: number }[];
 };
 
+function collectPointIdsFromGeometry(geometry: GeometryWithPoints): number[] {
+  const ids: number[] = [];
+  for (const point of geometry.points ?? []) {
+    if (point.id != null) ids.push(point.id);
+  }
+  return ids;
+}
+
+function isSelectedGeometry(
+  geometry: GeometryWithPoints,
+  geometryIds: number[]
+): boolean {
+  return geometryIds.includes(geometry.id);
+}
+
 function gatherGeometryPointIds(input: {
   geometryIds: number[];
   geometries: GeometryWithPoints[];
@@ -11,14 +26,9 @@ function gatherGeometryPointIds(input: {
     return [];
   }
 
-  const geometryPointIds: number[] = [];
-  for (const geometry of input.geometries) {
-    if (!input.geometryIds.includes(geometry.id)) continue;
-    for (const point of geometry.points ?? []) {
-      if (point.id != null) geometryPointIds.push(point.id);
-    }
-  }
-  return geometryPointIds;
+  return input.geometries
+    .filter((geometry) => isSelectedGeometry(geometry, input.geometryIds))
+    .flatMap(collectPointIdsFromGeometry);
 }
 
 /** Merge direct point IDs with point IDs from selected geometries (deduped). */

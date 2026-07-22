@@ -9,6 +9,6 @@ export function addPlanGeometryHighlights(
   for (const g of plan.geometries || []) {
     const path = geometryPathFromPoints(g.points);
     if (path.length < 2) continue;
-    layer.add(createPlanGeometryHighlightGraphic(plan, g, path));
+    layer.add(createPlanGeometryHighlightGraphic({ plan, geometry: g, path }));
   }
 }

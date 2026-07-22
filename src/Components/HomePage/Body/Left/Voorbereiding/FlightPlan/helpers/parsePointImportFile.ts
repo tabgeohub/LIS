@@ -109,15 +109,21 @@ function numericColumnHandler(key: NumericColumn): ImportColumnHandler {
   };
 }
 
+function coerceTruthyCell(value: unknown): string | number | boolean {
+  if (value == null) return 0;
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+  return String(value);
+}
+
 function truthyColumnHandler(key: TruthyColumn): ImportColumnHandler {
   return ({ obj, value }) => {
-    obj[key] =
-      value == null ||
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-        ? value ?? 0
-        : String(value);
+    obj[key] = coerceTruthyCell(value);
   };
 }
 

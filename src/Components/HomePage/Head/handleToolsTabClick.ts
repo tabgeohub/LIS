@@ -42,14 +42,20 @@ export function openToolSideTab(input: HandleToolsTabClickInput) {
   input.graphicsLayerHover?.removeAll();
 }
 
+const TOOL_TAB_ACTIONS: Partial<
+  Record<ToolsTabsType, (input: HandleToolsTabClickInput) => void>
+> = {
+  startgebied: goToStartgebied,
+  exporteer: (input) => input.setOpenExporter(true),
+  uploaden: (input) => input.setOpenUploader(true),
+  bevragen: (input) => input.setOpenBevragen(true),
+};
+
 export function handleToolsTabClick(input: HandleToolsTabClickInput) {
   if (input.item.disabled) return;
 
-  if (input.item.id === "startgebied") goToStartgebied(input);
-  else if (input.item.id === "exporteer") input.setOpenExporter(true);
-  else if (input.item.id === "uploaden") input.setOpenUploader(true);
-  else if (input.item.id === "bevragen") input.setOpenBevragen(true);
-  else openToolSideTab(input);
+  const action = TOOL_TAB_ACTIONS[input.item.id] ?? openToolSideTab;
+  action(input);
 
   if (input.item.id !== "bevragen") input.setOpenBevragen(false);
 }

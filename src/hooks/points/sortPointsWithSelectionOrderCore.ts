@@ -5,23 +5,25 @@ function selectionPriority(id: number, selectedPointIds: number[]): number {
   return selectedPointIds.includes(id) ? 0 : 1;
 }
 
-function compareSelectedReverseOrder(
-  aId: number,
-  bId: number,
-  selectedReverseIndexMap: Map<number, number>
-): number {
+function compareSelectedReverseOrder(input: {
+  aId: number;
+  bId: number;
+  selectedReverseIndexMap: Map<number, number>;
+}): number {
   return (
-    (selectedReverseIndexMap.get(aId) ?? 0) -
-    (selectedReverseIndexMap.get(bId) ?? 0)
+    (input.selectedReverseIndexMap.get(input.aId) ?? 0) -
+    (input.selectedReverseIndexMap.get(input.bId) ?? 0)
   );
 }
 
-function compareOriginalIndex(
-  aId: number,
-  bId: number,
-  indexMap: Map<number, number>
-): number {
-  return (indexMap.get(aId) ?? 0) - (indexMap.get(bId) ?? 0);
+function compareOriginalIndex(input: {
+  aId: number;
+  bId: number;
+  indexMap: Map<number, number>;
+}): number {
+  return (
+    (input.indexMap.get(input.aId) ?? 0) - (input.indexMap.get(input.bId) ?? 0)
+  );
 }
 
 type CompareSelectionOrderInput = {
@@ -46,10 +48,14 @@ function comparePointsWithSelectionOrder(
     selectedPointIds.includes(aId) &&
     selectedPointIds.includes(bId)
   ) {
-    return compareSelectedReverseOrder(aId, bId, selectedReverseIndexMap);
+    return compareSelectedReverseOrder({
+      aId,
+      bId,
+      selectedReverseIndexMap,
+    });
   }
 
-  return compareOriginalIndex(aId, bId, indexMap);
+  return compareOriginalIndex({ aId, bId, indexMap });
 }
 
 export function sortPointsWithSelectionOrder<T extends { id: number }>(
