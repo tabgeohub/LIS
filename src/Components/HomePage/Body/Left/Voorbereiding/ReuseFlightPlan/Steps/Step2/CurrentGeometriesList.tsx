@@ -8,16 +8,19 @@ import {
 } from "hooks/features/useGeometriesStore";
 import SelectableGeometryList from "./SelectableGeometryList";
 
-function resolvePlanGeometries(
+function resolvePlanGeometries(input: {
   selectedPlan: NonNullable<
     ReturnType<typeof useReuseFlightPlan>["selectedPlan"]
-  >,
-  dbGeometries: Geometry[]
-): Geometry[] {
-  const planGeoms = (selectedPlan as { geometries?: { id: number }[] }).geometries;
+  >;
+  dbGeometries: Geometry[];
+}): Geometry[] {
+  const planGeoms = (input.selectedPlan as { geometries?: { id: number }[] })
+    .geometries;
   if (!planGeoms || !Array.isArray(planGeoms)) return [];
 
-  return dbGeometries.filter((g) => planGeoms.some((pg) => pg.id === g.id));
+  return input.dbGeometries.filter((g) =>
+    planGeoms.some((pg) => pg.id === g.id)
+  );
 }
 
 export default function CurrentGeometriesList() {
@@ -28,7 +31,7 @@ export default function CurrentGeometriesList() {
 
   useEffect(() => {
     if (!selectedPlan) return;
-    const geometries = resolvePlanGeometries(selectedPlan, dbGeometries);
+    const geometries = resolvePlanGeometries({ selectedPlan, dbGeometries });
     setPlanGeometries(geometries);
     setCurrentGeometries(geometries.flatMap((g) => g.id));
   }, [selectedPlan, dbGeometries, setCurrentGeometries]);

@@ -16,13 +16,14 @@ Interface module with 78 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGI
 Interface module with 74 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/pointMapGraphicActionsCore.ts,TypeScript,74
 Interface module with 70 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/points/sortPointsWithSelectionOrderCore.ts,TypeScript,70
 Interface module with 66 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/createGeometryGraphicInternal.ts,TypeScript,66
+Interface module with 63 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/bufferFlightPlansOnLayerCore.ts,TypeScript,63
 Interface module with 61 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/bufferPointsOnLayerCore.ts,TypeScript,61
 Interface module with 60 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/tableExports/shapefileExportCore.ts,TypeScript,60
 Interface module with 59 lines of code,MEDIUM,RAW,2026-07-22,5,src/hooks/zustand/tools/deletePointFormFields.ts,TypeScript,59
 Interface module with 59 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/tableExports/csvExportCore.ts,TypeScript,59
 Interface module with 56 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/hover-click-handlers/useNearestPointClickCore.ts,TypeScript,56
 Interface module with 56 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/points/useWizardPointsFilterHeaderCore.tsx,TypeScript,56
-Interface module with 56 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/bufferFlightPlansOnLayerCore.ts,TypeScript,56
+Interface module with 55 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/buildPlanBoundingBoxGraphicCore.ts,TypeScript,55
 Interface module with 55 lines of code,MEDIUM,RAW,2026-07-18,9,src/api-hooks/mutations/useCreateDataCore.ts,TypeScript,55
 Interface module with 54 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/planBoundingBoxGeometryCore.ts,TypeScript,54
 Interface module with 52 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/flightPlan/submitCollectedFlightPlanCreate.ts,TypeScript,52
@@ -31,7 +32,6 @@ Interface module with 50 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/zustand
 Interface module with 50 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/tableExports/xlsxExportCore.ts,TypeScript,50
 Interface module with 49 lines of code,MEDIUM,RAW,2026-07-18,9,src/api-hooks/mutations/useUpdateDataCore.ts,TypeScript,49
 Interface module with 48 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/planStarGraphicsCore.ts,TypeScript,48
-Interface module with 46 lines of code,MEDIUM,RAW,2026-07-18,9,src/helpers/ArcGISHelpers/buildPlanBoundingBoxGraphicCore.ts,TypeScript,46
 Interface module with 45 lines of code,MEDIUM,RAW,2026-07-18,9,src/api-hooks/mutations/useDeleteDataCore.ts,TypeScript,45
 Interface module with 44 lines of code,MEDIUM,RAW,2026-07-18,9,src/hooks/useTimeRangeCore.ts,TypeScript,44
 Interface module with 43 lines of code,MEDIUM,RAW,2026-07-17,10,src/helpers/ArcGISHelpers/pointGraphicCoordinates.ts,TypeScript,43

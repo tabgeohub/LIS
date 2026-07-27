@@ -16,13 +16,11 @@ function keepPlanIfPresent(
   return plans.some((p) => p.id === prev.id) ? prev : null;
 }
 
-function resolveSelectedPlan(input: {
+function resolveNonEmptySelection(input: {
   filteredPlans: FinishedFlightPlanType[];
   planIdFromQuery: number | null;
   prev: FinishedFlightPlanType | null;
-}): FinishedFlightPlanType | null {
-  if (input.filteredPlans.length === 0) return null;
-
+}): FinishedFlightPlanType {
   if (input.planIdFromQuery != null) {
     const match = findPlanById(input.filteredPlans, input.planIdFromQuery);
     if (match) return match;
@@ -32,6 +30,15 @@ function resolveSelectedPlan(input: {
     keepPlanIfPresent(input.filteredPlans, input.prev) ??
     input.filteredPlans[0]
   );
+}
+
+function resolveSelectedPlan(input: {
+  filteredPlans: FinishedFlightPlanType[];
+  planIdFromQuery: number | null;
+  prev: FinishedFlightPlanType | null;
+}): FinishedFlightPlanType | null {
+  if (input.filteredPlans.length === 0) return null;
+  return resolveNonEmptySelection(input);
 }
 
 export function useTimesliderSelectedPlan(input: {

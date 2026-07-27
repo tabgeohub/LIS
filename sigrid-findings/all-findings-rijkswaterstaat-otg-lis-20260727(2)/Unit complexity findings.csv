@@ -1,0 +1,3 @@
+Description,Severity,Status,First Seen,Issue age,Unit,File,Technology,Lines of code,McCabe complexity,Number of parameters
+McCabe complexity of 6 for unit useTimesliderSelection.ts.resolveSelectedPlan(any),LOW,RAW,2026-07-27,0,useTimesliderSelection.ts.resolveSelectedPlan(any),src/Components/TimesliderItemDetailPage/useTimesliderSelection.ts#L19:35,TypeScript,11,6,1
+McCabe complexity of 6 for unit resolveRegioFilter.ts.resolveRealmRolesFromAuth(any),LOW,RAW,2026-07-27,0,resolveRegioFilter.ts.resolveRealmRolesFromAuth(any),backend/src/helpers/queries/shared/resolveRegioFilter.ts#L38:49,TypeScript,9,6,1

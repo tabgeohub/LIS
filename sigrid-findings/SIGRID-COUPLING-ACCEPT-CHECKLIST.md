@@ -1,6 +1,6 @@
-# Sigrid coupling Accept checklist (pack 1)
+# Sigrid coupling Accept checklist (pack 2)
 
-Source: `all-findings-rijkswaterstaat-otg-lis-20260727(1)/Module coupling findings.csv`
+Source: `all-findings-rijkswaterstaat-otg-lis-20260727(2)/Module coupling findings.csv`
 
 1. [ ] `src/hooks/useLogAction.ts` — fan-in 98 (HIGH, 21 LOC)
 2. [ ] `src/hooks/useContent.ts` — fan-in 126 (HIGH, 5 LOC)
@@ -14,7 +14,7 @@ Source: `all-findings-rijkswaterstaat-otg-lis-20260727(1)/Module coupling findin
 10. [ ] `src/Components/HomePage/Body/Left/Tools/EditGeometry/EditForm/EditGeometryPointPanel/coords.ts` — fan-in 24 (MEDIUM, 9 LOC)
 11. [ ] `src/helpers/ArcGISHelpers/validateMapView.ts` — fan-in 24 (MEDIUM, 7 LOC)
 12. [ ] `backend/src/routes/keycloak/management/users/keycloakAdminClient.ts` — fan-in 14 (LOW, 114 LOC)
-13. [ ] `backend/src/helpers/queries/shared/resolveRegioFilter.ts` — fan-in 16 (LOW, 77 LOC)
+13. [ ] `backend/src/helpers/queries/shared/resolveRegioFilter.ts` — fan-in 16 (LOW, 80 LOC)
 14. [ ] `src/api-hooks/mutations/useCreateDataCore.ts` — fan-in 13 (LOW, 55 LOC)
 15. [ ] `src/hooks/zustand/shared/planWizardCore.ts` — fan-in 12 (LOW, 51 LOC)
 16. [ ] `src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts` — fan-in 12 (LOW, 41 LOC)

@@ -21,13 +21,13 @@ function pickStepSelection(
   };
 }
 
-function pickStepText(
-  content: ReturnType<typeof useContent>,
-  isStep2: boolean
-) {
-  return isStep2
-    ? content.voorbereiding.vluchtenTemplate.step2.text
-    : content.voorbereiding.vluchtenTemplate.step3.text;
+function pickStepText(input: {
+  content: ReturnType<typeof useContent>;
+  isStep2: boolean;
+}) {
+  return input.isStep2
+    ? input.content.voorbereiding.vluchtenTemplate.step2.text
+    : input.content.voorbereiding.vluchtenTemplate.step3.text;
 }
 
 /** Shared TemplateFlight Step2/Step3 wiring into TemplateSelectionStep. */
@@ -38,7 +38,7 @@ export function useTemplateFlightSelectionStepProps(step: 2 | 3) {
 
   return {
     repeat: isStep2,
-    text: pickStepText(content, isStep2),
+    text: pickStepText({ content, isStep2 }),
     step,
     ...pickStepSelection(state, isStep2),
   };

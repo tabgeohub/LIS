@@ -1,10 +1,10 @@
-# ACCEPT-LIST — pack 20260727(1)
+# ACCEPT-LIST — pack 20260727(2)
 
-Generated from `all-findings-rijkswaterstaat-otg-lis-20260727(1)`.
+Generated from `all-findings-rijkswaterstaat-otg-lis-20260727(2)`.
 
 ## Do in Sigrid UI
 
-- Full checklist: [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) (**192** items)
+- Full checklist: [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) (**191** items)
 - Coupling only: [SIGRID-COUPLING-ACCEPT-CHECKLIST.md](SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (**24**)
 
 ## Buckets
@@ -16,7 +16,7 @@ Generated from `all-findings-rijkswaterstaat-otg-lis-20260727(1)`.
 | Entanglement | 5 | Accept |
 | Security Docker | 4 | Accept |
 | Size dockerfile | 1 | Accept |
-| Interfacing Express/Multer | 14 | Accept |
+| Interfacing Express/Multer | 13 | Accept |
 | OSH residual | 1 | Bump if possible else Accept |
 
 ## Do not Accept (code wave)

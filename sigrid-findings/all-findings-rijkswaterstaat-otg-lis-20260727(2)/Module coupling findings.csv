@@ -11,7 +11,7 @@ Fan-in of 23 for module with 11 lines of code,MEDIUM,RAW,2026-06-04,53,src/hooks
 Fan-in of 24 for module with 9 lines of code,MEDIUM,RAW,2026-06-04,53,src/Components/HomePage/Body/Left/Tools/EditGeometry/EditForm/EditGeometryPointPanel/coords.ts,TypeScript,9,24
 Fan-in of 24 for module with 7 lines of code,MEDIUM,RAW,2026-06-04,53,src/helpers/ArcGISHelpers/validateMapView.ts,TypeScript,7,24
 Fan-in of 14 for module with 114 lines of code,LOW,RAW,2026-06-29,28,backend/src/routes/keycloak/management/users/keycloakAdminClient.ts,TypeScript,114,14
-Fan-in of 16 for module with 77 lines of code,LOW,RAW,2026-07-01,26,backend/src/helpers/queries/shared/resolveRegioFilter.ts,TypeScript,77,16
+Fan-in of 16 for module with 80 lines of code,LOW,RAW,2026-07-01,26,backend/src/helpers/queries/shared/resolveRegioFilter.ts,TypeScript,80,16
 Fan-in of 13 for module with 55 lines of code,LOW,RAW,2026-07-18,9,src/api-hooks/mutations/useCreateDataCore.ts,TypeScript,55,13
 Fan-in of 12 for module with 51 lines of code,LOW,RAW,2026-07-13,14,src/hooks/zustand/shared/planWizardCore.ts,TypeScript,51,12
 Fan-in of 12 for module with 41 lines of code,LOW,RAW,2026-06-10,47,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts,TypeScript,41,12

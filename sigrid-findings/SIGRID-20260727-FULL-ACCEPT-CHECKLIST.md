@@ -1,8 +1,8 @@
-# Sigrid-20260727 FULL Accept checklist (pack 1)
+# Sigrid-20260727 FULL Accept checklist (pack 2)
 
-Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(1)`.
+Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(2)`.
 
-**Code-fixed this wave (do not Accept):** remaining McCabe 6–7 units, non-Express interfacing options-objects, size MEDIUM TS (`FotoPanel`, `useGeometryGraphicsRendering`, `testResolveRegioFilter`).
+**Code-fixed this wave (do not Accept):** remaining McCabe 6 units, size MEDIUM TS (`useFotoPanelModel`, `verify-regio-apis` helpers split), non-Express interfacing options-objects.
 
 **Out of scope code:** Docker/Nginx, Independence `*Core` façades, high fan-in hubs — Accept only.
 
@@ -15,9 +15,9 @@ Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-li
 | Entanglement | 5 |
 | Security Docker | 4 |
 | Size Accept (dockerfile) | 1 |
-| Interfacing Express/Multer | 14 |
+| Interfacing Express/Multer | 13 |
 | Security OSH residual | 1 |
-| **Total** | **192** |
+| **Total** | **191** |
 
 ## Independence HIGH
 
@@ -41,22 +41,22 @@ Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-li
 5. [ ] `src/helpers/ArcGISHelpers/pointMapGraphicActionsCore.ts` (74 LOC)
 6. [ ] `src/hooks/points/sortPointsWithSelectionOrderCore.ts` (70 LOC)
 7. [ ] `src/helpers/ArcGISHelpers/createGeometryGraphicInternal.ts` (66 LOC)
-8. [ ] `src/helpers/ArcGISHelpers/bufferPointsOnLayerCore.ts` (61 LOC)
-9. [ ] `src/helpers/tableExports/shapefileExportCore.ts` (60 LOC)
-10. [ ] `src/hooks/zustand/tools/deletePointFormFields.ts` (59 LOC)
-11. [ ] `src/helpers/tableExports/csvExportCore.ts` (59 LOC)
-12. [ ] `src/hooks/hover-click-handlers/useNearestPointClickCore.ts` (56 LOC)
-13. [ ] `src/hooks/points/useWizardPointsFilterHeaderCore.tsx` (56 LOC)
-14. [ ] `src/helpers/ArcGISHelpers/bufferFlightPlansOnLayerCore.ts` (56 LOC)
-15. [ ] `src/api-hooks/mutations/useCreateDataCore.ts` (55 LOC)
-16. [ ] `src/helpers/ArcGISHelpers/planBoundingBoxGeometryCore.ts` (54 LOC)
-17. [ ] `src/hooks/flightPlan/submitCollectedFlightPlanCreate.ts` (52 LOC)
-18. [ ] `src/hooks/filters/useFilteredSortedPlansCore.ts` (51 LOC)
-19. [ ] `src/hooks/zustand/shared/flightPlanFormSettersCore.ts` (50 LOC)
-20. [ ] `src/helpers/tableExports/xlsxExportCore.ts` (50 LOC)
-21. [ ] `src/api-hooks/mutations/useUpdateDataCore.ts` (49 LOC)
-22. [ ] `src/helpers/ArcGISHelpers/planStarGraphicsCore.ts` (48 LOC)
-23. [ ] `src/helpers/ArcGISHelpers/buildPlanBoundingBoxGraphicCore.ts` (46 LOC)
+8. [ ] `src/helpers/ArcGISHelpers/bufferFlightPlansOnLayerCore.ts` (63 LOC)
+9. [ ] `src/helpers/ArcGISHelpers/bufferPointsOnLayerCore.ts` (61 LOC)
+10. [ ] `src/helpers/tableExports/shapefileExportCore.ts` (60 LOC)
+11. [ ] `src/hooks/zustand/tools/deletePointFormFields.ts` (59 LOC)
+12. [ ] `src/helpers/tableExports/csvExportCore.ts` (59 LOC)
+13. [ ] `src/hooks/hover-click-handlers/useNearestPointClickCore.ts` (56 LOC)
+14. [ ] `src/hooks/points/useWizardPointsFilterHeaderCore.tsx` (56 LOC)
+15. [ ] `src/helpers/ArcGISHelpers/buildPlanBoundingBoxGraphicCore.ts` (55 LOC)
+16. [ ] `src/api-hooks/mutations/useCreateDataCore.ts` (55 LOC)
+17. [ ] `src/helpers/ArcGISHelpers/planBoundingBoxGeometryCore.ts` (54 LOC)
+18. [ ] `src/hooks/flightPlan/submitCollectedFlightPlanCreate.ts` (52 LOC)
+19. [ ] `src/hooks/filters/useFilteredSortedPlansCore.ts` (51 LOC)
+20. [ ] `src/hooks/zustand/shared/flightPlanFormSettersCore.ts` (50 LOC)
+21. [ ] `src/helpers/tableExports/xlsxExportCore.ts` (50 LOC)
+22. [ ] `src/api-hooks/mutations/useUpdateDataCore.ts` (49 LOC)
+23. [ ] `src/helpers/ArcGISHelpers/planStarGraphicsCore.ts` (48 LOC)
 24. [ ] `src/api-hooks/mutations/useDeleteDataCore.ts` (45 LOC)
 25. [ ] `src/hooks/useTimeRangeCore.ts` (44 LOC)
 26. [ ] `src/helpers/ArcGISHelpers/pointGraphicCoordinates.ts` (43 LOC)
@@ -226,10 +226,9 @@ Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-li
 8. [ ] `backend/src/routes/installersUpload.ts#L25:32` — installersUpload.ts.fileFilter(any,any,any)
 9. [ ] `backend/src/helpers/auth/realmAdminAuth.ts#L20:26` — realmAdminAuth.ts.requireAdmin(any,any,any)
 10. [ ] `backend/src/routes/reportUpload.ts#L19:24` — reportUpload.ts.filename(any,any,any)
-11. [ ] `src/Components/DashboardPage/shared/keycloakUserApi.ts#L11:19` — keycloakUserApi.ts.assertKeycloakOk(Response,any,string)
-12. [ ] `backend/src/routes/reportUpload.ts#L27:31` — reportUpload.ts.fileFilter(express.Request,Express.Multer.File,multer.FileFilterCallback)
-13. [ ] `backend/src/routes/installersUpload.ts#L12:15` — installersUpload.ts.filename(any,any,any)
-14. [ ] `src/helpers/arcgis/deleteAttachmentsResponse.ts#L45:49` — FeatureDeleteAttachmentsResponse.failedDeleteDescription(NonNullable,any,any)
+11. [ ] `backend/src/routes/reportUpload.ts#L27:31` — reportUpload.ts.fileFilter(express.Request,Express.Multer.File,multer.FileFilterCallback)
+12. [ ] `backend/src/routes/installersUpload.ts#L12:15` — installersUpload.ts.filename(any,any,any)
+13. [ ] `src/helpers/arcgis/deleteAttachmentsResponse.ts#L45:49` — FeatureDeleteAttachmentsResponse.failedDeleteDescription(NonNullable,any,any)
 
 ## Security OSH residual
 

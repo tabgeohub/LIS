@@ -8,10 +8,11 @@ import {
   FinishedPointType,
 } from "Types/finished_plans";
 import { filterValidAttachments } from "./filterValidAttachments";
-import { useFotoMapClickHandler } from "./useFotoMapClickHandler";
-import { useImageMarkersOnMap } from "./useImageMarkersOnMap";
-import { navigateToLocation } from "./navigateToLocation";
-import { runFotoAttachmentDelete } from "./runFotoAttachmentDelete";
+import {
+  createFotoDeleteHandler,
+  createFotoNavigateHandler,
+  useFotoPanelMapBindings,
+} from "./fotoPanelModelHelpers";
 
 export function useFotoPanelModel(input: {
   attachmentPoint: FinishedPointType | null;
@@ -30,18 +31,13 @@ export function useFotoPanelModel(input: {
     attachments: input.attachmentPoint?.attachments,
   });
 
-  useFotoMapClickHandler({
+  useFotoPanelMapBindings({
     mapView,
     redGraphicsLayer,
+    attachmentPoint: input.attachmentPoint,
     validAttachments,
     setActiveIndex,
     setIsOpen,
-  });
-  useImageMarkersOnMap({
-    attachmentPoint: input.attachmentPoint,
-    validAttachments,
-    mapView,
-    redGraphicsLayer,
   });
 
   return {
@@ -53,23 +49,20 @@ export function useFotoPanelModel(input: {
     loading,
     setLoading,
     validAttachments,
-    handleNavigateToLocation: (location: string | null | undefined) => {
-      navigateToLocation({ location, mapView, redGraphicsLayer });
-    },
-    deleteImage: async (attachmentId: number) => {
-      if (!input.attachmentPoint || !input.selectedPlan) return;
-      await runFotoAttachmentDelete({
-        attachmentId,
-        validAttachments,
-        attachmentPoint: input.attachmentPoint,
-        selectedPlan: input.selectedPlan,
-        activeIndex,
-        setLoading,
-        setIsOpen,
-        setActiveIndex,
-        onAttachmentsUpdated: input.onAttachmentsUpdated,
-        update,
-      });
-    },
+    handleNavigateToLocation: createFotoNavigateHandler({
+      mapView,
+      redGraphicsLayer,
+    }),
+    deleteImage: createFotoDeleteHandler({
+      attachmentPoint: input.attachmentPoint,
+      selectedPlan: input.selectedPlan,
+      validAttachments,
+      activeIndex,
+      setLoading,
+      setIsOpen,
+      setActiveIndex,
+      onAttachmentsUpdated: input.onAttachmentsUpdated,
+      update: update as never,
+    }),
   };
 }

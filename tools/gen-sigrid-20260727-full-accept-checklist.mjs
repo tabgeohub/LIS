@@ -68,7 +68,7 @@ function loadCsv(filePath) {
 }
 
 const base =
-  "sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(1)";
+  "sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(2)";
 
 const indep = loadCsv(
   path.join(base, "Component independence findings.csv")
@@ -120,11 +120,11 @@ const total =
   expressIface.length +
   osh.length;
 
-let out = "# Sigrid-20260727 FULL Accept checklist (pack 1)\n\n";
+let out = "# Sigrid-20260727 FULL Accept checklist (pack 2)\n\n";
 out +=
-  "Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(1)`.\n\n";
+  "Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(2)`.\n\n";
 out +=
-  "**Code-fixed this wave (do not Accept):** remaining McCabe 6–7 units, non-Express interfacing options-objects, size MEDIUM TS (`FotoPanel`, `useGeometryGraphicsRendering`, `testResolveRegioFilter`).\n\n";
+  "**Code-fixed this wave (do not Accept):** remaining McCabe 6 units, size MEDIUM TS (`useFotoPanelModel`, `verify-regio-apis` helpers split), non-Express interfacing options-objects.\n\n";
 out +=
   "**Out of scope code:** Docker/Nginx, Independence `*Core` façades, high fan-in hubs — Accept only.\n\n";
 out += "## Summary\n\n| Bucket | Count |\n| --- | --- |\n";
@@ -193,9 +193,9 @@ fs.writeFileSync(
 console.log("Wrote full checklist, total items:", total);
 
 // Coupling-only checklist
-let coupleOut = "# Sigrid coupling Accept checklist (pack 1)\n\n";
+let coupleOut = "# Sigrid coupling Accept checklist (pack 2)\n\n";
 coupleOut +=
-  "Source: `all-findings-rijkswaterstaat-otg-lis-20260727(1)/Module coupling findings.csv`\n\n";
+  "Source: `all-findings-rijkswaterstaat-otg-lis-20260727(2)/Module coupling findings.csv`\n\n";
 coupling.forEach((r, i) => {
   coupleOut += `${i + 1}. [ ] \`${r.File}\` — fan-in ${r["Fan-in"]} (${r.Severity}, ${r["Lines of code"]} LOC)\n`;
 });
@@ -206,8 +206,8 @@ fs.writeFileSync(
 console.log("Wrote coupling checklist, items:", coupling.length);
 
 // ACCEPT-LIST summary
-let acceptList = `# ACCEPT-LIST — pack 20260727(1)\n\n`;
-acceptList += `Generated from \`all-findings-rijkswaterstaat-otg-lis-20260727(1)\`.\n\n`;
+let acceptList = `# ACCEPT-LIST — pack 20260727(2)\n\n`;
+acceptList += `Generated from \`all-findings-rijkswaterstaat-otg-lis-20260727(2)\`.\n\n`;
 acceptList += `## Do in Sigrid UI\n\n`;
 acceptList += `- Full checklist: [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) (**${total}** items)\n`;
 acceptList += `- Coupling only: [SIGRID-COUPLING-ACCEPT-CHECKLIST.md](SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (**${coupling.length}**)\n\n`;
@@ -221,8 +221,8 @@ acceptList += `| Size dockerfile | ${size.length} | Accept |\n`;
 acceptList += `| Interfacing Express/Multer | ${expressIface.length} | Accept |\n`;
 acceptList += `| OSH residual | ${osh.length} | Bump if possible else Accept |\n`;
 acceptList += `\n## Do not Accept (code wave)\n\n`;
-acceptList += `- Unit complexity McCabe 6–7 (7 units)\n`;
+acceptList += `- Unit complexity McCabe 6 (resolveSelectedPlan, resolveRealmRolesFromAuth)\n`;
 acceptList += `- Non-Express unit interfacing (options-object conversions)\n`;
-acceptList += `- Size MEDIUM: FotoPanel, useGeometryGraphicsRendering, testResolveRegioFilter\n`;
+acceptList += `- Size MEDIUM: useFotoPanelModel, verify-regio-apis script helpers\n`;
 fs.writeFileSync("sigrid-findings/ACCEPT-LIST.md", acceptList);
 console.log("Wrote ACCEPT-LIST.md");

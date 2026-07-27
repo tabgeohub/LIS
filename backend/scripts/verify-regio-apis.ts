@@ -17,91 +17,15 @@ import {
   runGeometriesRegioCheck,
   runPointsRegioCheck,
 } from "./verifyRegioPointsGeometries";
-
-const REGIO = "RWS NN";
-const ADMIN = "admin";
-
-type Result = { name: string; ok: boolean; detail: string };
-
-const results: Result[] = [];
-
-function pass(name: string, detail: string) {
-  results.push({ name, ok: true, detail });
-  console.log(`  ✓ ${name} — ${detail}`);
-}
-
-function fail(name: string, detail: string) {
-  results.push({ name, ok: false, detail });
-  console.log(`  ✗ ${name} — ${detail}`);
-}
-
-const reporter = { pass, fail };
-
-function makeFakeAccessToken(roles: string[]): string {
-  const payload = Buffer.from(
-    JSON.stringify({ realm_access: { roles } })
-  ).toString("base64url");
-  return `e30.${payload}.e30`;
-}
-
-function mockReq(input: { roles: string[]; query?: Record<string, string> }) {
-  const { roles, query = {} } = input;
-  return {
-    query,
-    session: {
-      auth: {
-        tokenSet: { access_token: makeFakeAccessToken(roles) },
-      },
-    },
-  } as Parameters<typeof resolveRegioFilter>[0];
-}
-
-const RESOLVE_REGIO_FILTER_CASES: Array<{
-  name: string;
-  roles: string[];
-  query?: Record<string, string>;
-  expected: string | undefined;
-}> = [
-  {
-    name: "RWS NN session, no query",
-    roles: ["RWS NN", "offline_access"],
-    expected: REGIO,
-  },
-  {
-    name: "RWS NN session, query admin (no escalation)",
-    roles: ["RWS NN"],
-    query: { regio_id: "admin" },
-    expected: REGIO,
-  },
-  {
-    name: "RWS NN session, query other regio (no escalation)",
-    roles: ["RWS NN"],
-    query: { regio_id: "RWS WNN" },
-    expected: REGIO,
-  },
-  {
-    name: "admin session, no query",
-    roles: ["admin"],
-    expected: ADMIN,
-  },
-  {
-    name: "admin session, query RWS NN",
-    roles: ["admin"],
-    query: { regio_id: REGIO },
-    expected: REGIO,
-  },
-  {
-    name: "no session, query RWS NN",
-    roles: [],
-    query: { regio_id: REGIO },
-    expected: REGIO,
-  },
-  {
-    name: "no session, no query",
-    roles: [],
-    expected: undefined,
-  },
-];
+import {
+  REGIO,
+  RESOLVE_REGIO_FILTER_CASES,
+  fail,
+  getVerifyResults,
+  mockReq,
+  pass,
+  reporter,
+} from "./verifyRegioApisHelpers";
 
 function testResolveRegioFilter() {
   console.log("\n── resolveRegioFilter (unit) ──");
@@ -159,6 +83,7 @@ async function main() {
   testResolveRegioFilter();
   await testDatabaseQueries();
 
+  const results = getVerifyResults();
   const failed = results.filter((r) => !r.ok);
   console.log("\n══════════════════════════════════════");
   console.log(

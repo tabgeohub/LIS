@@ -35,17 +35,25 @@ function rolesFromAccessToken(accessToken: string): string[] | undefined {
   return rolesFromClaims(accessClaims);
 }
 
-function resolveRealmRolesFromAuth(auth: {
-  tokenSet: { access_token?: string; claims?: () => unknown };
+function rolesFromTokenSet(tokenSet: {
+  access_token?: string;
+  claims?: () => unknown;
 }): string[] {
-  const accessToken = auth.tokenSet.access_token;
+  const accessToken = tokenSet.access_token;
   if (!accessToken) return [];
 
   return (
     rolesFromAccessToken(accessToken) ??
-    rolesFromClaims(idTokenClaims(auth.tokenSet)) ??
+    rolesFromClaims(idTokenClaims(tokenSet)) ??
     []
   );
+}
+
+function resolveRealmRolesFromAuth(auth: {
+  tokenSet: { access_token?: string; claims?: () => unknown };
+}): string[] {
+  if (!auth.tokenSet.access_token) return [];
+  return rolesFromTokenSet(auth.tokenSet);
 }
 
 export function getSessionRealmRoles(req: Request): string[] {
