@@ -1,40 +1,46 @@
-# Next focus status — Coupling Accept + complexity/interfacing clear
+# NEXT-FOCUS-STATUS — after Big Wave pack 20260727(1)
 
-## Wave complete (local)
+Updated after implementing the Sigrid Big Wave against
+`sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727(1)`.
 
-Exports addressed:
-- [`module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv`](./module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv) — **Accept** (24)
-- [`unit-complexity-findings-rijkswaterstaat-otg-lis-20260727.csv`](./unit-complexity-findings-rijkswaterstaat-otg-lis-20260727.csv) — **code** (83 McCabe-6)
-- [`unit-interfacing-findings-rijkswaterstaat-otg-lis-20260727.csv`](./unit-interfacing-findings-rijkswaterstaat-otg-lis-20260727.csv) — **code** (~30 options-object) + Accept Express/Multer signatures
+## Code wave completed
 
-### Coupling — Accept only
+- Unit complexity: thinned all 7 McCabe 6–7 RAW units
+- Unit interfacing: options-object for non-Express units (incl. `classifyRoleChange` MEDIUM)
+- Unit size MEDIUM: `testResolveRegioFilter` cases hoisted; `FotoPanel` split; `renderDefaultGeometries` extracted
+- Duplication: already empty in this pack (no Dup work)
+- OSH `react-router-dom` CWE-601: still on latest `6.30.4` — **Accept** (no newer 6.x patch; do not jump to v7)
 
-Checklist: [`SIGRID-COUPLING-ACCEPT-CHECKLIST.md`](./SIGRID-COUPLING-ACCEPT-CHECKLIST.md)  
-Includes HIGH `useLogAction` / `useContent` and all MEDIUM/LOW hubs. No hub rewrites.
+## Accept in Sigrid UI (stars / Architecture)
 
-### Complexity — McCabe 6 thinned
+Use:
 
-Batches A/B/C: helper extracts + early returns across ~80 units (deleteUser, map hover/click, centroid, auth2, timeslider, PDF tables, regio filter, arcgis proxy, etc.).
+- [ACCEPT-LIST.md](ACCEPT-LIST.md)
+- [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) (~192 items)
+- [SIGRID-COUPLING-ACCEPT-CHECKLIST.md](SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (24 modules)
 
-### Interfacing — options objects
+Buckets to Accept (no code rewrites planned):
 
-Non-Express units collapsed to `input: { ... }` (bounding box, map source items, wizard cleanup, grantError, flightPlanExtraColumns, attachments helpers, etc.).  
-**Left as framework signatures (Accept):** Express `RequestHandler`, Multer `fileFilter`/`filename`.
+| Bucket | Action |
+| --- | --- |
+| Independence (143) | Accept — no `*Core` façades / hub rewrites |
+| Module coupling (24) | Accept — keep `useLogAction` / `useContent` hubs |
+| Entanglement (5) | Accept |
+| Security Docker CWE-266/CWE-250 (4) | Accept — no Dockerfile/Nginx edits |
+| Size dockerfile MEDIUM | Accept |
+| Interfacing Express/Multer | Accept — framework signatures |
+| OSH react-router-dom CWE-601 | Accept until a CVE-clearing 6.x patch exists |
 
-## Verification
+## Out of scope / do not grind
 
-- `npm run check:architecture` — passed
-- `npm run test:architecture-helpers` — passed
-- `backend npm run build` — passed
-- `npx vitest run` — 15 files / 39 tests passed
+- ~686 unit size LOW findings
+- Independence coupling entanglement code restructures
+- Dockerfile / Nginx
 
-## Your next steps
+## Regenerators
 
-1. Accept [`SIGRID-COUPLING-ACCEPT-CHECKLIST.md`](./SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (+ Express/Multer interfacing rows listed there) in Sigrid UI
-2. Deploy → rescan → expect complexity/interfacing RAW drop; coupling cleared by Accept
+```bash
+node tools/gen-sigrid-20260727-full-accept-checklist.mjs
+```
 
-## Constraints held
-
-- No Dockerfile / Nginx edits
-- No `useLogAction` / `useContent` rewrites
-- No new Independence `*Core` façades
+Source pack path is hard-coded to `all-findings-rijkswaterstaat-otg-lis-20260727(1)`.

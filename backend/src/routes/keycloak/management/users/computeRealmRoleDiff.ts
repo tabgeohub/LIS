@@ -8,17 +8,17 @@ function buildRequestedRoleSet(
   return new Set(requestedRoleNames.filter((role) => availableNames.has(role)));
 }
 
-function classifyRoleChange(
-  role: RealmRoleRef,
-  currentRealmRoles: Set<string>,
-  newRealmRoles: Set<string>,
-  toAdd: RealmRoleRef[],
-  toRemove: RealmRoleRef[]
-) {
-  const isRequested = newRealmRoles.has(role.name);
-  const isCurrent = currentRealmRoles.has(role.name);
-  if (isRequested && !isCurrent) toAdd.push(role);
-  else if (isCurrent && !isRequested) toRemove.push(role);
+function classifyRoleChange(input: {
+  role: RealmRoleRef;
+  currentRealmRoles: Set<string>;
+  newRealmRoles: Set<string>;
+  toAdd: RealmRoleRef[];
+  toRemove: RealmRoleRef[];
+}) {
+  const isRequested = input.newRealmRoles.has(input.role.name);
+  const isCurrent = input.currentRealmRoles.has(input.role.name);
+  if (isRequested && !isCurrent) input.toAdd.push(input.role);
+  else if (isCurrent && !isRequested) input.toRemove.push(input.role);
 }
 
 export function computeRealmRoleDiff(input: {
@@ -36,7 +36,13 @@ export function computeRealmRoleDiff(input: {
   const toRemove: RealmRoleRef[] = [];
 
   for (const role of input.availableRealmRoles) {
-    classifyRoleChange(role, currentRealmRoles, newRealmRoles, toAdd, toRemove);
+    classifyRoleChange({
+      role,
+      currentRealmRoles,
+      newRealmRoles,
+      toAdd,
+      toRemove,
+    });
   }
 
   return { toAdd, toRemove };

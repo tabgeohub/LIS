@@ -10,15 +10,19 @@ type TimesliderPageStatusInput = {
   imagesLength: number;
 };
 
+const BLOCK_IMAGE_PREDICATES: Array<
+  (input: TimesliderPageStatusInput) => boolean
+> = [
+  (input) => input.invalidQuery,
+  (input) => input.needsAuth,
+  (input) => !!input.plansError,
+  (input) => input.noPlansInRange,
+  (input) => input.noMatchingPlans,
+  (input) => input.allPlansLoading,
+];
+
 function shouldBlockImages(input: TimesliderPageStatusInput): boolean {
-  return Boolean(
-    input.invalidQuery ||
-      input.needsAuth ||
-      input.plansError ||
-      input.noPlansInRange ||
-      input.noMatchingPlans ||
-      input.allPlansLoading
-  );
+  return BLOCK_IMAGE_PREDICATES.some((predicate) => predicate(input));
 }
 
 export function buildTimesliderPageStatus(input: TimesliderPageStatusInput) {

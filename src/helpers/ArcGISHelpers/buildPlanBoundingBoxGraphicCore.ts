@@ -32,6 +32,18 @@ function buildBoundingBoxFillSymbol(
   });
 }
 
+function toPlanBoundingBoxGraphic(input: {
+  polygon: NonNullable<ReturnType<typeof createPlanBoundingBoxPolygon>>;
+  symbolOptions?: CreatePlanBoundingBoxGraphicOptions["symbolOptions"];
+  attributes?: CreatePlanBoundingBoxGraphicOptions["attributes"];
+}): Graphic {
+  return new Graphic({
+    geometry: input.polygon,
+    symbol: buildBoundingBoxFillSymbol(input.symbolOptions ?? {}),
+    attributes: input.attributes ?? {},
+  });
+}
+
 /** Graphic outline around all points in a flight plan. */
 export function buildPlanBoundingBoxGraphic(options: {
   points: PlanBoundingBoxPoint[] | null | undefined;
@@ -41,12 +53,9 @@ export function buildPlanBoundingBoxGraphic(options: {
   const polygon = createPlanBoundingBoxPolygon({ points: options.points });
   if (!polygon) return null;
 
-  const symbolOptions = options.symbolOptions ?? {};
-  const attributes = options.attributes ?? {};
-
-  return new Graphic({
-    geometry: polygon,
-    symbol: buildBoundingBoxFillSymbol(symbolOptions),
-    attributes,
+  return toPlanBoundingBoxGraphic({
+    polygon,
+    symbolOptions: options.symbolOptions,
+    attributes: options.attributes,
   });
 }

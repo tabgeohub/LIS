@@ -15,17 +15,23 @@ function orderedDateRange(minDate: Date, maxDate: Date) {
   return { minDate: maxDate, maxDate: minDate };
 }
 
+function fallbackTimesliderRange() {
+  return { minDate: FALLBACK_MIN, maxDate: FALLBACK_MAX };
+}
+
+function boundOrFallback(value: string, fallback: Date): Date {
+  return parseIsoOrUndefined(value) ?? fallback;
+}
+
 export function parseTimesliderRange(
   from?: string | null,
   to?: string | null
 ) {
-  if (!from || !to) {
-    return { minDate: FALLBACK_MIN, maxDate: FALLBACK_MAX };
-  }
+  if (!from || !to) return fallbackTimesliderRange();
 
   return orderedDateRange(
-    parseIsoOrUndefined(from) ?? FALLBACK_MIN,
-    parseIsoOrUndefined(to) ?? FALLBACK_MAX
+    boundOrFallback(from, FALLBACK_MIN),
+    boundOrFallback(to, FALLBACK_MAX)
   );
 }
 

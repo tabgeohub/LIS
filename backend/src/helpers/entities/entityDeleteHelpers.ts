@@ -69,20 +69,20 @@ export function sendDeleteError(input: SendDeleteErrorInput): void {
   });
 }
 
-async function stripPointIdsFromFlightPlan(
-  client: PoolClient,
-  flightPlan: { id: number; points: number[] | null },
-  pointIds: number[]
-): Promise<void> {
-  const currentPoints: number[] = flightPlan.points || [];
+async function stripPointIdsFromFlightPlan(input: {
+  client: PoolClient;
+  flightPlan: { id: number; points: number[] | null };
+  pointIds: number[];
+}): Promise<void> {
+  const currentPoints: number[] = input.flightPlan.points || [];
   const updatedPoints = currentPoints.filter(
-    (pointId: number) => !pointIds.includes(pointId)
+    (pointId: number) => !input.pointIds.includes(pointId)
   );
 
-  await client.query(`UPDATE lis.flightplans SET points = $1::int[] WHERE id = $2`, [
-    updatedPoints,
-    flightPlan.id,
-  ]);
+  await input.client.query(
+    `UPDATE lis.flightplans SET points = $1::int[] WHERE id = $2`,
+    [updatedPoints, input.flightPlan.id]
+  );
 }
 
 export async function removePointIdsFromFlightPlans(
@@ -99,7 +99,7 @@ export async function removePointIdsFromFlightPlans(
   );
 
   for (const flightPlan of flightPlansResult.rows) {
-    await stripPointIdsFromFlightPlan(client, flightPlan, pointIds);
+    await stripPointIdsFromFlightPlan({ client, flightPlan, pointIds });
   }
 
   return flightPlansResult.rowCount ?? 0;

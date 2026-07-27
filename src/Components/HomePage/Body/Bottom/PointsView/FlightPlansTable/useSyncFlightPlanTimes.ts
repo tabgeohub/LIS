@@ -14,19 +14,19 @@ function hasCompleteFlightMetrics(metrics: FlightPathMetrics): boolean {
   );
 }
 
-function withUpdatedPlanTimes(
-  flightPlans: FlightPlanType[],
-  planId: number,
-  metrics: FlightPathMetrics
-): FlightPlanType[] {
-  return flightPlans.map((fp) =>
-    fp.id === planId
+function withUpdatedPlanTimes(input: {
+  flightPlans: FlightPlanType[];
+  planId: number;
+  metrics: FlightPathMetrics;
+}): FlightPlanType[] {
+  return input.flightPlans.map((fp) =>
+    fp.id === input.planId
       ? {
           ...fp,
-          beginTime: metrics.beginTime!,
-          endTime: metrics.endTime!,
-          durationSeconds: metrics.durationSeconds!,
-          totalDistance: metrics.totalDistance!,
+          beginTime: input.metrics.beginTime!,
+          endTime: input.metrics.endTime!,
+          durationSeconds: input.metrics.durationSeconds!,
+          totalDistance: input.metrics.totalDistance!,
         }
       : fp
   );
@@ -38,7 +38,9 @@ export function useSyncFlightPlanTimes(plan: FlightPlanType) {
 
   useEffect(() => {
     if (!hasCompleteFlightMetrics(metrics)) return;
-    setFlightPlans(withUpdatedPlanTimes(flightPlans, plan.id, metrics));
+    setFlightPlans(
+      withUpdatedPlanTimes({ flightPlans, planId: plan.id, metrics })
+    );
   }, [
     metrics.beginTime,
     metrics.endTime,

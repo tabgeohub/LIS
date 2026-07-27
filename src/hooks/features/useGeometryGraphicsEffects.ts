@@ -32,6 +32,26 @@ function renderTimesliderGeometries(input: {
   );
 }
 
+function renderDefaultGeometries(input: {
+  layer: __esri.GraphicsLayer;
+  geometries: Geometry[];
+  step: number;
+  flightPlanStep: number;
+}): (() => void) | undefined {
+  if (
+    shouldSkipDefaultGeometryRender({
+      step: input.step,
+      flightPlanStep: input.flightPlanStep,
+      geometriesCount: input.geometries.length,
+    })
+  ) {
+    return;
+  }
+
+  replaceGraphics(input.layer, buildGeometryMapGraphics(input.geometries));
+  return () => input.layer.removeAll();
+}
+
 function canRenderGeometryGraphics(input: {
   layer: __esri.GraphicsLayer | null;
   userId?: number;
@@ -60,17 +80,12 @@ export function useGeometryGraphicsRendering(input: {
       return () => input.layer?.removeAll();
     }
 
-    if (
-      shouldSkipDefaultGeometryRender({
-        ...input,
-        geometriesCount: input.geometries.length,
-      })
-    ) {
-      return;
-    }
-
-    replaceGraphics(input.layer, buildGeometryMapGraphics(input.geometries));
-    return () => input.layer?.removeAll();
+    return renderDefaultGeometries({
+      layer: input.layer,
+      geometries: input.geometries,
+      step: input.step,
+      flightPlanStep: input.flightPlanStep,
+    });
   }, [
     input.layer,
     input.geometries,

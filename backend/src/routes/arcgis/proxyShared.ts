@@ -41,16 +41,21 @@ function tryDecodeHttpUrl(value: string): string | null {
   return decodeMaybeEncodedUrl(value);
 }
 
+function httpUrlFromQueryEntry(
+  key: string,
+  value: unknown
+): string | null {
+  if (typeof value === "string") {
+    const fromValue = tryDecodeHttpUrl(value);
+    if (fromValue) return fromValue;
+  }
+  return tryDecodeHttpUrl(key);
+}
+
 function findHttpUrlInQueryKeys(query: Record<string, unknown>): string | null {
   for (const key of Object.keys(query || {})) {
-    const fromValue =
-      typeof query[key] === "string"
-        ? tryDecodeHttpUrl(query[key] as string)
-        : null;
-    if (fromValue) return fromValue;
-
-    const fromKey = tryDecodeHttpUrl(key);
-    if (fromKey) return fromKey;
+    const hit = httpUrlFromQueryEntry(key, query[key]);
+    if (hit) return hit;
   }
   return null;
 }

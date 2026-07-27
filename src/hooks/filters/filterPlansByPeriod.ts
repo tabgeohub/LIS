@@ -17,13 +17,13 @@ function matchesLastFourWeeks(planDate: string, now: Date): boolean {
   return new Date(planDate) >= fourWeeksAgo;
 }
 
-function matchesDateRange(
-  planDate: string,
-  dateFrom: string,
-  dateTo: string
-): boolean {
-  const d = new Date(planDate);
-  return d >= new Date(dateFrom) && d <= new Date(dateTo);
+function matchesDateRange(input: {
+  planDate: string;
+  dateFrom: string;
+  dateTo: string;
+}): boolean {
+  const d = new Date(input.planDate);
+  return d >= new Date(input.dateFrom) && d <= new Date(input.dateTo);
 }
 
 function isVanTotPeriod(input: {
@@ -50,7 +50,11 @@ function matchesPeriod(input: {
   }
 
   if (isVanTotPeriod(input)) {
-    return matchesDateRange(input.planDate, input.dateFrom, input.dateTo);
+    return matchesDateRange({
+      planDate: input.planDate,
+      dateFrom: input.dateFrom,
+      dateTo: input.dateTo,
+    });
   }
 
   return true;

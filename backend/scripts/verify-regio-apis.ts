@@ -56,62 +56,67 @@ function mockReq(input: { roles: string[]; query?: Record<string, string> }) {
   } as Parameters<typeof resolveRegioFilter>[0];
 }
 
+const RESOLVE_REGIO_FILTER_CASES: Array<{
+  name: string;
+  roles: string[];
+  query?: Record<string, string>;
+  expected: string | undefined;
+}> = [
+  {
+    name: "RWS NN session, no query",
+    roles: ["RWS NN", "offline_access"],
+    expected: REGIO,
+  },
+  {
+    name: "RWS NN session, query admin (no escalation)",
+    roles: ["RWS NN"],
+    query: { regio_id: "admin" },
+    expected: REGIO,
+  },
+  {
+    name: "RWS NN session, query other regio (no escalation)",
+    roles: ["RWS NN"],
+    query: { regio_id: "RWS WNN" },
+    expected: REGIO,
+  },
+  {
+    name: "admin session, no query",
+    roles: ["admin"],
+    expected: ADMIN,
+  },
+  {
+    name: "admin session, query RWS NN",
+    roles: ["admin"],
+    query: { regio_id: REGIO },
+    expected: REGIO,
+  },
+  {
+    name: "no session, query RWS NN",
+    roles: [],
+    query: { regio_id: REGIO },
+    expected: REGIO,
+  },
+  {
+    name: "no session, no query",
+    roles: [],
+    expected: undefined,
+  },
+];
+
 function testResolveRegioFilter() {
   console.log("\n── resolveRegioFilter (unit) ──");
 
-  const cases: Array<{
-    name: string;
-    roles: string[];
-    query?: Record<string, string>;
-    expected: string | undefined;
-  }> = [
-    {
-      name: "RWS NN session, no query",
-      roles: ["RWS NN", "offline_access"],
-      expected: REGIO,
-    },
-    {
-      name: "RWS NN session, query admin (no escalation)",
-      roles: ["RWS NN"],
-      query: { regio_id: "admin" },
-      expected: REGIO,
-    },
-    {
-      name: "RWS NN session, query other regio (no escalation)",
-      roles: ["RWS NN"],
-      query: { regio_id: "RWS WNN" },
-      expected: REGIO,
-    },
-    {
-      name: "admin session, no query",
-      roles: ["admin"],
-      expected: ADMIN,
-    },
-    {
-      name: "admin session, query RWS NN",
-      roles: ["admin"],
-      query: { regio_id: REGIO },
-      expected: REGIO,
-    },
-    {
-      name: "no session, query RWS NN",
-      roles: [],
-      query: { regio_id: REGIO },
-      expected: REGIO,
-    },
-    {
-      name: "no session, no query",
-      roles: [],
-      expected: undefined,
-    },
-  ];
-
-  for (const c of cases) {
-    const got = resolveRegioFilter(mockReq({ roles: c.roles, query: c.query ?? {} }));
+  for (const c of RESOLVE_REGIO_FILTER_CASES) {
+    const got = resolveRegioFilter(
+      mockReq({ roles: c.roles, query: c.query ?? {} })
+    );
     if (got === c.expected) {
       pass(c.name, `→ "${got ?? "(none)"}"`);
     } else {
-      fail(c.name, `expected "${c.expected ?? "(none)"}", got "${got ?? "(none)"}"`);
+      fail(
+        c.name,
+        `expected "${c.expected ?? "(none)"}", got "${got ?? "(none)"}"`
+      );
     }
   }
 }

@@ -29,13 +29,13 @@ function closedPolygonRings(
   return polygonRings;
 }
 
-function bufferSingleFlightPlan(
-  plan: FlightPlanType,
-  distance: number,
-  unit: BufferUnit,
-  graphicsLayer: GraphicsLayer
-): void {
-  const points = plan.points;
+function bufferSingleFlightPlan(input: {
+  plan: FlightPlanType;
+  distance: number;
+  unit: BufferUnit;
+  graphicsLayer: GraphicsLayer;
+}): void {
+  const points = input.plan.points;
   if (!Array.isArray(points) || points.length < 3) return;
 
   const projectedPolygon = projection.project(
@@ -43,14 +43,16 @@ function bufferSingleFlightPlan(
     SpatialReference.WebMercator
   ) as Polygon;
 
-  const buffered = bufferOperator.execute(projectedPolygon, distance, { unit });
+  const buffered = bufferOperator.execute(projectedPolygon, input.distance, {
+    unit: input.unit,
+  });
   if (!buffered) return;
 
   addBufferedGraphics({
-    graphicsLayer,
+    graphicsLayer: input.graphicsLayer,
     buffered,
     symbol: BLUE_BUFFER_SYMBOL,
-    id: plan.id,
+    id: input.plan.id,
   });
 }
 
@@ -58,6 +60,11 @@ export function bufferFlightPlansOnLayer(
   input: BufferFlightPlansOnLayerInput
 ): void {
   input.flightPlans.forEach((plan) =>
-    bufferSingleFlightPlan(plan, input.distance, input.unit, input.graphicsLayer)
+    bufferSingleFlightPlan({
+      plan,
+      distance: input.distance,
+      unit: input.unit,
+      graphicsLayer: input.graphicsLayer,
+    })
   );
 }

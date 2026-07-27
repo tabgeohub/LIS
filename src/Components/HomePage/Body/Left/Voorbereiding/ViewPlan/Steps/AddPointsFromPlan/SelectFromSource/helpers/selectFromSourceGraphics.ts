@@ -32,15 +32,15 @@ export function removeAllPins(
   pinRefs.clear();
 }
 
-function removeUnselectedPins(
-  mapView: __esri.MapView,
-  pinRefs: PinRefMap,
-  currentIds: Set<number>
-) {
-  pinRefs.forEach((value, key) => {
-    if (currentIds.has(key)) return;
-    mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
-    pinRefs.delete(key);
+function removeUnselectedPins(input: {
+  mapView: __esri.MapView;
+  pinRefs: PinRefMap;
+  currentIds: Set<number>;
+}) {
+  input.pinRefs.forEach((value, key) => {
+    if (input.currentIds.has(key)) return;
+    input.mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
+    input.pinRefs.delete(key);
   });
 }
 
@@ -82,7 +82,7 @@ export function syncPinsForSelection(input: {
   const { mapView, selectedPointIds, itemPoints, dbPoints, pinRefs } = input;
   const currentIds = new Set(selectedPointIds);
 
-  removeUnselectedPins(mapView, pinRefs, currentIds);
+  removeUnselectedPins({ mapView, pinRefs, currentIds });
   itemPoints.forEach((pt) =>
     addPinForSelectedPoint({ mapView, pt, dbPoints, pinRefs, currentIds })
   );

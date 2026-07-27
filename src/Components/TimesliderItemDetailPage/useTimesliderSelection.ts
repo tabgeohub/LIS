@@ -1,20 +1,37 @@
 import { useEffect, useState } from "react";
 import type { FinishedFlightPlanType } from "Types/finished_plans";
 
-function resolveSelectedPlan(
-  filteredPlans: FinishedFlightPlanType[],
-  planIdFromQuery: number | null,
+function findPlanById(
+  plans: FinishedFlightPlanType[],
+  planId: number
+): FinishedFlightPlanType | undefined {
+  return plans.find((p) => p.id === planId);
+}
+
+function keepPlanIfPresent(
+  plans: FinishedFlightPlanType[],
   prev: FinishedFlightPlanType | null
 ): FinishedFlightPlanType | null {
-  if (filteredPlans.length === 0) return null;
+  if (!prev) return null;
+  return plans.some((p) => p.id === prev.id) ? prev : null;
+}
 
-  if (planIdFromQuery != null) {
-    const match = filteredPlans.find((p) => p.id === planIdFromQuery);
+function resolveSelectedPlan(input: {
+  filteredPlans: FinishedFlightPlanType[];
+  planIdFromQuery: number | null;
+  prev: FinishedFlightPlanType | null;
+}): FinishedFlightPlanType | null {
+  if (input.filteredPlans.length === 0) return null;
+
+  if (input.planIdFromQuery != null) {
+    const match = findPlanById(input.filteredPlans, input.planIdFromQuery);
     if (match) return match;
   }
 
-  if (prev && filteredPlans.some((p) => p.id === prev.id)) return prev;
-  return filteredPlans[0];
+  return (
+    keepPlanIfPresent(input.filteredPlans, input.prev) ??
+    input.filteredPlans[0]
+  );
 }
 
 export function useTimesliderSelectedPlan(input: {
@@ -26,7 +43,11 @@ export function useTimesliderSelectedPlan(input: {
 
   useEffect(() => {
     setSelectedPlan((prev) =>
-      resolveSelectedPlan(input.filteredPlans, input.planIdFromQuery, prev)
+      resolveSelectedPlan({
+        filteredPlans: input.filteredPlans,
+        planIdFromQuery: input.planIdFromQuery,
+        prev,
+      })
     );
   }, [input.filteredPlans, input.planIdFromQuery]);
 

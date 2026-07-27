@@ -28,18 +28,21 @@ function idTokenClaims(tokenSet: {
   return typeof tokenSet.claims === "function" ? tokenSet.claims() : {};
 }
 
+function rolesFromAccessToken(accessToken: string): string[] | undefined {
+  const accessClaims = decodeJwtPayload<{
+    realm_access?: { roles?: string[] };
+  }>(accessToken);
+  return rolesFromClaims(accessClaims);
+}
+
 function resolveRealmRolesFromAuth(auth: {
   tokenSet: { access_token?: string; claims?: () => unknown };
 }): string[] {
   const accessToken = auth.tokenSet.access_token;
   if (!accessToken) return [];
 
-  const accessClaims = decodeJwtPayload<{
-    realm_access?: { roles?: string[] };
-  }>(accessToken);
-
   return (
-    rolesFromClaims(accessClaims) ??
+    rolesFromAccessToken(accessToken) ??
     rolesFromClaims(idTokenClaims(auth.tokenSet)) ??
     []
   );

@@ -8,13 +8,13 @@ async function readJsonBody(response: Response): Promise<{ error?: string }> {
   return response.json().catch(() => ({}));
 }
 
-function assertKeycloakOk(
-  response: Response,
-  data: { error?: string },
-  fallback: string
-): void {
-  if (!response.ok) {
-    throw new Error(data.error || fallback);
+function assertKeycloakOk(input: {
+  response: Response;
+  data: { error?: string };
+  fallback: string;
+}): void {
+  if (!input.response.ok) {
+    throw new Error(input.data.error || input.fallback);
   }
 }
 
@@ -37,7 +37,11 @@ export async function updateKeycloakUserProfile(input: {
   );
 
   const errorData = await readJsonBody(response);
-  assertKeycloakOk(response, errorData, "Failed to update user");
+  assertKeycloakOk({
+    response,
+    data: errorData,
+    fallback: "Failed to update user",
+  });
 }
 
 export async function assignKeycloakUserRoles(input: {
@@ -55,7 +59,11 @@ export async function assignKeycloakUserRoles(input: {
   );
 
   const errorData = await readJsonBody(response);
-  assertKeycloakOk(response, errorData, "Failed to update user roles");
+  assertKeycloakOk({
+    response,
+    data: errorData,
+    fallback: "Failed to update user roles",
+  });
 }
 
 export async function createKeycloakUser(input: {
@@ -80,5 +88,9 @@ export async function createKeycloakUser(input: {
   );
 
   const data = await readJsonBody(response);
-  assertKeycloakOk(response, data, "Failed to create user");
+  assertKeycloakOk({
+    response,
+    data,
+    fallback: "Failed to create user",
+  });
 }

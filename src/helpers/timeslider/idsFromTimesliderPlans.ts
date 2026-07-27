@@ -1,12 +1,19 @@
 import type { FinishedFlightPlanType } from "Types/finished_plans";
 
+function addIdsFromItems(
+  items: { id: number }[] | null | undefined,
+  target: Set<number>
+) {
+  for (const item of items ?? []) target.add(item.id);
+}
+
 function addPlanPointAndGeometryIds(input: {
   plan: FinishedFlightPlanType;
   pointIds: Set<number>;
   geometryIds: Set<number>;
 }) {
-  for (const p of input.plan.points_data ?? []) input.pointIds.add(p.id);
-  for (const g of input.plan.geometries ?? []) input.geometryIds.add(g.id);
+  addIdsFromItems(input.plan.points_data, input.pointIds);
+  addIdsFromItems(input.plan.geometries, input.geometryIds);
 }
 
 /** IDs of points and geometries attached to the given finished flight plans (timeslider list). */

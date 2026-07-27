@@ -1,47 +1,28 @@
-# Sigrid Accept — Module coupling `20260727(1)`
+# Sigrid coupling Accept checklist (pack 1)
 
-Source: [`module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv`](./module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv)
+Source: `all-findings-rijkswaterstaat-otg-lis-20260727(1)/Module coupling findings.csv`
 
-**Do not rewrite these hubs.** Fan-in is intentional shared infrastructure. Apply Accept in Sigrid UI.
-
-## HIGH (2)
-
-1. [ ] `src/hooks/useLogAction.ts` — fan-in 98
-2. [ ] `src/hooks/useContent.ts` — fan-in 126
-
-## MEDIUM (9)
-
-1. [ ] `nnederlandLayerBuilders.ts` — fan-in 33
-2. [ ] `useUpdateDataCore.ts` — fan-in 25
-3. [ ] `backend/.../routeResponses.ts` — fan-in 23
-4. [ ] `nnederlandIconPrimitives.tsx` — fan-in 26
-5. [ ] `useWizardButtons.ts` — fan-in 32
-6. [ ] `useConstSelectOptions.ts` — fan-in 26
-7. [ ] `useResetFeatures.ts` — fan-in 23
-8. [ ] EditGeometry `coords.ts` — fan-in 24
-9. [ ] `validateMapView.ts` — fan-in 24
-
-## LOW (13)
-
-1. [ ] `keycloakAdminClient.ts` — fan-in 14
-2. [ ] `resolveRegioFilter.ts` — fan-in 16
-3. [ ] `useCreateDataCore.ts` — fan-in 13
-4. [ ] `planWizardCore.ts` — fan-in 12
-5. [ ] `drawingToolMapCleanup.ts` — fan-in 12
-6. [ ] `authSecurityLog.ts` — fan-in 16
-7. [ ] `getTransformedCoordinates.ts` — fan-in 18
-8. [ ] `validateBody.ts` — fan-in 11
-9. [ ] `attachmentDisplayUrl.ts` — fan-in 11
-10. [ ] `useHandleCancel.ts` — fan-in 11
-11. [ ] `fetchApi.ts` — fan-in 13
-12. [ ] `useWizardCleanup.ts` — fan-in 13
-13. [ ] `classNames.ts` — fan-in 20
-
-**Total: 24 Accept**
-
-Also Accept these interfacing findings that are **framework signatures** (cannot change without breaking Express/Multer):
-
-- devices-updates `middleware` RequestHandler
-- `requireAuthClientHeader`, `requirePassword`, `requireSessionAuth`, `legacyAuthUsageMonitor`, `realmAdminAuth`
-- `installersUpload` / `reportUpload` fileFilter + filename callbacks
-- `handleInstallerUploadMiddleware`
+1. [ ] `src/hooks/useLogAction.ts` — fan-in 98 (HIGH, 21 LOC)
+2. [ ] `src/hooks/useContent.ts` — fan-in 126 (HIGH, 5 LOC)
+3. [ ] `src/Components/HomePage/Body/Left/Common/KaartLegend/LayersList/NNederland/nnederlandLayerBuilders.ts` — fan-in 33 (MEDIUM, 50 LOC)
+4. [ ] `src/api-hooks/mutations/useUpdateDataCore.ts` — fan-in 25 (MEDIUM, 49 LOC)
+5. [ ] `backend/src/helpers/http/routeResponses.ts` — fan-in 23 (MEDIUM, 41 LOC)
+6. [ ] `src/Components/HomePage/Body/Left/Common/KaartLegend/LayersList/NNederland/nnederlandIconPrimitives.tsx` — fan-in 26 (MEDIUM, 26 LOC)
+7. [ ] `src/hooks/wizard/useWizardButtons.ts` — fan-in 32 (MEDIUM, 24 LOC)
+8. [ ] `src/hooks/consts/useConstSelectOptions.ts` — fan-in 26 (MEDIUM, 17 LOC)
+9. [ ] `src/hooks/features/useResetFeatures.ts` — fan-in 23 (MEDIUM, 11 LOC)
+10. [ ] `src/Components/HomePage/Body/Left/Tools/EditGeometry/EditForm/EditGeometryPointPanel/coords.ts` — fan-in 24 (MEDIUM, 9 LOC)
+11. [ ] `src/helpers/ArcGISHelpers/validateMapView.ts` — fan-in 24 (MEDIUM, 7 LOC)
+12. [ ] `backend/src/routes/keycloak/management/users/keycloakAdminClient.ts` — fan-in 14 (LOW, 114 LOC)
+13. [ ] `backend/src/helpers/queries/shared/resolveRegioFilter.ts` — fan-in 16 (LOW, 77 LOC)
+14. [ ] `src/api-hooks/mutations/useCreateDataCore.ts` — fan-in 13 (LOW, 55 LOC)
+15. [ ] `src/hooks/zustand/shared/planWizardCore.ts` — fan-in 12 (LOW, 51 LOC)
+16. [ ] `src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts` — fan-in 12 (LOW, 41 LOC)
+17. [ ] `backend/src/routes/auth2/authSecurityLog.ts` — fan-in 16 (LOW, 26 LOC)
+18. [ ] `src/helpers/ArcGISHelpers/getTransformedCoordinates.ts` — fan-in 18 (LOW, 24 LOC)
+19. [ ] `backend/src/helpers/http/validateBody.ts` — fan-in 11 (LOW, 20 LOC)
+20. [ ] `src/helpers/arcgis/attachmentDisplayUrl.ts` — fan-in 11 (LOW, 13 LOC)
+21. [ ] `src/hooks/handleCancel/useHandleCancel.ts` — fan-in 11 (LOW, 12 LOC)
+22. [ ] `src/api/fetchApi.ts` — fan-in 13 (LOW, 8 LOC)
+23. [ ] `src/hooks/wizard/useWizardCleanup.ts` — fan-in 13 (LOW, 7 LOC)
+24. [ ] `src/helpers/classNames.ts` — fan-in 20 (LOW, 3 LOC)
