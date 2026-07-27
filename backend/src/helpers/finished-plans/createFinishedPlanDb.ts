@@ -183,17 +183,22 @@ class FinishedPlanWriter {
     attachment: FinishedPlanAttachment
   ): Promise<void> {
     const realPointId = this.realIdOf(point);
-    const attId = await this.insertAttachmentRow(realPointId, point, attachment);
+    const attId = await this.insertAttachmentRow({
+      realPointId,
+      point,
+      attachment,
+    });
     if (attId) {
       this.attachmentIdsByPointId[realPointId].push(attId);
     }
   }
 
-  private async insertAttachmentRow(
-    realPointId: number,
-    point: FinishedPlanPoint,
-    attachment: FinishedPlanAttachment
-  ): Promise<number | undefined> {
+  private async insertAttachmentRow(input: {
+    realPointId: number;
+    point: FinishedPlanPoint;
+    attachment: FinishedPlanAttachment;
+  }): Promise<number | undefined> {
+    const { realPointId, point, attachment } = input;
     const ins = await this.client.query(
       `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
        VALUES ($1, $2, $3, $4, $5)

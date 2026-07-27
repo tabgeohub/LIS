@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { LegendLayerDefinition } from "./layerTypes";
 
-type SyncOptions = {
+export type LegendLayerSyncOptions = {
   externalParentChecked?: boolean;
   nestedParentChecked?: boolean;
   onExternalParentUnchecked?: () => void;
@@ -10,32 +10,54 @@ type SyncOptions = {
   onSyncFromSelectedLayers?: () => void;
 };
 
+function syncExternalParentUnchecked(input: {
+  setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>;
+  options: LegendLayerSyncOptions;
+}) {
+  if (input.options.externalParentChecked !== false) return;
+  input.options.onExternalParentUnchecked?.();
+  input.setLayers((prev) => prev.map((layer) => ({ ...layer, checked: false })));
+}
+
+function syncNestedParentUnchecked(input: {
+  setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>;
+  options: LegendLayerSyncOptions;
+}) {
+  if (input.options.nestedParentChecked !== false) return;
+  input.setLayers((prev) => prev.map((layer) => ({ ...layer, checked: false })));
+}
+
+function syncSelectedLayerIds(input: {
+  setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>;
+  selectedLayers: string[];
+  options: LegendLayerSyncOptions;
+}) {
+  if (!input.options.syncFromSelectedLayers || input.selectedLayers.length === 0) {
+    return;
+  }
+  input.options.onSyncFromSelectedLayers?.();
+  input.setLayers((prev) =>
+    prev.map((layer) => ({
+      ...layer,
+      checked: input.selectedLayers.includes(layer.id),
+    }))
+  );
+}
+
 export function useLegendLayerSyncEffects(
   setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>,
   selectedLayers: string[],
-  options: SyncOptions
+  options: LegendLayerSyncOptions
 ) {
   useEffect(() => {
-    if (options.externalParentChecked === false) {
-      options.onExternalParentUnchecked?.();
-      setLayers((prev) => prev.map((layer) => ({ ...layer, checked: false })));
-    }
+    syncExternalParentUnchecked({ setLayers, options });
   }, [options.externalParentChecked]);
 
   useEffect(() => {
-    if (options.nestedParentChecked === false) {
-      setLayers((prev) => prev.map((layer) => ({ ...layer, checked: false })));
-    }
+    syncNestedParentUnchecked({ setLayers, options });
   }, [options.nestedParentChecked]);
 
   useEffect(() => {
-    if (!options.syncFromSelectedLayers || selectedLayers.length === 0) return;
-    options.onSyncFromSelectedLayers?.();
-    setLayers((prev) =>
-      prev.map((layer) => ({
-        ...layer,
-        checked: selectedLayers.includes(layer.id),
-      }))
-    );
+    syncSelectedLayerIds({ setLayers, selectedLayers, options });
   }, [options.syncFromSelectedLayers, selectedLayers]);
 }

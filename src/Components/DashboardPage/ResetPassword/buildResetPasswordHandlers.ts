@@ -1,5 +1,5 @@
 import { submitResetPassword } from "./submitResetPassword";
-import { createDashboardFormHandlers } from "../shared/createDashboardFormHandlers";
+import { createDashboardSubmitHandlers } from "../shared/createDashboardSubmitHandlers";
 
 type FormData = { password: string; confirmPassword: string };
 
@@ -10,14 +10,13 @@ export function buildResetPasswordHandlers(input: {
   setLoading: (value: boolean) => void;
   handleBack: () => void;
 }) {
-  return createDashboardFormHandlers({
+  return createDashboardSubmitHandlers({
     setFormData: input.setFormData,
-    hasSelection: Boolean(input.selectedUser),
+    selected: input.selectedUser,
     setLoading: input.setLoading,
-    submit: async () => {
-      if (!input.selectedUser) return;
+    submitSelected: async (selectedUser) => {
       const ok = await submitResetPassword({
-        userId: input.selectedUser.id,
+        userId: selectedUser.id,
         password: input.formData.password,
         confirmPassword: input.formData.confirmPassword,
         onSuccess: input.handleBack,

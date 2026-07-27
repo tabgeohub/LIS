@@ -29,7 +29,7 @@ async function addImageAttachmentPage(input: {
   doc.text(`Bijlage ${index + 1}: ${att.name}`, 25, 20);
   doc.addImage(scaledUrl, "JPEG", 25, 24, drawW, drawH);
   const takenAt = resolveTakenAt(att);
-  if (takenAt != null) drawTakenAtCaption(doc, takenAt, drawH);
+  if (takenAt != null) drawTakenAtCaption({ doc, takenAt, drawH });
 }
 
 function addOtherAttachmentsTable(doc: jsPDF, otherAtts: PdfAttachment[]) {

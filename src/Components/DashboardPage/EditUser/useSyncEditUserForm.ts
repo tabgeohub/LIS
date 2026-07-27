@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import type { EditUserFormData } from "./submitEditUser";
 
-export function useSyncEditUserForm(
+export function useSyncEditUserForm(input: {
   selectedUser: {
     username?: string;
     email?: string;
     realmRoles?: string[];
-  } | null,
-  setFormData: React.Dispatch<React.SetStateAction<EditUserFormData>>
-) {
+  } | null;
+  setFormData: React.Dispatch<React.SetStateAction<EditUserFormData>>;
+}) {
+  const { selectedUser, setFormData } = input;
   useEffect(() => {
     if (!selectedUser) return;
     setFormData({

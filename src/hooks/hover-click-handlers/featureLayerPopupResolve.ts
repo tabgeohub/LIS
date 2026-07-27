@@ -21,39 +21,62 @@ export function findTargetFeatureHit(results: __esri.MapViewViewHit[]) {
   }) as __esri.MapViewGraphicHit | undefined;
 }
 
-function canQueryFeatureAttributes(
-  objectId: unknown,
-  layerTitle: string | undefined
-): boolean {
-  return Boolean(objectId && layerTitle);
-}
-
-export async function resolveFeaturePopupData(input: {
-  layer: __esri.FeatureLayer;
+type PopupResolveBase = {
   attributes: import("@helpers/ZustandStates/popUpState").FeatureLayerAttributes;
+  layerTitle: string;
+  screenPoint: { x: number; y: number };
+  geometry: __esri.Point;
+};
+
+function buildPopupBase(input: {
+  layer: __esri.FeatureLayer;
+  attributes: PopupResolveBase["attributes"];
   geometry: __esri.Point;
   screenPoint: { x: number; y: number };
-}): Promise<FeatureLayerPopupData> {
-  const objectId = readFeatureObjectId(input.attributes);
-  const base = {
+}): PopupResolveBase {
+  return {
     attributes: input.attributes,
     layerTitle: input.layer.title ?? "",
     screenPoint: input.screenPoint,
     geometry: input.geometry,
   };
+}
 
+async function resolveQueriedPopupAttributes(input: {
+  layer: __esri.FeatureLayer;
+  objectId: unknown;
+  layerTitle: string;
+  base: PopupResolveBase;
+}): Promise<FeatureLayerPopupData> {
+  const queried = await queryFeaturePopupAttributes({
+    layer: input.layer,
+    objectId: input.objectId,
+  });
+  return buildFeaturePopupData({
+    ...input.base,
+    attributes: queried ?? input.base.attributes,
+    layerTitle: input.layerTitle,
+  });
+}
+
+export async function resolveFeaturePopupData(input: {
+  layer: __esri.FeatureLayer;
+  attributes: PopupResolveBase["attributes"];
+  geometry: __esri.Point;
+  screenPoint: { x: number; y: number };
+}): Promise<FeatureLayerPopupData> {
+  const base = buildPopupBase(input);
+  const objectId = readFeatureObjectId(input.attributes);
   const layerTitle = input.layer.title ?? undefined;
-  if (!canQueryFeatureAttributes(objectId, layerTitle)) {
+
+  if (!objectId || !layerTitle) {
     return buildFeaturePopupData(base);
   }
 
-  const queried = await queryFeaturePopupAttributes({
+  return resolveQueriedPopupAttributes({
     layer: input.layer,
     objectId,
-  });
-  return buildFeaturePopupData({
-    ...base,
-    attributes: queried ?? input.attributes,
-    layerTitle: layerTitle!,
+    layerTitle,
+    base,
   });
 }

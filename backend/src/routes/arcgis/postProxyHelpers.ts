@@ -57,6 +57,31 @@ function hasUrlencodedBody(req: Request): boolean {
   );
 }
 
+function readForwardableBody(req: Request): Buffer | undefined {
+  if (!Buffer.isBuffer(req.body) || req.body.length === 0) return undefined;
+  return req.body as Buffer;
+}
+
+async function dispatchArcgisPost(
+  req: Request,
+  targetUrl: string,
+  accessToken: string
+) {
+  if (hasUrlencodedBody(req)) {
+    return postUrlencodedToArcgis({
+      targetUrl,
+      body: req.body as Buffer,
+      accessToken,
+    });
+  }
+  return postBodyToArcgis({
+    targetUrl,
+    contentType: req.headers["content-type"] || "",
+    body: readForwardableBody(req),
+    accessToken,
+  });
+}
+
 export async function forwardArcgisPostRequest(req: Request) {
   const validation = validatePostProxyRequest(req);
   if (!validation.ok) {
@@ -64,23 +89,7 @@ export async function forwardArcgisPostRequest(req: Request) {
   }
 
   const { access_token } = await getValidToken();
-  const contentType = req.headers["content-type"] || "";
-  const arcgisRes = hasUrlencodedBody(req)
-    ? await postUrlencodedToArcgis({
-        targetUrl: validation.targetUrl,
-        body: req.body as Buffer,
-        accessToken: access_token,
-      })
-    : await postBodyToArcgis({
-        targetUrl: validation.targetUrl,
-        contentType,
-        body:
-          Buffer.isBuffer(req.body) && req.body.length > 0
-            ? (req.body as Buffer)
-            : undefined,
-        accessToken: access_token,
-      });
-
+  const arcgisRes = await dispatchArcgisPost(req, validation.targetUrl, access_token);
   const buf = Buffer.from(await arcgisRes.arrayBuffer());
   return {
     ok: true as const,

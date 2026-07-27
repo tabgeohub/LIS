@@ -6,6 +6,7 @@ import DeleteConfirmModal from "./DeleteConfirmModal";
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
 import { filterUnwantedRoleNames } from "../shared/keycloakRoleTypes";
+import { deleteKeycloakUser, removeDeletedUserFromList } from "./deleteUserHelpers";
 
 function filterUnwantedRoles(roles: string[]): string[] {
   return filterUnwantedRoleNames(roles);
@@ -83,26 +84,10 @@ export default function AllUsersTable() {
     if (!userToDelete) return;
 
     setDeleting(true);
-
     try {
-      const response = await fetch(
-        `${getBackEndUrl()}/api/keycloak/management/users/${userToDelete.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to delete user");
-      }
-
+      await deleteKeycloakUser(userToDelete.id);
       toast.success("User deleted successfully");
-
-      // Remove user from state
-      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+      setUsers((prev) => removeDeletedUserFromList(prev, userToDelete.id));
       setDeleteModalOpen(false);
       setUserToDelete(null);
     } catch (err: any) {

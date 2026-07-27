@@ -16,7 +16,7 @@ export function useEditUserFormModel() {
   });
   const { loadingRoles, filteredRealmRoles } = useKeycloakRoles();
   const [loading, setLoading] = useState(false);
-  useSyncEditUserForm(selectedUser, setFormData);
+  useSyncEditUserForm({ selectedUser, setFormData });
   return {
     selectedUser,
     formProps: {

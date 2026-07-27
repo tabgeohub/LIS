@@ -26,10 +26,11 @@ interface GeometriesState {
   clearGeometries: () => void;
 }
 
-async function loadGeometries(
-  filters: GeometryFilters,
-  set: (partial: Partial<GeometriesState>) => void
-): Promise<void> {
+async function loadGeometries(input: {
+  filters: GeometryFilters;
+  set: (partial: Partial<GeometriesState>) => void;
+}): Promise<void> {
+  const { filters, set } = input;
   try {
     const url = `${getBackEndUrl()}/api/geometries`;
 
@@ -58,17 +59,17 @@ export const useGeometriesStore = create<GeometriesState>((set, get) => ({
 
   refetchGeometries: async () => {
     const { lastFetchFilters } = get();
-    await loadGeometries(lastFetchFilters ?? {}, set);
+    await loadGeometries({ filters: lastFetchFilters ?? {}, set });
   },
 
   fetchGeometries: async (filters = {}) => {
     set({ lastFetchFilters: filters });
-    await loadGeometries(filters, set);
+    await loadGeometries({ filters, set });
   },
 
   fetchDBGeometries: async (filters = {}) => {
     set({ lastFetchFilters: filters });
-    await loadGeometries(filters, set);
+    await loadGeometries({ filters, set });
   },
 
   clearGeometries: () => set({ geometries: [] }),

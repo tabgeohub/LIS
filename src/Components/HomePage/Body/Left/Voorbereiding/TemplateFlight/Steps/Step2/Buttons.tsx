@@ -4,7 +4,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import { useFilterStepWizardSelection } from "../../../common/useFilterStepWizardSelection";
+import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
 import {
   runTemplateFlightCancelCleanup,
   runTemplateFlightPreviousCleanup,
@@ -16,26 +16,21 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
   const { resetFeatures } = useResetFeatures();
-  const { labels, withLog, clearSelectionGraphics, handleNext } =
-    useFilterStepWizardSelection({
-      selection: {
-        mapView,
-        selectedGraphics: store.selectedGraphics,
-        setSelectedGraphics: store.setSelectedGraphics,
-        hoveredGraphic: store.hoveredGraphic,
-        setHoveredGraphic: store.setHoveredGraphic,
-      },
-      step: store.step,
-      setStep: store.setStep,
-      resetFilters,
-      clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
-    });
-  return {
-    labels,
-    withLog,
+
+  return useWizardFilterStep2Buttons({
     setOpenFilter,
-    handleNext,
-    handlePrevious: () =>
+    selection: {
+      mapView,
+      selectedGraphics: store.selectedGraphics,
+      setSelectedGraphics: store.setSelectedGraphics,
+      hoveredGraphic: store.hoveredGraphic,
+      setHoveredGraphic: store.setHoveredGraphic,
+    },
+    step: store.step,
+    setStep: store.setStep,
+    resetFilters,
+    clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
+    buildPrevious: (clearSelectionGraphics) => () =>
       runTemplateFlightPreviousCleanup({
         previousStep: 1,
         setStep: store.setStep,
@@ -46,7 +41,7 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
         clearGraphics,
         clearSelectionGraphics,
       }),
-    handleCancelClick: () =>
+    buildCancel: (clearSelectionGraphics) => () =>
       runTemplateFlightCancelCleanup({
         resetFeatures,
         clear: store.clear,
@@ -57,7 +52,7 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
         clearGraphics,
         clearSelectionGraphics,
       }),
-  };
+  });
 }
 
 export default function Buttons({
@@ -74,7 +69,7 @@ export default function Buttons({
       previousLogMessage="User clicked 'Previous' button"
       onFilter={() => actions.setOpenFilter(true)}
       onNext={actions.handleNext}
-      onCancel={actions.handleCancelClick}
+      onCancel={actions.handleCancel}
     />
   );
 }

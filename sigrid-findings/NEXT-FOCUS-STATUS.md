@@ -1,30 +1,36 @@
-# Next focus status — Next Maintainability findings wave (`20260721(1)`)
+# Next focus status — Sigrid-227 huge change wave
 
 ## Wave complete (local)
 
-Follow-up Maintainability wave after the volume pass. Behavior-preserving; no Docker/Nginx; no new Architecture `*Core` façades.
+Sigrid-227 plan implemented: Architecture Accept ledger + major code unification + McCabe/interfacing polish. Behavior-preserving; no Docker/Nginx; no new `*Core` façade splits.
 
-### Batch 1 — Residual McCabe ≥7
-- Further thinned geometry formatters, proxy URL helpers, auth2/keycloak paths where still complex
-- Template `Fase3` map-preview extract; many prior-wave targets already simple on disk
+### Part 1 — Architecture Accept pass (UI)
 
-### Batch 2 — McCabe == 6 clusters
-- `resolveRegioFilter` / regio role predicates
-- `usePointGraphicsEffects` branch extracts
-- `pdfReportTables` cell helpers + options objects
-- Hover/path/auth/drawing clusters continued where still open
+- Rebased [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) to export `sigrid-227`
+- Added [`SIGRID-227-ACCEPT-CHECKLIST.md`](./SIGRID-227-ACCEPT-CHECKLIST.md) — **185** Accept rows (143 independence + 24 coupling + 5 entanglement + 2 security + 9 FE↔BE dup + 2 size)
+- **Your action:** apply Accept in Sigrid UI using the checklist (primary lever for Architecture 3.3 → green)
 
-### Batch 3 — Residual interfacing
-- Legend layout helpers → options objects
-- `respondVerifyError`, `assertKeycloakResponseOk`, `buildNormalizedFields`, `appendFinishedDateRange`, `respondImportSuccess`
-- `patchPlanWithUpdatedPoint`, `isNearExistingPoint`, `commitFotoAttachmentDelete`
-- PDF table APIs updated to options; call sites updated
+### Part 2 — Dup + MEDIUM size unification
 
-### Batch 4 — Size LOC ≥25 / selective 22–24
-- Prior size-agent splits (auth2 barrels, EditPointCoordinates, hover siblings, Step2 wizard selection) kept
-- `FlightPlanPickerList` → `FlightPlanPickerRow` sibling
-- `formatFinishedPlansWithGeometries` helper extracts
-- LOC 16–19 vanity left for later
+- `useWizardFilterStep2Buttons` — FlightPlan / TemplateFlight Step2 dup cleared
+- `PlanInformationPanel` — Aandachtspunten + SelectedPoint twins unified
+- `createDashboardSubmitHandlers` — EditUser / ResetPassword submit wiring deduped
+- `useTimesliderItemImages` — shared enabled predicate; internal dup removed
+- `appendFlightPlanWhereClause` — shared `FlightPlanWhereBase` + `resolveRegioColumn`
+
+### Part 3 — McCabe 8 + MEDIUM interfacing
+
+- `proxyShared.extractTargetUrlFromRequest` — resolver chain
+- `featureLayerPopupResolve.resolveFeaturePopupData` — query path split
+- `parseCsvImportRows` sibling — CSV buffer loop extracted from `parsePointImportFile`
+- `respondToVerifyGrantFailure` — OTP vs password response builders
+- `geometryHerhalen.compareGeometriesForSelection` — options context object (5 params → 3)
+
+### Part 4 — Selective maintainability volume (~80 cap)
+
+- Interfacing: 9 units → options objects (`runReturningUpdate`, `attemptPasswordGrant`, `loadPoints`/`loadGeometries`, report zip/attachment fetch, `useSyncEditUserForm`, etc.)
+- McCabe 6: 10 units thinned (point graphics click, map hover, post proxy, drawing lifecycle, path click, geometries list, ViewPlan Step1/2, delete user, flight path metrics)
+- Additional: `syncSelectedPlanPathLayer`, `nearestPoint`, legend sync effects, `drawTakenAtCaption` options object
 
 ## Verification
 
@@ -33,13 +39,20 @@ Follow-up Maintainability wave after the volume pass. Behavior-preserving; no Do
 
 ## Your next steps
 
-1. Smoke-test: auth2 verify/login, CreateReport PDF, Legend nesting, Foto delete, EditPoint coords, add-point near-check, template Fase3, finished-plan queries
-2. Deploy → re-export Sigrid
-3. Apply [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) in Sigrid UI
-4. Remaining volume after this: mostly LOC ≤21 vanity + Accept-only Architecture
+1. Smoke-test: FlightPlan + TemplateFlight Step2 filter wizard, PlanInformation both paths, Dashboard edit/reset password, timeslider images, geometry herhalen sort, arcgis proxy, auth2 verify/login, ViewPlan Step1/2, PDF report attachments
+2. Apply [`SIGRID-227-ACCEPT-CHECKLIST.md`](./SIGRID-227-ACCEPT-CHECKLIST.md) in Sigrid UI (~185 items)
+3. Deploy → re-export Sigrid → confirm Architecture green and dup/size MEDIUM cleared
 
 ## Out of scope (unchanged)
 
 - Architecture Independence MEDIUM Core re-splits
-- Coupling fan-in rewrites
+- Coupling fan-in rewrites (`useLogAction`, `useContent`)
 - Docker CWE-266 / FE↔BE shared packages
+- LOC ≤21 vanity (698 LOW size findings)
+
+## Expected post-Accept + rescan
+
+| Action | Findings cleared | Star impact |
+| --- | --- | --- |
+| Accept pass | ~185 | Architecture 3.3 → green (~4+) |
+| Code wave (Parts 2–4) | ~25–40 maintainability | Maintainability hold ≥4.3 |

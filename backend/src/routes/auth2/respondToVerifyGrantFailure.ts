@@ -7,6 +7,51 @@ import {
 } from "./verifyLoggedResponse";
 import { classifyVerifyGrantFailure } from "./verifyCredentialsFlow";
 
+function respondOtpRequired(input: {
+  req: Request;
+  res: Response;
+  username: string;
+  hasOtp: boolean | "lookup_unavailable";
+  grantFailureKind: string;
+  inferred: boolean;
+}) {
+  return respondLoggedVerify({
+    req: input.req,
+    res: input.res,
+    username: input.username,
+    event: "auth2.verify.otp_required",
+    meta: {
+      hasOtp: input.hasOtp,
+      grantFailureKind: input.grantFailureKind,
+      inferred: input.inferred,
+    },
+    body: OTP_REQUIRED_RESPONSE,
+  });
+}
+
+function respondInvalidPassword(input: {
+  req: Request;
+  res: Response;
+  username: string;
+  hasOtp: boolean | "lookup_unavailable";
+  grantFailureKind: string;
+  error: unknown;
+}) {
+  return respondLoggedVerify({
+    req: input.req,
+    res: input.res,
+    username: input.username,
+    event: "auth2.verify.invalid_password",
+    meta: {
+      hasOtp: input.hasOtp,
+      grantFailureKind: input.grantFailureKind,
+      message: (input.error as Error)?.message,
+    },
+    status: 401,
+    body: invalidPasswordResponse(),
+  });
+}
+
 export function respondToVerifyGrantFailure(input: {
   req: Request;
   res: Response;
@@ -17,31 +62,24 @@ export function respondToVerifyGrantFailure(input: {
 }) {
   const grant = classifyVerifyGrantFailure(input.error, input.otpStatusUnknown);
   const hasOtp = input.lookup.ok ? input.lookup.hasOtp : "lookup_unavailable";
+
   if (grant.requiresOtp) {
-    return respondLoggedVerify({
+    return respondOtpRequired({
       req: input.req,
       res: input.res,
       username: input.username,
-      event: "auth2.verify.otp_required",
-      meta: {
-        hasOtp,
-        grantFailureKind: grant.grantFailureKind,
-        inferred: grant.grantFailureKind !== "otp_required",
-      },
-      body: OTP_REQUIRED_RESPONSE,
+      hasOtp,
+      grantFailureKind: grant.grantFailureKind,
+      inferred: grant.grantFailureKind !== "otp_required",
     });
   }
-  return respondLoggedVerify({
+
+  return respondInvalidPassword({
     req: input.req,
     res: input.res,
     username: input.username,
-    event: "auth2.verify.invalid_password",
-    meta: {
-      hasOtp,
-      grantFailureKind: grant.grantFailureKind,
-      message: (input.error as Error)?.message,
-    },
-    status: 401,
-    body: invalidPasswordResponse(),
+    hasOtp,
+    grantFailureKind: grant.grantFailureKind,
+    error: input.error,
   });
 }

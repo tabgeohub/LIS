@@ -8,11 +8,12 @@ export function getAdminTokenTimeoutMs(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 15000;
 }
 
-function logAdminTokenFetchFailure(
-  attempt: number,
-  tokenUrl: string,
-  error: any
-): void {
+function logAdminTokenFetchFailure(input: {
+  attempt: number;
+  tokenUrl: string;
+  error: any;
+}): void {
+  const { attempt, tokenUrl, error } = input;
   console.error(
     `[getKeycloakAdminToken] Fetch failed (attempt ${attempt}/2):`,
     {
@@ -57,7 +58,7 @@ export async function requestAdminTokenWithRetry(input: {
       return await postAdminTokenOnce(input);
     } catch (error: any) {
       lastError = error;
-      logAdminTokenFetchFailure(attempt, input.tokenUrl, error);
+      logAdminTokenFetchFailure({ attempt, tokenUrl: input.tokenUrl, error });
     }
   }
   throwAdminTokenConnectionError(lastError);

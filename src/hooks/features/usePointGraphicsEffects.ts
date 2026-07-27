@@ -76,6 +76,43 @@ export function usePointGraphicsRendering(input: {
   ]);
 }
 
+function findLayerGraphicHit(
+  response: __esri.HitTestResult,
+  layer: __esri.GraphicsLayer
+): __esri.GraphicHit | undefined {
+  return response.results.find(
+    (result) => (result as __esri.GraphicHit).graphic?.layer === layer
+  ) as __esri.GraphicHit | undefined;
+}
+
+function notifyPointGraphicClick(
+  hit: __esri.GraphicHit | undefined,
+  onPoint: (attributes: EnrichedPointType) => void
+): void {
+  if (!hit?.graphic?.attributes?.id) return;
+  onPoint(hit.graphic.attributes);
+}
+
+async function runPointGraphicClick(
+  input: {
+    mapView: __esri.MapView;
+    layer: __esri.GraphicsLayer;
+    onPoint: (attributes: EnrichedPointType) => void;
+  },
+  event: __esri.ViewClickEvent,
+  clickGuard: ReturnType<typeof createDebouncedClickGuard>
+): Promise<void> {
+  if (clickGuard.shouldSkip()) return;
+  try {
+    const response = await input.mapView.hitTest(event, { include: [input.layer] });
+    notifyPointGraphicClick(findLayerGraphicHit(response, input.layer), input.onPoint);
+  } catch (error) {
+    console.error("Error in point click handler:", error);
+  } finally {
+    clickGuard.finish();
+  }
+}
+
 export function usePointGraphicsClick(input: {
   mapView: __esri.MapView | null;
   layer: __esri.GraphicsLayer | null;
@@ -84,25 +121,11 @@ export function usePointGraphicsClick(input: {
   useEffect(() => {
     if (!input.mapView || !input.layer) return;
     const clickGuard = createDebouncedClickGuard();
-    const handle = input.mapView.on("click", async (event) => {
-      if (clickGuard.shouldSkip()) return;
-      try {
-        const response = await input.mapView!.hitTest(event, {
-          include: [input.layer!],
-        });
-        const hit = response.results.find(
-          (result) =>
-            (result as __esri.GraphicHit).graphic?.layer === input.layer
-        ) as __esri.GraphicHit | undefined;
-        if (hit?.graphic?.attributes?.id) {
-          input.onPoint(hit.graphic.attributes);
-        }
-      } catch (error) {
-        console.error("Error in point click handler:", error);
-      } finally {
-        clickGuard.finish();
-      }
-    });
+    const mapView = input.mapView;
+    const layer = input.layer;
+    const handle = mapView.on("click", (event) =>
+      runPointGraphicClick({ mapView, layer, onPoint: input.onPoint }, event, clickGuard)
+    );
     return () => handle.remove();
   }, [input.mapView, input.layer, input.onPoint]);
 }

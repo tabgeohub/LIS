@@ -1,36 +1,11 @@
-import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
-import ScrollButtonsLayout from "../../../Common/ScrollButtonsLayout";
+import { PlanInformationPanel } from "Components/HomePage/Body/Left/Common/PlanInformationPanel";
 import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
-import { goBackFromPlanInformation } from "Components/HomePage/Body/Left/Common/goBackFromPlanInformation";
-import { formatPlanSpoedLabel } from "Components/HomePage/Body/Left/Common/formatPlanSpoedLabel";
 import Images from "./Images";
 
-export default function PlanInformation({
-  selectedPlan,
-  setSelectedPlan,
-  setStep,
-}: PlanInformationProps) {
+export default function PlanInformation(props: PlanInformationProps) {
   return (
-    <ScrollButtonsLayout
-      buttons={
-        <>
-          <button
-            onClick={() => goBackFromPlanInformation(setStep, setSelectedPlan)}
-            className="gray-button"
-          >
-            Vorige
-          </button>
-        </>
-      }
-    >
-      <div className="space-y-3 p-3 pt-10">
-        <PlanInformationFields
-          plan={selectedPlan}
-          urgentValue={formatPlanSpoedLabel(selectedPlan.spoed)}
-        />
-
-        <Images selectedPlan={selectedPlan} />
-      </div>
-    </ScrollButtonsLayout>
+    <PlanInformationPanel {...props} layout="scroll">
+      <Images selectedPlan={props.selectedPlan} />
+    </PlanInformationPanel>
   );
 }

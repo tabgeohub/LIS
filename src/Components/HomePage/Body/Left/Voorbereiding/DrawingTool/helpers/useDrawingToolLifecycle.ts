@@ -69,6 +69,31 @@ export function useDrawingToolStep1Lifecycle(input: {
   }, [input.mapView, input.sketchViewModel]);
 }
 
+function clearDrawingStep2Graphics(mapView: MapView | null): void {
+  clearCurrentlyDrawingGraphics(mapView);
+  resetMapCursor(mapView);
+}
+
+function shouldClearDrawingStep2Graphics(currentTab: string, currentStep: number): boolean {
+  return currentTab !== DRAWING_TAB || currentStep === 1;
+}
+
+function handleDrawingStep2TabOrStepChange(input: {
+  mapView: MapView | null;
+  selectedTab: string;
+  step: number;
+  clear: () => void;
+}): void {
+  if (input.selectedTab !== DRAWING_TAB) {
+    clearDrawingStep2Graphics(input.mapView);
+    input.clear();
+    return;
+  }
+  if (input.step === 1) {
+    clearDrawingStep2Graphics(input.mapView);
+  }
+}
+
 export function useDrawingToolStep2Lifecycle(input: {
   mapView: MapView | null;
   selectedTab: string;
@@ -82,29 +107,16 @@ export function useDrawingToolStep2Lifecycle(input: {
       isFirstMount.current = false;
       return;
     }
-
-    if (input.selectedTab !== DRAWING_TAB) {
-      clearCurrentlyDrawingGraphics(input.mapView);
-      resetMapCursor(input.mapView);
-      input.clear();
-      return;
-    }
-
-    if (input.step === 1) {
-      clearCurrentlyDrawingGraphics(input.mapView);
-      resetMapCursor(input.mapView);
-    }
+    handleDrawingStep2TabOrStepChange(input);
   }, [input.selectedTab, input.step, input.mapView, input.clear]);
 
   useEffect(() => {
     return () => {
       const { step: currentStep } = useDrawingStore.getState();
       const { selectedTab: currentTab } = useTabState.getState();
-
-      if (currentTab !== DRAWING_TAB || currentStep === 1) {
+      if (shouldClearDrawingStep2Graphics(currentTab, currentStep)) {
         clearCurrentlyDrawingGraphics(input.mapView);
       }
-
       resetMapCursor(input.mapView);
     };
   }, [input.mapView]);

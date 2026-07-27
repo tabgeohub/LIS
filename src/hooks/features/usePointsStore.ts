@@ -63,10 +63,11 @@ function buildPointsQueryParams(
   return params;
 }
 
-async function loadPoints(
-  filters: PointsFilters,
-  set: (partial: Partial<PointsState>) => void
-): Promise<void> {
+async function loadPoints(input: {
+  filters: PointsFilters;
+  set: (partial: Partial<PointsState>) => void;
+}): Promise<void> {
+  const { filters, set } = input;
   try {
     const url = `${getBackEndUrl()}/api/points?hasGeometry=false`;
     const res = await axios.get<EnrichedPointType[]>(url, {
@@ -92,17 +93,17 @@ export const usePointsStore = create<PointsState>((set, get) => ({
 
   refetchPoints: async () => {
     const { lastFetchFilters } = get();
-    await loadPoints(lastFetchFilters ?? {}, set);
+    await loadPoints({ filters: lastFetchFilters ?? {}, set });
   },
 
   fetchPoints: async (filters = {}) => {
     set({ lastFetchFilters: filters });
-    await loadPoints(filters, set);
+    await loadPoints({ filters, set });
   },
 
   fetchDBPoints: async (filters = {}) => {
     set({ lastFetchFilters: filters });
-    await loadPoints(filters, set);
+    await loadPoints({ filters, set });
   },
 
   clearPoints: () => set({ points: [] }),

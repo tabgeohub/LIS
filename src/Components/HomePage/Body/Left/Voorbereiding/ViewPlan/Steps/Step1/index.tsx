@@ -2,11 +2,14 @@
 import { useEffect } from "react";
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { createQuadrantGraphic } from "../../helpers/createQuadrantGraphic";
 import SinglePlan from "./SinglePlan";
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import {
+  syncHoverQuadrantGraphics,
+  syncSelectedQuadrantGraphics,
+} from "./syncQuadrantGraphics";
 
 export default function Step1({
   handleCancel,
@@ -22,29 +25,12 @@ export default function Step1({
 
   useEffect(() => {
     if (!mapView || !graphicsLayerHover) return;
-
-    graphicsLayerHover.removeAll();
-
-    hoveredPoints?.forEach((point) => {
-      const quadrantGraphic = createQuadrantGraphic(hoveredPoints);
-
-      graphicsLayerHover?.add(quadrantGraphic);
-    });
+    syncHoverQuadrantGraphics({ graphicsLayerHover, hoveredPoints });
   }, [hoveredPoints, mapView]);
 
   useEffect(() => {
-    if (selectedIndex > 0) {
-      if (!mapView || !graphicsLayerHover) return;
-
-      graphicsLayerHover?.removeAll();
-      graphicsLayer?.removeAll();
-
-      hoveredPoints?.forEach((point) => {
-        const quadrantGraphic = createQuadrantGraphic(hoveredPoints);
-
-        graphicsLayer?.add(quadrantGraphic);
-      });
-    }
+    if (selectedIndex <= 0 || !mapView || !graphicsLayerHover) return;
+    syncSelectedQuadrantGraphics({ graphicsLayer, graphicsLayerHover, hoveredPoints });
   }, [selectedIndex]);
 
   return (

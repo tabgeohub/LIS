@@ -1,6 +1,6 @@
 import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
 import { submitEditUser, type EditUserFormData } from "./submitEditUser";
-import { createDashboardFormHandlers } from "../shared/createDashboardFormHandlers";
+import { createDashboardSubmitHandlers } from "../shared/createDashboardSubmitHandlers";
 
 export function buildEditUserFormHandlers(input: {
   selectedUser: KeycloakUser | null;
@@ -9,14 +9,13 @@ export function buildEditUserFormHandlers(input: {
   setLoading: (value: boolean) => void;
   handleEditSuccess: (user: KeycloakUser) => void;
 }) {
-  return createDashboardFormHandlers({
+  return createDashboardSubmitHandlers({
     setFormData: input.setFormData,
-    hasSelection: Boolean(input.selectedUser),
+    selected: input.selectedUser,
     setLoading: input.setLoading,
-    submit: async () => {
-      if (!input.selectedUser) return;
+    submitSelected: async (selectedUser) => {
       await submitEditUser({
-        selectedUser: input.selectedUser,
+        selectedUser,
         formData: input.formData,
         onSuccess: input.handleEditSuccess,
       });

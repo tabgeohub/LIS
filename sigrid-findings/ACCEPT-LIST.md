@@ -1,68 +1,81 @@
-# Sigrid Accept list — export `20260721(1)` (final polish)
+# Sigrid Accept list — export `sigrid-227`
 
 Use for a **Sigrid UI Accept** pass. Do not rewrite these unless responsibilities start mixing.
 **No Dockerfile or Nginx edits.**
 
-Source: [`all-findings-rijkswaterstaat-otg-lis-20260721(1)`](./all-findings-rijkswaterstaat-otg-lis-20260721(1)/)
+Source: [`sigrid-findings/sigrid-227`](./sigrid-227/)  
+Checklist with CSV line refs: [`SIGRID-227-ACCEPT-CHECKLIST.md`](./SIGRID-227-ACCEPT-CHECKLIST.md)
 
 ## Architecture — Component independence HIGH (Accept — intentional façades)
 
 | Module | Why |
 | --- | --- |
+| `src/api-hooks/templateFlights/useTemplateFlights.ts` | Domain React Query façade |
+| `src/api-hooks/finishedPlans/usePlanPointAttachments.ts` | Domain React Query façade |
+| `src/api-hooks/points/usePointLookupQueries.ts` | Domain React Query façade |
 | `src/hooks/useLogAction.ts` | App-wide logging façade |
-| `src/hooks/useContent.ts` | App-wide i18n/content hub (also Coupling HIGH) |
+| `src/api-hooks/flightPlans/useFlightPlanLookupQueries.ts` | Domain React Query façade |
 | `src/hooks/consts/useConstSelectOptions.ts` | Const lookup façade |
 | `src/hooks/useGetFlightTimesDistance.ts` | Thin query wrapper |
-| `src/hooks/flightPlan/useFlightPlanStandardSelectProps.ts` | Thin select-props wrapper |
-| `src/helpers/refreshToken.ts` | Auth helper entry |
-| `src/api-hooks/templateFlights/useTemplateFlights.ts` | Domain React Query façade |
-| `src/api-hooks/points/usePointLookupQueries.ts` | Domain React Query façade |
-| `src/api-hooks/flightPlans/useFlightPlanLookupQueries.ts` | Domain React Query façade |
-| `src/api-hooks/finishedPlans/usePlanPointAttachments.ts` | Domain React Query façade |
 | `src/api-hooks/consts/useLookupQuery.ts` | Shared lookup façade |
+| `src/helpers/refreshToken.ts` | Auth helper entry |
 | `src/api-hooks/emails/useEmailsList.ts` | Domain React Query façade |
 
-Hover helpers (`showPlanSearchListHover`, `hoverFlightPlanFromOriginalMap`, `clearHoveredFlightPlanFromOriginalMap`, `resolveOriginalPlanGraphic`) are thinned siblings — expect Independence HIGH on deleted `showPlanSearchListHoverCore` to clear on rescan.
+## Architecture — Independence MEDIUM `*Core` bodies (Accept — 133 items)
 
-## Architecture — Independence MEDIUM `*Core` bodies (Accept)
+Façade-only splits did not move Architecture stars. Accept all MEDIUM independence rows in `Component independence findings.csv` (rows 12–144). **Do not re-split for score.**
 
-Façade-only splits did not move Architecture stars. Accept remaining shared `hooks/` / `helpers/` / `api-hooks/` Core/Internal modules. **Do not re-split for score.**
+Includes shared `hooks/` / `helpers/` / `api-hooks/` Core/Internal modules (`centerAndZoomMathCore`, `csvExportCore`, `useUpdateDataCore`, hover siblings, etc.).
 
-## Architecture — Module coupling (Accept)
+## Architecture — Module coupling (Accept — 24 items)
 
 | Module | Why |
 | --- | --- |
-| `useLogAction` / `useContent` | HIGH fan-in by design |
-| `validateMapView`, EditGeometry `coords.ts` | Tiny shared utilities |
-| `useWizardButtons`, `useConstSelectOptions`, `useResetFeatures` | Cohesive hooks |
-| `nnederlandLayerBuilders` / icon primitives | Layer catalogue builders |
-| `useUpdateDataCore`, `routeResponses` | Shared HTTP helpers |
+| `src/hooks/useLogAction.ts` | HIGH fan-in by design |
+| `src/hooks/useContent.ts` | HIGH fan-in i18n hub |
+| `nnederlandLayerBuilders.ts` | Layer catalogue builder hub |
+| `useUpdateDataCore.ts` | Shared mutation helper |
+| `routeResponses.ts` | Shared HTTP helpers |
+| `nnederlandIconPrimitives.tsx` | Layer icon primitives hub |
+| `useWizardButtons.ts` | Cohesive wizard hook |
+| `useConstSelectOptions.ts` | Const lookup façade |
+| `useResetFeatures.ts` | Feature reset hook |
+| EditGeometry `coords.ts` | Tiny shared utility |
+| `validateMapView.ts` | Tiny map guard |
+| Remaining LOW coupling rows | Shared infrastructure (keycloak admin, regio filter, etc.) |
 
-## Architecture — Component entanglement
+## Architecture — Component entanglement (Accept)
 
 | Finding | Why |
 | --- | --- |
-| High density on `src/api-hooks` / `src/hooks` | Intentional façade layers — Accept |
+| High density on `src/api-hooks` | Intentional façade layer |
+| Moderate density on `src/helpers` | Shared helper layer |
+| Moderate density on `src/hooks` | Shared hook layer |
+| Moderate density on `src/Components/HomePage` | Main UI shell |
+| Moderate density on `src/Components/TimesliderItemDetailPage` | Feature page shell |
 | Cyclic `hooks` ↔ `HomePage` | **Code-fixed** — expect FIXED on rescan |
 
 ## Maintainability — Unit size (Accept)
 
 | Module | Why |
 | --- | --- |
-| `backend/dockerfile` | Deployment artifact |
+| `backend/dockerfile` / root `dockerfile` | Deployment artifact |
 | `backend/scripts/verify-regio-apis.ts` | Verification script |
 
 ## Maintainability — Duplication (Accept / out of scope)
 
 | Clone family | Why |
 | --- | --- |
-| FE↔BE `keycloakUser`, `devices`, `installer` | Needs shared package |
-| FE↔BE `pointCoreColumns` ↔ FE identity keys | Cross-layer twin |
-| FE↔BE flight-plan persistence field lists | Cross-layer twin |
+| FE↔BE `keycloakUser` | Needs shared package |
+| FE↔BE `devices` (2 clones) | Needs shared package |
+| FE↔BE `pointCoreColumns` ↔ identity keys | Cross-layer twin |
+| FE↔BE `flightPlanFieldNormalize` ↔ persistence fields | Cross-layer twin |
 | FE↔BE `createGeometryInsert` ↔ drawing form fields | Cross-layer twin |
+| FE↔BE `installer` | Needs shared package |
 | `public/index.html` ↔ root `index.html` | CRA vs Vite entry shells |
+| `PointDetailsFieldsList` 3-way column keys | Accept residual |
 
-Same-component Dup HIGH clones were polished in code — expect count drop on rescan.
+Same-component Dup HIGH clones (Step2 Buttons, PlanInformation, dashboard handlers, timeslider, `appendFlightPlanWhereClause`) were unified in code — expect FIXED on rescan.
 
 ## Security (Accept / out of scope)
 
@@ -70,4 +83,8 @@ Same-component Dup HIGH clones were polished in code — expect count drop on re
 | --- | --- |
 | Docker CWE-266 (`dockerfile`, `backend/dockerfile`) | Out of scope unless non-root containers required |
 
-`csvExportCore` XSS MEDIUM hardened with escape + nosemgrep — expect FIXED on rescan.
+`csvExportCore` XSS — **FIXED** in prior wave.
+
+## Expected post-Accept
+
+Architecture actionable code drops from **172 → ~15** (mostly low fan-in coupling LOWs + `nnederlandIconPrimitives` MEDIUM if not accepted).

@@ -31,10 +31,11 @@ export async function preloadReportAttachments(input: {
   };
 }
 
-export function addProcessedItemsToZip(
-  zip: InstanceType<typeof JSZip>,
-  processedItems: ProcessedItem[]
-) {
+export function addProcessedItemsToZip(input: {
+  zip: InstanceType<typeof JSZip>;
+  processedItems: ProcessedItem[];
+}) {
+  const { zip, processedItems } = input;
   const attachmentsFolder = zip.folder("attachments");
 
   for (const result of processedItems) {

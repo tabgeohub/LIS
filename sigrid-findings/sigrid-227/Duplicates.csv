@@ -1,0 +1,30 @@
+ID,Path,Component,Lines of code,Duplication percentage,Start line,End line
+e693dac9-7ed2-47cf-b948-d3c375fc612b,src/Types/keycloakUser.ts,Types,11,100,1,11
+e693dac9-7ed2-47cf-b948-d3c375fc612b,backend/src/routes/keycloak/management/users/types.ts,backend,11,100,1,11
+667ae96d-9499-4b5e-acab-ca0ce974f165,src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step2/Buttons.tsx,HomePage,11,26.829268,17,28
+667ae96d-9499-4b5e-acab-ca0ce974f165,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step2/Buttons.tsx,HomePage,11,22.916666,19,30
+286c60be-e8f5-46dd-b6c5-c10d63457639,backend/src/helpers/queries/flight-plans/flightPlanFieldNormalize.ts,backend,9,25.714285,3,11
+286c60be-e8f5-46dd-b6c5-c10d63457639,src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts,hooks,9,37.5,5,13
+8b0a205d-522f-49af-9f47-1b171a3b7605,src/Types/devices.ts,Types,8,34.782608,10,17
+8b0a205d-522f-49af-9f47-1b171a3b7605,backend/src/routes/devices-updates/types.ts,backend,8,24.242424,14,21
+c08a36ac-e8a1-46c2-9c61-cc66660681ac,src/Types/devices.ts,Types,8,34.782608,1,8
+c08a36ac-e8a1-46c2-9c61-cc66660681ac,backend/src/routes/devices-updates/types.ts,backend,8,24.242424,1,8
+ea190d8c-5a8b-4637-839e-1d8576234b1c,backend/src/helpers/queries/points/pointCoreColumns.ts,backend,8,18.60465,3,10
+ea190d8c-5a8b-4637-839e-1d8576234b1c,src/helpers/points/pointCoreIdentityKeys.ts,helpers,8,100,1,8
+0b152f6a-d053-4b1f-9889-458028db7144,backend/src/helpers/queries/flight-plans/appendFlightPlanWhereClause.ts,backend,8,13.559322,9,16
+0b152f6a-d053-4b1f-9889-458028db7144,backend/src/helpers/queries/flight-plans/appendFlightPlanWhereClause.ts,backend,8,13.559322,49,56
+3ad5d784-5d09-4fb2-ad36-0cd871ebf4db,backend/src/helpers/queries/points/pointCoreColumns.ts,backend,6,13.953488,4,9
+3ad5d784-5d09-4fb2-ad36-0cd871ebf4db,src/helpers/points/pointCoreIdentityKeys.ts,helpers,6,75,2,7
+3ad5d784-5d09-4fb2-ad36-0cd871ebf4db,src/Components/HomePage/Body/Left/Common/PointDetailsFieldsList.tsx,HomePage,6,31.578947,4,9
+88ab61a7-75f0-4d33-95b2-ee68f0de95a6,src/Components/HomePage/Body/Left/Tools/AandachtspuntenVerwijderen/Actions/ViewPlans/PlanInformation.tsx,HomePage,6,100,6,11
+88ab61a7-75f0-4d33-95b2-ee68f0de95a6,src/Components/HomePage/Body/Left/Voorbereiding/SelectedPoint/ViewPlans/PlanInformation.tsx,HomePage,6,75,8,13
+170226ad-c930-4d26-b747-a350e4722345,backend/src/helpers/queries/geometries/createGeometryInsert.ts,backend,6,20,4,9
+170226ad-c930-4d26-b747-a350e4722345,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/pickDrawingGeometryFormFields.ts,HomePage,6,42.857143,3,8
+4f1487b1-abfe-413f-be8f-1c5ed6fb591b,src/Types/installer.ts,Types,7,100,1,7
+4f1487b1-abfe-413f-be8f-1c5ed6fb591b,backend/src/routes/installersStorage.ts,backend,7,20,4,10
+500b5dbf-7be0-4dfb-b4b8-5a377baca2b4,src/Components/TimesliderItemDetailPage/useTimesliderItemImages.ts,TimesliderItemDetailPage,6,13.043478,33,38
+500b5dbf-7be0-4dfb-b4b8-5a377baca2b4,src/Components/TimesliderItemDetailPage/useTimesliderItemImages.ts,TimesliderItemDetailPage,6,13.043478,46,51
+6a832724-ba7b-4cc4-b992-eadff910f2fd,index.html,Root files,6,31.578947,6,11
+6a832724-ba7b-4cc4-b992-eadff910f2fd,public/index.html,public,6,33.333332,6,11
+6cf8e29a-e06e-43b2-9cb0-06c63de46057,src/Components/DashboardPage/EditUser/buildEditUserFormHandlers.ts,DashboardPage,6,37.5,12,17
+6cf8e29a-e06e-43b2-9cb0-06c63de46057,src/Components/DashboardPage/ResetPassword/buildResetPasswordHandlers.ts,DashboardPage,6,31.578947,13,18

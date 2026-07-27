@@ -2,17 +2,15 @@ export function getOtpParamName(): string {
   return process.env.KC_OTP_PARAM_NAME || "otp";
 }
 
-type PasswordGrantParams = {
+export type AttemptPasswordGrantInput = {
+  client: import("openid-client").Client;
   username: string;
   password: string;
   otp?: string;
 };
 
-export async function attemptPasswordGrant(
-  client: import("openid-client").Client,
-  params: PasswordGrantParams
-) {
-  const { username, password, otp } = params;
+export async function attemptPasswordGrant(input: AttemptPasswordGrantInput) {
+  const { client, username, password, otp } = input;
   const otpParam = getOtpParamName();
 
   return client.grant({

@@ -24,34 +24,43 @@ export function getHerhalenFilterFromGeometries(
   return isHerhalenTruthy(first.herhalen);
 }
 
+type GeometrySelectionSortContext = {
+  selectedSet: Set<number>;
+  selectedRank: Map<number, number>;
+  originalIndex: Map<number, number>;
+};
+
 export function sortGeometriesForSelection(
   geometries: Geometry[],
   selectedIds: number[]
 ): Geometry[] {
-  const selectedSet = new Set(selectedIds);
-  const originalIndex = new Map(
-    geometries.map((geometry, index) => [geometry.id, index])
-  );
-  const selectedRank = new Map(
-    selectedIds.map((id, index) => [id, selectedIds.length - 1 - index])
-  );
+  const context: GeometrySelectionSortContext = {
+    selectedSet: new Set(selectedIds),
+    selectedRank: new Map(
+      selectedIds.map((id, index) => [id, selectedIds.length - 1 - index])
+    ),
+    originalIndex: new Map(
+      geometries.map((geometry, index) => [geometry.id, index])
+    ),
+  };
 
   return [...geometries].sort((a, b) =>
-    compareGeometriesForSelection(a, b, selectedSet, selectedRank, originalIndex)
+    compareGeometriesForSelection(a, b, context)
   );
 }
 
 function compareGeometriesForSelection(
   a: Geometry,
   b: Geometry,
-  selectedSet: Set<number>,
-  selectedRank: Map<number, number>,
-  originalIndex: Map<number, number>
+  context: GeometrySelectionSortContext
 ): number {
   const selectionDifference =
-    Number(!selectedSet.has(a.id)) - Number(!selectedSet.has(b.id));
+    Number(!context.selectedSet.has(a.id)) -
+    Number(!context.selectedSet.has(b.id));
   if (selectionDifference !== 0) return selectionDifference;
-  const rank = selectedSet.has(a.id) ? selectedRank : originalIndex;
+  const rank = context.selectedSet.has(a.id)
+    ? context.selectedRank
+    : context.originalIndex;
   return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0);
 }
 

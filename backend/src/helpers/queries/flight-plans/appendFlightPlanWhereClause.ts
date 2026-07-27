@@ -5,15 +5,22 @@ import {
   shouldFilterByRegio,
 } from "../shared/regioFilter";
 
-function appendWhereWithOptionalRegio(input: {
+type FlightPlanWhereBase = {
   query: string;
   params: unknown[];
-  where: string;
   regio_id?: unknown;
   regioColumn?: string;
   regioFilter: RegioFilterOptions;
   planAlias: string;
-}): string {
+};
+
+function resolveRegioColumn(input: FlightPlanWhereBase): string {
+  return input.regioColumn ?? `${input.planAlias}.regio_id`;
+}
+
+function appendWhereWithOptionalRegio(
+  input: FlightPlanWhereBase & { where: string }
+): string {
   let query = `${input.query}
       WHERE ${input.where}`;
   if (input.regio_id === undefined) return query;
@@ -21,59 +28,29 @@ function appendWhereWithOptionalRegio(input: {
     sql: query,
     params: input.params,
     regio_id: input.regio_id,
-    column: input.regioColumn ?? `${input.planAlias}.regio_id`,
+    column: resolveRegioColumn(input),
     options: input.regioFilter,
   });
 }
 
-function appendRegioOnlyWhere(input: {
-  query: string;
-  params: unknown[];
-  regio_id: unknown;
-  regioColumn?: string;
-  regioFilter: RegioFilterOptions;
-  planAlias: string;
-}): string {
+function appendRegioOnlyWhere(input: FlightPlanWhereBase): string {
   if (!shouldFilterByRegio(input.regio_id, input.regioFilter)) {
     return input.query;
   }
   input.params.push(input.regio_id);
-  const regioColumn = assertSafeSqlColumn(
-    input.regioColumn ?? `${input.planAlias}.regio_id`
-  );
+  const regioColumn = assertSafeSqlColumn(resolveRegioColumn(input));
   return `${input.query}
       WHERE ${regioColumn} = $${input.params.length}`;
 }
 
-export function appendFlightPlanWhereClause(input: {
-  query: string;
-  params: unknown[];
-  where?: string;
-  regio_id?: unknown;
-  regioColumn?: string;
-  regioFilter: RegioFilterOptions;
-  planAlias: string;
-}): string {
+export function appendFlightPlanWhereClause(
+  input: FlightPlanWhereBase & { where?: string }
+): string {
   if (input.where) {
-    return appendWhereWithOptionalRegio({
-      query: input.query,
-      params: input.params,
-      where: input.where,
-      regio_id: input.regio_id,
-      regioColumn: input.regioColumn,
-      regioFilter: input.regioFilter,
-      planAlias: input.planAlias,
-    });
+    return appendWhereWithOptionalRegio({ ...input, where: input.where });
   }
 
   if (input.regio_id === undefined) return input.query;
 
-  return appendRegioOnlyWhere({
-    query: input.query,
-    params: input.params,
-    regio_id: input.regio_id,
-    regioColumn: input.regioColumn,
-    regioFilter: input.regioFilter,
-    planAlias: input.planAlias,
-  });
+  return appendRegioOnlyWhere(input);
 }

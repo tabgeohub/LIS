@@ -54,14 +54,22 @@ function readQueryUrlParam(query: Record<string, unknown>): string | null {
   return null;
 }
 
-export function extractTargetUrlFromRequest(req: {
+type ProxyUrlRequest = {
   query: Record<string, unknown>;
   originalUrl?: string;
   url?: string;
-}): string | null {
-  return (
-    readQueryUrlParam(req.query) ??
-    findUrlFromOriginalUrl(req.originalUrl || req.url || "") ??
-    findHttpUrlInQueryKeys(req.query || {})
-  );
+};
+
+const TARGET_URL_RESOLVERS: Array<(req: ProxyUrlRequest) => string | null> = [
+  (req) => readQueryUrlParam(req.query),
+  (req) => findUrlFromOriginalUrl(req.originalUrl || req.url || ""),
+  (req) => findHttpUrlInQueryKeys(req.query || {}),
+];
+
+export function extractTargetUrlFromRequest(req: ProxyUrlRequest): string | null {
+  for (const resolve of TARGET_URL_RESOLVERS) {
+    const url = resolve(req);
+    if (url) return url;
+  }
+  return null;
 }

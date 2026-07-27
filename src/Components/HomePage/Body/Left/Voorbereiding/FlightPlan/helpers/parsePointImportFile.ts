@@ -4,6 +4,7 @@ import {
   EMPTY_POINT_IDENTITY_FIELDS,
   EMPTY_POINT_NUMERIC_FLAGS,
 } from "@helpers/points/emptyPointCoreFields";
+import { parseDelimitedRows } from "./parseCsvImportRows";
 
 type NumericColumn =
   | "xcoordinaat_rd"
@@ -41,25 +42,7 @@ export function isCsvFileName(fileName: string): boolean {
 }
 
 export function parseCsvRows(text: string): string[][] {
-  const delimiter = ";";
-  const lines = text.split(/\r?\n/);
-  const expectedFieldCount = lines[0]?.split(delimiter).length ?? 0;
-  const rows: string[][] = [];
-  let buffer = "";
-
-  for (const line of lines) {
-    if (!line?.trim()) continue;
-
-    buffer += (buffer ? "\n" : "") + line;
-    const fields = buffer.split(delimiter);
-
-    if (fields.length === expectedFieldCount) {
-      rows.push(fields.map((f) => f.trim()));
-      buffer = "";
-    }
-  }
-
-  return rows;
+  return parseDelimitedRows(text);
 }
 
 export function parseExcelRows(buffer: ArrayBuffer): string[][] {

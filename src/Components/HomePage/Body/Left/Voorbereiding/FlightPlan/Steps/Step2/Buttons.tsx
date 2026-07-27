@@ -5,7 +5,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import { useFilterStepWizardSelection } from "../../../common/useFilterStepWizardSelection";
+import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
 
 function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
   const { resetFeatures } = useResetFeatures();
@@ -14,29 +14,24 @@ function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
     useMapViewState();
   const resetFilters = usePointsFilterStore((s) => s.resetFilters);
   const handleCancel = useHandleCancel();
-  const { labels, withLog, clearSelectionGraphics, handleNext } =
-    useFilterStepWizardSelection({
-      selection: {
-        mapView,
-        selectedGraphics: store.selectedGraphics,
-        setSelectedGraphics: store.setSelectedGraphics,
-        hoveredGraphic: store.hoveredGraphic,
-        setHoveredGraphic: store.setHoveredGraphic,
-      },
-      step: store.step,
-      setStep: store.setStep,
-      resetFilters,
-      clearYellowLayers: () => {
-        yellowGraphicsLayer?.graphics.removeAll();
-        yellowGeometriesGraphicsLayer?.graphics.removeAll();
-      },
-    });
-  return {
-    labels,
-    withLog,
+
+  return useWizardFilterStep2Buttons({
     setOpenFilter,
-    handleNext,
-    handleBack: () =>
+    selection: {
+      mapView,
+      selectedGraphics: store.selectedGraphics,
+      setSelectedGraphics: store.setSelectedGraphics,
+      hoveredGraphic: store.hoveredGraphic,
+      setHoveredGraphic: store.setHoveredGraphic,
+    },
+    step: store.step,
+    setStep: store.setStep,
+    resetFilters,
+    clearYellowLayers: () => {
+      yellowGraphicsLayer?.graphics.removeAll();
+      yellowGeometriesGraphicsLayer?.graphics.removeAll();
+    },
+    buildPrevious: (clearSelectionGraphics) => () =>
       runWizardCleanup([
         () => store.setStep(2),
         resetFilters,
@@ -45,9 +40,9 @@ function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
         clearGraphics,
         clearSelectionGraphics,
       ]),
-    handleCancel: () =>
+    buildCancel: (clearSelectionGraphics) => () =>
       runWizardCleanup([resetFeatures, store.clear, handleCancel, resetFilters]),
-  };
+  });
 }
 
 export default function Buttons({
@@ -60,7 +55,7 @@ export default function Buttons({
     <FilterStepWizardButtons
       labels={actions.labels}
       withLog={actions.withLog}
-      onPrevious={actions.handleBack}
+      onPrevious={actions.handlePrevious}
       previousLogMessage="User clicked 'Back' button"
       onFilter={() => actions.setOpenFilter(true)}
       onNext={actions.handleNext}

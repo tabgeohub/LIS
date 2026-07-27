@@ -46,7 +46,11 @@ export async function authenticatePasswordCredentials(input: {
   password: string;
 }) {
   const { client } = await getOidcClientFor(input.req);
-  const tokenSet = await attemptPasswordGrant(client, input);
+  const tokenSet = await attemptPasswordGrant({
+    client,
+    username: input.username,
+    password: input.password,
+  });
   const userInfo = await client.userinfo(tokenSet.access_token!);
   await persistLoginSession({ req: input.req, tokenSet, userInfo });
   return {

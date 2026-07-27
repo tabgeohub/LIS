@@ -7,6 +7,13 @@ import {
 
 export { clearPathFeatureLayer };
 
+function hasRenderablePlanPath(
+  selectedPlan: { path?: unknown } | null | undefined
+): selectedPlan is { path: unknown[] } {
+  const planPath = selectedPlan?.path;
+  return Boolean(selectedPlan && Array.isArray(planPath) && planPath.length > 0);
+}
+
 /** Build/replace the selected plan path layer; returns cleanup. */
 export function syncSelectedPlanPathLayer(input: {
   mapView: MapView | null | undefined;
@@ -21,13 +28,7 @@ export function syncSelectedPlanPathLayer(input: {
   });
   input.featureLayerRef.current = null;
 
-  if (!input.selectedPlan || !input.mapView?.map) {
-    input.setLoadingPath(false);
-    return;
-  }
-
-  const planPath = input.selectedPlan.path;
-  if (!planPath || !Array.isArray(planPath) || planPath.length === 0) {
+  if (!input.mapView?.map || !hasRenderablePlanPath(input.selectedPlan)) {
     input.setLoadingPath(false);
     return;
   }
@@ -35,7 +36,7 @@ export function syncSelectedPlanPathLayer(input: {
   return attachSelectedPlanPathLayer({
     mapView: input.mapView,
     selectedPlan: input.selectedPlan,
-    planPath,
+    planPath: input.selectedPlan.path,
     pointsGraphicsLayer: input.pointsGraphicsLayer,
     featureLayerRef: input.featureLayerRef,
     setLoadingPath: input.setLoadingPath,

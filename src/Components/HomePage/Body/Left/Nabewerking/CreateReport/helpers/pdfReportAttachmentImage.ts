@@ -18,12 +18,12 @@ export function resolveTakenAt(att: PdfAttachment): number | undefined {
   return match ? parseInt(match[1], 10) : undefined;
 }
 
-export function drawTakenAtCaption(
-  doc: jsPDF,
-  takenAt: number,
-  drawH: number
-) {
-  const date = new Date(takenAt);
+export function drawTakenAtCaption(input: {
+  doc: jsPDF;
+  takenAt: number;
+  drawH: number;
+}) {
+  const date = new Date(input.takenAt);
   const formatted =
     date.toLocaleDateString("nl-NL", {
       day: "numeric",
@@ -32,11 +32,11 @@ export function drawTakenAtCaption(
       hour: "2-digit",
       minute: "2-digit",
     }) || date.toISOString();
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(80, 80, 80);
-  doc.text(formatted, 25, 24 + drawH + 8);
-  doc.setTextColor(0, 0, 0);
+  input.doc.setFont("helvetica", "normal");
+  input.doc.setFontSize(10);
+  input.doc.setTextColor(80, 80, 80);
+  input.doc.text(formatted, 25, 24 + input.drawH + 8);
+  input.doc.setTextColor(0, 0, 0);
 }
 
 function paintScaledCanvas(img: HTMLImageElement) {

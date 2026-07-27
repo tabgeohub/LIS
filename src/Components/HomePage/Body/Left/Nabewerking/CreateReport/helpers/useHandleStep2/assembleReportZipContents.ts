@@ -38,8 +38,8 @@ export async function assembleReportZipContents(
     featureLayerUrl: ATTACHMENTS_FEATURE_LAYER_URL,
     logoDataUrl,
   });
-  addProcessedItemsToZip(
+  addProcessedItemsToZip({
     zip,
-    await runWithConcurrency({ tasks, concurrency: 4 })
-  );
+    processedItems: await runWithConcurrency({ tasks, concurrency: 4 }),
+  });
 }

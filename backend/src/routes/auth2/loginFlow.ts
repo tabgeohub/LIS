@@ -11,7 +11,7 @@ type LoginCredentials = { username: string; password: string; otp?: string };
 
 export async function authenticateLogin(req: Request, credentials: LoginCredentials) {
   const { client } = await getOidcClientFor(req);
-  const tokenSet = await attemptPasswordGrant(client, credentials);
+  const tokenSet = await attemptPasswordGrant({ client, ...credentials });
   const userInfo = await client.userinfo(tokenSet.access_token!);
   await persistLoginSession({ req, tokenSet, userInfo });
   return {

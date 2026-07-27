@@ -53,7 +53,7 @@ async function executeReturningUpdate(input: {
       message: config.successMessage,
     });
   } catch (err) {
-    respondWithUpdateError(res, config, err);
+    respondWithUpdateError({ res, config, err });
   }
 }
 
@@ -67,11 +67,12 @@ function shouldReportNotFound(
   );
 }
 
-function respondWithUpdateError(
-  res: Response,
-  config: UpdateExecutionConfig,
-  err: unknown
-): void {
+function respondWithUpdateError(input: {
+  res: Response;
+  config: UpdateExecutionConfig;
+  err: unknown;
+}): void {
+  const { res, config, err } = input;
   const errText = err instanceof Error ? err.message : String(err);
   const separator = config.errorMessage.trimEnd().endsWith(":") ? " " : ": ";
   serverError({

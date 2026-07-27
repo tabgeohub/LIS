@@ -27,11 +27,12 @@ function takenAtFromAttachmentMeta(att: AttachmentMeta): number | undefined {
   return undefined;
 }
 
-async function fetchOnePointAttachment(
-  featureLayerUrl: string,
-  objectId: number,
-  att: AttachmentMeta
-): Promise<AttachmentWithMeta> {
+async function fetchOnePointAttachment(input: {
+  featureLayerUrl: string;
+  objectId: number;
+  att: AttachmentMeta;
+}): Promise<AttachmentWithMeta> {
+  const { featureLayerUrl, objectId, att } = input;
   const url = attachmentDisplayUrl(
     `${featureLayerUrl}/0/${objectId}/attachments/${att.id}`
   );
@@ -57,7 +58,7 @@ export async function fetchAttachmentsForPoint(
 
   const attachments = await Promise.allSettled(
     metadata.attachmentInfos.map((att: AttachmentMeta) =>
-      fetchOnePointAttachment(featureLayerUrl, objectId, att)
+      fetchOnePointAttachment({ featureLayerUrl, objectId, att })
     )
   );
   return attachments
