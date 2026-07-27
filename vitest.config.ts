@@ -14,6 +14,7 @@ export default defineConfig({
       lib: path.resolve(__dirname, "./src/lib"),
       api: path.resolve(__dirname, "./src/api"),
       "api-hooks": path.resolve(__dirname, "./src/api-hooks"),
+      shared: path.resolve(__dirname, "./backend/src/shared"),
     },
   },
   test: {

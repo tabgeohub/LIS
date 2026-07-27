@@ -1,6 +1,8 @@
-# Sigrid-227 Accept checklist
+# Sigrid-20260727 Accept checklist
 
-Apply in Sigrid UI. Source: `sigrid-findings/sigrid-227`.
+Apply in Sigrid UI. Source: `sigrid-findings/*-20260727*` (independence + coupling).
+
+Duplication HIGH findings are **code-fixed** in this wave (shared FE/BE module + Step2 + dead `public/index.html`) — do not Accept those; expect FIXED on rescan.
 
 ## Summary
 
@@ -8,11 +10,7 @@ Apply in Sigrid UI. Source: `sigrid-findings/sigrid-227`.
 | --- | --- |
 | Independence | 143 |
 | Module coupling | 24 |
-| Entanglement | 5 |
-| Security Docker | 2 |
-| Duplication FE/BE | 9 |
-| Size Accept | 2 |
-| **Total** | **185** |
+| **Total** | **167** |
 
 ## Independence HIGH
 
@@ -180,7 +178,7 @@ Apply in Sigrid UI. Source: `sigrid-findings/sigrid-227`.
 13. [ ] `backend/src/helpers/queries/shared/resolveRegioFilter.ts` — fan-in 16 (LOW)
 14. [ ] `src/api-hooks/mutations/useCreateDataCore.ts` — fan-in 13 (LOW)
 15. [ ] `src/hooks/zustand/shared/planWizardCore.ts` — fan-in 12 (LOW)
-16. [ ] `src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts` — fan-in 14 (LOW)
+16. [ ] `src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/drawingToolMapCleanup.ts` — fan-in 12 (LOW)
 17. [ ] `backend/src/routes/auth2/authSecurityLog.ts` — fan-in 16 (LOW)
 18. [ ] `src/helpers/ArcGISHelpers/getTransformedCoordinates.ts` — fan-in 18 (LOW)
 19. [ ] `backend/src/helpers/http/validateBody.ts` — fan-in 11 (LOW)
@@ -189,33 +187,3 @@ Apply in Sigrid UI. Source: `sigrid-findings/sigrid-227`.
 22. [ ] `src/api/fetchApi.ts` — fan-in 13 (LOW)
 23. [ ] `src/hooks/wizard/useWizardCleanup.ts` — fan-in 13 (LOW)
 24. [ ] `src/helpers/classNames.ts` — fan-in 20 (LOW)
-
-## Entanglement
-
-1. [ ] High communication density on src/api-hooks (MEDIUM)
-2. [ ] Moderate communication density on src/helpers (LOW)
-3. [ ] Moderate communication density on src/hooks (LOW)
-4. [ ] Moderate communication density on src/Components/HomePage (LOW)
-5. [ ] Moderate communication density on src/Components/TimesliderItemDetailPage (LOW)
-
-## Security
-
-1. [ ] `dockerfile#L22` — CWE-266 @ dockerfile#L22
-2. [ ] `backend/dockerfile#L4` — CWE-266 @ backend/dockerfile#L4
-
-## Duplication FE/BE
-
-1. [ ] src/Types/keycloakUser.ts#L1:11,backend/src/routes/keycloak/management/users/types.ts#L1:11
-2. [ ] backend/src/helpers/queries/flight-plans/flightPlanFieldNormalize.ts#L3:11,src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts#L5:13
-3. [ ] src/Types/devices.ts#L10:17,backend/src/routes/devices-updates/types.ts#L14:21
-4. [ ] src/Types/devices.ts#L1:8,backend/src/routes/devices-updates/types.ts#L1:8
-5. [ ] backend/src/helpers/queries/points/pointCoreColumns.ts#L3:10,src/helpers/points/pointCoreIdentityKeys.ts#L1:8
-6. [ ] backend/src/helpers/queries/points/pointCoreColumns.ts#L4:9,src/helpers/points/pointCoreIdentityKeys.ts#L2:7,src/Components/HomePage/Body/Left/Common/PointDetailsFieldsList.tsx#L4:9
-7. [ ] backend/src/helpers/queries/geometries/createGeometryInsert.ts#L4:9,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/pickDrawingGeometryFormFields.ts#L3:8
-8. [ ] src/Types/installer.ts#L1:7,backend/src/routes/installersStorage.ts#L4:10
-9. [ ] index.html#L6:11,public/index.html#L6:11
-
-## Size Accept
-
-1. [ ] `backend/dockerfile#L1:86` — 59 lines of code for unit dockerfile
-2. [ ] `backend/scripts/verify-regio-apis.ts#L59:117` — 56 lines of code for unit verify-regio-apis.ts.testResolveRegioFilter()

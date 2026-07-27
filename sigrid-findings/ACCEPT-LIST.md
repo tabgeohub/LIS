@@ -1,10 +1,14 @@
-# Sigrid Accept list — export `sigrid-227`
+# Sigrid Accept list — export `20260727`
 
 Use for a **Sigrid UI Accept** pass. Do not rewrite these unless responsibilities start mixing.
 **No Dockerfile or Nginx edits.**
 
-Source: [`sigrid-findings/sigrid-227`](./sigrid-227/)  
-Checklist with CSV line refs: [`SIGRID-227-ACCEPT-CHECKLIST.md`](./SIGRID-227-ACCEPT-CHECKLIST.md)
+Source:
+- [`component-independence-findings-rijkswaterstaat-otg-lis-20260727.csv`](./component-independence-findings-rijkswaterstaat-otg-lis-20260727.csv)
+- [`module-coupling-findings-rijkswaterstaat-otg-lis-20260727.csv`](./module-coupling-findings-rijkswaterstaat-otg-lis-20260727.csv)
+- Duplication pack: [`duplication-findings-rijkswaterstaat-otg-lis-20260727/`](./duplication-findings-rijkswaterstaat-otg-lis-20260727/)
+
+Checklist: [`SIGRID-20260727-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-ACCEPT-CHECKLIST.md)
 
 ## Architecture — Component independence HIGH (Accept — intentional façades)
 
@@ -21,13 +25,11 @@ Checklist with CSV line refs: [`SIGRID-227-ACCEPT-CHECKLIST.md`](./SIGRID-227-AC
 | `src/helpers/refreshToken.ts` | Auth helper entry |
 | `src/api-hooks/emails/useEmailsList.ts` | Domain React Query façade |
 
-## Architecture — Independence MEDIUM `*Core` bodies (Accept — 133 items)
+## Architecture — Independence MEDIUM (Accept — 134 items)
 
-Façade-only splits did not move Architecture stars. Accept all MEDIUM independence rows in `Component independence findings.csv` (rows 12–144). **Do not re-split for score.**
+Façade-only splits did not move Architecture stars. Accept all MEDIUM independence rows. **Do not re-split for score.**
 
-Includes shared `hooks/` / `helpers/` / `api-hooks/` Core/Internal modules (`centerAndZoomMathCore`, `csvExportCore`, `useUpdateDataCore`, hover siblings, etc.).
-
-## Architecture — Module coupling (Accept — 24 items)
+## Architecture — Module coupling (Accept — 23 items)
 
 | Module | Why |
 | --- | --- |
@@ -42,49 +44,27 @@ Includes shared `hooks/` / `helpers/` / `api-hooks/` Core/Internal modules (`cen
 | `useResetFeatures.ts` | Feature reset hook |
 | EditGeometry `coords.ts` | Tiny shared utility |
 | `validateMapView.ts` | Tiny map guard |
-| Remaining LOW coupling rows | Shared infrastructure (keycloak admin, regio filter, etc.) |
+| Remaining LOW coupling rows | Shared infrastructure |
 
-## Architecture — Component entanglement (Accept)
+## Maintainability — Duplication (code-fixed in 20260727 wave)
+
+| Clone family | Status |
+| --- | --- |
+| FlightPlan ↔ TemplateFlight Step2 Buttons | **Code-fixed** via `buildWizardStep2Selection` |
+| FE↔BE `keycloakUser`, `devices`, `installer` | **Code-fixed** via `backend/src/shared/` |
+| FE↔BE `pointCoreColumns` / identity keys / PointDetailsFieldsList | **Code-fixed** via shared keys |
+| FE↔BE flight-plan persistence fields | **Code-fixed** via `shared/flightPlanFields` |
+| FE↔BE geometry form fields | **Code-fixed** via `shared/geometryFormFields` |
+| `public/index.html` ↔ root `index.html` | **Deleted** dead CRA `public/index.html` |
+
+Expect Dup HIGH → 0 on next rescan.
+
+## Security (Accept / out of scope if still RAW)
 
 | Finding | Why |
 | --- | --- |
-| High density on `src/api-hooks` | Intentional façade layer |
-| Moderate density on `src/helpers` | Shared helper layer |
-| Moderate density on `src/hooks` | Shared hook layer |
-| Moderate density on `src/Components/HomePage` | Main UI shell |
-| Moderate density on `src/Components/TimesliderItemDetailPage` | Feature page shell |
-| Cyclic `hooks` ↔ `HomePage` | **Code-fixed** — expect FIXED on rescan |
-
-## Maintainability — Unit size (Accept)
-
-| Module | Why |
-| --- | --- |
-| `backend/dockerfile` / root `dockerfile` | Deployment artifact |
-| `backend/scripts/verify-regio-apis.ts` | Verification script |
-
-## Maintainability — Duplication (Accept / out of scope)
-
-| Clone family | Why |
-| --- | --- |
-| FE↔BE `keycloakUser` | Needs shared package |
-| FE↔BE `devices` (2 clones) | Needs shared package |
-| FE↔BE `pointCoreColumns` ↔ identity keys | Cross-layer twin |
-| FE↔BE `flightPlanFieldNormalize` ↔ persistence fields | Cross-layer twin |
-| FE↔BE `createGeometryInsert` ↔ drawing form fields | Cross-layer twin |
-| FE↔BE `installer` | Needs shared package |
-| `public/index.html` ↔ root `index.html` | CRA vs Vite entry shells |
-| `PointDetailsFieldsList` 3-way column keys | Accept residual |
-
-Same-component Dup HIGH clones (Step2 Buttons, PlanInformation, dashboard handlers, timeslider, `appendFlightPlanWhereClause`) were unified in code — expect FIXED on rescan.
-
-## Security (Accept / out of scope)
-
-| Finding | Why |
-| --- | --- |
-| Docker CWE-266 (`dockerfile`, `backend/dockerfile`) | Out of scope unless non-root containers required |
-
-`csvExportCore` XSS — **FIXED** in prior wave.
+| Docker CWE-266 | Out of scope unless non-root containers required |
 
 ## Expected post-Accept
 
-Architecture actionable code drops from **172 → ~15** (mostly low fan-in coupling LOWs + `nnederlandIconPrimitives` MEDIUM if not accepted).
+Architecture actionable independence/coupling drops after Accept of ~167 items. Duplication cleared by code.

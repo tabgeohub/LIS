@@ -5,7 +5,10 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
+import {
+  buildWizardStep2Selection,
+  useWizardFilterStep2Buttons,
+} from "../../../common/useWizardFilterStep2Buttons";
 
 function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
   const { resetFeatures } = useResetFeatures();
@@ -17,13 +20,7 @@ function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
 
   return useWizardFilterStep2Buttons({
     setOpenFilter,
-    selection: {
-      mapView,
-      selectedGraphics: store.selectedGraphics,
-      setSelectedGraphics: store.setSelectedGraphics,
-      hoveredGraphic: store.hoveredGraphic,
-      setHoveredGraphic: store.setHoveredGraphic,
-    },
+    selection: buildWizardStep2Selection(store, mapView),
     step: store.step,
     setStep: store.setStep,
     resetFilters,
@@ -40,7 +37,7 @@ function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
         clearGraphics,
         clearSelectionGraphics,
       ]),
-    buildCancel: (clearSelectionGraphics) => () =>
+    buildCancel: () => () =>
       runWizardCleanup([resetFeatures, store.clear, handleCancel, resetFilters]),
   });
 }

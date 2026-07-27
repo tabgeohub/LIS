@@ -1,0 +1,11 @@
+Description,Severity,Status,First Seen,Issue age,Lines of code,Redundant lines of code,Occurrences,Same file,Same component,Technology,Locations
+11 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-27,0,11,11,2,false,true,TypeScript,"src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step2/Buttons.tsx#L18:29,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step2/Buttons.tsx#L20:31"
+11 lines occurring 2 times in 2 files,HIGH,RAW,2026-06-29,28,11,11,2,false,false,TypeScript,"src/Types/keycloakUser.ts#L1:11,backend/src/routes/keycloak/management/users/types.ts#L1:11"
+9 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-22,5,9,9,2,false,false,TypeScript,"backend/src/helpers/queries/flight-plans/flightPlanFieldNormalize.ts#L3:11,src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts#L5:13"
+8 lines occurring 2 times in 2 files,HIGH,RAW,2026-06-29,28,8,8,2,false,false,TypeScript,"src/Types/devices.ts#L10:17,backend/src/routes/devices-updates/types.ts#L14:21"
+8 lines occurring 2 times in 2 files,HIGH,RAW,2026-06-29,28,8,8,2,false,false,TypeScript,"src/Types/devices.ts#L1:8,backend/src/routes/devices-updates/types.ts#L1:8"
+8 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-18,9,8,8,2,false,false,TypeScript,"backend/src/helpers/queries/points/pointCoreColumns.ts#L3:10,src/helpers/points/pointCoreIdentityKeys.ts#L1:8"
+6 lines occurring 3 times in 3 files,HIGH,RAW,2026-07-27,0,6,12,3,false,false,TypeScript,"backend/src/helpers/queries/points/pointCoreColumns.ts#L4:9,src/helpers/points/pointCoreIdentityKeys.ts#L2:7,src/Components/HomePage/Body/Left/Common/PointDetailsFieldsList.tsx#L4:9"
+6 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-18,9,6,6,2,false,false,TypeScript,"backend/src/helpers/queries/geometries/createGeometryInsert.ts#L4:9,src/Components/HomePage/Body/Left/Voorbereiding/DrawingTool/helpers/pickDrawingGeometryFormFields.ts#L3:8"
+7 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-04,23,7,7,2,false,false,TypeScript,"src/Types/installer.ts#L1:7,backend/src/routes/installersStorage.ts#L4:10"
+6 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-27,0,6,6,2,false,false,Angular Templates,"public/index.html#L6:11,index.html#L6:11"

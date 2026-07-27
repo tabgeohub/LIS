@@ -12,7 +12,8 @@
       "utils/*": ["./src/utils/*"],
       "lib/*": ["./src/lib/*"],
       "api/*": ["./src/api/*"],
-      "api-hooks/*": ["./src/api-hooks/*"]
+      "api-hooks/*": ["./src/api-hooks/*"],
+      "shared/*": ["./backend/src/shared/*"]
     },
     // "strictNullChecks": false,
     "noImplicitAny": false,
@@ -31,6 +32,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "backend/src/shared"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

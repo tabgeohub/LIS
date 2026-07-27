@@ -1,12 +1,7 @@
 import { EnrichedPointType } from "Types";
+import { POINT_CORE_IDENTITY_KEYS } from "@helpers/points/pointCoreIdentityKeys";
 
-const POINT_DETAIL_FIELDS = [
-  "omschrijving",
-  "regio_id",
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
+const POINT_DETAIL_EXTRA_FIELDS = [
   "herhalen",
   "vertrouwelijk",
   "user_id",
@@ -14,6 +9,11 @@ const POINT_DETAIL_FIELDS = [
   "organisatie_id",
   "specifiek_letten_op",
   "datum",
+] as const;
+
+const POINT_DETAIL_FIELDS = [
+  ...POINT_CORE_IDENTITY_KEYS,
+  ...POINT_DETAIL_EXTRA_FIELDS,
 ] as const;
 
 /** Shared field list renderer for point detail side panels. */

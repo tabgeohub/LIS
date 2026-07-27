@@ -1,12 +1,7 @@
 import type { PointCoreSource } from "../points/pointFields";
+import type { GeometryFormFields } from "../../../shared/geometryFormFields";
 
-export type CreateGeometryBody = {
-  omschrijving: string;
-  organisatie: string;
-  vertrouwelijk?: boolean;
-  herhalen?: boolean;
-  activiteit?: string;
-  specifiekLettenOp?: string;
+export type CreateGeometryBody = GeometryFormFields & {
   geometry_type: string;
   regio_id?: string;
   points: PointCoreSource[];

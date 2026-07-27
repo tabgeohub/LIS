@@ -11,7 +11,7 @@ function respondOtpRequired(input: {
   req: Request;
   res: Response;
   username: string;
-  hasOtp: boolean | "lookup_unavailable";
+  hasOtp: boolean | "lookup_unavailable" | null;
   grantFailureKind: string;
   inferred: boolean;
 }) {
@@ -33,7 +33,7 @@ function respondInvalidPassword(input: {
   req: Request;
   res: Response;
   username: string;
-  hasOtp: boolean | "lookup_unavailable";
+  hasOtp: boolean | "lookup_unavailable" | null;
   grantFailureKind: string;
   error: unknown;
 }) {

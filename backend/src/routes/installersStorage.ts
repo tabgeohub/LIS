@@ -1,14 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-export type InstallerMeta = {
-  originalName: string;
-  savedAs: string;
-  size: number;
-  mimetype: string;
-  uploadedAt: string;
-  version: string | null;
-};
+export type { InstallerMeta } from "../shared/installer";
+import type { InstallerMeta } from "../shared/installer";
 
 export const INSTALLERS_DIR = path.join(__dirname, "..", "installers");
 export const META_PATH = path.join(INSTALLERS_DIR, "latest.json");

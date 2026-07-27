@@ -1,13 +1,8 @@
 /** Shared point column keys for SQL builders and geometry JSON presets. */
 
-export const POINT_CORE_IDENTITY_KEYS = [
-  "omschrijving",
-  "regio_id",
-  "xcoordinaat_rd",
-  "ycoordinaat_rd",
-  "latitude",
-  "longitude",
-] as const;
+import { POINT_CORE_IDENTITY_KEYS } from "../../../shared/pointCoreKeys";
+
+export { POINT_CORE_IDENTITY_KEYS };
 
 export const POINT_CORE_ORG_KEYS = [
   "user_id",
