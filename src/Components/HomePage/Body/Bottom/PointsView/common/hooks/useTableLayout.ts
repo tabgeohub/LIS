@@ -5,25 +5,51 @@ export type UseTableLayoutInput = {
   containerWidth: number;
 };
 
+function computeAvailableHeight(
+  containerHeight: number,
+  headerHeight: number
+): number | undefined {
+  if (containerHeight <= 0) return undefined;
+  return Math.max(containerHeight - headerHeight, 0);
+}
+
+function needsHorizontalScroll(
+  tableScrollWidth: number,
+  containerWidth: number
+): boolean {
+  return (
+    tableScrollWidth > 0 &&
+    containerWidth > 0 &&
+    tableScrollWidth > containerWidth
+  );
+}
+
+function computeScrollAreaHeight(
+  availableHeight: number | undefined,
+  horizontalScrollbarHeight: number
+): number | undefined {
+  if (typeof availableHeight !== "number") return undefined;
+  return Math.max(availableHeight - horizontalScrollbarHeight, 0);
+}
+
 export const useTableLayout = (input: UseTableLayoutInput) => {
-  const availableHeight =
-    input.containerHeight > 0
-      ? Math.max(input.containerHeight - input.headerHeight, 0)
-      : undefined;
-  const needsHorizontalScroll =
-    input.tableScrollWidth > 0 &&
-    input.containerWidth > 0 &&
-    input.tableScrollWidth > input.containerWidth;
-  const horizontalScrollbarHeight = needsHorizontalScroll ? 18 : 0;
-  const scrollAreaHeight =
-    typeof availableHeight === "number"
-      ? Math.max(availableHeight - horizontalScrollbarHeight, 0)
-      : undefined;
+  const availableHeight = computeAvailableHeight(
+    input.containerHeight,
+    input.headerHeight
+  );
+  const scrollNeeded = needsHorizontalScroll(
+    input.tableScrollWidth,
+    input.containerWidth
+  );
+  const horizontalScrollbarHeight = scrollNeeded ? 18 : 0;
 
   return {
     availableHeight,
-    needsHorizontalScroll,
+    needsHorizontalScroll: scrollNeeded,
     horizontalScrollbarHeight,
-    scrollAreaHeight,
+    scrollAreaHeight: computeScrollAreaHeight(
+      availableHeight,
+      horizontalScrollbarHeight
+    ),
   };
 };

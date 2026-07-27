@@ -4,21 +4,29 @@ export const FALLBACK_MIN = new Date(2024, 0, 1);
 export const FALLBACK_MAX = new Date(2025, 11, 31);
 export const SLIDER_PARTS = 10;
 
+function parseIsoOrUndefined(value: string): Date | undefined {
+  const parsed = parseISO(value);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+  return parsed;
+}
+
+function orderedDateRange(minDate: Date, maxDate: Date) {
+  if (minDate <= maxDate) return { minDate, maxDate };
+  return { minDate: maxDate, maxDate: minDate };
+}
+
 export function parseTimesliderRange(
   from?: string | null,
   to?: string | null
 ) {
-  let minDate = FALLBACK_MIN;
-  let maxDate = FALLBACK_MAX;
-  if (from && to) {
-    const parsedFrom = parseISO(from);
-    const parsedTo = parseISO(to);
-    if (!Number.isNaN(parsedFrom.getTime())) minDate = parsedFrom;
-    if (!Number.isNaN(parsedTo.getTime())) maxDate = parsedTo;
+  if (!from || !to) {
+    return { minDate: FALLBACK_MIN, maxDate: FALLBACK_MAX };
   }
-  return minDate <= maxDate
-    ? { minDate, maxDate }
-    : { minDate: maxDate, maxDate: minDate };
+
+  return orderedDateRange(
+    parseIsoOrUndefined(from) ?? FALLBACK_MIN,
+    parseIsoOrUndefined(to) ?? FALLBACK_MAX
+  );
 }
 
 export function createTimesliderConversions(input: {

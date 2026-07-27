@@ -1,16 +1,19 @@
 import { Request } from "express";
 import { decodeJwtPayload } from "../../../routes/auth/jwt";
 
+function isBlankQueryValue(value: unknown): boolean {
+  return value == null || value === "";
+}
+
+function firstArrayQueryValue(value: unknown[]): string | undefined {
+  const first = value[0];
+  if (isBlankQueryValue(first)) return undefined;
+  return String(first);
+}
+
 function firstQueryValue(value: unknown): string | undefined {
-  if (value == null || value === "") {
-    return undefined;
-  }
-
-  if (Array.isArray(value)) {
-    const first = value[0];
-    return first != null && first !== "" ? String(first) : undefined;
-  }
-
+  if (isBlankQueryValue(value)) return undefined;
+  if (Array.isArray(value)) return firstArrayQueryValue(value);
   return String(value);
 }
 
@@ -25,12 +28,11 @@ function idTokenClaims(tokenSet: {
   return typeof tokenSet.claims === "function" ? tokenSet.claims() : {};
 }
 
-export function getSessionRealmRoles(req: Request): string[] {
-  const auth = req.session?.auth;
-  const accessToken = auth?.tokenSet?.access_token;
-  if (!accessToken) {
-    return [];
-  }
+function resolveRealmRolesFromAuth(auth: {
+  tokenSet: { access_token?: string; claims?: () => unknown };
+}): string[] {
+  const accessToken = auth.tokenSet.access_token;
+  if (!accessToken) return [];
 
   const accessClaims = decodeJwtPayload<{
     realm_access?: { roles?: string[] };
@@ -41,6 +43,12 @@ export function getSessionRealmRoles(req: Request): string[] {
     rolesFromClaims(idTokenClaims(auth.tokenSet)) ??
     []
   );
+}
+
+export function getSessionRealmRoles(req: Request): string[] {
+  const auth = req.session?.auth;
+  if (!auth?.tokenSet?.access_token) return [];
+  return resolveRealmRolesFromAuth(auth);
 }
 
 function isRwsOrExtRole(role: string): boolean {

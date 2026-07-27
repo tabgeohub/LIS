@@ -98,6 +98,14 @@ export function useSelectionPins(input: {
   ]);
 }
 
+function hoverPayloadFromGraphic(graphic: __esri.Graphic | null) {
+  if (!graphic) return null;
+  return {
+    id: graphic.attributes.id,
+    label: graphic.attributes.label || graphic.attributes.omschrijving || "",
+  };
+}
+
 export function useSourcePointHover(input: {
   selectedItem: SelectFromSourceItem | null;
   mapView: __esri.MapView | null;
@@ -113,14 +121,7 @@ export function useSourcePointHover(input: {
         pinRefs: input.pinRefs.current,
         pointsGraphicsLayer: input.pointsGraphicsLayer,
       });
-      useHoveredGraphicState.getState().setHovered(
-        graphic
-          ? {
-              id: graphic.attributes.id,
-              label: graphic.attributes.label || graphic.attributes.omschrijving || "",
-            }
-          : null
-      );
+      useHoveredGraphicState.getState().setHovered(hoverPayloadFromGraphic(graphic));
     });
     return () => {
       handle.remove();

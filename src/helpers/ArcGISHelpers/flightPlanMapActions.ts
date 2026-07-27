@@ -4,7 +4,9 @@ import { computeFlightPlanCentroid } from "./computeFlightPlanCentroid";
 import { getFlightPlanPoints } from "./createPlanBoundingBoxGraphic";
 
 export function getFlightPlanMapCenter(flightPlan: FlightPlanType) {
-  return computeFlightPlanCentroid(getFlightPlanPoints(flightPlan));
+  return computeFlightPlanCentroid({
+    points: getFlightPlanPoints(flightPlan),
+  });
 }
 
 export function zoomMapToFlightPlan(input: {

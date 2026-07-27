@@ -1,24 +1,28 @@
 import { MutableRefObject, RefObject } from "react";
 
+function copyScrollLeft(from: HTMLDivElement, to: HTMLDivElement) {
+  to.scrollLeft = from.scrollLeft;
+}
+
 export const syncScrollPositions = (input: {
   source: "top" | "table";
   topScrollRef: RefObject<HTMLDivElement>;
   tableScrollRef: RefObject<HTMLDivElement>;
   syncingRef: MutableRefObject<boolean>;
 }) => {
-  if (!input.topScrollRef.current || !input.tableScrollRef.current) return;
-  if (input.syncingRef.current) return;
+  const top = input.topScrollRef.current;
+  const table = input.tableScrollRef.current;
+  if (!top || !table || input.syncingRef.current) return;
+
   input.syncingRef.current = true;
 
   if (input.source === "top") {
-    input.tableScrollRef.current.scrollLeft = input.topScrollRef.current.scrollLeft;
+    copyScrollLeft(top, table);
   } else {
-    input.topScrollRef.current.scrollLeft = input.tableScrollRef.current.scrollLeft;
+    copyScrollLeft(table, top);
   }
 
   window.requestAnimationFrame(() => {
-    if (input.syncingRef.current !== null) {
-      input.syncingRef.current = false;
-    }
+    input.syncingRef.current = false;
   });
 };

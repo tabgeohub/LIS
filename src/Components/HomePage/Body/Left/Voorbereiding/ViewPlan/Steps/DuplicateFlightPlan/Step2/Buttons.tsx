@@ -53,13 +53,13 @@ export default function Buttons({
         {
           label: labels.vorige,
           onClick: () =>
-            runWizardCleanup([
+            runWizardCleanup({ actions: [
               () => setStep(1),
               () => setSelectedIndex(0),
               () => setPointsTable([]),
               () => setGeometriesTable([]),
               () => setOpenTable(false),
-            ]),
+            ] }),
         },
         {
           label: labels.opslaan,

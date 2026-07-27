@@ -11,6 +11,33 @@ export type FilterPlansByPeriodInput<T extends PlanWithDatumAndVluchtnummer> = {
   periodFilter?: string;
 };
 
+function matchesLastFourWeeks(planDate: string, now: Date): boolean {
+  const fourWeeksAgo = new Date(now);
+  fourWeeksAgo.setDate(now.getDate() - 28);
+  return new Date(planDate) >= fourWeeksAgo;
+}
+
+function matchesDateRange(
+  planDate: string,
+  dateFrom: string,
+  dateTo: string
+): boolean {
+  const d = new Date(planDate);
+  return d >= new Date(dateFrom) && d <= new Date(dateTo);
+}
+
+function isVanTotPeriod(input: {
+  periodFilter?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}): input is { periodFilter: string; dateFrom: string; dateTo: string } {
+  return (
+    input.periodFilter === "Periodoe van-tot" &&
+    Boolean(input.dateFrom) &&
+    Boolean(input.dateTo)
+  );
+}
+
 function matchesPeriod(input: {
   planDate: string;
   periodFilter?: string;
@@ -19,18 +46,11 @@ function matchesPeriod(input: {
   now: Date;
 }): boolean {
   if (input.periodFilter === "Laatste 4 weken") {
-    const fourWeeksAgo = new Date(input.now);
-    fourWeeksAgo.setDate(input.now.getDate() - 28);
-    return new Date(input.planDate) >= fourWeeksAgo;
+    return matchesLastFourWeeks(input.planDate, input.now);
   }
 
-  if (
-    input.periodFilter === "Periodoe van-tot" &&
-    input.dateFrom &&
-    input.dateTo
-  ) {
-    const planDate = new Date(input.planDate);
-    return planDate >= new Date(input.dateFrom) && planDate <= new Date(input.dateTo);
+  if (isVanTotPeriod(input)) {
+    return matchesDateRange(input.planDate, input.dateFrom, input.dateTo);
   }
 
   return true;

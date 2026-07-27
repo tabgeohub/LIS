@@ -11,6 +11,6 @@ export function useDeletePointStep2Sub1(props: EditPointMapStepProps) {
     cancelLabel: content.common.annuleren,
     loadingText: labels.loading,
     isLoading: props.isLoading,
-    ...buildDeletePointStep2Sub1Handlers(props, logAction),
+    ...buildDeletePointStep2Sub1Handlers({ props, logAction }),
   };
 }

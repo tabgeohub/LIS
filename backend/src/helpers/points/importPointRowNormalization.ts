@@ -39,14 +39,7 @@ function toNum(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function to01(value: unknown): number | null {
-  if (isEmpty(value)) {
-    return null;
-  }
-  if (typeof value === "boolean") {
-    return value ? 1 : 0;
-  }
-  const s = String(value).trim().toLowerCase();
+function flagFromString(s: string): number | null {
   if (TRUTHY_FLAGS.has(s)) {
     return 1;
   }
@@ -54,6 +47,16 @@ function to01(value: unknown): number | null {
     return 0;
   }
   return null;
+}
+
+function to01(value: unknown): number | null {
+  if (isEmpty(value)) {
+    return null;
+  }
+  if (typeof value === "boolean") {
+    return value ? 1 : 0;
+  }
+  return flagFromString(String(value).trim().toLowerCase());
 }
 
 function toStr(value: unknown): string | null {

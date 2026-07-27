@@ -12,7 +12,10 @@ type Source = "flightPlans" | "templates";
 export function useSelectFromSourceData(source: Source) {
   const { selectedPlan } = useViewPlanState();
   const { data, dataLoading } = useSelectFromSourceQuery(source);
-  const items = useMemo(() => mapSourceToItems(source, data), [data, source]);
+  const items = useMemo(
+    () => mapSourceToItems({ source, data }),
+    [data, source]
+  );
   const planPointIds = useMemo(
     () => buildPlanPointIdSet(selectedPlan?.points),
     [selectedPlan?.points]

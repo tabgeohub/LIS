@@ -146,7 +146,7 @@ export default function Buttons({
 
   const resetViewPlanStep = () =>
 
-    runWizardCleanup([
+    runWizardCleanup({ actions: [
 
       resetFeatures,
 
@@ -166,7 +166,7 @@ export default function Buttons({
 
       () => setOpenTable(false),
 
-    ]);
+    ] });
 
 
 
@@ -208,7 +208,7 @@ export default function Buttons({
 
           onClick: withLog("User clicked 'Cancel' button", () =>
 
-            runWizardCleanup([resetFeatures, handleCancel])
+            runWizardCleanup({ actions: [resetFeatures, handleCancel] })
 
           ),
 

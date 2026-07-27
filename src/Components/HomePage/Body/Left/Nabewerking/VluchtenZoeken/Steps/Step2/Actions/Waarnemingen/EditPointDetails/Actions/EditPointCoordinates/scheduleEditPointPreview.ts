@@ -10,15 +10,18 @@ export type ScheduleEditPointPreviewInput = {
   latitude: number;
 };
 
-function canSchedulePreview(input: ScheduleEditPointPreviewInput): boolean {
+function hasRequiredPreviewLayers(input: ScheduleEditPointPreviewInput): boolean {
   return Boolean(
-    input.mapView &&
-      input.redGraphicsLayer &&
-      input.pointsGraphicsLayer &&
-      input.selectedPoint &&
-      input.longitude &&
-      input.latitude
+    input.mapView && input.redGraphicsLayer && input.pointsGraphicsLayer
   );
+}
+
+function hasRequiredPreviewCoords(input: ScheduleEditPointPreviewInput): boolean {
+  return Boolean(input.selectedPoint && input.longitude && input.latitude);
+}
+
+function canSchedulePreview(input: ScheduleEditPointPreviewInput): boolean {
+  return hasRequiredPreviewLayers(input) && hasRequiredPreviewCoords(input);
 }
 
 export function scheduleEditPointPreview(

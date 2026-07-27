@@ -11,12 +11,12 @@ export function getFlightPlanPoints(plan: {
   return plan.pointsObjects || plan.points || [];
 }
 
-function getValidPlanPoints(
-  points: PlanBoundingBoxPoint[] | null | undefined
-): PlanBoundingBoxPoint[] {
-  if (!points?.length) return [];
+function getValidPlanPoints(options: {
+  points: PlanBoundingBoxPoint[] | null | undefined;
+}): PlanBoundingBoxPoint[] {
+  if (!options.points?.length) return [];
 
-  return points.filter(
+  return options.points.filter(
     (point) =>
       typeof point.latitude === "number" &&
       typeof point.longitude === "number" &&
@@ -26,10 +26,10 @@ function getValidPlanPoints(
 }
 
 /** Min/max lat/lon envelope for a set of plan points. */
-export function getPlanBoundingBoxExtents(
-  points: PlanBoundingBoxPoint[] | null | undefined
-): PlanBoundingBoxExtents | null {
-  const valid = getValidPlanPoints(points);
+export function getPlanBoundingBoxExtents(options: {
+  points: PlanBoundingBoxPoint[] | null | undefined;
+}): PlanBoundingBoxExtents | null {
+  const valid = getValidPlanPoints(options);
   if (valid.length === 0) return null;
 
   return {
@@ -44,10 +44,10 @@ export function getPlanBoundingBoxExtents(
  * Bounding-box polygon used across flight plan map highlights.
  * Ring order matches existing plan click/hover/star graphics.
  */
-export function createPlanBoundingBoxPolygon(
-  points: PlanBoundingBoxPoint[] | null | undefined
-): Polygon | null {
-  const extents = getPlanBoundingBoxExtents(points);
+export function createPlanBoundingBoxPolygon(options: {
+  points: PlanBoundingBoxPoint[] | null | undefined;
+}): Polygon | null {
+  const extents = getPlanBoundingBoxExtents(options);
   if (!extents) return null;
 
   const { minLat, maxLat, minLon, maxLon } = extents;

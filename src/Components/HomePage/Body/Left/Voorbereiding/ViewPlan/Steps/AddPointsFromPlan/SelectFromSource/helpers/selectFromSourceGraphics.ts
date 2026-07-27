@@ -32,6 +32,46 @@ export function removeAllPins(
   pinRefs.clear();
 }
 
+function removeUnselectedPins(
+  mapView: __esri.MapView,
+  pinRefs: PinRefMap,
+  currentIds: Set<number>
+) {
+  pinRefs.forEach((value, key) => {
+    if (currentIds.has(key)) return;
+    mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
+    pinRefs.delete(key);
+  });
+}
+
+function addPinForSelectedPoint(input: {
+  mapView: __esri.MapView;
+  pt: SelectFromSourceItemPoint;
+  dbPoints: EnrichedPointType[];
+  pinRefs: PinRefMap;
+  currentIds: Set<number>;
+}) {
+  const { mapView, pt, dbPoints, pinRefs, currentIds } = input;
+  if (!currentIds.has(pt.id) || pinRefs.has(pt.id)) return;
+
+  const fullPoint = dbPoints.find((dbPt) => dbPt.id === pt.id);
+  if (!fullPoint) return;
+
+  const coords = getPointCoordinates(fullPoint);
+  if (!coords) return;
+
+  const res = createPin({
+    point: {
+      id: fullPoint.id,
+      longitude: coords.longitude,
+      latitude: coords.latitude,
+    } as EnrichedPointType,
+    mapView,
+    label: fullPoint.omschrijving,
+  });
+  pinRefs.set(fullPoint.id, res);
+}
+
 export function syncPinsForSelection(input: {
   mapView: __esri.MapView;
   selectedPointIds: number[];
@@ -42,32 +82,10 @@ export function syncPinsForSelection(input: {
   const { mapView, selectedPointIds, itemPoints, dbPoints, pinRefs } = input;
   const currentIds = new Set(selectedPointIds);
 
-  pinRefs.forEach((value, key) => {
-    if (currentIds.has(key)) return;
-    mapView.graphics.removeMany([value.outerGraphic, value.pinGraphic]);
-    pinRefs.delete(key);
-  });
-
-  itemPoints.forEach((pt) => {
-    if (!currentIds.has(pt.id) || pinRefs.has(pt.id)) return;
-
-    const fullPoint = dbPoints.find((dbPt) => dbPt.id === pt.id);
-    if (!fullPoint) return;
-
-    const coords = getPointCoordinates(fullPoint);
-    if (!coords) return;
-
-    const res = createPin({
-      point: {
-        id: fullPoint.id,
-        longitude: coords.longitude,
-        latitude: coords.latitude,
-      } as EnrichedPointType,
-      mapView,
-      label: fullPoint.omschrijving,
-    });
-    pinRefs.set(fullPoint.id, res);
-  });
+  removeUnselectedPins(mapView, pinRefs, currentIds);
+  itemPoints.forEach((pt) =>
+    addPinForSelectedPoint({ mapView, pt, dbPoints, pinRefs, currentIds })
+  );
 }
 
 function isHoverableGraphic(

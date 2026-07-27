@@ -1,10 +1,11 @@
 import useLogAction from "hooks/useLogAction";
 import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
 
-export function buildDeletePointStep2Sub1Handlers(
-  props: EditPointMapStepProps,
-  logAction: ReturnType<typeof useLogAction>
-) {
+export function buildDeletePointStep2Sub1Handlers(options: {
+  props: EditPointMapStepProps;
+  logAction: ReturnType<typeof useLogAction>;
+}) {
+  const { props, logAction } = options;
   return {
     onSave: () => {
       props.handleSubmit();

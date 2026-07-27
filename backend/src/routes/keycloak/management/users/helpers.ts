@@ -50,7 +50,14 @@ export async function getUserRoles(
   return { realmRoles, clientRoles };
 }
 
-export async function getUserRolesForRequest(userId: string, req: import("express").Request) {
-  const { adminToken, adminBase } = await getKeycloakAdminContext(req);
-  return getUserRoles({ userId, adminToken, adminBase });
+export async function getUserRolesForRequest(options: {
+  userId: string;
+  req: import("express").Request;
+}) {
+  const { adminToken, adminBase } = await getKeycloakAdminContext(options.req);
+  return getUserRoles({
+    userId: options.userId,
+    adminToken,
+    adminBase,
+  });
 }

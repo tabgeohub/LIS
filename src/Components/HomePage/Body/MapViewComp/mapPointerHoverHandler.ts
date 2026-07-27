@@ -16,11 +16,11 @@ type MapPointerHoverHandlerInput = {
   } | null) => void;
 };
 
-function resolveMapHoverHitTestOptions(
-  includeLayers: (__esri.Layer | __esri.GraphicsLayer)[]
-): __esri.MapViewHitTestOptions | undefined {
-  if (includeLayers.length === 0) return undefined;
-  return { include: includeLayers };
+function resolveMapHoverHitTestOptions(options: {
+  includeLayers: (__esri.Layer | __esri.GraphicsLayer)[];
+}): __esri.MapViewHitTestOptions | undefined {
+  if (options.includeLayers.length === 0) return undefined;
+  return { include: options.includeLayers };
 }
 
 function applyMapHoverFromGraphic(
@@ -53,7 +53,7 @@ export function createMapPointerHoverHandler(input: MapPointerHoverHandlerInput)
     try {
       const response = await input.mapView.hitTest(
         event,
-        resolveMapHoverHitTestOptions(input.includeLayers)
+        resolveMapHoverHitTestOptions({ includeLayers: input.includeLayers })
       );
       const match = response.results.find(isMapHoverGraphicHit);
       if (!match?.graphic?.geometry) {

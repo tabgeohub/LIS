@@ -23,6 +23,14 @@ function assertPlanRegios(reporter: RegioTestReporter, input: {
   return true;
 }
 
+function resolvePlanTableSql(table?: keyof typeof PLAN_TABLE_BY_KEY): string {
+  return table === "lis.template_plans" ? "lis.template_plans" : "lis.flightplans";
+}
+
+function collectPlanIds(rows: PlanRow[]): number[] {
+  return rows.map((row) => row.id).filter((id): id is number => id != null);
+}
+
 export async function assertPlanRegiosWithDb(reporter: RegioTestReporter, input: {
   pool: Pool;
   endpoint: string;
@@ -34,18 +42,13 @@ export async function assertPlanRegiosWithDb(reporter: RegioTestReporter, input:
     reporter.pass(input.endpoint, "0 plan(s)");
     return true;
   }
-  const ids = input.rows.map((row) => row.id).filter((id): id is number => id != null);
+  const ids = collectPlanIds(input.rows);
   if (!ids.length) {
     reporter.fail(input.endpoint, "rows returned without plan ids");
     return false;
   }
-  const tableKey = input.table ?? "lis.flightplans";
-  const tableSql =
-    tableKey === "lis.template_plans"
-      ? "lis.template_plans"
-      : "lis.flightplans";
   const result = await input.pool.query(
-    `SELECT id, regio_id FROM ${tableSql} WHERE id = ANY($1::int[])`,
+    `SELECT id, regio_id FROM ${resolvePlanTableSql(input.table)} WHERE id = ANY($1::int[])`,
     [ids]
   );
   return assertPlanRegios(reporter, { ...input, rows: result.rows });

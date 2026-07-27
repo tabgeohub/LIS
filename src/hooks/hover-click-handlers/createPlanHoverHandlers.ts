@@ -11,7 +11,8 @@ export function createPlanHoverHandlers(
   return {
     handleHover(plan: FlightPlanType) {
       if (!graphicsLayerHover) return;
-      const graphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
+      const graphic = createPlanBoundingBoxGraphic({
+        points: getFlightPlanPoints(plan),
         symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hover,
       });
       if (graphic) graphicsLayerHover.add(graphic);

@@ -20,7 +20,7 @@ export default function useMapClickToUpdateCoordinates({
     const clickHandle = mapView.on("click", (event) => {
       // @ts-ignore ArcGIS event may expose stopPropagation
       event.stopPropagation?.();
-      const coords = readFiniteLonLat(event.mapPoint);
+      const coords = readFiniteLonLat({ mapPoint: event.mapPoint });
       if (!coords) return;
       placeClickPointGraphic({
         lon: coords.lon,

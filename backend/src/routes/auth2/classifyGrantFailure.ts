@@ -28,6 +28,23 @@ function isAmbiguousGrantError(errorCode: string | undefined): boolean {
   return errorCode === "invalid_grant" || errorCode === "unauthorized_client";
 }
 
+function isInvalidOtpFailure(input: {
+  otpWasSent: boolean;
+  normalized: string;
+}): boolean {
+  return input.otpWasSent && hasExplicitOtpRejectedSignal(input.normalized);
+}
+
+function isAmbiguousFailure(input: {
+  errorCode: string | undefined;
+  normalized: string;
+}): boolean {
+  return (
+    isAmbiguousGrantError(input.errorCode) ||
+    hasInvalidCredentialsSignal(input.normalized)
+  );
+}
+
 export function classifyGrantFailure(
   error: unknown,
   options: { otpWasSent: boolean }
@@ -39,11 +56,11 @@ export function classifyGrantFailure(
     return "otp_required";
   }
 
-  if (options.otpWasSent && hasExplicitOtpRejectedSignal(normalized)) {
+  if (isInvalidOtpFailure({ otpWasSent: options.otpWasSent, normalized })) {
     return "invalid_otp";
   }
 
-  if (isAmbiguousGrantError(details.error) || hasInvalidCredentialsSignal(normalized)) {
+  if (isAmbiguousFailure({ errorCode: details.error, normalized })) {
     return "ambiguous_invalid_grant";
   }
 

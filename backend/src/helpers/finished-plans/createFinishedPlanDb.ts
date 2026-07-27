@@ -65,6 +65,12 @@ function formatLatLongPair(
   return `${lat},${long}`;
 }
 
+function insertedAttachmentId(ins: {
+  rows?: Array<{ id?: number }>;
+}): number | undefined {
+  return ins.rows?.[0]?.id;
+}
+
 /**
  * Writes a finished plan (points, path, attachments, finished rows) within an
  * open transaction. State is held on the instance so step methods stay at
@@ -193,25 +199,33 @@ class FinishedPlanWriter {
     }
   }
 
+  private attachmentInsertValues(input: {
+    realPointId: number;
+    point: FinishedPlanPoint;
+    attachment: FinishedPlanAttachment;
+  }) {
+    const { realPointId, point, attachment } = input;
+    return [
+      attachment.url,
+      realPointId,
+      attachment.objectId ?? null,
+      attachment.taken_at ?? null,
+      resolveAttachmentLocation(attachment, point),
+    ];
+  }
+
   private async insertAttachmentRow(input: {
     realPointId: number;
     point: FinishedPlanPoint;
     attachment: FinishedPlanAttachment;
   }): Promise<number | undefined> {
-    const { realPointId, point, attachment } = input;
     const ins = await this.client.query(
       `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [
-        attachment.url,
-        realPointId,
-        attachment.objectId ?? null,
-        attachment.taken_at ?? null,
-        resolveAttachmentLocation(attachment, point),
-      ]
+      this.attachmentInsertValues(input)
     );
-    return ins.rows?.[0]?.id;
+    return insertedAttachmentId(ins);
   }
 
   private async insertFinishedRows(): Promise<void> {

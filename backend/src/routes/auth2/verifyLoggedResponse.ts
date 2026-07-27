@@ -20,12 +20,14 @@ export function logVerifyEvent(input: {
   });
 }
 
-function jsonVerifyResponse(
-  res: Response,
-  status: number | undefined,
-  body: object
-) {
-  return status === undefined ? res.json(body) : res.status(status).json(body);
+function jsonVerifyResponse(options: {
+  res: Response;
+  status: number | undefined;
+  body: object;
+}) {
+  return options.status === undefined
+    ? options.res.json(options.body)
+    : options.res.status(options.status).json(options.body);
 }
 
 export function respondLoggedVerify(input: {
@@ -43,5 +45,9 @@ export function respondLoggedVerify(input: {
     username: input.username,
     meta: input.meta,
   });
-  return jsonVerifyResponse(input.res, input.status, input.body);
+  return jsonVerifyResponse({
+    res: input.res,
+    status: input.status,
+    body: input.body,
+  });
 }

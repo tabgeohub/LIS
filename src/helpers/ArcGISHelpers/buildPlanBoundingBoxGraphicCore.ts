@@ -33,14 +33,16 @@ function buildBoundingBoxFillSymbol(
 }
 
 /** Graphic outline around all points in a flight plan. */
-export function buildPlanBoundingBoxGraphic(
-  points: PlanBoundingBoxPoint[] | null | undefined,
-  options: CreatePlanBoundingBoxGraphicOptions = {}
-): Graphic | null {
-  const polygon = createPlanBoundingBoxPolygon(points);
+export function buildPlanBoundingBoxGraphic(options: {
+  points: PlanBoundingBoxPoint[] | null | undefined;
+  symbolOptions?: CreatePlanBoundingBoxGraphicOptions["symbolOptions"];
+  attributes?: CreatePlanBoundingBoxGraphicOptions["attributes"];
+}): Graphic | null {
+  const polygon = createPlanBoundingBoxPolygon({ points: options.points });
   if (!polygon) return null;
 
-  const { symbolOptions = {}, attributes = {} } = options;
+  const symbolOptions = options.symbolOptions ?? {};
+  const attributes = options.attributes ?? {};
 
   return new Graphic({
     geometry: polygon,

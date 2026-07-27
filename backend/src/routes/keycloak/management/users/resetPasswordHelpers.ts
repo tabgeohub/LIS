@@ -33,9 +33,10 @@ export async function putKeycloakResetPassword(
   });
 }
 
-export async function throwIfResetPasswordFailed(
-  response: Awaited<ReturnType<typeof keycloakAdminFetch>>
-): Promise<void> {
+export async function throwIfResetPasswordFailed(options: {
+  response: Awaited<ReturnType<typeof keycloakAdminFetch>>;
+}): Promise<void> {
+  const { response } = options;
   if (response.ok) return;
 
   const text = await response.text();

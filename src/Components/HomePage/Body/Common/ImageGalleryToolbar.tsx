@@ -12,6 +12,32 @@ function resolveActiveLocation(
   return attachments[activeIndex]?.location;
 }
 
+function LocationToolbarButton(props: {
+  location: string | undefined;
+  onShowLocation?: (location: string) => void;
+}) {
+  if (!props.onShowLocation || !props.location) return null;
+  return (
+    <GalleryLocationButton
+      location={props.location}
+      onShowLocation={props.onShowLocation}
+    />
+  );
+}
+
+function DeleteToolbarButton(props: {
+  onDelete?: () => void;
+  showLocation: boolean;
+}) {
+  if (!props.onDelete) return null;
+  return (
+    <GalleryDeleteButton
+      onDelete={props.onDelete}
+      showLocation={props.showLocation}
+    />
+  );
+}
+
 export function ImageGalleryToolbar(props: {
   attachments: AttachmentType[];
   activeIndex: number;
@@ -25,18 +51,14 @@ export function ImageGalleryToolbar(props: {
   return (
     <>
       <GalleryCloseButton onClose={props.onClose} />
-      {canShowLocation && location && props.onShowLocation && (
-        <GalleryLocationButton
-          location={location}
-          onShowLocation={props.onShowLocation}
-        />
-      )}
-      {props.onDelete && (
-        <GalleryDeleteButton
-          onDelete={props.onDelete}
-          showLocation={canShowLocation}
-        />
-      )}
+      <LocationToolbarButton
+        location={location}
+        onShowLocation={props.onShowLocation}
+      />
+      <DeleteToolbarButton
+        onDelete={props.onDelete}
+        showLocation={canShowLocation}
+      />
     </>
   );
 }

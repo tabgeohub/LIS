@@ -39,6 +39,17 @@ function failTimesliderQuery(reason: string): ParsedTimesliderQuery {
   return { ok: false, reason };
 }
 
+function parseDateRange(searchParams: URLSearchParams):
+  | { ok: true; from: string; to: string }
+  | { ok: false } {
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  if (!hasDateFormat(from) || !hasDateFormat(to)) {
+    return { ok: false };
+  }
+  return { ok: true, from, to };
+}
+
 export function parseTimesliderImageQuery(
   searchParams: URLSearchParams
 ): ParsedTimesliderQuery {
@@ -52,14 +63,20 @@ export function parseTimesliderImageQuery(
     return failTimesliderQuery("Ongeldige link (id).");
   }
 
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-  if (!hasDateFormat(from) || !hasDateFormat(to)) {
+  const range = parseDateRange(searchParams);
+  if (!range.ok) {
     return failTimesliderQuery("Ongeldige link (periode).");
   }
 
   const planId = parseOptionalPlanId(searchParams.get("plan_id"));
   if (!planId.ok) return failTimesliderQuery("Ongeldige link (plan_id).");
 
-  return { ok: true, kind, id, from, to, planId: planId.value };
+  return {
+    ok: true,
+    kind,
+    id,
+    from: range.from,
+    to: range.to,
+    planId: planId.value,
+  };
 }

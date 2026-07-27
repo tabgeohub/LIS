@@ -93,14 +93,24 @@ function averagePointCenter(
   };
 }
 
+function canGoToGeometryCenter(input: {
+  mapView: __esri.MapView | null | undefined;
+  points: Array<{ longitude: number; latitude: number }>;
+}): input is {
+  mapView: __esri.MapView;
+  points: Array<{ longitude: number; latitude: number }>;
+} {
+  return Boolean(
+    validateMapView(input.mapView) && input.mapView && input.points.length
+  );
+}
+
 export function goToGeometryCenter(input: {
   mapView: __esri.MapView | null | undefined;
   points: Array<{ longitude: number; latitude: number }>;
   zoom?: number;
 }) {
-  if (!validateMapView(input.mapView) || !input.mapView || !input.points.length) {
-    return;
-  }
+  if (!canGoToGeometryCenter(input)) return;
 
   const center = averagePointCenter(input.points);
   input.mapView.zoom = input.zoom ?? 12;

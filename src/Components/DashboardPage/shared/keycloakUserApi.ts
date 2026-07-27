@@ -1,5 +1,23 @@
 import { getBackEndUrl } from "@helpers/getBackEndUrl";
 
+function optionalField(value: string | undefined): string | undefined {
+  return value || undefined;
+}
+
+async function readJsonBody(response: Response): Promise<{ error?: string }> {
+  return response.json().catch(() => ({}));
+}
+
+function assertKeycloakOk(
+  response: Response,
+  data: { error?: string },
+  fallback: string
+): void {
+  if (!response.ok) {
+    throw new Error(data.error || fallback);
+  }
+}
+
 export async function updateKeycloakUserProfile(input: {
   userId: string;
   username: string;
@@ -13,15 +31,13 @@ export async function updateKeycloakUserProfile(input: {
       credentials: "include",
       body: JSON.stringify({
         username: input.username,
-        email: input.email || undefined,
+        email: optionalField(input.email),
       }),
     }
   );
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || "Failed to update user");
-  }
+  const errorData = await readJsonBody(response);
+  assertKeycloakOk(response, errorData, "Failed to update user");
 }
 
 export async function assignKeycloakUserRoles(input: {
@@ -38,10 +54,8 @@ export async function assignKeycloakUserRoles(input: {
     }
   );
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || "Failed to update user roles");
-  }
+  const errorData = await readJsonBody(response);
+  assertKeycloakOk(response, errorData, "Failed to update user roles");
 }
 
 export async function createKeycloakUser(input: {
@@ -58,15 +72,13 @@ export async function createKeycloakUser(input: {
       credentials: "include",
       body: JSON.stringify({
         username: input.username,
-        email: input.email || undefined,
+        email: optionalField(input.email),
         password: input.password,
-        role: input.role || undefined,
+        role: optionalField(input.role),
       }),
     }
   );
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || "Failed to create user");
-  }
+  const data = await readJsonBody(response);
+  assertKeycloakOk(response, data, "Failed to create user");
 }

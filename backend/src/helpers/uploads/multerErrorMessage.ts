@@ -10,9 +10,17 @@ const MULTER_ERROR_MESSAGES: Record<string, string> = {
   LIMIT_FIELD_NESTING: "Form fields exceeded limits.",
 };
 
+function mapKnownMulterError(err: multer.MulterError): string {
+  return MULTER_ERROR_MESSAGES[err.code] ?? `Upload failed: ${err.code}`;
+}
+
+function mapGenericUploadError(err: unknown): string {
+  return (err as Error)?.message || "Upload failed";
+}
+
 export function mapMulterError(err: unknown): string {
   if (err instanceof multer.MulterError) {
-    return MULTER_ERROR_MESSAGES[err.code] ?? `Upload failed: ${err.code}`;
+    return mapKnownMulterError(err);
   }
-  return (err as Error)?.message || "Upload failed";
+  return mapGenericUploadError(err);
 }

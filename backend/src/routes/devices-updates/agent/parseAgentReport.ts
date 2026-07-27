@@ -16,19 +16,22 @@ export function parseDeviceStatus(value: unknown): DeviceStatus | null {
   return VALID_STATUSES.has(status) ? status : null;
 }
 
+function optionalString(value: unknown): string | undefined {
+  return value ? String(value) : undefined;
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  return value !== undefined ? Number(value) : undefined;
+}
+
 export function parseAgentReportBody(body: Record<string, unknown>): AgentReportBody {
   return {
     status: String(body.status || "") as DeviceStatus,
-    windows_version: body.windows_version
-      ? String(body.windows_version)
-      : undefined,
-    os_build: body.os_build ? String(body.os_build) : undefined,
-    pending_update_count:
-      body.pending_update_count !== undefined
-        ? Number(body.pending_update_count)
-        : undefined,
+    windows_version: optionalString(body.windows_version),
+    os_build: optionalString(body.os_build),
+    pending_update_count: optionalNumber(body.pending_update_count),
     reboot_required: Boolean(body.reboot_required),
-    error: body.error ? String(body.error) : undefined,
+    error: optionalString(body.error),
     command_completed: Boolean(body.command_completed),
   };
 }

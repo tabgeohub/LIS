@@ -45,10 +45,20 @@ export type SelectedListItem =
       planId: number;
     };
 
+function planDisplayVluchtnummer(plan: FinishedFlightPlanType): string {
+  return plan.vluchtnummer || `Plan ${plan.id}`;
+}
+
+function geometryDisplayLabel(g: FinishedGeometryType): string {
+  return (
+    g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`
+  );
+}
+
 export function collectSelectedDataFromPlan(
   plan: FinishedFlightPlanType
 ): { points: PointWithPlan[]; geometries: GeometryWithPlan[] } {
-  const vn = plan.vluchtnummer || `Plan ${plan.id}`;
+  const vn = planDisplayVluchtnummer(plan);
   const points: PointWithPlan[] = (plan.points_data || []).map((p) => ({
     point: p,
     vluchtnummers: [vn],
@@ -58,8 +68,7 @@ export function collectSelectedDataFromPlan(
   const geometries: GeometryWithPlan[] = (plan.geometries || []).map((g) => ({
     geometry: g,
     vluchtnummers: [vn],
-    geometryLabel:
-      g.geometry_omschrijving || g.geometry_type || `Geometrie ${g.id}`,
+    geometryLabel: geometryDisplayLabel(g),
     planId: plan.id,
   }));
 

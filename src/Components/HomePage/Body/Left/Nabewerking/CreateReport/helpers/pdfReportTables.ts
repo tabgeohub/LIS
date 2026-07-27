@@ -105,6 +105,20 @@ export function addCoordinatesTable(input: {
   });
 }
 
+function orDash(value: string | null | undefined): string {
+  return value || "-";
+}
+
+function detailTableRows(pointData: PDFPointDataType) {
+  return [
+    [boldCell("Activiteit:"), orDash(pointData.activiteit)],
+    [boldCell("Organisatie:"), orDash(pointData.organisatie)],
+    [boldCell("Regio:"), orDash(pointData.regio)],
+    [boldCell("Omschrijving:"), orDash(pointData.omschrijving)],
+    [boldCell("Aanvullende informatie:"), orDash(pointData.aanvullende)],
+  ];
+}
+
 export function addDetailTable(input: {
   doc: jsPDF;
   pointData: PDFPointDataType;
@@ -113,12 +127,6 @@ export function addDetailTable(input: {
   addWrappedTable({
     doc: input.doc,
     startY: detailStart,
-    body: [
-      [boldCell("Activiteit:"), input.pointData.activiteit || "-"],
-      [boldCell("Organisatie:"), input.pointData.organisatie || "-"],
-      [boldCell("Regio:"), input.pointData.regio || "-"],
-      [boldCell("Omschrijving:"), input.pointData.omschrijving || "-"],
-      [boldCell("Aanvullende informatie:"), input.pointData.aanvullende || "-"],
-    ],
+    body: detailTableRows(input.pointData),
   });
 }

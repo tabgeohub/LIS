@@ -11,14 +11,14 @@ function resolveLogoutRedirect(profile: "intranet" | "public"): string {
     : process.env.PUBLIC_FRONTEND_URL!;
 }
 
-async function revokeRefreshTokenIfPresent(
-  client: { revoke: (token: string, type: string) => Promise<unknown> },
-  tokens: { tokenSet?: { refresh_token?: string } } | undefined
-): Promise<void> {
-  const refreshToken = tokens?.tokenSet?.refresh_token;
+async function revokeRefreshTokenIfPresent(options: {
+  client: { revoke: (token: string, type: string) => Promise<unknown> };
+  tokens: { tokenSet?: { refresh_token?: string } } | undefined;
+}): Promise<void> {
+  const refreshToken = options.tokens?.tokenSet?.refresh_token;
   if (!refreshToken) return;
   try {
-    await client.revoke(refreshToken, "refresh_token");
+    await options.client.revoke(refreshToken, "refresh_token");
   } catch {
     // ignore revoke failures during logout
   }
@@ -32,7 +32,10 @@ export const logoutHandler: RequestHandler = async (req, res) => {
     const { client } = await getOidcClientFor(profileKey);
     const redirectBack = resolveLogoutRedirect(profile);
 
-    await revokeRefreshTokenIfPresent(client, req.session.auth);
+    await revokeRefreshTokenIfPresent({
+      client,
+      tokens: req.session.auth,
+    });
     req.session.destroy(() => res.json({ redirect: redirectBack }));
   } catch (err) {
     console.error("Logout error:", err);

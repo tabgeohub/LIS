@@ -1,5 +1,0 @@
-ID,Path,Component,Lines of code,Duplication percentage,Start line,End line
-fb4a618a-2146-4a8f-88f8-5eeb5b4bf593,src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step2/Buttons.tsx,HomePage,6,19.35484,21,26
-fb4a618a-2146-4a8f-88f8-5eeb5b4bf593,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step2/Buttons.tsx,HomePage,6,15.789474,23,28
-1addaefe-4114-49d0-96f5-ab3ec24c1f83,src/Types/devices.ts,Types,6,100,1,6
-1addaefe-4114-49d0-96f5-ab3ec24c1f83,backend/src/routes/devices-updates/types.ts,backend,6,42.857143,1,6

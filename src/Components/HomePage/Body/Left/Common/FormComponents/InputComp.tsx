@@ -62,13 +62,21 @@ function DatePickerField(props: {
   );
 }
 
+function isTextOrNumberType(type: string): type is "text" | "number" {
+  return type === "text" || type === "number";
+}
+
+function isNativeDateType(type: string, nativeDate: boolean): boolean {
+  return type === "date" && nativeDate;
+}
+
 function resolveInputField(props: InputCompProps & {
   type: string;
   disabled: boolean;
   nativeDate: boolean;
   inputClassName: string;
 }) {
-  if (props.type === "text" || props.type === "number") {
+  if (isTextOrNumberType(props.type)) {
     return (
       <TextInputField
         value={props.value}
@@ -80,7 +88,7 @@ function resolveInputField(props: InputCompProps & {
     );
   }
 
-  if (props.type === "date" && props.nativeDate) {
+  if (isNativeDateType(props.type, props.nativeDate)) {
     return (
       <TextInputField
         value={props.value}

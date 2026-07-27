@@ -10,19 +10,23 @@ type TimesliderPageStatusInput = {
   imagesLength: number;
 };
 
-export function buildTimesliderPageStatus(input: TimesliderPageStatusInput) {
-  const blockImages =
+function shouldBlockImages(input: TimesliderPageStatusInput): boolean {
+  return Boolean(
     input.invalidQuery ||
-    input.needsAuth ||
-    !!input.plansError ||
-    input.noPlansInRange ||
-    input.noMatchingPlans ||
-    input.allPlansLoading;
+      input.needsAuth ||
+      input.plansError ||
+      input.noPlansInRange ||
+      input.noMatchingPlans ||
+      input.allPlansLoading
+  );
+}
 
-  const plansEmptyHint = resolvePlansEmptyHint(input);
-  const emptyMain = resolveEmptyMainMessage(input);
-
-  return { blockImages, plansEmptyHint, emptyMain };
+export function buildTimesliderPageStatus(input: TimesliderPageStatusInput) {
+  return {
+    blockImages: shouldBlockImages(input),
+    plansEmptyHint: resolvePlansEmptyHint(input),
+    emptyMain: resolveEmptyMainMessage(input),
+  };
 }
 
 type PlansEmptyHintRule = {

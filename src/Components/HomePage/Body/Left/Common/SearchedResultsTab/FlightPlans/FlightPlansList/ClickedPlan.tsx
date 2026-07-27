@@ -16,7 +16,9 @@ export default function ClickedPlan({
   const { mapView } = useMapViewState();
 
   const getPlanCenter = () =>
-    computeFlightPlanCentroid(getFlightPlanPoints(flightPlan));
+    computeFlightPlanCentroid({
+      points: getFlightPlanPoints(flightPlan),
+    });
 
   const zoomToPoint = () => {
     if (mapView && flightPlan) {

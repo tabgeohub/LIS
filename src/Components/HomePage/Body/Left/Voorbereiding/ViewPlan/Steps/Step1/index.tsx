@@ -10,6 +10,60 @@ import {
   syncHoverQuadrantGraphics,
   syncSelectedQuadrantGraphics,
 } from "./syncQuadrantGraphics";
+import type { FlightPlanType } from "Types";
+
+function syncHoverIfReady(input: {
+  mapView: __esri.MapView | null | undefined;
+  graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
+  hoveredPoints: ReturnType<typeof useHoveredPlanState>["hoveredPoints"];
+}) {
+  if (!input.mapView || !input.graphicsLayerHover) return;
+  syncHoverQuadrantGraphics({
+    graphicsLayerHover: input.graphicsLayerHover,
+    hoveredPoints: input.hoveredPoints,
+  });
+}
+
+function syncSelectedIfReady(input: {
+  selectedIndex: number;
+  mapView: __esri.MapView | null | undefined;
+  graphicsLayer: __esri.GraphicsLayer | null | undefined;
+  graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
+  hoveredPoints: ReturnType<typeof useHoveredPlanState>["hoveredPoints"];
+}) {
+  if (input.selectedIndex <= 0 || !input.mapView || !input.graphicsLayerHover) {
+    return;
+  }
+  syncSelectedQuadrantGraphics({
+    graphicsLayer: input.graphicsLayer,
+    graphicsLayerHover: input.graphicsLayerHover,
+    hoveredPoints: input.hoveredPoints,
+  });
+}
+
+function ViewPlanPlansList({
+  filteredPlans,
+}: {
+  filteredPlans: FlightPlanType[] | null | undefined;
+}) {
+  if (!filteredPlans?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-center text-gray-400 text-[12px]">
+          Er zijn geen vluchtplannen om te bekijken.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="divide-y-2">
+      {filteredPlans.map((plan, index) => (
+        <SinglePlan key={index} index={index} plan={plan} />
+      ))}
+    </div>
+  );
+}
 
 export default function Step1({
   handleCancel,
@@ -24,13 +78,17 @@ export default function Step1({
   const { setFilterInput, filteredPlans, selectedIndex } = useViewPlanState();
 
   useEffect(() => {
-    if (!mapView || !graphicsLayerHover) return;
-    syncHoverQuadrantGraphics({ graphicsLayerHover, hoveredPoints });
+    syncHoverIfReady({ mapView, graphicsLayerHover, hoveredPoints });
   }, [hoveredPoints, mapView]);
 
   useEffect(() => {
-    if (selectedIndex <= 0 || !mapView || !graphicsLayerHover) return;
-    syncSelectedQuadrantGraphics({ graphicsLayer, graphicsLayerHover, hoveredPoints });
+    syncSelectedIfReady({
+      selectedIndex,
+      mapView,
+      graphicsLayer,
+      graphicsLayerHover,
+      hoveredPoints,
+    });
   }, [selectedIndex]);
 
   return (
@@ -45,19 +103,7 @@ export default function Step1({
       setFilterTerm={setFilterInput}
     >
       <div className="divide-y-2">
-        {!filteredPlans || filteredPlans.length === 0 ? (
-          <div className="flex flex-col items-center justify-center">
-            <p className="text-center text-gray-400 text-[12px]">
-              Er zijn geen vluchtplannen om te bekijken.
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y-2">
-            {filteredPlans?.map((plan, index) => (
-              <SinglePlan key={index} index={index} plan={plan} />
-            ))}
-          </div>
-        )}
+        <ViewPlanPlansList filteredPlans={filteredPlans} />
       </div>
     </ScrollButtonsLayout>
   );

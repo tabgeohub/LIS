@@ -17,20 +17,30 @@ function hitHasFeature(hit: __esri.HitTestResult): boolean {
   );
 }
 
+function isOriginPoint(point: { x: number; y: number }): boolean {
+  return point.x === 0 || point.y === 0;
+}
+
+function matchesStalePointGraphic(
+  graphic: __esri.Graphic,
+  currentPoint: { x: number; y: number }
+): boolean {
+  return (
+    graphic.geometry?.type === "point" &&
+    graphic.geometry.x === currentPoint.x &&
+    graphic.geometry.y === currentPoint.y
+  );
+}
+
 function removeStalePointGraphic(input: {
   mapView: __esri.MapView;
   currentPoint: { x: number; y: number };
 }) {
-  if (input.currentPoint.x === 0 || input.currentPoint.y === 0) return;
+  if (isOriginPoint(input.currentPoint)) return;
 
   const stale = input.mapView.graphics
     .toArray()
-    .find(
-      (graphic) =>
-        graphic.geometry?.type === "point" &&
-        graphic.geometry.x === input.currentPoint.x &&
-        graphic.geometry.y === input.currentPoint.y
-    );
+    .find((graphic) => matchesStalePointGraphic(graphic, input.currentPoint));
   if (stale) input.mapView.graphics.remove(stale);
 }
 

@@ -19,13 +19,16 @@ export function useRenderPoints() {
     if (user.user_id) fetchPoints({ regio: user.role });
   }, [user.user_id, user.role]);
   usePointGraphicsRendering({ map, layer: pointsGraphicsLayer, points, userId: user.user_id, selectedTab, selectedPage, timesliderPlans });
-  const selectPoint = useCallback((point: typeof points[number]) => {
-    setClickedPointId(point.id);
-    setClickedPoint(point);
-  }, [setClickedPointId, setClickedPoint]);
+  const selectPoint = useCallback(
+    (options: { point: (typeof points)[number] }) => {
+      setClickedPointId(options.point.id);
+      setClickedPoint(options.point);
+    },
+    [setClickedPointId, setClickedPoint]
+  );
   usePointGraphicsClick({
     mapView,
     layer: pointsGraphicsLayer,
-    onPoint: selectPoint,
+    onPoint: (point) => selectPoint({ point }),
   });
 }

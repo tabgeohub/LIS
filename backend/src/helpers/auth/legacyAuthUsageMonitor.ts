@@ -6,14 +6,18 @@ const LEGACY_AUTH_PATHS = new Set([
   "/auth/desktop-ok",
 ]);
 
-function logLegacyUsage(
-  req: Parameters<RequestHandler>[0],
-  extra: Record<string, string> = {}
-) {
+function logLegacyUsage(options: {
+  req: Parameters<RequestHandler>[0];
+  extra?: Record<string, string>;
+}) {
   logAuthSecurityEvent({
     event: "auth.legacy.usage",
-    meta: { endpoint: req.path, method: req.method, ...extra },
-    req,
+    meta: {
+      endpoint: options.req.path,
+      method: options.req.method,
+      ...options.extra,
+    },
+    req: options.req,
   });
 }
 
@@ -36,11 +40,11 @@ function isLegacyPathGet(req: Parameters<RequestHandler>[0]): boolean {
  */
 export const legacyAuthUsageMonitor: RequestHandler = (req, _res, next) => {
   if (req.path === "/auth/login-direct" && req.method === "POST") {
-    logLegacyUsage(req);
+    logLegacyUsage({ req });
   } else if (isDesktopLoginGet(req)) {
-    logLegacyUsage(req, { mode: "desktop" });
+    logLegacyUsage({ req, extra: { mode: "desktop" } });
   } else if (isLegacyPathGet(req)) {
-    logLegacyUsage(req);
+    logLegacyUsage({ req });
   }
 
   next();

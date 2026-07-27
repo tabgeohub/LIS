@@ -7,7 +7,7 @@ export default function Details({
   flightPlan: FlightPlanType;
 }) {
   const { beginTime, endTime, durationSeconds, totalDistance } =
-    useGetFlightTimesDistance(flightPlan);
+    useGetFlightTimesDistance({ flightPlan });
 
   if (!flightPlan) return null;
 

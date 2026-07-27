@@ -12,6 +12,10 @@ const REJECT_DECODED: Array<(decoded: string) => boolean> = [
   (decoded) => decoded.includes("://"),
 ];
 
+function isNonEmptyString(raw: unknown): raw is string {
+  return typeof raw === "string" && raw.length > 0;
+}
+
 function decodeReturnPath(raw: string): string | null {
   try {
     return decodeURIComponent(raw.trim());
@@ -20,14 +24,15 @@ function decodeReturnPath(raw: string): string | null {
   }
 }
 
+function isRejectedDecodedPath(decoded: string): boolean {
+  return REJECT_DECODED.some((reject) => reject(decoded));
+}
+
 export function safeReturnPath(raw: unknown): string | null {
-  if (typeof raw !== "string" || raw.length === 0) return null;
+  if (!isNonEmptyString(raw)) return null;
 
   const decoded = decodeReturnPath(raw);
   if (decoded == null) return null;
-
-  for (const reject of REJECT_DECODED) {
-    if (reject(decoded)) return null;
-  }
+  if (isRejectedDecodedPath(decoded)) return null;
   return decoded;
 }

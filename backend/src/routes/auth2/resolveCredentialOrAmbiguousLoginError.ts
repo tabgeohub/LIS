@@ -22,6 +22,29 @@ function isAmbiguousGrantFailure(kind: GrantFailureKind): boolean {
   return kind === "ambiguous_invalid_grant" || kind === "unknown";
 }
 
+function isCredentialOrAmbiguous(
+  kind: GrantFailureKind,
+  ambiguous: boolean
+): boolean {
+  return kind === "invalid_credentials" || ambiguous;
+}
+
+function serverLoginFailure(input: {
+  errorMessage?: string;
+  exposeErrorMessage: boolean;
+}): LoginErrorDecision {
+  return {
+    result: {
+      status: 500,
+      body: {
+        success: false,
+        message: "Login failed",
+        error: input.exposeErrorMessage ? input.errorMessage : undefined,
+      } satisfies LoginErrorBody,
+    },
+  };
+}
+
 export function resolveCredentialOrAmbiguousLoginError(input: {
   kind: GrantFailureKind;
   otpWasSent: boolean;
@@ -34,18 +57,9 @@ export function resolveCredentialOrAmbiguousLoginError(input: {
     return unauthorizedLoginDecision("password_or_otp_incorrect");
   }
 
-  if (input.kind === "invalid_credentials" || ambiguous) {
+  if (isCredentialOrAmbiguous(input.kind, ambiguous)) {
     return unauthorizedLoginDecision("password_incorrect");
   }
 
-  return {
-    result: {
-      status: 500,
-      body: {
-        success: false,
-        message: "Login failed",
-        error: input.exposeErrorMessage ? input.errorMessage : undefined,
-      } satisfies LoginErrorBody,
-    },
-  };
+  return serverLoginFailure(input);
 }

@@ -26,6 +26,20 @@ export type ApiMutationConfig<TVariables, TResult> = {
   ) => void | Promise<void>;
 };
 
+function shouldToastSuccessMessage<TVariables>(
+  config: ApiMutationConfig<TVariables, unknown>,
+  variables: TVariables
+): boolean {
+  return config.shouldToastSuccess?.(variables) ?? true;
+}
+
+function resolveSuccessMessage<TVariables, TResult>(
+  config: ApiMutationConfig<TVariables, TResult>,
+  result: TResult
+): string {
+  return config.getSuccessMessage?.(result) ?? config.defaultSuccessMessage;
+}
+
 export function useApiMutation<TVariables, TResult>(
   config: ApiMutationConfig<TVariables, TResult>
 ) {
@@ -36,10 +50,8 @@ export function useApiMutation<TVariables, TResult>(
       return config.request(url, variables);
     },
     onSuccess: async (result, variables) => {
-      if (config.shouldToastSuccess?.(variables) ?? true) {
-        toast.success(
-          config.getSuccessMessage?.(result) ?? config.defaultSuccessMessage
-        );
+      if (shouldToastSuccessMessage(config, variables)) {
+        toast.success(resolveSuccessMessage(config, result));
       }
 
       await invalidateAfterMutation(queryClient, config.path);

@@ -8,39 +8,34 @@ import {
 } from "hooks/features/useGeometriesStore";
 import SelectableGeometryList from "./SelectableGeometryList";
 
+function resolvePlanGeometries(
+  selectedPlan: NonNullable<
+    ReturnType<typeof useReuseFlightPlan>["selectedPlan"]
+  >,
+  dbGeometries: Geometry[]
+): Geometry[] {
+  const planGeoms = (selectedPlan as { geometries?: { id: number }[] }).geometries;
+  if (!planGeoms || !Array.isArray(planGeoms)) return [];
+
+  return dbGeometries.filter((g) => planGeoms.some((pg) => pg.id === g.id));
+}
+
 export default function CurrentGeometriesList() {
   const { selectedPlan, currentGeometries, setCurrentGeometries } =
     useReuseFlightPlan();
   const { dbGeometries } = useGeometriesStore();
   const [planGeometries, setPlanGeometries] = useState<Geometry[]>([]);
 
-  // Get geometries from plan if available, otherwise from store
   useEffect(() => {
     if (!selectedPlan) return;
-
-    // Check if plan has geometries property (for finished plans)
-    const planGeoms = (selectedPlan as any).geometries;
-    if (planGeoms && Array.isArray(planGeoms)) {
-      // Plan has geometries, use them
-      const geometries = dbGeometries.filter((g) =>
-        planGeoms.some((pg: any) => pg.id === g.id)
-      );
-      setPlanGeometries(geometries);
-      setCurrentGeometries(geometries.flatMap((g) => g.id));
-    } else {
-      // Plan doesn't have geometries, check if we can infer from points
-      // For now, set empty array
-      setPlanGeometries([]);
-      setCurrentGeometries([]);
-    }
+    const geometries = resolvePlanGeometries(selectedPlan, dbGeometries);
+    setPlanGeometries(geometries);
+    setCurrentGeometries(geometries.flatMap((g) => g.id));
   }, [selectedPlan, dbGeometries, setCurrentGeometries]);
 
   const content = useContent();
 
-  // Don't render if no geometries available
-  if (!planGeometries || planGeometries.length === 0) {
-    return null;
-  }
+  if (!planGeometries.length) return null;
 
   return (
     <div className="px-2">

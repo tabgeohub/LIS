@@ -43,21 +43,21 @@ function mapTemplatePoints(template: Template): SelectFromSourceItemPoint[] {
   }));
 }
 
-export function mapSourceToItems(
-  source: "flightPlans" | "templates",
-  data: FlightPlanType[] | Template[] | undefined
-): SelectFromSourceItem[] {
-  if (!data) return [];
+export function mapSourceToItems(options: {
+  source: "flightPlans" | "templates";
+  data: FlightPlanType[] | Template[] | undefined;
+}): SelectFromSourceItem[] {
+  if (!options.data) return [];
 
-  if (source === "flightPlans") {
-    return (data as FlightPlanType[]).map((plan) => ({
+  if (options.source === "flightPlans") {
+    return (options.data as FlightPlanType[]).map((plan) => ({
       id: plan.id,
       title: plan.vluchtnummer,
       points: mapFlightPlanPoints(plan),
     }));
   }
 
-  return (data as Template[]).map((template) => ({
+  return (options.data as Template[]).map((template) => ({
     id: template.id,
     title: template.name,
     points: mapTemplatePoints(template),

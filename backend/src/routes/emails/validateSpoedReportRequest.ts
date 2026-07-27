@@ -55,10 +55,10 @@ function readUploadGroup(
   return files[key] ?? [];
 }
 
-function readSpoedUploads(
-  files: Record<string, Express.Multer.File[]> | Express.Multer.File[] | undefined
-) {
-  const map = files as Record<string, Express.Multer.File[]> | undefined;
+function readSpoedUploads(options: {
+  files: Record<string, Express.Multer.File[]> | Express.Multer.File[] | undefined;
+}) {
+  const map = options.files as Record<string, Express.Multer.File[]> | undefined;
   return {
     images: readUploadGroup(map, "images"),
     screenshots: readUploadGroup(map, "screenshots"),
@@ -74,7 +74,7 @@ export function validateSpoedReportRequest(req: {
   if (fieldError) return fieldError;
 
   const recipients = parseSpoedReportRecipients(body.sendToEmail);
-  const { images, screenshots } = readSpoedUploads(req.files);
+  const { images, screenshots } = readSpoedUploads({ files: req.files });
 
   if (images.length === 0) {
     return fail("No images uploaded");

@@ -25,16 +25,16 @@ function useFlightPlanStep2Actions(setOpenFilter: (value: boolean) => void) {
       yellowGeometriesGraphicsLayer?.graphics.removeAll();
     },
     buildPrevious: (clearSelectionGraphics) => () =>
-      runWizardCleanup([
+      runWizardCleanup({ actions: [
         () => store.setStep(2),
         resetFilters,
         () => store.setSelectedPoints([]),
         resetFeatures,
         clearGraphics,
         clearSelectionGraphics,
-      ]),
+      ] }),
     buildCancel: () => () =>
-      runWizardCleanup([resetFeatures, store.clear, handleCancel, resetFilters]),
+      runWizardCleanup({ actions: [resetFeatures, store.clear, handleCancel, resetFilters] }),
   });
 }
 

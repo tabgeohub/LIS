@@ -1,10 +1,9 @@
 import type { AttachmentType } from "Types/finished_plans";
 
-export async function findFotoMarkerAttachmentIndex(
-  hitTestResult: __esri.HitTestResult,
-  validAttachments: AttachmentType[]
-): Promise<number | null> {
-  const clickedGraphic = hitTestResult.results
+function findClickedFotoMarkerGraphic(
+  hitTestResult: __esri.HitTestResult
+): __esri.Graphic | undefined {
+  return hitTestResult.results
     .filter(
       (result): result is __esri.GraphicHit =>
         result.type === "graphic" &&
@@ -16,11 +15,27 @@ export async function findFotoMarkerAttachmentIndex(
         graphic?.attributes?.type === "image-numbered-marker" ||
         graphic?.attributes?.type === "image-numbered-marker-label"
     );
-  if (!clickedGraphic) return null;
-  const attachmentId = clickedGraphic.attributes?.attachmentId;
+}
+
+function indexOfAttachmentById(
+  validAttachments: AttachmentType[],
+  attachmentId: unknown
+): number | null {
   if (attachmentId === undefined) return null;
   const sortedIndex = [...validAttachments]
     .sort((a, b) => a.taken_at - b.taken_at)
     .findIndex((att) => att.id === attachmentId);
   return sortedIndex === -1 ? null : sortedIndex;
+}
+
+export async function findFotoMarkerAttachmentIndex(
+  hitTestResult: __esri.HitTestResult,
+  validAttachments: AttachmentType[]
+): Promise<number | null> {
+  const clickedGraphic = findClickedFotoMarkerGraphic(hitTestResult);
+  if (!clickedGraphic) return null;
+  return indexOfAttachmentById(
+    validAttachments,
+    clickedGraphic.attributes?.attachmentId
+  );
 }

@@ -42,12 +42,20 @@ function formatPopupObject(value: unknown): string {
   return String(value);
 }
 
+function formatPopupBoolean(value: boolean): string {
+  return value ? "Ja" : "Nee";
+}
+
+const POPUP_TYPE_FORMATTERS: Record<string, (value: unknown) => string> = {
+  boolean: (value) => formatPopupBoolean(value as boolean),
+  number: (value) => formatPopupNumber(value as number),
+  string: (value) => formatPopupString(value as string),
+};
+
 export function formatPopupValue(value: unknown): string {
   if (value == null) return "";
-  if (typeof value === "boolean") return value ? "Ja" : "Nee";
-  if (typeof value === "number") return formatPopupNumber(value);
-  if (typeof value === "string") return formatPopupString(value);
-  return formatPopupObject(value);
+  const format = POPUP_TYPE_FORMATTERS[typeof value];
+  return format ? format(value) : formatPopupObject(value);
 }
 
 export function buildPopupDisplayAttributes(

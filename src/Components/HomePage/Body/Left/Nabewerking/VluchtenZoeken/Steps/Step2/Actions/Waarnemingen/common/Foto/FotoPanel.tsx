@@ -43,7 +43,9 @@ export default function FotoPanel({
     `/finished_plans/points/finishedPointAttachments`
   );
 
-  const validAttachments = filterValidAttachments(attachmentPoint?.attachments);
+  const validAttachments = filterValidAttachments({
+    attachments: attachmentPoint?.attachments,
+  });
 
   useFotoMapClickHandler({
     mapView,

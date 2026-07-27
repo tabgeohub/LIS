@@ -13,14 +13,14 @@ function resolveAttachmentId(id: number | undefined): number {
   return id ?? 0;
 }
 
-function isAttachmentsQueryEnabled(
-  isFinished: boolean,
-  planId: number,
-  pointId: number
-): boolean {
-  if (!isFinished) return false;
-  if (planId <= 0) return false;
-  return pointId > 0;
+function isAttachmentsQueryEnabled(options: {
+  isFinished: boolean;
+  planId: number;
+  pointId: number;
+}): boolean {
+  if (!options.isFinished) return false;
+  if (options.planId <= 0) return false;
+  return options.pointId > 0;
 }
 
 function fetchPlanPointAttachments(
@@ -39,6 +39,10 @@ export function usePlanPointAttachments(input: PlanPointAttachmentsInput) {
   return useQuery({
     queryKey: finishedPlanKeys.attachments(planId, pointId),
     queryFn: () => fetchPlanPointAttachments(input.planId, input.pointId),
-    enabled: isAttachmentsQueryEnabled(input.isFinished, planId, pointId),
+    enabled: isAttachmentsQueryEnabled({
+      isFinished: input.isFinished,
+      planId,
+      pointId,
+    }),
   });
 }

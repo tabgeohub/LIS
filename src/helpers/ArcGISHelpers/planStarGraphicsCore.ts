@@ -21,7 +21,8 @@ export function addPlanStarGraphic(input: {
   layer: __esri.GraphicsLayer;
   variant?: PlanStarGraphicVariant;
 }) {
-  const graphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(input.plan), {
+  const graphic = createPlanBoundingBoxGraphic({
+    points: getFlightPlanPoints(input.plan),
     symbolOptions: getStarSymbolOptions(input.variant ?? "search"),
     attributes: { id: input.plan.id },
   });

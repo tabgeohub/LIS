@@ -20,7 +20,7 @@ export default function Details() {
   const { flightPlanData } = useOpenTable();
   const content = useContent();
   const { beginTime, endTime, durationSeconds, totalDistance } =
-    useGetFlightTimesDistance(flightPlanData ?? {});
+    useGetFlightTimesDistance({ flightPlan: flightPlanData ?? {} });
 
   if (!flightPlanData) return null;
 

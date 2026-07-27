@@ -27,14 +27,21 @@ export function registerArcgisToken(token: string) {
   localStorage.setItem("credential_server", ARCGIS_TOKEN_SERVERS[0]);
 }
 
+async function readErrorMessage(response: Response): Promise<string> {
+  const message = await response.text().catch(() => "");
+  return message || `Failed to fetch ArcGIS token (${response.status})`;
+}
+
+function readAccessToken(data: { access_token?: unknown }): string {
+  return String(data?.access_token || "");
+}
+
 export async function fetchArcgisToken(tokenEndpoint: string) {
   const response = await fetch(tokenEndpoint, { method: "GET", credentials: "include" });
   if (!response.ok) {
-    const message = await response.text().catch(() => "");
-    throw new Error(message || `Failed to fetch ArcGIS token (${response.status})`);
+    throw new Error(await readErrorMessage(response));
   }
-  const data = await response.json();
-  const token = String(data?.access_token || "");
+  const token = readAccessToken(await response.json());
   if (!token) throw new Error("Invalid ArcGIS token response from backend");
   return token;
 }

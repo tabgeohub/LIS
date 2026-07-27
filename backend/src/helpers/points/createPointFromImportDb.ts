@@ -75,14 +75,14 @@ class ImportPointsWriter {
   private existingMap = new Map<string, number>();
   private insertedMap = new Map<string, number>();
 
-  constructor(
-    client: PoolClient,
-    normalized: NormalizedImportRow[],
-    rawRows: unknown[]
-  ) {
-    this.client = client;
-    this.normalized = normalized;
-    this.rawRows = rawRows;
+  constructor(options: {
+    client: PoolClient;
+    normalized: NormalizedImportRow[];
+    rawRows: unknown[];
+  }) {
+    this.client = options.client;
+    this.normalized = options.normalized;
+    this.rawRows = options.rawRows;
   }
 
   async run(mode: ReturnMode): Promise<ImportPointsDbResult> {
@@ -173,9 +173,11 @@ export async function importPointsInTransaction(
   client: PoolClient,
   input: ImportPointsInput
 ): Promise<ImportPointsDbResult> {
-  return new ImportPointsWriter(client, input.normalized, input.rawRows).run(
-    input.mode
-  );
+  return new ImportPointsWriter({
+    client,
+    normalized: input.normalized,
+    rawRows: input.rawRows,
+  }).run(input.mode);
 }
 
 export async function rollbackImportPointsTransaction(

@@ -5,14 +5,14 @@ import {
 import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
 import type { Request } from "express";
 
-function appendRegioCondition(
-  conditions: string[],
-  params: unknown[],
-  regio: ReturnType<typeof resolveRegioFilter>
-): void {
-  if (regio === undefined || regio === "admin") return;
-  params.push(String(regio).toLowerCase());
-  conditions.push(`LOWER(p.regio_id) = $${params.length}`);
+function appendRegioCondition(options: {
+  conditions: string[];
+  params: unknown[];
+  regio: ReturnType<typeof resolveRegioFilter>;
+}): void {
+  if (options.regio === undefined || options.regio === "admin") return;
+  options.params.push(String(options.regio).toLowerCase());
+  options.conditions.push(`LOWER(p.regio_id) = $${options.params.length}`);
 }
 
 export function buildGeometriesListQuery(req: Request): {
@@ -25,7 +25,7 @@ export function buildGeometriesListQuery(req: Request): {
   const params: unknown[] = [];
   const conditions: string[] = [];
 
-  appendRegioCondition(conditions, params, regio);
+  appendRegioCondition({ conditions, params, regio });
 
   let query = `
       SELECT

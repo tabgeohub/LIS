@@ -10,10 +10,10 @@ export function ringBoundingBox(ring: number[][]): {
   let maxY = -Infinity;
 
   for (const [px, py] of ring) {
-    if (px < minX) minX = px;
-    if (px > maxX) maxX = px;
-    if (py < minY) minY = py;
-    if (py > maxY) maxY = py;
+    minX = Math.min(minX, px);
+    maxX = Math.max(maxX, px);
+    minY = Math.min(minY, py);
+    maxY = Math.max(maxY, py);
   }
 
   return { minX, maxX, minY, maxY };
@@ -42,11 +42,27 @@ export function pointInRingRayCast(input: {
   return inside;
 }
 
+function isOutsideBoundingBox(input: {
+  x: number;
+  y: number;
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}): boolean {
+  return (
+    input.x < input.minX ||
+    input.x > input.maxX ||
+    input.y < input.minY ||
+    input.y > input.maxY
+  );
+}
+
 export function isPointInPolygon(point: __esri.Point, ring: number[][]): boolean {
   const { x, y } = point;
-  const { minX, maxX, minY, maxY } = ringBoundingBox(ring);
+  const box = ringBoundingBox(ring);
 
-  if (x < minX || x > maxX || y < minY || y > maxY) {
+  if (isOutsideBoundingBox({ x, y, ...box })) {
     return false;
   }
 

@@ -33,12 +33,12 @@ function toOptional(value: string): string | undefined {
   return value || undefined;
 }
 
-function readBodyField(
-  body: { error?: string; error_description?: string } | undefined,
-  key: "error" | "error_description"
-): string | undefined {
-  if (!body) return undefined;
-  return body[key];
+function readBodyField(options: {
+  body: { error?: string; error_description?: string } | undefined;
+  key: "error" | "error_description";
+}): string | undefined {
+  if (!options.body) return undefined;
+  return options.body[options.key];
 }
 
 function readResponseBody(err: GrantErrorLike) {
@@ -50,10 +50,10 @@ function readDirectGrantError(error: unknown) {
   const err = (error ?? {}) as GrantErrorLike;
   const body = readResponseBody(err);
   return {
-    errorCode: firstString(err.error, readBodyField(body, "error")),
+    errorCode: firstString(err.error, readBodyField({ body, key: "error" })),
     errorDescription: firstString(
       err.error_description,
-      readBodyField(body, "error_description"),
+      readBodyField({ body, key: "error_description" }),
       err.message
     ),
     messageText: firstString(err.message),

@@ -1,18 +1,20 @@
-import type { RequestHandler } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { getDeviceByToken } from "./db";
 import { requireAdmin } from "../../helpers/auth/realmAdminAuth";
 
 export { requireAdmin } from "../../helpers/auth/realmAdminAuth";
 
-export const requireDeviceToken: RequestHandler = async (req, res, next) => {
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
+function extractBearerToken(authorizationHeader: string | undefined): string {
+  const header = authorizationHeader || "";
+  return header.startsWith("Bearer ") ? header.slice(7).trim() : "";
+}
 
-  if (!token) {
-    res.status(401).json({ error: "Device token required" });
-    return;
-  }
-
+async function attachDeviceFromToken(
+  req: Request,
+  res: Response,
+  token: string,
+  next: NextFunction
+): Promise<void> {
   try {
     const device = await getDeviceByToken(token);
     if (!device) {
@@ -31,6 +33,15 @@ export const requireDeviceToken: RequestHandler = async (req, res, next) => {
     console.error("Device token auth failed:", err);
     res.status(500).json({ error: "Failed to authenticate device" });
   }
+}
+
+export const requireDeviceToken: RequestHandler = async (req, res, next) => {
+  const token = extractBearerToken(req.headers.authorization);
+  if (!token) {
+    res.status(401).json({ error: "Device token required" });
+    return;
+  }
+  await attachDeviceFromToken(req, res, token, next);
 };
 
 declare global {

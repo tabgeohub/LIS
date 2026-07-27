@@ -12,7 +12,7 @@ export async function handleResetPassword(req: Request, res: Response) {
     if (!input) return;
 
     const response = await putKeycloakResetPassword(req, input);
-    await throwIfResetPasswordFailed(response);
+    await throwIfResetPasswordFailed({ response });
     res.json({ success: true });
   } catch (error: unknown) {
     handleKeycloakRouteError({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import TabsComp from "./TabsComp";
 
 import Details from "./Details";
@@ -6,6 +6,14 @@ import GpsLocations from "./GpsLocations";
 import GpsTracks from "./GpsTracks";
 import WayPoints from "./Waypoints";
 import Tracks from "./Tracks";
+
+const TAB_CONTENT: Record<string, () => ReactNode> = {
+  Details: () => <Details />,
+  Gps_tracks: () => <GpsTracks />,
+  Gps_locaties: () => <GpsLocations />,
+  Waypoints: () => <WayPoints />,
+  Tracks: () => <Tracks />,
+};
 
 export default function PlansView({
   containerHeight,
@@ -17,20 +25,9 @@ export default function PlansView({
   const [activeTab, setActiveTab] = useState<string>("Details");
 
   const renderTabContent = () => {
-    switch (activeTab) {
-      case "Details":
-        return <Details />;
-      case "Gps_tracks":
-        return <GpsTracks />;
-      case "Gps_locaties":
-        return <GpsLocations />;
-      case "Waypoints":
-        return <WayPoints />;
-      case "Tracks":
-        return <Tracks />;
-      default:
-        return null;
-    }
+    const render = TAB_CONTENT[activeTab];
+    if (!render) return null;
+    return render();
   };
 
   return (

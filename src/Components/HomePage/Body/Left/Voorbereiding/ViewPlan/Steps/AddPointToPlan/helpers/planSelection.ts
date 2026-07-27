@@ -1,18 +1,28 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { EnrichedPointType, FlightPlanType } from "Types";
 
+function planPointSources(plan: FlightPlanType) {
+  if (plan.pointsObjects?.length) return plan.pointsObjects;
+  return plan.points ?? [];
+}
+
 /** Collect all point IDs already on the plan (standalone points + geometry vertices). */
 export function collectExistingPlanPointIds(plan: FlightPlanType): number[] {
-  const pointSources = plan.pointsObjects?.length
-    ? plan.pointsObjects
-    : plan.points ?? [];
-
-  const fromPoints = pointSources.map((p) => p.id);
+  const fromPoints = planPointSources(plan).map((p) => p.id);
   const fromGeometries = (plan.geometries ?? []).flatMap((g) =>
     g.points.map((p) => p.id)
   );
 
   return [...fromPoints, ...fromGeometries];
+}
+
+function addGeometryIfSelected(input: {
+  byId: Map<number, Geometry>;
+  geometry: Geometry;
+  newlySelectedIds: number[];
+}) {
+  if (!input.newlySelectedIds.includes(input.geometry.id)) return;
+  input.byId.set(input.geometry.id, input.geometry);
 }
 
 /** Merge existing plan geometries with newly selected ones from the database. */
@@ -28,9 +38,11 @@ export function mergeGeometries(input: {
   }
 
   for (const g of input.allGeometries) {
-    if (input.newlySelectedIds.includes(g.id)) {
-      byId.set(g.id, g);
-    }
+    addGeometryIfSelected({
+      byId,
+      geometry: g,
+      newlySelectedIds: input.newlySelectedIds,
+    });
   }
 
   return Array.from(byId.values());

@@ -19,7 +19,8 @@ export function createFinishedPlanBoundingBoxGraphic(
   plan: FinishedFlightPlanType,
   symbolOptions: PlanBoundingBoxSymbolOptions
 ): Graphic | null {
-  return createPlanBoundingBoxGraphic(getFinishedPlanBoundingPoints(plan), {
+  return createPlanBoundingBoxGraphic({
+    points: getFinishedPlanBoundingPoints(plan),
     symbolOptions,
   });
 }

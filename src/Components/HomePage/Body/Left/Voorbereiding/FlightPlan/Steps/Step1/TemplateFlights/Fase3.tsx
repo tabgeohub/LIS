@@ -11,8 +11,10 @@ import {
   TemplatePointRow,
 } from "./templateFlightRows";
 
-function collectIds(items: Array<{ id: number }> | null | undefined): number[] {
-  return items?.map((item) => item.id) || [];
+function collectIds(options: {
+  items: Array<{ id: number }> | null | undefined;
+}): number[] {
+  return options.items?.map((item) => item.id) || [];
 }
 
 function useTemplateFase3MapPreview(selectedTemplate: {
@@ -21,8 +23,8 @@ function useTemplateFase3MapPreview(selectedTemplate: {
 }) {
   const templatePoints = selectedTemplate?.points || [];
   const templateGeometries = selectedTemplate?.geometries || [];
-  const pointIds = collectIds(templatePoints);
-  const geometryIds = collectIds(templateGeometries);
+  const pointIds = collectIds({ items: templatePoints });
+  const geometryIds = collectIds({ items: templateGeometries });
 
   useDrawYellowMarkers({
     selectedPointIds: pointIds,

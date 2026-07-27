@@ -50,6 +50,30 @@ export function goToGeometryCentroid(
   mapView.zoom = 12;
 }
 
+function hasGeometryPoints(geometry: BaseGeometryData): boolean {
+  return Boolean(geometry.points && geometry.points.length > 0);
+}
+
+function syncOneGeometryTableGraphic(input: {
+  geometry: BaseGeometryData;
+  starredGeometries: BaseGeometryData[];
+  yellowGraphicsLayer: __esri.GraphicsLayer | null | undefined;
+  graphicsLayer?: __esri.GraphicsLayer | null | undefined;
+}) {
+  if (!hasGeometryPoints(input.geometry)) return;
+
+  const graphic = createYellowGeometryTableGraphic(input.geometry);
+  if (graphic) {
+    input.yellowGraphicsLayer?.add(graphic);
+  }
+
+  const alreadyStarred = input.starredGeometries.find(
+    (g) => g.id === input.geometry.id
+  );
+  if (!alreadyStarred || !input.graphicsLayer) return;
+  addStarGeometryGraphic(input.geometry, input.graphicsLayer);
+}
+
 export function syncGeometriesTableMapGraphics({
   geometries,
   starredGeometries = [],
@@ -62,16 +86,11 @@ export function syncGeometriesTableMapGraphics({
   graphicsLayer?: __esri.GraphicsLayer | null | undefined;
 }) {
   geometries.forEach((geometry) => {
-    if (!geometry.points || geometry.points.length === 0) return;
-
-    const graphic = createYellowGeometryTableGraphic(geometry);
-    if (graphic) {
-      yellowGraphicsLayer?.add(graphic);
-    }
-
-    const alreadyStarred = starredGeometries.find((g) => g.id === geometry.id);
-    if (alreadyStarred && graphicsLayer) {
-      addStarGeometryGraphic(geometry, graphicsLayer);
-    }
+    syncOneGeometryTableGraphic({
+      geometry,
+      starredGeometries,
+      yellowGraphicsLayer,
+      graphicsLayer,
+    });
   });
 }

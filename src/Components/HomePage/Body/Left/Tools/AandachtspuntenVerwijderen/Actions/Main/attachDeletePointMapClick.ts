@@ -1,6 +1,32 @@
 import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
 import type { EnrichedPointType } from "Types";
 
+async function selectPointFromHit(input: {
+  mapView: __esri.MapView;
+  pointsGraphicsLayer: __esri.GraphicsLayer;
+  event: __esri.ViewClickEvent;
+  getPoints: () => EnrichedPointType[];
+  setSelectedPoints: (points: EnrichedPointType[]) => void;
+}) {
+  input.event.stopPropagation();
+  const hitTestResults = await input.mapView.hitTest(input.event, {
+    include: [input.pointsGraphicsLayer],
+  });
+
+  const pointAttributes = (
+    hitTestResults.results.find(
+      (result) => (result as __esri.GraphicHit).graphic
+    ) as __esri.GraphicHit | undefined
+  )?.graphic?.attributes;
+
+  if (!pointAttributes?.id) return;
+
+  const clickedPoint = input.getPoints().find(
+    (p) => p.id === pointAttributes.id
+  );
+  if (clickedPoint) input.setSelectedPoints([clickedPoint]);
+}
+
 /** Attach map click to select a point from the points layer; returns cleanup. */
 export function attachDeletePointMapClick(input: {
   mapView: __esri.MapView;
@@ -14,23 +40,7 @@ export function attachDeletePointMapClick(input: {
     if (clickGuard.shouldSkip()) return;
 
     try {
-      event.stopPropagation();
-      const hitTestResults = await input.mapView.hitTest(event, {
-        include: [input.pointsGraphicsLayer],
-      });
-
-      const pointAttributes = (
-        hitTestResults.results.find(
-          (result) => (result as __esri.GraphicHit).graphic
-        ) as __esri.GraphicHit | undefined
-      )?.graphic?.attributes;
-
-      if (!pointAttributes?.id) return;
-
-      const clickedPoint = input.getPoints().find(
-        (p) => p.id === pointAttributes.id
-      );
-      if (clickedPoint) input.setSelectedPoints([clickedPoint]);
+      await selectPointFromHit({ ...input, event });
     } catch (error) {
       console.error("Error handling map click:", error);
     } finally {

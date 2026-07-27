@@ -12,6 +12,26 @@ type EntityPlanImagesInput = {
   enabled: boolean;
 };
 
+function resolveLoadError(error: unknown): string {
+  if (axios.isAxiosError(error) && error.response?.data?.message) {
+    return String((error.response.data as { message?: string }).message);
+  }
+  return "Afbeeldingen laden mislukt.";
+}
+
+function isCanceled(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.code === "ERR_CANCELED";
+}
+
+function buildImageQueryParams(input: EntityPlanImagesInput): Record<string, string> {
+  const params: Record<string, string> = {
+    [input.entityParamKey]: String(input.entityId),
+    plan_ids: input.planIds.join(","),
+  };
+  if (input.regioId) params.regio_id = input.regioId;
+  return params;
+}
+
 export function useEntityPlanImages(input: EntityPlanImagesInput) {
   const [images, setImages] = useState<PointPlanImageRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,18 +46,11 @@ export function useEntityPlanImages(input: EntityPlanImagesInput) {
 
     const controller = new AbortController();
 
-    const resolveLoadError = (error: unknown): string => {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.message
-      ) {
-        return String((error.response.data as { message?: string }).message);
-      }
-      return "Afbeeldingen laden mislukt.";
+    const applyLoadFailure = (error: unknown) => {
+      if (isCanceled(error)) return;
+      setImages([]);
+      setError(resolveLoadError(error));
     };
-
-    const isCanceled = (error: unknown): boolean =>
-      axios.isAxiosError(error) && error.code === "ERR_CANCELED";
 
     const loadImages = async () => {
       setLoading(true);
@@ -45,21 +58,13 @@ export function useEntityPlanImages(input: EntityPlanImagesInput) {
       setImages([]);
 
       try {
-        const params: Record<string, string> = {
-          [input.entityParamKey]: String(input.entityId),
-          plan_ids: input.planIds.join(","),
-        };
-        if (input.regioId) params.regio_id = input.regioId;
-
         const { data } = await axios.get<{ images?: PointPlanImageRow[] }>(
           `${getBackEndUrl()}${input.endpoint}`,
-          { params, signal: controller.signal }
+          { params: buildImageQueryParams(input), signal: controller.signal }
         );
         setImages(data.images ?? []);
       } catch (error: unknown) {
-        if (isCanceled(error)) return;
-        setImages([]);
-        setError(resolveLoadError(error));
+        applyLoadFailure(error);
       } finally {
         setLoading(false);
       }

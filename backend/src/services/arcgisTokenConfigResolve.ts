@@ -38,19 +38,19 @@ const ARCGIS_TOKEN_NUMERIC_DEFAULTS = {
   minTtlMs: 0,
 } as const;
 
-function pickNumericField(
-  config: ArcgisTokenConfig | undefined,
-  key: keyof typeof ARCGIS_TOKEN_NUMERIC_DEFAULTS
-): number {
-  return config?.[key] ?? ARCGIS_TOKEN_NUMERIC_DEFAULTS[key];
+function pickNumericField(options: {
+  config: ArcgisTokenConfig | undefined;
+  key: keyof typeof ARCGIS_TOKEN_NUMERIC_DEFAULTS;
+}): number {
+  return options.config?.[options.key] ?? ARCGIS_TOKEN_NUMERIC_DEFAULTS[options.key];
 }
 
 export function resolveArcgisTokenNumericFields(config?: ArcgisTokenConfig) {
   return {
-    requestTimeoutMs: pickNumericField(config, "requestTimeoutMs"),
-    retryCount: pickNumericField(config, "retryCount"),
-    retryBaseDelayMs: pickNumericField(config, "retryBaseDelayMs"),
-    skewBufferMs: pickNumericField(config, "skewBufferMs"),
-    minTtlMs: pickNumericField(config, "minTtlMs"),
+    requestTimeoutMs: pickNumericField({ config, key: "requestTimeoutMs" }),
+    retryCount: pickNumericField({ config, key: "retryCount" }),
+    retryBaseDelayMs: pickNumericField({ config, key: "retryBaseDelayMs" }),
+    skewBufferMs: pickNumericField({ config, key: "skewBufferMs" }),
+    minTtlMs: pickNumericField({ config, key: "minTtlMs" }),
   };
 }

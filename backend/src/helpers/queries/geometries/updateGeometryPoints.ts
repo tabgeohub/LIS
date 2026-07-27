@@ -7,6 +7,35 @@ import {
 
 type PointPayload = PointCorePayload & { id?: number };
 
+async function updateOwnedPointIfValid(input: {
+  client: PoolClient;
+  geometryId: number;
+  raw: PointPayload;
+}): Promise<string | null> {
+  const { client, geometryId, raw } = input;
+  if (raw.id == null) return null;
+
+  const pointId = Number(raw.id);
+  if (!Number.isFinite(pointId)) return null;
+
+  const owner = await client.query(
+    `SELECT id FROM lis.points WHERE id = $1 AND geometry_id = $2`,
+    [pointId, geometryId]
+  );
+
+  if (owner.rowCount === 0) {
+    return `Punt ${pointId} hoort niet bij deze geometrie.`;
+  }
+
+  await client.query(
+    `UPDATE lis.points SET
+      ${buildPointUpdateAssignments({ coalesceColumns: ["user_id"] })}
+    WHERE id = $13 AND geometry_id = $14`,
+    [...buildPointUpdateParams(raw, pointId), geometryId]
+  );
+  return null;
+}
+
 export async function updateGeometryOwnedPoints(input: {
   client: PoolClient;
   geometryId: number;
@@ -16,26 +45,8 @@ export async function updateGeometryOwnedPoints(input: {
   if (!points.length) return null;
 
   for (const raw of points) {
-    if (raw.id == null) continue;
-
-    const pointId = Number(raw.id);
-    if (!Number.isFinite(pointId)) continue;
-
-    const owner = await client.query(
-      `SELECT id FROM lis.points WHERE id = $1 AND geometry_id = $2`,
-      [pointId, geometryId]
-    );
-
-    if (owner.rowCount === 0) {
-      return `Punt ${pointId} hoort niet bij deze geometrie.`;
-    }
-
-    await client.query(
-      `UPDATE lis.points SET
-        ${buildPointUpdateAssignments({ coalesceColumns: ["user_id"] })}
-      WHERE id = $13 AND geometry_id = $14`,
-      [...buildPointUpdateParams(raw, pointId), geometryId]
-    );
+    const error = await updateOwnedPointIfValid({ client, geometryId, raw });
+    if (error) return error;
   }
 
   return null;

@@ -30,13 +30,16 @@ export function resolveArcgisTokenConfig(
   };
 }
 
+function hasAdminCredentials(resolved: ResolvedArcgisTokenConfig): boolean {
+  return Boolean(
+    resolved.portalUrl && resolved.adminUser && resolved.adminPass
+  );
+}
+
 export function assertArcgisTokenCredentials(
   resolved: ResolvedArcgisTokenConfig
 ): void {
-  const hasAdminCreds =
-    !!resolved.portalUrl && !!resolved.adminUser && !!resolved.adminPass;
-
-  if (hasAdminCreds) {
+  if (hasAdminCredentials(resolved)) {
     return;
   }
 

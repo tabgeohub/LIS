@@ -1,13 +1,20 @@
 import { AttachmentType } from "Types/finished_plans";
 
+export type FilterValidAttachmentsOptions = {
+  attachments: (AttachmentType | null)[] | undefined;
+};
+
+function isValidAttachment(
+  attachment: AttachmentType | null
+): attachment is AttachmentType {
+  if (attachment === null) return false;
+  if (typeof attachment !== "object") return false;
+  if (typeof attachment.url !== "string") return false;
+  return attachment.url.length > 0;
+}
+
 export function filterValidAttachments(
-  attachments: (AttachmentType | null)[] | undefined
+  options: FilterValidAttachmentsOptions
 ): AttachmentType[] {
-  return (attachments ?? []).filter(
-    (attachment): attachment is AttachmentType =>
-      attachment !== null &&
-      typeof attachment === "object" &&
-      typeof attachment.url === "string" &&
-      attachment.url.length > 0
-  );
+  return (options.attachments ?? []).filter(isValidAttachment);
 }

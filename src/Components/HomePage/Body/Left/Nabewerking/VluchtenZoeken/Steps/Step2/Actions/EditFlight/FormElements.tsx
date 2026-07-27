@@ -19,7 +19,7 @@ export default function FormElements() {
   usePopulateFlightPlanFormEffect(store.selectedPlan, fields);
 
   const { beginTime, endTime, durationSeconds } =
-    useGetFlightTimesDistance(store.selectedPlan);
+    useGetFlightTimesDistance({ flightPlan: store.selectedPlan });
 
   const durationLabel = `${String(durationSeconds! / 60).padStart(2, "0")}:${String(
     durationSeconds! % 60

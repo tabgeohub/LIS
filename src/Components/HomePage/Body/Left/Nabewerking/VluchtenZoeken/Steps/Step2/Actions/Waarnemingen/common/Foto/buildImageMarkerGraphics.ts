@@ -47,23 +47,38 @@ export function buildImageMarkerGraphics(
   return graphics;
 }
 
+function parseFiniteLatLong(location: string) {
+  const [latitude, longitude] = location.split(",").map(Number);
+  if (!Number.isFinite(latitude)) return null;
+  if (!Number.isFinite(longitude)) return null;
+  return { latitude, longitude };
+}
+
+function nextOffsetCount(
+  locationKey: string,
+  locationMap: Map<string, number>
+): number {
+  const offsetCount = locationMap.get(locationKey) ?? 0;
+  locationMap.set(locationKey, offsetCount + 1);
+  return offsetCount;
+}
+
 function resolveMarkerPoint(
   location: string | null | undefined,
   locationMap: Map<string, number>
 ) {
   if (!location) return null;
-  const [latitude, longitude] = location.split(",").map(Number);
-  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  const coords = parseFiniteLatLong(location);
+  if (!coords) return null;
 
-  const locationKey = `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-  const offsetCount = locationMap.get(locationKey) ?? 0;
-  locationMap.set(locationKey, offsetCount + 1);
+  const locationKey = `${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`;
+  const offsetCount = nextOffsetCount(locationKey, locationMap);
   const angle = offsetCount * 60 * (Math.PI / 180);
   const offsetDistance = 0.0001 * offsetCount;
 
   return new Point({
-    longitude: longitude + offsetDistance * Math.sin(angle),
-    latitude: latitude + offsetDistance * Math.cos(angle),
+    longitude: coords.longitude + offsetDistance * Math.sin(angle),
+    latitude: coords.latitude + offsetDistance * Math.cos(angle),
     spatialReference: { wkid: 4326 },
   });
 }

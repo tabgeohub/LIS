@@ -38,18 +38,27 @@ export function initArcgisToken(config?: ArcgisTokenConfig): void {
   cfg = resolved;
 }
 
+function isCacheFreshEnough(input: {
+  cache: NonNullable<Cached>;
+  now: number;
+  minTtlMs: number;
+}): boolean {
+  if (input.now >= input.cache.expires_at) return false;
+  if (input.minTtlMs <= 0) return true;
+  return input.cache.expires_at - input.now >= input.minTtlMs;
+}
+
 export async function getValidToken(): Promise<{
   access_token: string;
   expires_at: number;
 }> {
   if (!cfg) initArcgisToken();
   const now = Date.now();
-  if (cache && now < cache.expires_at) {
-    if (cfg!.minTtlMs > 0 && cache.expires_at - now < cfg!.minTtlMs) {
-      // force refresh when almost expired
-    } else {
-      return cache;
-    }
+  if (
+    cache &&
+    isCacheFreshEnough({ cache, now, minTtlMs: cfg!.minTtlMs })
+  ) {
+    return cache;
   }
   cache = await fetchArcgisTokenWithRetry();
   return cache!;

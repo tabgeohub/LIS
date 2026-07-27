@@ -1,29 +1,25 @@
-# Next focus status — Sigrid 20260727 huge wave (no Docker / Nginx)
+# Next focus status — Coupling Accept + complexity/interfacing clear
 
 ## Wave complete (local)
 
-Full-pack remediation against `all-findings-rijkswaterstaat-otg-lis-20260727`. Behavior-preserving; **no Dockerfile / Nginx edits**.
+Exports addressed:
+- [`module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv`](./module-coupling-findings-rijkswaterstaat-otg-lis-20260727(1).csv) — **Accept** (24)
+- [`unit-complexity-findings-rijkswaterstaat-otg-lis-20260727.csv`](./unit-complexity-findings-rijkswaterstaat-otg-lis-20260727.csv) — **code** (83 McCabe-6)
+- [`unit-interfacing-findings-rijkswaterstaat-otg-lis-20260727.csv`](./unit-interfacing-findings-rijkswaterstaat-otg-lis-20260727.csv) — **code** (~30 options-object) + Accept Express/Multer signatures
 
-### Part 1 — Dup HIGH → 0 (code)
+### Coupling — Accept only
 
-- `useWizardFilterStep2Buttons` now takes `store` + `mapView` (selection built inside) — Step2 FlightPlan/TemplateFlight clone cleared
-- BE [`devices-updates/types.ts`](../backend/src/routes/devices-updates/types.ts) no longer re-exports shared device types (only `AgentReportBody`); callers import from `backend/src/shared/devices`
+Checklist: [`SIGRID-COUPLING-ACCEPT-CHECKLIST.md`](./SIGRID-COUPLING-ACCEPT-CHECKLIST.md)  
+Includes HIGH `useLogAction` / `useContent` and all MEDIUM/LOW hubs. No hub rewrites.
 
-### Part 2 — Security / OSH
+### Complexity — McCabe 6 thinned
 
-- `react-router-dom` bumped to **6.30.4** (CWE-601 / CVE-2026-53668)
-- Docker CWE-266 + CWE-250 → **Accept only** (no Dockerfile edits)
+Batches A/B/C: helper extracts + early returns across ~80 units (deleteUser, map hover/click, centroid, auth2, timeslider, PDF tables, regio filter, arcgis proxy, etc.).
 
-### Part 3 — Accept ledger
+### Interfacing — options objects
 
-- [`ACCEPT-LIST.md`](./ACCEPT-LIST.md) rebased to full 20260727 pack
-- [`SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) — **178** items (143 indep + 24 coupling + 5 entanglement + 4 Docker security + 2 size)
-- Generator: `tools/gen-sigrid-20260727-full-accept-checklist.mjs`
-
-### Part 4 — Maintainability volume
-
-- McCabe 7 cluster thinned (`App` bootstrap helper, grantError, parseCsv, geometryHerhalen, query defaults, attachments, spoed validate, logEntry, template geometry)
-- ~20+ non-Express 3-param units → options objects (map layers, arcgis post, image gallery, legend sync, CSV accumulate, herhalen filters, wizard log step, etc.)
+Non-Express units collapsed to `input: { ... }` (bounding box, map source items, wizard cleanup, grantError, flightPlanExtraColumns, attachments helpers, etc.).  
+**Left as framework signatures (Accept):** Express `RequestHandler`, Multer `fileFilter`/`filename`.
 
 ## Verification
 
@@ -34,13 +30,11 @@ Full-pack remediation against `all-findings-rijkswaterstaat-otg-lis-20260727`. B
 
 ## Your next steps
 
-1. Apply [`SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) in Sigrid UI (~178 items) — primary Architecture lever
-2. Deploy this wave
-3. Rescan + export — expect Dup HIGH **0**, McCabe/interfacing polish, `react-router-dom` FIXED, Architecture toward green after Accept
+1. Accept [`SIGRID-COUPLING-ACCEPT-CHECKLIST.md`](./SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (+ Express/Multer interfacing rows listed there) in Sigrid UI
+2. Deploy → rescan → expect complexity/interfacing RAW drop; coupling cleared by Accept
 
-## Out of scope (unchanged)
+## Constraints held
 
-- Dockerfile / Nginx edits
-- Independence MEDIUM Core re-splits
-- Coupling fan-in rewrites (`useLogAction`, `useContent`)
-- LOC ≤21 vanity (698 LOW size)
+- No Dockerfile / Nginx edits
+- No `useLogAction` / `useContent` rewrites
+- No new Independence `*Core` façades

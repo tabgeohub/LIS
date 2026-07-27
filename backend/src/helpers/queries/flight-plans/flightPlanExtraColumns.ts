@@ -1,6 +1,8 @@
-export function flightPlanExtraColumns(
-  planAlias: string,
-  columns: readonly string[]
-): string {
-  return columns.map((column) => `${planAlias}.${column}`).join(",\n        ");
+export function flightPlanExtraColumns(options: {
+  planAlias: string;
+  columns: readonly string[];
+}): string {
+  return options.columns
+    .map((column) => `${options.planAlias}.${column}`)
+    .join(",\n        ");
 }

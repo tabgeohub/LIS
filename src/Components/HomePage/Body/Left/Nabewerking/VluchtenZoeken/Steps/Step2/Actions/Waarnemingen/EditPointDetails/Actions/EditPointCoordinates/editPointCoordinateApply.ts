@@ -20,21 +20,31 @@ export function applySelectedPointCoords(input: {
   return next;
 }
 
+type CoordinateSystemPatchSetters = {
+  setLongitude: (v: number) => void;
+  setLatitude: (v: number) => void;
+  setXCoordinaat_rd: (v: number) => void;
+  setYCoordinaat_rd: (v: number) => void;
+};
+
+function applyPatchField(
+  value: number | null | undefined,
+  setter: (v: number) => void
+) {
+  if (value != null) setter(value);
+}
+
 export function applyCoordinateSystemPatch(input: {
   coordinateSystem: string;
   longitude: number;
   latitude: number;
   xcoordinaat_rd: number;
   ycoordinaat_rd: number;
-  setLongitude: (v: number) => void;
-  setLatitude: (v: number) => void;
-  setXCoordinaat_rd: (v: number) => void;
-  setYCoordinaat_rd: (v: number) => void;
-}) {
+} & CoordinateSystemPatchSetters) {
   const patch = syncCoordsForCoordinateSystem(input);
   if (!patch) return;
-  if (patch.longitude != null) input.setLongitude(patch.longitude);
-  if (patch.latitude != null) input.setLatitude(patch.latitude);
-  if (patch.xcoordinaat_rd != null) input.setXCoordinaat_rd(patch.xcoordinaat_rd);
-  if (patch.ycoordinaat_rd != null) input.setYCoordinaat_rd(patch.ycoordinaat_rd);
+  applyPatchField(patch.longitude, input.setLongitude);
+  applyPatchField(patch.latitude, input.setLatitude);
+  applyPatchField(patch.xcoordinaat_rd, input.setXCoordinaat_rd);
+  applyPatchField(patch.ycoordinaat_rd, input.setYCoordinaat_rd);
 }

@@ -17,6 +17,19 @@ export const emptyAddUserForm: AddUserFormData = {
   role: "",
 };
 
+function createUserPayload(formData: AddUserFormData) {
+  return {
+    username: formData.username,
+    email: formData.email || undefined,
+    password: formData.password,
+    role: formData.role || undefined,
+  };
+}
+
+function toastCreateUserError(err: any) {
+  toast.error(err?.message || "Failed to create user");
+}
+
 export async function submitCreateUser(input: {
   formData: AddUserFormData;
   onSuccess: () => void;
@@ -27,17 +40,12 @@ export async function submitCreateUser(input: {
   }
 
   try {
-    await createKeycloakUser({
-      username: input.formData.username,
-      email: input.formData.email || undefined,
-      password: input.formData.password,
-      role: input.formData.role || undefined,
-    });
+    await createKeycloakUser(createUserPayload(input.formData));
     toast.success("User created successfully");
     setTimeout(() => input.onSuccess(), 1000);
     return true;
-  } catch (err: any) {
-    toast.error(err?.message || "Failed to create user");
+  } catch (err: unknown) {
+    toastCreateUserError(err);
     return false;
   }
 }

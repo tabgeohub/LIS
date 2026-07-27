@@ -36,18 +36,43 @@ interface PointsState {
   clearPoints: () => void;
 }
 
+function isBlankFilterValue(value: unknown): boolean {
+  return value === undefined || value === "";
+}
+
+function appendArrayFilterParam(input: {
+  params: Record<string, string | number>;
+  key: string;
+  value: unknown[];
+}): void {
+  if (input.value.length === 0) return;
+  input.params[input.key] = input.value.join(",");
+}
+
+function appendScalarFilterParam(input: {
+  params: Record<string, string | number>;
+  key: string;
+  value: unknown;
+}): void {
+  input.params[input.key] =
+    typeof input.value === "number" ? input.value : String(input.value);
+}
+
 function appendFilterParam(input: {
   params: Record<string, string | number>;
   key: string;
   value: unknown;
 }): void {
-  if (input.value === undefined || input.value === "") return;
+  if (isBlankFilterValue(input.value)) return;
   if (Array.isArray(input.value)) {
-    if (input.value.length > 0) input.params[input.key] = input.value.join(",");
+    appendArrayFilterParam({
+      params: input.params,
+      key: input.key,
+      value: input.value,
+    });
     return;
   }
-  input.params[input.key] =
-    typeof input.value === "number" ? input.value : String(input.value);
+  appendScalarFilterParam(input);
 }
 
 function buildPointsQueryParams(

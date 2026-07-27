@@ -18,18 +18,18 @@ export default function SelectedPointDetails() {
   const { setSelectedBottomTab } = useSelectedBottomTabState();
   const content = useContent();
   const labels = content.bottomSection.editPointTabs;
-  const selectAction = (
-    tab: Parameters<typeof setSelectedBottomTab>[0],
-    message: string
-  ) => () => {
-    setSelectedBottomTab(tab);
-    logAction({ message, step: "Selected point details" });
+  const selectAction = (options: {
+    tab: Parameters<typeof setSelectedBottomTab>[0];
+    message: string;
+  }) => () => {
+    setSelectedBottomTab(options.tab);
+    logAction({ message: options.message, step: "Selected point details" });
   };
   const actions = [
-    { label: labels.editPoint, onClick: selectAction("editSelectedPoint", "User clicked 'Aandachtspunt wijzigen' button") },
-    { label: labels.deletePoint, onClick: selectAction("deletePoint", "User clicked 'Delete point' button") },
-    { label: labels.viewObservations, onClick: selectAction("viewPlans", "User clicked 'View plans' button") },
-    { label: labels.addToPlan, onClick: selectAction("addToPlan", "User clicked 'Add to plan' button") },
+    { label: labels.editPoint, onClick: selectAction({ tab: "editSelectedPoint", message: "User clicked 'Aandachtspunt wijzigen' button" }) },
+    { label: labels.deletePoint, onClick: selectAction({ tab: "deletePoint", message: "User clicked 'Delete point' button" }) },
+    { label: labels.viewObservations, onClick: selectAction({ tab: "viewPlans", message: "User clicked 'View plans' button" }) },
+    { label: labels.addToPlan, onClick: selectAction({ tab: "addToPlan", message: "User clicked 'Add to plan' button" }) },
   ];
   const handleClose = () => {
     setSelectedBottomTab("Kaartlagenlijst");

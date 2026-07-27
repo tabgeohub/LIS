@@ -4,8 +4,12 @@ const cache = new Map<string, CachedAdminToken>();
 export const ADMIN_TOKEN_EXPIRY_SKEW_MS = 30_000;
 export const ADMIN_TOKEN_FALLBACK_TTL_MS = 60_000;
 
-export function getCachedAdminToken(profile: string, now = Date.now()) {
-  const cached = cache.get(profile);
+export function getCachedAdminToken(options: {
+  profile: string;
+  now?: number;
+}) {
+  const now = options.now ?? Date.now();
+  const cached = cache.get(options.profile);
   return cached && cached.expiresAtMs > now ? cached.token : undefined;
 }
 

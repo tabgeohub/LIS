@@ -2,10 +2,14 @@ import type { Request } from "express";
 import { ALLOWED_ARCGIS_HOSTS } from "../../config/allowlist";
 import { decodeMaybeEncodedUrl, extractTargetUrlFromRequest } from "./proxyShared";
 
-function extractUrlFromFormBody(req: Request): string | null {
-  if (!Buffer.isBuffer(req.body) || req.body.length === 0) return null;
+function isUrlEncodedFormBody(req: Request): boolean {
+  if (!Buffer.isBuffer(req.body) || req.body.length === 0) return false;
   const contentType = req.headers["content-type"] || "";
-  if (!contentType.includes("application/x-www-form-urlencoded")) return null;
+  return contentType.includes("application/x-www-form-urlencoded");
+}
+
+function extractUrlFromFormBody(req: Request): string | null {
+  if (!isUrlEncodedFormBody(req)) return null;
 
   const urlParam = new URLSearchParams(req.body.toString("utf8")).get("url");
   return urlParam ? decodeMaybeEncodedUrl(urlParam) : null;

@@ -36,7 +36,7 @@ export default function Buttons() {
         {
           label: labels.annuleren,
           onClick: withLog("User clicked 'Cancel' button", () =>
-            runWizardCleanup([() => handleCancel(), clear])
+            runWizardCleanup({ actions: [() => handleCancel(), clear] })
           ),
         },
       ]}

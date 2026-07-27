@@ -5,6 +5,16 @@ import {
 } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 import { FlightPlanType } from "Types";
 
+function canShowPlanHover(input: {
+  mapView: __esri.MapView | null | undefined;
+  graphicsLayerHover: __esri.GraphicsLayer | null | undefined;
+  graphicsLayer: __esri.GraphicsLayer | null | undefined;
+}): boolean {
+  return Boolean(
+    input.mapView && input.graphicsLayerHover && input.graphicsLayer
+  );
+}
+
 /** Hover highlight used by FlightPlansTable + searched FlightPlansList. */
 export function showPlanSearchListHover(input: {
   plan: FlightPlanType;
@@ -13,18 +23,18 @@ export function showPlanSearchListHover(input: {
   graphicsLayer: __esri.GraphicsLayer | null | undefined;
   originalGraphic: __esri.Graphic | undefined;
 }) {
-  if (!input.mapView || !input.graphicsLayerHover || !input.graphicsLayer) {
+  if (!canShowPlanHover(input)) {
     return;
   }
   if (input.originalGraphic) {
-    input.graphicsLayer.remove(input.originalGraphic);
+    input.graphicsLayer!.remove(input.originalGraphic);
   }
-  input.graphicsLayerHover.removeAll();
-  const hoverGraphic = createPlanBoundingBoxGraphic(
-    getFlightPlanPoints(input.plan),
-    { symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hoverSearchList }
-  );
+  input.graphicsLayerHover!.removeAll();
+  const hoverGraphic = createPlanBoundingBoxGraphic({
+    points: getFlightPlanPoints(input.plan),
+    symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.hoverSearchList,
+  });
   if (hoverGraphic) {
-    input.graphicsLayerHover.add(hoverGraphic);
+    input.graphicsLayerHover!.add(hoverGraphic);
   }
 }

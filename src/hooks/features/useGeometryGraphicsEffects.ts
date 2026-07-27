@@ -14,6 +14,31 @@ export function shouldSkipDefaultGeometryRender(input: {
     input.flightPlanStep === 3 || input.flightPlanStep === 4;
 }
 
+function renderTimesliderGeometries(input: {
+  layer: __esri.GraphicsLayer;
+  geometries: Geometry[];
+  timesliderPlans: FinishedFlightPlanType[];
+}) {
+  if (input.timesliderPlans.length === 0) {
+    input.layer.removeAll();
+    return;
+  }
+  const { geometryIds } = getPointAndGeometryIdsFromPlans(input.timesliderPlans);
+  replaceGraphics(
+    input.layer,
+    buildGeometryMapGraphics(
+      input.geometries.filter((item) => geometryIds.has(item.id))
+    )
+  );
+}
+
+function canRenderGeometryGraphics(input: {
+  layer: __esri.GraphicsLayer | null;
+  userId?: number;
+}): input is { layer: __esri.GraphicsLayer; userId: number } {
+  return Boolean(input.layer && input.userId);
+}
+
 export function useGeometryGraphicsRendering(input: {
   layer: __esri.GraphicsLayer | null;
   geometries: Geometry[];
@@ -24,18 +49,35 @@ export function useGeometryGraphicsRendering(input: {
   flightPlanStep: number;
 }) {
   useEffect(() => {
-    if (!input.layer || !input.userId) return;
+    if (!canRenderGeometryGraphics(input)) return;
+
     if (input.selectedPage === "timeslider") {
-      if (input.timesliderPlans.length === 0) {
-        input.layer.removeAll();
-        return;
-      }
-      const { geometryIds } = getPointAndGeometryIdsFromPlans(input.timesliderPlans);
-      replaceGraphics(input.layer, buildGeometryMapGraphics(input.geometries.filter((item) => geometryIds.has(item.id))));
+      renderTimesliderGeometries({
+        layer: input.layer,
+        geometries: input.geometries,
+        timesliderPlans: input.timesliderPlans,
+      });
       return () => input.layer?.removeAll();
     }
-    if (shouldSkipDefaultGeometryRender({ ...input, geometriesCount: input.geometries.length })) return;
+
+    if (
+      shouldSkipDefaultGeometryRender({
+        ...input,
+        geometriesCount: input.geometries.length,
+      })
+    ) {
+      return;
+    }
+
     replaceGraphics(input.layer, buildGeometryMapGraphics(input.geometries));
     return () => input.layer?.removeAll();
-  }, [input.layer, input.geometries, input.userId, input.selectedPage, input.timesliderPlans, input.step, input.flightPlanStep]);
+  }, [
+    input.layer,
+    input.geometries,
+    input.userId,
+    input.selectedPage,
+    input.timesliderPlans,
+    input.step,
+    input.flightPlanStep,
+  ]);
 }

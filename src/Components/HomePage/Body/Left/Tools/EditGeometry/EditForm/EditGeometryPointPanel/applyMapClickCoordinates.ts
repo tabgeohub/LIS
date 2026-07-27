@@ -3,19 +3,13 @@ import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import type { PointFormState } from "../helpers/pointForm";
 import { toStr } from "./coords";
 
-export function readFiniteLonLat(
-  mapPoint: { longitude?: number; latitude?: number } | null | undefined
-): { lon: number; lat: number } | null {
-  const lon = mapPoint?.longitude;
-  const lat = mapPoint?.latitude;
-  if (
-    typeof lon !== "number" ||
-    typeof lat !== "number" ||
-    !Number.isFinite(lon) ||
-    !Number.isFinite(lat)
-  ) {
-    return null;
-  }
+export function readFiniteLonLat(options: {
+  mapPoint: { longitude?: number; latitude?: number } | null | undefined;
+}): { lon: number; lat: number } | null {
+  const lon = options.mapPoint?.longitude;
+  const lat = options.mapPoint?.latitude;
+  if (typeof lon !== "number" || typeof lat !== "number") return null;
+  if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
   return { lon, lat };
 }
 

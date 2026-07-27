@@ -93,12 +93,12 @@ export default function Buttons({
           {
             label: labels.vorige,
             onClick: withLog("User clicked 'Next' button", () =>
-              runWizardCleanup([
+              runWizardCleanup({ actions: [
                 () => setStep(3),
                 resetFilters,
                 () => yellowGraphicsLayer?.graphics.removeAll(),
                 () => yellowGeometriesGraphicsLayer?.graphics.removeAll(),
-              ])
+              ] })
             ),
           },
           {
@@ -114,12 +114,12 @@ export default function Buttons({
           {
             label: labels.annuleren,
             onClick: withLog("User clicked 'Cancel' button", () =>
-              runWizardCleanup([
+              runWizardCleanup({ actions: [
                 resetFeatures,
                 handleCancel,
                 resetFilters,
                 clear,
-              ])
+              ] })
             ),
           },
         ]}

@@ -16,12 +16,18 @@ export function createTemplateFlightClearSelectionGraphics(
  * Run TemplateFlight wizard cleanup steps, always ending with map graphics clear.
  * Shared by Step2 / Step3 previous + cancel handlers.
  */
-export function runTemplateFlightWizardCleanup(
-  steps: Array<() => void>,
-  clearGraphics: () => void,
-  clearSelectionGraphics: () => void
-) {
-  runWizardCleanup([...steps, clearGraphics, clearSelectionGraphics]);
+export function runTemplateFlightWizardCleanup(options: {
+  steps: Array<() => void>;
+  clearGraphics: () => void;
+  clearSelectionGraphics: () => void;
+}) {
+  runWizardCleanup({
+    actions: [
+      ...options.steps,
+      options.clearGraphics,
+      options.clearSelectionGraphics,
+    ],
+  });
 }
 
 /** Previous-step cleanup shared by TemplateFlight selection steps. */
@@ -35,17 +41,17 @@ export function runTemplateFlightPreviousCleanup(input: {
   clearGraphics: () => void;
   clearSelectionGraphics: () => void;
 }) {
-  runTemplateFlightWizardCleanup(
-    [
+  runTemplateFlightWizardCleanup({
+    steps: [
       () => input.setStep(input.previousStep),
       input.resetFilters,
       input.clearSelectedPoints,
       input.clearSelectedGeometries,
       input.resetFeatures,
     ],
-    input.clearGraphics,
-    input.clearSelectionGraphics
-  );
+    clearGraphics: input.clearGraphics,
+    clearSelectionGraphics: input.clearSelectionGraphics,
+  });
 }
 
 /** Cancel cleanup shared by TemplateFlight selection steps. */
@@ -76,9 +82,9 @@ export function runTemplateFlightCancelCleanup(input: {
         input.clear,
       ];
 
-  runTemplateFlightWizardCleanup(
+  runTemplateFlightWizardCleanup({
     steps,
-    input.clearGraphics,
-    input.clearSelectionGraphics
-  );
+    clearGraphics: input.clearGraphics,
+    clearSelectionGraphics: input.clearSelectionGraphics,
+  });
 }

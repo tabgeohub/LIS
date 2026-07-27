@@ -9,6 +9,11 @@ import {
   type FlightPlanRegioQueryInput,
 } from "./regionalFlightPlanQueryConfig";
 
+function isRegionalQueryEnabled(input: FlightPlanRegioQueryInput): boolean {
+  const explicitlyEnabled = input.enabled ?? true;
+  return explicitlyEnabled && enabledForRegio(input.regioId, input.userId);
+}
+
 /** Shared regio-scoped flight-plan query; not a public API surface. */
 export function useRegionalFlightPlans(
   kind: FlightPlanRegioKind,
@@ -19,7 +24,6 @@ export function useRegionalFlightPlans(
     queryKey: config.key(input.regioId ?? ""),
     queryFn: () =>
       fetchApi<FlightPlanType[]>(appendRegioQuery(config.path, input.regioId)),
-    enabled:
-      (input.enabled ?? true) && enabledForRegio(input.regioId, input.userId),
+    enabled: isRegionalQueryEnabled(input),
   });
 }

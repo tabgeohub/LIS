@@ -15,13 +15,19 @@ export type PointItemViewProps = {
   onItemClick?: () => void;
 };
 
+function hasAttachmentsArray(
+  point: PointItemPoint
+): point is PointItemPoint & { attachments: unknown[] } {
+  return "attachments" in point && Array.isArray(point.attachments);
+}
+
+function isValidAttachmentUrl(attachment: unknown): boolean {
+  if (attachment == null || typeof attachment !== "object") return false;
+  const url = (attachment as { url?: unknown }).url;
+  return typeof url === "string" && Boolean(url);
+}
+
 export function countPointAttachments(point: PointItemPoint) {
-  if (!("attachments" in point) || !Array.isArray(point.attachments)) return 0;
-  return point.attachments.filter(
-    (attachment) =>
-      attachment != null &&
-      typeof attachment === "object" &&
-      typeof (attachment as { url?: unknown }).url === "string" &&
-      Boolean((attachment as { url: string }).url)
-  ).length;
+  if (!hasAttachmentsArray(point)) return 0;
+  return point.attachments.filter(isValidAttachmentUrl).length;
 }

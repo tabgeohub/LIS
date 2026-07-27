@@ -13,7 +13,8 @@ function parseLatLongPair(
   location: string
 ): { lat: number; long: number } | null {
   const [lat, long] = location.split(",").map(Number);
-  if (isNaN(lat) || isNaN(long)) return null;
+  if (Number.isNaN(lat)) return null;
+  if (Number.isNaN(long)) return null;
   return { lat, long };
 }
 
@@ -25,17 +26,22 @@ function buildWgs84Point(lat: number, long: number): Point {
   });
 }
 
+function canNavigate(input: NavigateToLocationInput): boolean {
+  return Boolean(input.location && input.mapView);
+}
+
 export function navigateToLocation(input: NavigateToLocationInput) {
-  const { location, mapView, redGraphicsLayer } = input;
-  if (!location || !mapView) return;
+  if (!canNavigate(input)) return;
 
   try {
-    const coords = parseLatLongPair(location);
+    const coords = parseLatLongPair(input.location!);
     if (!coords) return;
 
     const point = buildWgs84Point(coords.lat, coords.long);
-    mapView.goTo({ target: point, zoom: 15 });
-    if (redGraphicsLayer) replaceImageLocationMarker(redGraphicsLayer, point);
+    input.mapView!.goTo({ target: point, zoom: 15 });
+    if (input.redGraphicsLayer) {
+      replaceImageLocationMarker(input.redGraphicsLayer, point);
+    }
   } catch (error) {
     console.error("Error parsing location:", error);
   }

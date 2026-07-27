@@ -1,3 +1,0 @@
-Description,Severity,Status,First Seen,Issue age,Lines of code,Redundant lines of code,Occurrences,Same file,Same component,Technology,Locations
-6 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-27,0,6,6,2,false,true,TypeScript,"src/Components/HomePage/Body/Left/Voorbereiding/FlightPlan/Steps/Step2/Buttons.tsx#L21:26,src/Components/HomePage/Body/Left/Voorbereiding/TemplateFlight/Steps/Step2/Buttons.tsx#L23:28"
-6 lines occurring 2 times in 2 files,HIGH,RAW,2026-07-27,0,6,6,2,false,false,TypeScript,"src/Types/devices.ts#L1:6,backend/src/routes/devices-updates/types.ts#L1:6"

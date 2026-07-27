@@ -7,6 +7,40 @@ import {
   type PointPlanImageRow,
 } from "api-hooks/planImages";
 
+function buildVluchtnummerByPlanId(
+  plans: Array<{ id: number; vluchtnummer?: string | null }>
+) {
+  const m = new Map<number, string>();
+  for (const p of plans) {
+    if (p.vluchtnummer) m.set(p.id, p.vluchtnummer);
+  }
+  return m;
+}
+
+function PanelStatusMessage(props: {
+  loading: boolean;
+  error: string | null;
+  imagesLength: number;
+  emptyMessage: string;
+}) {
+  if (props.loading) {
+    return <p className="text-[11px] text-gray-500">Laden...</p>;
+  }
+  if (props.error) {
+    return <p className="text-[11px] text-red-600">{props.error}</p>;
+  }
+  if (props.imagesLength === 0) {
+    return <p className="text-[11px] text-gray-500">{props.emptyMessage}</p>;
+  }
+  return null;
+}
+
+function clampActiveIndex(activeIndex: number, length: number): number {
+  if (length === 0) return 0;
+  if (activeIndex >= length) return length - 1;
+  return activeIndex;
+}
+
 export default function SelectedPlanImagesPanel({
   images,
   loading,
@@ -22,13 +56,10 @@ export default function SelectedPlanImagesPanel({
   const [activeIndex, setActiveIndex] = useState(0);
 
   const { plans } = useTimesliderState();
-  const vluchtnummerByPlanId = useMemo(() => {
-    const m = new Map<number, string>();
-    for (const p of plans) {
-      if (p.vluchtnummer) m.set(p.id, p.vluchtnummer);
-    }
-    return m;
-  }, [plans]);
+  const vluchtnummerByPlanId = useMemo(
+    () => buildVluchtnummerByPlanId(plans),
+    [plans]
+  );
 
   const attachments = useMemo(
     () => pointPlanImagesToAttachments(images),
@@ -40,10 +71,8 @@ export default function SelectedPlanImagesPanel({
   }, [attachments.length]);
 
   useEffect(() => {
-    if (activeIndex >= attachments.length && attachments.length > 0) {
-      setActiveIndex(attachments.length - 1);
-    }
-  }, [attachments.length, activeIndex]);
+    setActiveIndex((prev) => clampActiveIndex(prev, attachments.length));
+  }, [attachments.length]);
 
   const openGalleryAt = (imageId: number) => {
     const idx = attachments.findIndex((a) => a.id === imageId);
@@ -51,23 +80,22 @@ export default function SelectedPlanImagesPanel({
     setGalleryOpen(true);
   };
 
+  const showGrid = !loading && images.length > 0;
+
   return (
     <div className="space-y-2">
       <div>
         <p className="text-[11px] font-semibold text-gray-700">Afbeeldingen</p>
       </div>
 
-      {loading && <p className="text-[11px] text-gray-500">Laden...</p>}
+      <PanelStatusMessage
+        loading={loading}
+        error={error}
+        imagesLength={images.length}
+        emptyMessage={emptyMessage}
+      />
 
-      {error && !loading && (
-        <p className="text-[11px] text-red-600">{error}</p>
-      )}
-
-      {!loading && !error && images.length === 0 && (
-        <p className="text-[11px] text-gray-500">{emptyMessage}</p>
-      )}
-
-      {!loading && images.length > 0 && (
+      {showGrid && (
         <div className="grid grid-cols-3 gap-1.5">
           {images.map((img) => (
             <button

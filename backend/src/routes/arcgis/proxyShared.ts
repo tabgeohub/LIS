@@ -36,13 +36,21 @@ function isHttpUrlString(value: string): boolean {
   return HTTP_PREFIX_RE.test(decodeMaybeEncodedUrl(value));
 }
 
+function tryDecodeHttpUrl(value: string): string | null {
+  if (!isHttpUrlString(value)) return null;
+  return decodeMaybeEncodedUrl(value);
+}
+
 function findHttpUrlInQueryKeys(query: Record<string, unknown>): string | null {
   for (const key of Object.keys(query || {})) {
-    const value = query[key];
-    if (typeof value === "string" && isHttpUrlString(value)) {
-      return decodeMaybeEncodedUrl(value);
-    }
-    if (isHttpUrlString(key)) return decodeMaybeEncodedUrl(key);
+    const fromValue =
+      typeof query[key] === "string"
+        ? tryDecodeHttpUrl(query[key] as string)
+        : null;
+    if (fromValue) return fromValue;
+
+    const fromKey = tryDecodeHttpUrl(key);
+    if (fromKey) return fromKey;
   }
   return null;
 }

@@ -1,13 +1,25 @@
 type HerhalenValue = number | string | boolean | undefined | null;
 
+function matchesNumberHerhalen(value: number, herhalen: boolean): boolean {
+  return value === (herhalen ? 1 : 0);
+}
+
+function matchesStringHerhalen(value: string, herhalen: boolean): boolean {
+  return value === (herhalen ? "1" : "0");
+}
+
+function matchesBooleanHerhalen(value: HerhalenValue, herhalen: boolean): boolean {
+  return value === herhalen;
+}
+
 export function matchesHerhalen(herhalenValue: HerhalenValue, herhalen: boolean): boolean {
   if (typeof herhalenValue === "number") {
-    return herhalen ? herhalenValue === 1 : herhalenValue === 0;
+    return matchesNumberHerhalen(herhalenValue, herhalen);
   }
   if (typeof herhalenValue === "string") {
-    return herhalen ? herhalenValue === "1" : herhalenValue === "0";
+    return matchesStringHerhalen(herhalenValue, herhalen);
   }
-  return herhalen ? herhalenValue === true : herhalenValue === false;
+  return matchesBooleanHerhalen(herhalenValue, herhalen);
 }
 
 export function filterByHerhalen<T extends { herhalen?: HerhalenValue }>(

@@ -10,6 +10,18 @@ import {
   uploadFlightPathZip,
 } from "./exportFlightPathZip";
 
+function canExportFlightPath(
+  plan: FinishedFlightPlanType | null | undefined
+): plan is FinishedFlightPlanType {
+  if (!plan) return false;
+  if (plan.path == null) return false;
+  if (plan.path.length === 0) {
+    console.error("No flight path data available.");
+    return false;
+  }
+  return true;
+}
+
 export default function VliegrouteExporteren({
   setAction,
 }: {
@@ -35,14 +47,7 @@ export default function VliegrouteExporteren({
   const content = useContent();
 
   const exportFlightPath = async (): Promise<void> => {
-    if (!selectedPlan) return;
-
-    if (selectedPlan.path === null || selectedPlan.path === undefined) return;
-
-    if (selectedPlan.path.length === 0) {
-      console.error("No flight path data available.");
-      return;
-    }
+    if (!canExportFlightPath(selectedPlan)) return;
 
     try {
       const { blob, filename } = await buildFlightPathZipBlob(
@@ -50,7 +55,7 @@ export default function VliegrouteExporteren({
       );
       const result = await uploadFlightPathZip({ blob, filename });
       setDownloadInfo(result);
-    } catch (error) {
+    } catch {
       toast.error(
         content.nabewerking.vluchtenZoeken.step2.exportFlightPath.toasts
           .uploadFailed

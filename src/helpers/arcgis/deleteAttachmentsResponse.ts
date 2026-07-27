@@ -42,6 +42,12 @@ function firstFailedDeleteResult(
   return results.find((r) => r.success === false);
 }
 
+function failedDeleteDescription(
+  failed: NonNullable<ReturnType<typeof firstFailedDeleteResult>>
+): string {
+  return failed.error?.description || "";
+}
+
 export function assertDeleteAttachmentsSuccess(
   payload: FeatureDeleteAttachmentsResponse
 ): void {
@@ -52,7 +58,7 @@ export function assertDeleteAttachmentsSuccess(
   const failed = firstFailedDeleteResult(payload.deleteResults);
   if (!failed) return;
 
-  const description = failed.error?.description || "";
+  const description = failedDeleteDescription(failed);
   if (isBenignMissingAttachmentError(description)) return;
 
   throw new Error(description || "ArcGIS deleteAttachments mislukt");

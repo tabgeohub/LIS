@@ -50,6 +50,28 @@ export default function ImportVluchtPlan() {
     return orgMap.get(cleanLabel) ?? "";
   }
 
+  function applyImportSuccess(resp: BulkImportResponse) {
+    if (resp.points.length === 0) return;
+
+    if (!resp.ok) {
+      toast.error(
+        resp.message ??
+          content.voorbereiding.vluchtAanmaken.step1.toasts.importFailed
+      );
+      return;
+    }
+
+    toast.success(
+      content.voorbereiding.vluchtAanmaken.step1.toasts.importCompleted
+        .replace("{created}", String(resp.created))
+        .replace("{existing}", String(resp.existing))
+    );
+
+    const { herhalen, nietHerhalen } = splitImportedPointIds(resp.points);
+    setSelectedPoints(herhalen);
+    setSelectedPoints2(nietHerhalen);
+  }
+
   async function processImportedRows(rows: string[][]) {
     const pointObjects = mapImportRowsToPoints({
       rows,
@@ -65,35 +87,16 @@ export default function ImportVluchtPlan() {
     try {
       await create({
         data: { rows: pointObjects },
-        onSuccess: (resp) => {
-          if (resp.points.length === 0) return;
-
-          if (!resp.ok) {
-            toast.error(
-              resp.message ??
-                content.voorbereiding.vluchtAanmaken.step1.toasts.importFailed
-            );
-            return;
-          }
-
-          toast.success(
-            content.voorbereiding.vluchtAanmaken.step1.toasts.importCompleted
-              .replace("{created}", String(resp.created))
-              .replace("{existing}", String(resp.existing))
-          );
-
-          const { herhalen, nietHerhalen } = splitImportedPointIds(resp.points);
-          setSelectedPoints(herhalen);
-          setSelectedPoints2(nietHerhalen);
-        },
+        onSuccess: applyImportSuccess,
         disableErrorMessage: true,
         disableSuccessMessage: true,
       });
       resetFeatures();
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : undefined;
       toast.error(
-        message ?? content.voorbereiding.vluchtAanmaken.step1.toasts.fetchError
+        e instanceof Error
+          ? e.message
+          : content.voorbereiding.vluchtAanmaken.step1.toasts.fetchError
       );
     }
   }

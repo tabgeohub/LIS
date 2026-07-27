@@ -1,6 +1,22 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { toggleGeometrySelection } from "./geometryHerhalen";
 
+function geometryIdFromHitTest(
+  hitTestResults: __esri.HitTestResult
+): number | null {
+  const existingFeature = hitTestResults.results.find(
+    (result) => (result as __esri.GraphicHit).graphic
+  );
+  const attributes = (existingFeature as __esri.GraphicHit | undefined)
+    ?.graphic?.attributes;
+
+  if (!attributes || attributes.type !== "geometry" || !attributes.geometryId) {
+    return null;
+  }
+
+  return attributes.geometryId as number;
+}
+
 export async function selectGeometryFromMapClick(input: {
   mapView: __esri.MapView;
   event: __esri.ViewClickEvent;
@@ -10,19 +26,10 @@ export async function selectGeometryFromMapClick(input: {
 }): Promise<void> {
   input.event.stopPropagation();
   const hitTestResults = await input.mapView.hitTest(input.event);
-  const existingFeature = hitTestResults.results.find(
-    (result) => (result as __esri.GraphicHit).graphic
-  );
-  const attributes = (existingFeature as __esri.GraphicHit | undefined)
-    ?.graphic?.attributes;
+  const geometryId = geometryIdFromHitTest(hitTestResults);
+  if (geometryId == null) return;
 
-  if (!attributes || attributes.type !== "geometry" || !attributes.geometryId) {
-    return;
-  }
-
-  const geometry = input.geometries.find(
-    (item) => item.id === attributes.geometryId
-  );
+  const geometry = input.geometries.find((item) => item.id === geometryId);
   if (!geometry) return;
 
   input.setSelectedGeometries(

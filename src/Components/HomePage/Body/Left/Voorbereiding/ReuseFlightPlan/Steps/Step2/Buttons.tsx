@@ -74,11 +74,11 @@ export default function Buttons() {
           {
             label: labels.vorige,
             onClick: () =>
-              runWizardCleanup([
+              runWizardCleanup({ actions: [
                 () => graphicsLayer?.graphics.removeAll(),
                 () => setStep(1),
                 clear,
-              ]),
+              ] }),
           },
           {
             label: labels.opslaan,
@@ -87,7 +87,7 @@ export default function Buttons() {
           },
           {
             label: labels.annuleren,
-            onClick: () => runWizardCleanup([() => handleCancel(), clear]),
+            onClick: () => runWizardCleanup({ actions: [() => handleCancel(), clear] }),
           },
         ]}
       />

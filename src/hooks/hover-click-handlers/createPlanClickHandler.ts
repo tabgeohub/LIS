@@ -16,7 +16,8 @@ export function createPlanClickHandler(
       if (!graphicsLayer) return;
       setSelectedPlan(plan);
       graphicsLayer.removeAll();
-      const graphic = createPlanBoundingBoxGraphic(getFlightPlanPoints(plan), {
+      const graphic = createPlanBoundingBoxGraphic({
+        points: getFlightPlanPoints(plan),
         symbolOptions: PLAN_BOUNDING_BOX_SYMBOLS.click,
       });
       if (graphic) graphicsLayer.add(graphic);

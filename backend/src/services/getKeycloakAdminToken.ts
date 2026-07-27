@@ -10,7 +10,7 @@ import { parseKeycloakAdminTokenResponse } from "./parseKeycloakAdminTokenRespon
 export async function getKeycloakAdminToken(req: any): Promise<string> {
   ensureUndiciCorporateProxy();
   const context = createKeycloakAdminContext(req);
-  const cached = getCachedAdminToken(context.profile);
+  const cached = getCachedAdminToken({ profile: context.profile });
   if (cached) return cached;
 
   const response = await requestAdminTokenWithRetry({

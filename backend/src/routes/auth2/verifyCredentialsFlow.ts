@@ -9,18 +9,30 @@ export type VerifyLookupDecision =
   | { kind: "otp_required" }
   | { kind: "attempt_password_grant"; otpStatusUnknown: boolean };
 
+function isNotFoundLookup(lookup: KeycloakUserLookupResult): boolean {
+  return !lookup.ok && lookup.reason === "not_found";
+}
+
+function hasConfirmedOtp(lookup: KeycloakUserLookupResult): boolean {
+  return Boolean(lookup.ok && lookup.hasOtp === true);
+}
+
+function isOtpStatusUnknown(lookup: KeycloakUserLookupResult): boolean {
+  return !lookup.ok || lookup.hasOtp === null;
+}
+
 export function classifyVerifyLookup(
   lookup: KeycloakUserLookupResult
 ): VerifyLookupDecision {
-  if (!lookup.ok && lookup.reason === "not_found") {
+  if (isNotFoundLookup(lookup)) {
     return { kind: "invalid_username" };
   }
-  if (lookup.ok && lookup.hasOtp === true) {
+  if (hasConfirmedOtp(lookup)) {
     return { kind: "otp_required" };
   }
   return {
     kind: "attempt_password_grant",
-    otpStatusUnknown: !lookup.ok || lookup.hasOtp === null,
+    otpStatusUnknown: isOtpStatusUnknown(lookup),
   };
 }
 

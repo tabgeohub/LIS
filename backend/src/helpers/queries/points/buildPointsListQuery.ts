@@ -15,6 +15,16 @@ type QueryBuildResult = {
   params: unknown[];
 };
 
+function normalizeStatusList(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value.join(",") : String(value).trim();
+  if (raw.toLowerCase() === "all") return [];
+  if (raw.length === 0) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 class PointsFilterBuilder {
   private readonly conditions: string[] = [];
   private readonly params: unknown[] = [];
@@ -70,14 +80,7 @@ class PointsFilterBuilder {
   addStatus(value: unknown) {
     if (value === undefined) return;
 
-    const raw = Array.isArray(value) ? value.join(",") : String(value).trim();
-    if (raw.toLowerCase() === "all" || raw.length === 0) return;
-
-    const statusList = raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
+    const statusList = normalizeStatusList(value);
     if (statusList.length > 0) {
       this.pushParam("status = ANY($idx)", statusList);
     }
