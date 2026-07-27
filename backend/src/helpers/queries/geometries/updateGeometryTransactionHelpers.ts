@@ -45,14 +45,14 @@ export async function updateGeometryMetadataAndPoints(
   return { ok: true, geometryRow: geometryUpdate.rows[0] };
 }
 
-export async function fetchGeometryWithPoints(
-  client: PoolClient,
-  geometryId: number,
-  geometryRow: Record<string, unknown>
-) {
-  const pointsResult = await client.query(
+export async function fetchGeometryWithPoints(input: {
+  client: PoolClient;
+  geometryId: number;
+  geometryRow: Record<string, unknown>;
+}) {
+  const pointsResult = await input.client.query(
     `SELECT * FROM lis.points WHERE geometry_id = $1 ORDER BY id ASC`,
-    [geometryId]
+    [input.geometryId]
   );
-  return { ...geometryRow, points: pointsResult.rows };
+  return { ...input.geometryRow, points: pointsResult.rows };
 }

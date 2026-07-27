@@ -22,7 +22,7 @@ export default function Step1() {
   const { filteredPlans } = useFinishedPlansState();
 
   // Filter and sort plans
-  useFilterAndSortPlans(plans, filterTerm);
+  useFilterAndSortPlans({ plans, filterTerm });
 
   return (
     <div className="h-full">

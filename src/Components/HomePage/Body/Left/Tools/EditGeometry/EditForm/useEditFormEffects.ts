@@ -25,15 +25,15 @@ export function useResetEditFormOnGeometryChange(input: {
   }, [geometry.id]);
 }
 
-export function useClearVerticesOnMetadata(
-  screen: EditFormScreen,
-  setHoveredVertexId: (id: number | null) => void,
-  setSelectedVertexId: (id: number | null) => void
-) {
+export function useClearVerticesOnMetadata(input: {
+  screen: EditFormScreen;
+  setHoveredVertexId: (id: number | null) => void;
+  setSelectedVertexId: (id: number | null) => void;
+}) {
   useEffect(() => {
-    if (screen === "metadata") {
-      setHoveredVertexId(null);
-      setSelectedVertexId(null);
+    if (input.screen === "metadata") {
+      input.setHoveredVertexId(null);
+      input.setSelectedVertexId(null);
     }
-  }, [screen, setHoveredVertexId, setSelectedVertexId]);
+  }, [input.screen, input.setHoveredVertexId, input.setSelectedVertexId]);
 }

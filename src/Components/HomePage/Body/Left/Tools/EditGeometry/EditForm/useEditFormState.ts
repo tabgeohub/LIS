@@ -57,10 +57,10 @@ export function useEditFormState(geometry: Geometry) {
     setHoveredVertexId: state.setHoveredVertexId,
     setSelectedVertexId: state.setSelectedVertexId,
   });
-  useClearVerticesOnMetadata(
-    state.screen,
-    state.setHoveredVertexId,
-    state.setSelectedVertexId
-  );
+  useClearVerticesOnMetadata({
+    screen: state.screen,
+    setHoveredVertexId: state.setHoveredVertexId,
+    setSelectedVertexId: state.setSelectedVertexId,
+  });
   return state;
 }

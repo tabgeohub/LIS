@@ -22,7 +22,7 @@ export function useRemoveFlightPlanModel() {
   });
 
   const allPlans = useMemo(
-    () => visibleRemovePlans(plans, showAllPlans),
+    () => visibleRemovePlans({ plans, showAllPlans }),
     [plans, showAllPlans]
   );
 

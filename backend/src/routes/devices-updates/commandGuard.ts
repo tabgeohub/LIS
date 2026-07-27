@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { DeviceCommand } from "./types";
+import type { DeviceCommand } from "../../shared/devices";
 import {
   getDeviceById,
   queueDeviceCommand,

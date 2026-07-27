@@ -42,7 +42,13 @@ async function executeReturningUpdate(input: {
 
   try {
     const result = await runQuery();
-    if (shouldReportNotFound(result, requireReturnedRow, config)) {
+    if (
+      shouldReportNotFound({
+        result,
+        requireReturnedRow,
+        config,
+      })
+    ) {
       notFound(res, config.notFoundMessage!);
       return;
     }
@@ -57,13 +63,15 @@ async function executeReturningUpdate(input: {
   }
 }
 
-function shouldReportNotFound(
-  result: QueryResult,
-  requireReturnedRow: boolean,
-  config: UpdateExecutionConfig
-): boolean {
+function shouldReportNotFound(input: {
+  result: QueryResult;
+  requireReturnedRow: boolean;
+  config: UpdateExecutionConfig;
+}): boolean {
   return Boolean(
-    requireReturnedRow && result.rows.length === 0 && config.notFoundMessage
+    input.requireReturnedRow &&
+      input.result.rows.length === 0 &&
+      input.config.notFoundMessage
   );
 }
 

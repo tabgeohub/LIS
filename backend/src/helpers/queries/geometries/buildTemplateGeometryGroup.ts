@@ -4,21 +4,29 @@ type RawPoint = Record<string, unknown> & {
   geometry_omschrijving?: string | null;
 };
 
+function asStringOrNull(value: unknown): string | null {
+  return (value as string | null) ?? null;
+}
+
+function asPoints(value: unknown): Record<string, unknown>[] {
+  return (value as Record<string, unknown>[]) ?? [];
+}
+
 export function buildTemplateGeometryFromFullData(
   geometryId: number,
   fullGeometryData: Record<string, unknown>
 ) {
   return {
     id: geometryId,
-    type: (fullGeometryData.type as string | null) ?? null,
-    omschrijving: (fullGeometryData.omschrijving as string | null) ?? null,
+    type: asStringOrNull(fullGeometryData.type),
+    omschrijving: asStringOrNull(fullGeometryData.omschrijving),
     organisatie: fullGeometryData.organisatie,
     vertrouwelijk: fullGeometryData.vertrouwelijk,
     herhalen: fullGeometryData.herhalen,
     activiteit: fullGeometryData.activiteit,
     specifiek_letten_op: fullGeometryData.specifiek_letten_op,
     regio_id: fullGeometryData.regio_id,
-    points: (fullGeometryData.points as Record<string, unknown>[]) ?? [],
+    points: asPoints(fullGeometryData.points),
   };
 }
 

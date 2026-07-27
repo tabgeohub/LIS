@@ -20,15 +20,43 @@ type GrantErrorLike = {
   response?: { body?: { error?: string; error_description?: string } };
 };
 
+function firstString(
+  ...values: Array<string | undefined | null>
+): string {
+  for (const value of values) {
+    if (value) return value;
+  }
+  return "";
+}
+
+function toOptional(value: string): string | undefined {
+  return value || undefined;
+}
+
+function readBodyField(
+  body: { error?: string; error_description?: string } | undefined,
+  key: "error" | "error_description"
+): string | undefined {
+  if (!body) return undefined;
+  return body[key];
+}
+
+function readResponseBody(err: GrantErrorLike) {
+  if (!err.response) return undefined;
+  return err.response.body;
+}
+
 function readDirectGrantError(error: unknown) {
-  const err = error as GrantErrorLike;
-  const messageText = String(err?.message || "");
-  const body = err?.response?.body;
+  const err = (error ?? {}) as GrantErrorLike;
+  const body = readResponseBody(err);
   return {
-    errorCode: err?.error || body?.error || "",
-    errorDescription:
-      err?.error_description || body?.error_description || err?.message || "",
-    messageText,
+    errorCode: firstString(err.error, readBodyField(body, "error")),
+    errorDescription: firstString(
+      err.error_description,
+      readBodyField(body, "error_description"),
+      err.message
+    ),
+    messageText: firstString(err.message),
   };
 }
 
@@ -54,15 +82,19 @@ function readEmbeddedGrantError(messageText: string) {
 export function extractGrantError(error: unknown): GrantErrorDetails {
   const direct = readDirectGrantError(error);
   const embedded = readEmbeddedGrantError(direct.messageText);
-  const errorCode = direct.errorCode || embedded.errorCode;
-  const errorDescription =
-    direct.errorDescription || embedded.errorDescription;
+  const errorCode = firstString(direct.errorCode, embedded.errorCode);
+  const errorDescription = firstString(
+    direct.errorDescription,
+    embedded.errorDescription
+  );
 
   return {
-    error: errorCode || undefined,
-    error_description: errorDescription || undefined,
-    message: String(
-      errorDescription || direct.messageText || "Unknown grant error"
+    error: toOptional(errorCode),
+    error_description: toOptional(errorDescription),
+    message: firstString(
+      errorDescription,
+      direct.messageText,
+      "Unknown grant error"
     ),
   };
 }

@@ -34,20 +34,20 @@ export function placeClickPointGraphic(input: {
   }
 }
 
-export function patchCoordsFromLonLat(
-  lon: number,
-  lat: number,
-  patch: (p: Partial<PointFormState>) => void
-) {
+export function patchCoordsFromLonLat(input: {
+  lon: number;
+  lat: number;
+  patch: (p: Partial<PointFormState>) => void;
+}) {
   const transformed = getTransformedCoordinates({
     fromProjection: "WGS84",
     toProjection: "RD",
-    x: lon,
-    y: lat,
+    x: input.lon,
+    y: input.lat,
   });
-  patch({
-    longitude: toStr(lon),
-    latitude: toStr(lat),
+  input.patch({
+    longitude: toStr(input.lon),
+    latitude: toStr(input.lat),
     xcoordinaat_rd: toStr(transformed.x),
     ycoordinaat_rd: toStr(transformed.y),
   });

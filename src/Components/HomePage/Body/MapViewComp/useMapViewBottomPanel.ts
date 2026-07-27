@@ -10,7 +10,10 @@ export function useMapViewBottomPanel(input: {
 }) {
   const s = useBottomPanelState(input.openAllTable);
   useSyncPanelVh(input.openAllTable, s.setPanelVh);
-  useBottomPanelDragListeners(s.dragRef, s.setPanelVh);
+  useBottomPanelDragListeners({
+    dragRef: s.dragRef,
+    setPanelVh: s.setPanelVh,
+  });
   useBottomContainerSize({
     openTable: input.openTable,
     panelVh: s.panelVh,

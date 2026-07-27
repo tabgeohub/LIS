@@ -28,7 +28,7 @@ export default function useMapClickToUpdateCoordinates({
         mapView,
         redGraphicsLayer,
       });
-      patchCoordsFromLonLat(coords.lon, coords.lat, patch);
+      patchCoordsFromLonLat({ lon: coords.lon, lat: coords.lat, patch });
     });
 
     return () => {

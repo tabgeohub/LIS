@@ -12,7 +12,7 @@ export function useWizardButtons(step: string) {
   const content = useContent();
 
   const logStep = useMemo(
-    () => createWizardLogStep(logAction, step),
+    () => createWizardLogStep({ logAction, step }),
     [logAction, step]
   );
   const withLog = useMemo(() => createWizardWithLog(logStep), [logStep]);

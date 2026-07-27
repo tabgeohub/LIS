@@ -40,19 +40,22 @@ type SplitPointsOptions<T> = {
   addPointToGeometry: (group: T, point: RawPoint) => void;
 };
 
-function assignPointToGeometryGroup<T>(
-  point: RawPoint,
-  geometriesMap: Map<number, T>,
-  options: SplitPointsOptions<T>
-): void {
-  const geometryId = point.geometry_id!;
-  if (!geometriesMap.has(geometryId)) {
-    geometriesMap.set(
+function assignPointToGeometryGroup<T>(input: {
+  point: RawPoint;
+  geometriesMap: Map<number, T>;
+  options: SplitPointsOptions<T>;
+}): void {
+  const geometryId = input.point.geometry_id!;
+  if (!input.geometriesMap.has(geometryId)) {
+    input.geometriesMap.set(
       geometryId,
-      options.createGeometryGroup(point, geometryId)
+      input.options.createGeometryGroup(input.point, geometryId)
     );
   }
-  options.addPointToGeometry(geometriesMap.get(geometryId)!, point);
+  input.options.addPointToGeometry(
+    input.geometriesMap.get(geometryId)!,
+    input.point
+  );
 }
 
 function splitPointsByGeometry<T>(
@@ -67,7 +70,7 @@ function splitPointsByGeometry<T>(
       standalonePoints.push(stripGeometryFields(point));
       return;
     }
-    assignPointToGeometryGroup(point, geometriesMap, options);
+    assignPointToGeometryGroup({ point, geometriesMap, options });
   });
 
   return {

@@ -10,11 +10,19 @@ export function useWaarnemingenFilteredCollections(
   value: string
 ) {
   const filteredPoints = useMemo(
-    () => filterWaarnemingenPoints(selectedPlan?.points_data, value),
+    () =>
+      filterWaarnemingenPoints({
+        pointsData: selectedPlan?.points_data,
+        value,
+      }),
     [value, selectedPlan?.points_data]
   );
   const filteredGeometries = useMemo(
-    () => filterWaarnemingenGeometries(selectedPlan?.geometries, value),
+    () =>
+      filterWaarnemingenGeometries({
+        geometries: selectedPlan?.geometries,
+        value,
+      }),
     [value, selectedPlan?.geometries]
   );
   return { filteredPoints, filteredGeometries };

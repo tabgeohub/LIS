@@ -17,7 +17,7 @@ export default function createMapView(mapDiv: RefObject<HTMLDivElement>) {
     polygon: bounds.polygon,
   });
   const layers = createMapGraphicsLayers();
-  addAndOrderMapGraphicsLayers(map, layers);
+  addAndOrderMapGraphicsLayers({ map, layers });
 
   return {
     map,

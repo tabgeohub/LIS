@@ -14,10 +14,10 @@ export function createMapGraphicsLayers() {
   };
 }
 
-export function addAndOrderMapGraphicsLayers(
-  map: Map,
-  layers: ReturnType<typeof createMapGraphicsLayers>
-) {
+export function addAndOrderMapGraphicsLayers(input: {
+  map: Map;
+  layers: ReturnType<typeof createMapGraphicsLayers>;
+}) {
   const {
     pointsGraphicsLayer,
     yellowGraphicsLayer,
@@ -27,7 +27,7 @@ export function addAndOrderMapGraphicsLayers(
     graphicsLayerHover,
     redGraphicsLayer,
     selectedPointGraphicsLayer,
-  } = layers;
+  } = input.layers;
 
   const overlayOrder = [
     graphicsLayerHover,
@@ -39,8 +39,8 @@ export function addAndOrderMapGraphicsLayers(
     selectedPointGraphicsLayer,
   ];
 
-  map.addMany([pointsGraphicsLayer, ...overlayOrder]);
+  input.map.addMany([pointsGraphicsLayer, ...overlayOrder]);
   overlayOrder.forEach((layer, offset) =>
-    map.layers.reorder(layer, map.layers.length - 1 - offset)
+    input.map.layers.reorder(layer, input.map.layers.length - 1 - offset)
   );
 }

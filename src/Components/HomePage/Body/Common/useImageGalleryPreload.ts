@@ -2,11 +2,12 @@ import { useEffect } from "react";
 import type { AttachmentType } from "Types/finished_plans";
 import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 
-export function useImageGalleryPreload(
-  isOpen: boolean,
-  attachments: AttachmentType[],
-  activeIndex: number
-) {
+export function useImageGalleryPreload(input: {
+  isOpen: boolean;
+  attachments: AttachmentType[];
+  activeIndex: number;
+}) {
+  const { isOpen, attachments, activeIndex } = input;
   useEffect(() => {
     if (!isOpen || attachments.length <= 1) return;
     const preload = (url: string) => {

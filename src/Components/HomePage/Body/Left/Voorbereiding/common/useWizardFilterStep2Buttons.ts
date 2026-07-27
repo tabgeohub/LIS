@@ -1,43 +1,37 @@
 import { useFilterStepWizardSelection } from "./useFilterStepWizardSelection";
 import type { WizardSelectionGraphics } from "./wizardFilterStepSelection";
+import { buildWizardStep2Selection } from "./buildWizardStep2Selection";
 
-type WizardStep2SelectionStore = {
+export { buildWizardStep2Selection } from "./buildWizardStep2Selection";
+
+type WizardStep2Store = {
   selectedGraphics: __esri.Graphic[];
   setSelectedGraphics: (graphics: __esri.Graphic[]) => void;
   hoveredGraphic: __esri.Graphic | null;
   setHoveredGraphic: (graphic: __esri.Graphic | null) => void;
+  step: number;
+  setStep: (value: number) => void;
 };
-
-/** Build the shared Step2 selection bag from a wizard store + mapView. */
-export function buildWizardStep2Selection(
-  store: WizardStep2SelectionStore,
-  mapView: __esri.MapView | null
-): WizardSelectionGraphics {
-  return {
-    mapView,
-    selectedGraphics: store.selectedGraphics,
-    setSelectedGraphics: store.setSelectedGraphics,
-    hoveredGraphic: store.hoveredGraphic,
-    setHoveredGraphic: store.setHoveredGraphic,
-  };
-}
 
 /** Shared Step2 filter wizard button actions for FlightPlan / TemplateFlight. */
 export function useWizardFilterStep2Buttons(input: {
   setOpenFilter: (value: boolean) => void;
-  selection: WizardSelectionGraphics;
-  step: number;
-  setStep: (value: number) => void;
+  store: WizardStep2Store;
+  mapView: __esri.MapView | null;
   resetFilters: () => void;
   clearYellowLayers: () => void;
   buildPrevious: (clearSelectionGraphics: () => void) => () => void;
   buildCancel: (clearSelectionGraphics: () => void) => () => void;
 }) {
+  const selection: WizardSelectionGraphics = buildWizardStep2Selection(
+    input.store,
+    input.mapView
+  );
   const { labels, withLog, clearSelectionGraphics, handleNext } =
     useFilterStepWizardSelection({
-      selection: input.selection,
-      step: input.step,
-      setStep: input.setStep,
+      selection,
+      step: input.store.step,
+      setStep: input.store.setStep,
       resetFilters: input.resetFilters,
       clearYellowLayers: input.clearYellowLayers,
     });

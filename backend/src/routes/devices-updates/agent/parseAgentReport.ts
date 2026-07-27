@@ -1,4 +1,5 @@
-import type { AgentReportBody, DeviceCommand, DeviceStatus } from "../types";
+import type { AgentReportBody } from "../types";
+import type { DeviceCommand, DeviceStatus } from "../../../shared/devices";
 
 const VALID_STATUSES = new Set<DeviceStatus>([
   "unknown",

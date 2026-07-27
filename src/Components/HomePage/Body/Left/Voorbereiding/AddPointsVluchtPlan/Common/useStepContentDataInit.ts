@@ -26,7 +26,10 @@ export function useStepContentDataInit(input: {
     input.setFilteredPoints(availablePoints);
 
     const nextGeometries = dbGeometries.filter((geometry) =>
-      matchesHerhalenValue(geometry.herhalen, input.herhalen)
+      matchesHerhalenValue({
+        geometryHerhalen: geometry.herhalen,
+        herhalen: input.herhalen,
+      })
     );
     setGeometries(nextGeometries);
     input.setFilteredGeometries(nextGeometries);

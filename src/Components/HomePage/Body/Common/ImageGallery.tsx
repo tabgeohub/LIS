@@ -41,7 +41,7 @@ export default function ImageGallery({
         : "",
     [attachments, activeIndex]
   );
-  useImageGalleryPreload(isOpen, attachments, activeIndex);
+  useImageGalleryPreload({ isOpen, attachments, activeIndex });
 
   if (attachments.length === 0) return null;
 

@@ -4,13 +4,13 @@ import type { PointCorePayloadFields } from "Types/pointCoreFields";
 
 export type PointUpdateFormFields = PointCorePayloadFields;
 
-export function buildPointCorePayload(
-  fields: PointUpdateFormFields,
-  overrides: Partial<PointUpdateFormFields> = {}
-) {
+export function buildPointCorePayload(input: {
+  fields: PointUpdateFormFields;
+  overrides?: Partial<PointUpdateFormFields>;
+}) {
   return {
-    ...pickPointCoreFields(fields),
-    ...overrides,
+    ...pickPointCoreFields(input.fields),
+    ...input.overrides,
   };
 }
 
@@ -20,7 +20,7 @@ export function buildPointUpdatePayload(input: {
   created_at?: string;
 }) {
   return {
-    ...buildPointCorePayload(input.fields),
+    ...buildPointCorePayload({ fields: input.fields }),
     herhalen: input.fields.herhalen ? 1 : 0,
     datum: input.created_at,
     id: input.id,

@@ -1,4 +1,5 @@
-import type { AgentReportBody, DeviceCommand } from "./types";
+import type { AgentReportBody } from "./types";
+import type { DeviceCommand } from "../../shared/devices";
 import { resolveReportedDeviceStatus } from "./agent/parseAgentReport";
 
 export type ApplyAgentReportParams = {

@@ -33,7 +33,7 @@ export function useLegendLayers(
     [layers, user.role]
   );
   const uniqueRegioCodes = useMemo(() => getUniqueRegioCodes(layers), [layers]);
-  useLegendLayerSyncEffects(setLayers, selectedLayers, options);
+  useLegendLayerSyncEffects({ setLayers, selectedLayers, options });
   const isVisibleForRole =
     user.role === "admin" ||
     uniqueRegioCodes.some((role) => role === user.role);

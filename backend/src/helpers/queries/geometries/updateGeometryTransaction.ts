@@ -23,10 +23,10 @@ export async function runGeometryUpdateTransaction(
 
   return {
     ok: true as const,
-    result: await fetchGeometryWithPoints(
-      input.client,
-      input.geometryId,
-      updated.geometryRow
-    ),
+    result: await fetchGeometryWithPoints({
+      client: input.client,
+      geometryId: input.geometryId,
+      geometryRow: updated.geometryRow,
+    }),
   };
 }

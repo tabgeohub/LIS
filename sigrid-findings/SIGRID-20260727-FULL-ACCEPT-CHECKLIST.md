@@ -1,8 +1,10 @@
-# Sigrid-20260727 Accept checklist
+# Sigrid-20260727 FULL Accept checklist
 
-Apply in Sigrid UI. Source: `sigrid-findings/*-20260727*` (independence + coupling).
+Apply in Sigrid UI. Source: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260727`.
 
-Duplication HIGH findings are **code-fixed** in this wave (shared FE/BE module + Step2 + dead `public/index.html`) — do not Accept those; expect FIXED on rescan.
+**Code-fixed (do not Accept):** remaining Dup HIGH (Step2 + devices), `react-router-dom` CWE-601.
+
+**Out of scope code:** Docker/Nginx — Accept only.
 
 ## Summary
 
@@ -10,7 +12,10 @@ Duplication HIGH findings are **code-fixed** in this wave (shared FE/BE module +
 | --- | --- |
 | Independence | 143 |
 | Module coupling | 24 |
-| **Total** | **167** |
+| Entanglement | 5 |
+| Security Docker | 4 |
+| Size Accept | 2 |
+| **Total** | **178** |
 
 ## Independence HIGH
 
@@ -72,24 +77,24 @@ Duplication HIGH findings are **code-fixed** in this wave (shared FE/BE module +
 43. [ ] `src/hooks/hover-click-handlers/useEditGeometryVerticesOnMap.ts` (30 LOC)
 44. [ ] `src/hooks/flightPlan/flightPlanStandardSelectProps.ts` (30 LOC)
 45. [ ] `src/helpers/ArcGISHelpers/flightPlanMapActions.ts` (30 LOC)
-46. [ ] `src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts` (30 LOC)
-47. [ ] `src/hooks/features/useRenderGeometries.ts` (30 LOC)
-48. [ ] `backend/src/configure/configureBodyParsersAndSwagger.ts` (29 LOC)
-49. [ ] `src/hooks/flightPlan/assembleFlightPlanCreateAttributes.ts` (29 LOC)
-50. [ ] `src/hooks/features/useRenderPoints.ts` (29 LOC)
-51. [ ] `src/hooks/hover-click-handlers/useFeatureLayerLabels.ts` (28 LOC)
-52. [ ] `src/helpers/points/buildPointUpdatePayload.ts` (28 LOC)
-53. [ ] `src/hooks/popUpModal/useHandleClosePopUp.ts` (28 LOC)
-54. [ ] `src/hooks/points/useHerhalenSelectionHandlers.ts` (28 LOC)
-55. [ ] `src/hooks/features/useHoverPointsAndGeometries.ts` (26 LOC)
-56. [ ] `src/hooks/features/useResetPointFilters.ts` (26 LOC)
-57. [ ] `src/helpers/ArcGISHelpers/createMapView.ts` (25 LOC)
-58. [ ] `src/hooks/filters/useFilterPoints.ts` (25 LOC)
-59. [ ] `src/helpers/ArcGISHelpers/createYellowBorder.ts` (25 LOC)
-60. [ ] `src/hooks/flightPlan/buildFlightPlanPayloadFields.ts` (24 LOC)
-61. [ ] `src/hooks/wizard/useWizardButtons.ts` (24 LOC)
-62. [ ] `src/helpers/ArcGISHelpers/getTransformedCoordinates.ts` (24 LOC)
-63. [ ] `src/hooks/wizard/clearMapSelectionGraphics.ts` (24 LOC)
+46. [ ] `src/hooks/features/useRenderGeometries.ts` (30 LOC)
+47. [ ] `backend/src/configure/configureBodyParsersAndSwagger.ts` (29 LOC)
+48. [ ] `src/hooks/flightPlan/assembleFlightPlanCreateAttributes.ts` (29 LOC)
+49. [ ] `src/hooks/features/useRenderPoints.ts` (29 LOC)
+50. [ ] `src/hooks/hover-click-handlers/useFeatureLayerLabels.ts` (28 LOC)
+51. [ ] `src/helpers/points/buildPointUpdatePayload.ts` (28 LOC)
+52. [ ] `src/hooks/popUpModal/useHandleClosePopUp.ts` (28 LOC)
+53. [ ] `src/hooks/points/useHerhalenSelectionHandlers.ts` (28 LOC)
+54. [ ] `src/hooks/features/useHoverPointsAndGeometries.ts` (26 LOC)
+55. [ ] `src/hooks/features/useResetPointFilters.ts` (26 LOC)
+56. [ ] `src/helpers/ArcGISHelpers/createMapView.ts` (25 LOC)
+57. [ ] `src/hooks/filters/useFilterPoints.ts` (25 LOC)
+58. [ ] `src/helpers/ArcGISHelpers/createYellowBorder.ts` (25 LOC)
+59. [ ] `src/hooks/flightPlan/buildFlightPlanPayloadFields.ts` (24 LOC)
+60. [ ] `src/hooks/wizard/useWizardButtons.ts` (24 LOC)
+61. [ ] `src/helpers/ArcGISHelpers/getTransformedCoordinates.ts` (24 LOC)
+62. [ ] `src/hooks/wizard/clearMapSelectionGraphics.ts` (24 LOC)
+63. [ ] `src/hooks/flightPlan/pickFlightPlanPersistenceFields.ts` (24 LOC)
 64. [ ] `src/hooks/hover-click-handlers/useDrawYellowMarkers.ts` (22 LOC)
 65. [ ] `src/helpers/filterPlans.ts` (22 LOC)
 66. [ ] `src/helpers/ArcGISHelpers/finishedPlanMapGraphics.ts` (22 LOC)
@@ -187,3 +192,23 @@ Duplication HIGH findings are **code-fixed** in this wave (shared FE/BE module +
 22. [ ] `src/api/fetchApi.ts` — fan-in 13 (LOW)
 23. [ ] `src/hooks/wizard/useWizardCleanup.ts` — fan-in 13 (LOW)
 24. [ ] `src/helpers/classNames.ts` — fan-in 20 (LOW)
+
+## Entanglement
+
+1. [ ] High communication density on src/api-hooks (MEDIUM)
+2. [ ] Moderate communication density on src/helpers (LOW)
+3. [ ] Moderate communication density on src/hooks (LOW)
+4. [ ] Moderate communication density on src/Components/HomePage (LOW)
+5. [ ] Moderate communication density on src/Components/TimesliderItemDetailPage (LOW)
+
+## Security Docker (Accept — no Dockerfile edits)
+
+1. [ ] `dockerfile#L22` — CWE-266
+2. [ ] `backend/dockerfile#L4` — CWE-266
+3. [ ] `backend/dockerfile#L85` — CWE-250
+4. [ ] `dockerfile#L32` — CWE-250
+
+## Size Accept
+
+1. [ ] `backend/dockerfile#L1:86` — 59 lines of code for unit dockerfile
+2. [ ] `backend/scripts/verify-regio-apis.ts#L59:117` — 56 lines of code for unit verify-regio-apis.ts.testResolveRegioFilter()

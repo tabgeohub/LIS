@@ -1,4 +1,4 @@
-import type { GetacDevice, DeviceCommand, DeviceStatus } from "./types";
+import type { GetacDevice, DeviceCommand, DeviceStatus } from "../../shared/devices";
 
 function toIsoStringOrNull(value: unknown): string | null {
   return value ? new Date(String(value)).toISOString() : null;

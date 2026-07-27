@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 import useLogAction from "hooks/useLogAction";
 
-export function createWizardLogStep(
-  logAction: ReturnType<typeof useLogAction>,
-  step: string
-) {
+export function createWizardLogStep(input: {
+  logAction: ReturnType<typeof useLogAction>;
+  step: string;
+}) {
   return (message: string, newData?: unknown) => {
-    logAction({
+    input.logAction({
       message,
-      step,
+      step: input.step,
       ...(newData !== undefined ? { newData } : {}),
     });
   };

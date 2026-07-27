@@ -1,9 +1,6 @@
 import { pool } from "../../db";
-import type {
-  AgentReportBody,
-  DeviceCommand,
-  GetacDevice,
-} from "./types";
+import type { AgentReportBody } from "./types";
+import type { DeviceCommand, GetacDevice } from "../../shared/devices";
 import { upsertRegisteredDevice } from "./upsertRegisteredDevice";
 import { mapGetacDeviceRow } from "./mapGetacDeviceRow";
 import { buildApplyAgentReportQuery } from "./applyAgentReportSql";

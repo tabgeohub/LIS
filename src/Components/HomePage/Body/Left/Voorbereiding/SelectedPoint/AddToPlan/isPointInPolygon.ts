@@ -19,16 +19,21 @@ export function ringBoundingBox(ring: number[][]): {
   return { minX, maxX, minY, maxY };
 }
 
-export function pointInRingRayCast(x: number, y: number, ring: number[][]): boolean {
+export function pointInRingRayCast(input: {
+  x: number;
+  y: number;
+  ring: number[][];
+}): boolean {
   let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const xi = ring[i][0];
-    const yi = ring[i][1];
-    const xj = ring[j][0];
-    const yj = ring[j][1];
+  for (let i = 0, j = input.ring.length - 1; i < input.ring.length; j = i++) {
+    const xi = input.ring[i][0];
+    const yi = input.ring[i][1];
+    const xj = input.ring[j][0];
+    const yj = input.ring[j][1];
 
     const intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      yi > input.y !== yj > input.y &&
+      input.x < ((xj - xi) * (input.y - yi)) / (yj - yi) + xi;
 
     if (intersect) {
       inside = !inside;
@@ -45,5 +50,5 @@ export function isPointInPolygon(point: __esri.Point, ring: number[][]): boolean
     return false;
   }
 
-  return pointInRingRayCast(x, y, ring);
+  return pointInRingRayCast({ x, y, ring });
 }

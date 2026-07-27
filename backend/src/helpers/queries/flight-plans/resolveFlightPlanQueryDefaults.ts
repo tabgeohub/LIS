@@ -17,6 +17,10 @@ export type BuildFlightPlanQueryOptions = {
   orderBy?: string;
 };
 
+function withDefault<T>(value: T | null | undefined, fallback: T): T {
+  return value ?? fallback;
+}
+
 function defaultPlanAlias(
   planTable: string,
   planAlias?: string
@@ -28,23 +32,21 @@ function defaultPlanAlias(
 function defaultRegioFilter(
   regioFilter?: RegioFilterOptions
 ): RegioFilterOptions {
-  return (
-    regioFilter ?? {
-      when: "truthy" as const,
-      caseInsensitiveAdmin: true,
-    }
-  );
+  return withDefault(regioFilter, {
+    when: "truthy" as const,
+    caseInsensitiveAdmin: true,
+  });
 }
 
-function defaultOrderBy(
-  planAlias: string,
-  columnPreset: FlightPlanColumnPreset,
-  orderBy?: string
-): string {
-  if (orderBy) return orderBy;
-  return columnPreset === "template"
-    ? `${planAlias}.id`
-    : `${planAlias}.created_at DESC`;
+function defaultOrderBy(input: {
+  planAlias: string;
+  columnPreset: FlightPlanColumnPreset;
+  orderBy?: string;
+}): string {
+  if (input.orderBy) return input.orderBy;
+  return input.columnPreset === "template"
+    ? `${input.planAlias}.id`
+    : `${input.planAlias}.created_at DESC`;
 }
 
 function resolveFlightPlanQueryScalars(
@@ -52,25 +54,25 @@ function resolveFlightPlanQueryScalars(
   planAlias: string
 ) {
   return {
-    includeGeometryJoin: options.includeGeometryJoin ?? false,
+    includeGeometryJoin: withDefault(options.includeGeometryJoin, false),
     where: options.where,
-    params: options.params ?? [],
+    params: withDefault(options.params, [] as unknown[]),
     regio_id: options.regio_id,
     regioColumn: options.regioColumn,
     regioFilter: defaultRegioFilter(options.regioFilter),
-    groupBy: options.groupBy ?? `${planAlias}.id`,
-    orderBy: defaultOrderBy(
+    groupBy: withDefault(options.groupBy, `${planAlias}.id`),
+    orderBy: defaultOrderBy({
       planAlias,
-      options.columnPreset,
-      options.orderBy
-    ),
+      columnPreset: options.columnPreset,
+      orderBy: options.orderBy,
+    }),
   };
 }
 
 export function resolveFlightPlanQueryDefaults(
   options: BuildFlightPlanQueryOptions
 ) {
-  const planTable = options.planTable ?? "lis.flightPlans";
+  const planTable = withDefault(options.planTable, "lis.flightPlans" as const);
   const planAlias = defaultPlanAlias(planTable, options.planAlias);
 
   return {

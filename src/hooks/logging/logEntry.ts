@@ -31,13 +31,12 @@ function resolveLogActionFields(input: LogActionInput) {
 }
 
 function resolveLogContextFields(context: LogContext) {
-  const { userId, userName, userRole, selectedTab, selectedPage } = context;
   return {
-    userId: userId ?? null,
-    userName: userName ?? null,
-    userRole: userRole ?? null,
-    tab: selectedTab,
-    page: selectedPage,
+    userId: coalesceNull(context.userId),
+    userName: coalesceNull(context.userName),
+    userRole: coalesceNull(context.userRole),
+    tab: context.selectedTab,
+    page: context.selectedPage,
   };
 }
 

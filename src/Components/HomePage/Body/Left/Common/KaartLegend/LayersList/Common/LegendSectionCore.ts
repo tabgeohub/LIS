@@ -40,14 +40,16 @@ function resolveParentSetter(
   return onChange ?? internalSetter;
 }
 
-function resolveParentGate(
-  parentTitle: string | undefined,
-  parentChecked: boolean,
-  externalParentChecked: boolean | undefined
-): { gatedByParent: boolean; parentGateChecked: boolean | undefined } {
+function resolveParentGate(input: {
+  parentTitle: string | undefined;
+  parentChecked: boolean;
+  externalParentChecked: boolean | undefined;
+}): { gatedByParent: boolean; parentGateChecked: boolean | undefined } {
   const gatedByParent =
-    parentTitle != null || externalParentChecked !== undefined;
-  const parentGateChecked = parentTitle ? parentChecked : externalParentChecked;
+    input.parentTitle != null || input.externalParentChecked !== undefined;
+  const parentGateChecked = input.parentTitle
+    ? input.parentChecked
+    : input.externalParentChecked;
   return { gatedByParent, parentGateChecked };
 }
 
@@ -128,11 +130,11 @@ function useLegendSectionLayers(input: {
   nestedParentChecked: boolean;
   setNestedParentChecked: (checked: boolean) => void;
 }) {
-  const { gatedByParent, parentGateChecked } = resolveParentGate(
-    input.props.parentTitle,
-    input.parentChecked,
-    input.props.externalParentChecked
-  );
+  const { gatedByParent, parentGateChecked } = resolveParentGate({
+    parentTitle: input.props.parentTitle,
+    parentChecked: input.parentChecked,
+    externalParentChecked: input.props.externalParentChecked,
+  });
   return useLegendLayers(
     input.props.initialLayers,
     buildUseLegendLayersOptions({

@@ -31,6 +31,10 @@ export async function buildAndSendSpoedReport(input: {
 
     input.res.status(200).json({ message: "Email sent!" });
   } catch (err: unknown) {
-    respondSpoedReportError(input.res, err, requestId);
+    respondSpoedReportError({
+      res: input.res,
+      err,
+      requestId,
+    });
   }
 }

@@ -65,18 +65,21 @@ export async function buildAndMailSpoedArtifacts(
   return { ok: true };
 }
 
-export function respondSpoedReportError(
-  res: Response,
-  err: unknown,
-  requestId: string
-): void {
-  const payload = buildErrorPayload(err, requestId);
+export function respondSpoedReportError(input: {
+  res: Response;
+  err: unknown;
+  requestId: string;
+}): void {
+  const payload = buildErrorPayload(input.err, input.requestId);
   if (SMTP_NETWORK_ERROR.test(payload.code || "")) {
     // @ts-ignore
     payload.hint =
       "SMTP relay unreachable. Check outbound firewall/egress, proxy, DNS, or relay allow-lists.";
   }
-  console.error("[/emails/sendEmail] Error", { requestId, err });
+  console.error("[/emails/sendEmail] Error", {
+    requestId: input.requestId,
+    err: input.err,
+  });
   const status = SMTP_NETWORK_ERROR.test(payload.code || "") ? 502 : 500;
-  res.status(status).json({ error: payload });
+  input.res.status(status).json({ error: payload });
 }

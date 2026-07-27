@@ -35,12 +35,12 @@ export function useRemoveFlightPlanFilterEffects(input: {
   }, []);
 }
 
-export function visibleRemovePlans(
-  plans: FlightPlanType[] | undefined,
-  showAllPlans: boolean
-) {
-  if (showAllPlans) return plans;
-  return plans?.filter(
+export function visibleRemovePlans(input: {
+  plans: FlightPlanType[] | undefined;
+  showAllPlans: boolean;
+}) {
+  if (input.showAllPlans) return input.plans;
+  return input.plans?.filter(
     (plan) => plan.status !== "finished" && plan.status !== "in-progress"
   );
 }

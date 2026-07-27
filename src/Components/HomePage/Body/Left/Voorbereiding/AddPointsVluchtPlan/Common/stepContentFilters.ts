@@ -1,17 +1,17 @@
 import { Geometry } from "hooks/features/useGeometriesStore";
 
-export function matchesHerhalenValue(
-  geometryHerhalen: Geometry["herhalen"] | string,
-  herhalen: boolean
-): boolean {
-  const herhalenValue = herhalen ? 1 : 0;
-  if (typeof geometryHerhalen === "number") {
-    return geometryHerhalen === herhalenValue;
+export function matchesHerhalenValue(input: {
+  geometryHerhalen: Geometry["herhalen"] | string;
+  herhalen: boolean;
+}): boolean {
+  const herhalenValue = input.herhalen ? 1 : 0;
+  if (typeof input.geometryHerhalen === "number") {
+    return input.geometryHerhalen === herhalenValue;
   }
-  if (typeof geometryHerhalen === "string") {
-    return geometryHerhalen === String(herhalenValue);
+  if (typeof input.geometryHerhalen === "string") {
+    return input.geometryHerhalen === String(herhalenValue);
   }
-  return geometryHerhalen === herhalen;
+  return input.geometryHerhalen === input.herhalen;
 }
 
 export function filterPointsForStepContent<

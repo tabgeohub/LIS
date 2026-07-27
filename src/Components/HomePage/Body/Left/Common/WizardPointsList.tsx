@@ -21,15 +21,17 @@ export type WizardPointsListProps = {
   header?: ReactNode;
 };
 
-function togglePointInList(
-  pointId: number,
-  selectedPoints: number[],
-  setSelectedPoints: (value: number[]) => void
-) {
-  if (selectedPoints.includes(pointId)) {
-    setSelectedPoints(selectedPoints.filter((id) => id !== pointId));
+function togglePointInList(input: {
+  pointId: number;
+  selectedPoints: number[];
+  setSelectedPoints: (value: number[]) => void;
+}) {
+  if (input.selectedPoints.includes(input.pointId)) {
+    input.setSelectedPoints(
+      input.selectedPoints.filter((id) => id !== input.pointId)
+    );
   } else {
-    setSelectedPoints([...selectedPoints, pointId]);
+    input.setSelectedPoints([...input.selectedPoints, input.pointId]);
   }
 }
 
@@ -61,7 +63,11 @@ export default function WizardPointsList({
         }
         return;
       }
-      togglePointInList(point.id, selectedPoints, setSelectedPoints);
+      togglePointInList({
+        pointId: point.id,
+        selectedPoints,
+        setSelectedPoints,
+      });
     },
     [itemClick, selectedPoints, setSelectedPoints]
   );
@@ -124,7 +130,11 @@ export default function WizardPointsList({
           onMouseLeave={onMouseLeave}
           onCheckboxClick={(e) => {
             e.stopPropagation();
-            togglePointInList(point.id, selectedPoints, setSelectedPoints);
+            togglePointInList({
+              pointId: point.id,
+              selectedPoints,
+              setSelectedPoints,
+            });
           }}
           onItemClick={() => handlePointClick(point)}
         />

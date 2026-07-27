@@ -44,11 +44,12 @@ function syncSelectedLayerIds(input: {
   );
 }
 
-export function useLegendLayerSyncEffects(
-  setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>,
-  selectedLayers: string[],
-  options: LegendLayerSyncOptions
-) {
+export function useLegendLayerSyncEffects(input: {
+  setLayers: Dispatch<SetStateAction<LegendLayerDefinition[]>>;
+  selectedLayers: string[];
+  options: LegendLayerSyncOptions;
+}) {
+  const { setLayers, selectedLayers, options } = input;
   useEffect(() => {
     syncExternalParentUnchecked({ setLayers, options });
   }, [options.externalParentChecked]);

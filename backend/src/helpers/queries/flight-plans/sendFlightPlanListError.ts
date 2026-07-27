@@ -7,14 +7,14 @@ type FlightPlanListResolvedErrorOptions = {
   includeErrorField: boolean;
 };
 
-function buildFlightPlanErrorMessage(
-  errorMessage: string,
-  errText: string,
-  appendErrorToMessage: boolean
-): string {
-  if (!appendErrorToMessage) return errorMessage;
-  const sep = errorMessage.endsWith(":") ? " " : ": ";
-  return `${errorMessage}${sep}${errText}`;
+function buildFlightPlanErrorMessage(input: {
+  errorMessage: string;
+  errText: string;
+  appendErrorToMessage: boolean;
+}): string {
+  if (!input.appendErrorToMessage) return input.errorMessage;
+  const sep = input.errorMessage.endsWith(":") ? " " : ": ";
+  return `${input.errorMessage}${sep}${input.errText}`;
 }
 
 export function sendFlightPlanListError(
@@ -27,11 +27,11 @@ export function sendFlightPlanListError(
   console.error(input.errorLogLabel, errText);
   input.res.status(500).json({
     result: null,
-    message: buildFlightPlanErrorMessage(
-      input.errorMessage,
+    message: buildFlightPlanErrorMessage({
+      errorMessage: input.errorMessage,
       errText,
-      input.appendErrorToMessage
-    ),
+      appendErrorToMessage: input.appendErrorToMessage,
+    }),
     ...(input.includeErrorField ? { error: errText } : {}),
   });
 }

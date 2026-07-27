@@ -22,8 +22,14 @@ describe("step content filters", () => {
   });
 
   it("matches numeric, string and boolean geometry values", () => {
-    expect(matchesHerhalenValue(1, true)).toBe(true);
-    expect(matchesHerhalenValue("0", false)).toBe(true);
-    expect(matchesHerhalenValue(false, false)).toBe(true);
+    expect(
+      matchesHerhalenValue({ geometryHerhalen: 1, herhalen: true })
+    ).toBe(true);
+    expect(
+      matchesHerhalenValue({ geometryHerhalen: "0", herhalen: false })
+    ).toBe(true);
+    expect(
+      matchesHerhalenValue({ geometryHerhalen: false, herhalen: false })
+    ).toBe(true);
   });
 });

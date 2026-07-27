@@ -62,23 +62,23 @@ function readForwardableBody(req: Request): Buffer | undefined {
   return req.body as Buffer;
 }
 
-async function dispatchArcgisPost(
-  req: Request,
-  targetUrl: string,
-  accessToken: string
-) {
-  if (hasUrlencodedBody(req)) {
+async function dispatchArcgisPost(input: {
+  req: Request;
+  targetUrl: string;
+  accessToken: string;
+}) {
+  if (hasUrlencodedBody(input.req)) {
     return postUrlencodedToArcgis({
-      targetUrl,
-      body: req.body as Buffer,
-      accessToken,
+      targetUrl: input.targetUrl,
+      body: input.req.body as Buffer,
+      accessToken: input.accessToken,
     });
   }
   return postBodyToArcgis({
-    targetUrl,
-    contentType: req.headers["content-type"] || "",
-    body: readForwardableBody(req),
-    accessToken,
+    targetUrl: input.targetUrl,
+    contentType: input.req.headers["content-type"] || "",
+    body: readForwardableBody(input.req),
+    accessToken: input.accessToken,
   });
 }
 
@@ -89,7 +89,11 @@ export async function forwardArcgisPostRequest(req: Request) {
   }
 
   const { access_token } = await getValidToken();
-  const arcgisRes = await dispatchArcgisPost(req, validation.targetUrl, access_token);
+  const arcgisRes = await dispatchArcgisPost({
+    req,
+    targetUrl: validation.targetUrl,
+    accessToken: access_token,
+  });
   const buf = Buffer.from(await arcgisRes.arrayBuffer());
   return {
     ok: true as const,

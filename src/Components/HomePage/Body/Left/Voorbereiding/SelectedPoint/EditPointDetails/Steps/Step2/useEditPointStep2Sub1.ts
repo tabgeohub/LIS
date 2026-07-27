@@ -24,6 +24,6 @@ export function useEditPointStep2Sub1(props: EditPointMapStepProps) {
   return {
     ...editPointStep2Sub1Labels,
     isLoading: props.isLoading,
-    ...buildEditPointStep2Sub1Handlers(props, logAction),
+    ...buildEditPointStep2Sub1Handlers({ props, logAction }),
   };
 }

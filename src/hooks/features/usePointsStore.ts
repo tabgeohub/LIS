@@ -36,17 +36,18 @@ interface PointsState {
   clearPoints: () => void;
 }
 
-function appendFilterParam(
-  params: Record<string, string | number>,
-  key: string,
-  value: unknown
-): void {
-  if (value === undefined || value === "") return;
-  if (Array.isArray(value)) {
-    if (value.length > 0) params[key] = value.join(",");
+function appendFilterParam(input: {
+  params: Record<string, string | number>;
+  key: string;
+  value: unknown;
+}): void {
+  if (input.value === undefined || input.value === "") return;
+  if (Array.isArray(input.value)) {
+    if (input.value.length > 0) input.params[input.key] = input.value.join(",");
     return;
   }
-  params[key] = typeof value === "number" ? value : String(value);
+  input.params[input.key] =
+    typeof input.value === "number" ? input.value : String(input.value);
 }
 
 function buildPointsQueryParams(
@@ -58,7 +59,7 @@ function buildPointsQueryParams(
     ...filters,
   };
   Object.entries(mergedFilters).forEach(([key, value]) => {
-    appendFilterParam(params, key, value);
+    appendFilterParam({ params, key, value });
   });
   return params;
 }

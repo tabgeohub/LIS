@@ -5,14 +5,14 @@ import { useBindFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans
 /**
  * Hook to filter and sort plans based on filter criteria
  */
-export function useFilterAndSortPlans(
-  plans: FinishedFlightPlanType[] | undefined,
-  filterTerm: string
-) {
+export function useFilterAndSortPlans(input: {
+  plans: FinishedFlightPlanType[] | undefined;
+  filterTerm: string;
+}) {
   const finished = useFinishedPlansState();
   useBindFilteredSortedPlans({
-    plans,
-    filterText: filterTerm,
+    plans: input.plans,
+    filterText: input.filterTerm,
     source: finished,
   });
 }

@@ -1,25 +1,25 @@
 import { sortPointsByImageCount } from "@helpers/points/sortPointsByImageCount";
 import type { FinishedFlightPlanType } from "Types/finished_plans";
 
-export function filterWaarnemingenPoints(
-  pointsData: FinishedFlightPlanType["points_data"] | undefined,
-  value: string
-) {
-  if (!pointsData) return [];
+export function filterWaarnemingenPoints(input: {
+  pointsData: FinishedFlightPlanType["points_data"] | undefined;
+  value: string;
+}) {
+  if (!input.pointsData) return [];
   return sortPointsByImageCount(
-    pointsData.filter((point) =>
-      point.omschrijving.toLowerCase().includes(value.toLowerCase())
+    input.pointsData.filter((point) =>
+      point.omschrijving.toLowerCase().includes(input.value.toLowerCase())
     )
   );
 }
 
-export function filterWaarnemingenGeometries(
-  geometries: FinishedFlightPlanType["geometries"] | undefined,
-  value: string
-) {
-  if (!geometries) return [];
-  const searchTerm = value.toLowerCase();
-  return geometries.filter((geometry) => {
+export function filterWaarnemingenGeometries(input: {
+  geometries: FinishedFlightPlanType["geometries"] | undefined;
+  value: string;
+}) {
+  if (!input.geometries) return [];
+  const searchTerm = input.value.toLowerCase();
+  return input.geometries.filter((geometry) => {
     const omschrijving = geometry.geometry_omschrijving?.toLowerCase() || "";
     return omschrijving.includes(searchTerm);
   });

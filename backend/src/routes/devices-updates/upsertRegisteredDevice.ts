@@ -1,5 +1,5 @@
 import { pool } from "../../db";
-import type { GetacDevice } from "./types";
+import type { GetacDevice } from "../../shared/devices";
 import { mapGetacDeviceRow } from "./mapGetacDeviceRow";
 
 type RegisterDeviceInput = {

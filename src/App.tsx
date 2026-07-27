@@ -12,6 +12,7 @@ import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";
 import InstallationsPage from "Components/InstallationsPage";
 import DevicesUpdatesPage from "Components/DevicesUpdatesPage";
 import PostLoginRedirect from "Components/Common/PostLoginRedirect";
+import { applyAuthMeBootstrap } from "./bootstrapAuthMe";
 
 export default function App() {
   const { setUser } = useAuth();
@@ -24,23 +25,7 @@ export default function App() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data?.pendingClientPath) {
-          setPendingClientPath(data.pendingClientPath);
-        }
-
-        if (!data || !data.user || !data.user.sub) return;
-
-        setUser({
-          role: data.roles.realm.find(
-            (item: string) =>
-              item.includes("RWS ") ||
-              item.includes("EXT ") ||
-              item.includes("admin")
-          ),
-          user_id: data.user.sub,
-          user_name: data.user.username,
-          email: data.user.email,
-        });
+        applyAuthMeBootstrap(data, { setPendingClientPath, setUser });
       });
   }, [setUser]);
 

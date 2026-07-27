@@ -1,22 +1,22 @@
 import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
 import useLogAction from "hooks/useLogAction";
 
-export function buildEditPointStep2Sub1Handlers(
-  props: Pick<EditPointMapStepProps, "setSubStep" | "setStep" | "handleSubmit">,
-  logAction: ReturnType<typeof useLogAction>
-) {
+export function buildEditPointStep2Sub1Handlers(input: {
+  props: Pick<EditPointMapStepProps, "setSubStep" | "setStep" | "handleSubmit">;
+  logAction: ReturnType<typeof useLogAction>;
+}) {
   return {
-    onSave: props.handleSubmit,
+    onSave: input.props.handleSubmit,
     onEnterCoordinates: () => {
-      props.setSubStep(2);
-      logAction({
+      input.props.setSubStep(2);
+      input.logAction({
         message: "User clicked 'Enter coordinates' button",
         step: "Edit point details - Step 2",
       });
     },
     onCancel: () => {
-      props.setStep(1);
-      logAction({
+      input.props.setStep(1);
+      input.logAction({
         message: "User clicked 'Cancel' button",
         step: "Edit point details - Step 2",
       });

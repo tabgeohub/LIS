@@ -45,23 +45,47 @@ export function sortGeometriesForSelection(
   };
 
   return [...geometries].sort((a, b) =>
-    compareGeometriesForSelection(a, b, context)
+    compareGeometriesForSelection({ a, b, context })
   );
 }
 
-function compareGeometriesForSelection(
-  a: Geometry,
-  b: Geometry,
-  context: GeometrySelectionSortContext
-): number {
+function unselectedRank(input: {
+  id: number;
+  selectedSet: Set<number>;
+}): number {
+  return Number(!input.selectedSet.has(input.id));
+}
+
+function mapRankDelta(input: {
+  aId: number;
+  bId: number;
+  rank: Map<number, number>;
+}): number {
+  return (input.rank.get(input.aId) ?? 0) - (input.rank.get(input.bId) ?? 0);
+}
+
+function rankMapForGeometry(input: {
+  id: number;
+  context: GeometrySelectionSortContext;
+}): Map<number, number> {
+  if (input.context.selectedSet.has(input.id)) return input.context.selectedRank;
+  return input.context.originalIndex;
+}
+
+function compareGeometriesForSelection(input: {
+  a: Geometry;
+  b: Geometry;
+  context: GeometrySelectionSortContext;
+}): number {
   const selectionDifference =
-    Number(!context.selectedSet.has(a.id)) -
-    Number(!context.selectedSet.has(b.id));
+    unselectedRank({ id: input.a.id, selectedSet: input.context.selectedSet }) -
+    unselectedRank({ id: input.b.id, selectedSet: input.context.selectedSet });
   if (selectionDifference !== 0) return selectionDifference;
-  const rank = context.selectedSet.has(a.id)
-    ? context.selectedRank
-    : context.originalIndex;
-  return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0);
+  return mapRankDelta({
+    aId: input.a.id,
+    bId: input.b.id,
+    rank: rankMapForGeometry({ id: input.a.id, context: input.context }),
+  });
 }
 
 export function toggleGeometrySelection(

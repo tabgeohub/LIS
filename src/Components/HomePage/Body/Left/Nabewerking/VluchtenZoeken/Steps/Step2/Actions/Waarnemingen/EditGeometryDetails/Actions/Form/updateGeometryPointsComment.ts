@@ -7,7 +7,10 @@ type GeometryPoint = NonNullable<FinishedGeometryType["points"]>[number];
 
 function buildPointUpdatePayload(point: GeometryPoint, comment: string) {
   return {
-    ...buildPointCorePayload(point, { specifiek_letten_op: comment }),
+    ...buildPointCorePayload({
+      fields: point,
+      overrides: { specifiek_letten_op: comment },
+    }),
     datum: point.datum,
     id: point.id,
   };

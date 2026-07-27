@@ -1,9 +1,3 @@
-export type {
-  DeviceStatus,
-  DeviceCommand,
-  CommandState,
-  GetacDevice,
-} from "../../shared/devices";
 import type { DeviceStatus } from "../../shared/devices";
 
 export type AgentReportBody = {

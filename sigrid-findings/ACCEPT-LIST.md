@@ -1,14 +1,10 @@
-# Sigrid Accept list — export `20260727`
+# Sigrid Accept list — export `20260727` (full pack)
 
 Use for a **Sigrid UI Accept** pass. Do not rewrite these unless responsibilities start mixing.
 **No Dockerfile or Nginx edits.**
 
-Source:
-- [`component-independence-findings-rijkswaterstaat-otg-lis-20260727.csv`](./component-independence-findings-rijkswaterstaat-otg-lis-20260727.csv)
-- [`module-coupling-findings-rijkswaterstaat-otg-lis-20260727.csv`](./module-coupling-findings-rijkswaterstaat-otg-lis-20260727.csv)
-- Duplication pack: [`duplication-findings-rijkswaterstaat-otg-lis-20260727/`](./duplication-findings-rijkswaterstaat-otg-lis-20260727/)
-
-Checklist: [`SIGRID-20260727-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-ACCEPT-CHECKLIST.md)
+Source: [`all-findings-rijkswaterstaat-otg-lis-20260727`](./all-findings-rijkswaterstaat-otg-lis-20260727/)  
+Checklist: [`SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md)
 
 ## Architecture — Component independence HIGH (Accept — intentional façades)
 
@@ -25,46 +21,48 @@ Checklist: [`SIGRID-20260727-ACCEPT-CHECKLIST.md`](./SIGRID-20260727-ACCEPT-CHEC
 | `src/helpers/refreshToken.ts` | Auth helper entry |
 | `src/api-hooks/emails/useEmailsList.ts` | Domain React Query façade |
 
-## Architecture — Independence MEDIUM (Accept — 134 items)
+## Architecture — Independence MEDIUM (Accept — 133 items)
 
-Façade-only splits did not move Architecture stars. Accept all MEDIUM independence rows. **Do not re-split for score.**
+Accept all MEDIUM independence rows. **Do not re-split `*Core` for score.**
 
-## Architecture — Module coupling (Accept — 23 items)
+## Architecture — Module coupling (Accept — 24 items)
 
 | Module | Why |
 | --- | --- |
-| `src/hooks/useLogAction.ts` | HIGH fan-in by design |
-| `src/hooks/useContent.ts` | HIGH fan-in i18n hub |
-| `nnederlandLayerBuilders.ts` | Layer catalogue builder hub |
-| `useUpdateDataCore.ts` | Shared mutation helper |
-| `routeResponses.ts` | Shared HTTP helpers |
-| `nnederlandIconPrimitives.tsx` | Layer icon primitives hub |
-| `useWizardButtons.ts` | Cohesive wizard hook |
-| `useConstSelectOptions.ts` | Const lookup façade |
-| `useResetFeatures.ts` | Feature reset hook |
-| EditGeometry `coords.ts` | Tiny shared utility |
-| `validateMapView.ts` | Tiny map guard |
-| Remaining LOW coupling rows | Shared infrastructure |
+| `useLogAction` / `useContent` | HIGH fan-in by design |
+| `nnederlandLayerBuilders` / icon primitives | Layer catalogue hubs |
+| `useUpdateDataCore`, `routeResponses` | Shared HTTP helpers |
+| `useWizardButtons`, `useConstSelectOptions`, `useResetFeatures` | Cohesive hooks |
+| EditGeometry `coords.ts`, `validateMapView` | Tiny shared utilities |
+| Remaining LOW coupling | Shared infrastructure |
 
-## Maintainability — Duplication (code-fixed in 20260727 wave)
+## Architecture — Component entanglement (Accept — 5)
 
-| Clone family | Status |
+High/moderate communication density on `api-hooks`, `helpers`, `hooks`, `HomePage`, `TimesliderItemDetailPage` — intentional layers.
+
+## Maintainability — Unit size (Accept)
+
+| Module | Why |
 | --- | --- |
-| FlightPlan ↔ TemplateFlight Step2 Buttons | **Code-fixed** via `buildWizardStep2Selection` |
-| FE↔BE `keycloakUser`, `devices`, `installer` | **Code-fixed** via `backend/src/shared/` |
-| FE↔BE `pointCoreColumns` / identity keys / PointDetailsFieldsList | **Code-fixed** via shared keys |
-| FE↔BE flight-plan persistence fields | **Code-fixed** via `shared/flightPlanFields` |
-| FE↔BE geometry form fields | **Code-fixed** via `shared/geometryFormFields` |
-| `public/index.html` ↔ root `index.html` | **Deleted** dead CRA `public/index.html` |
+| `backend/dockerfile` | Deployment artifact — no Dockerfile edits |
+| `backend/scripts/verify-regio-apis.ts` | Verification script |
 
-Expect Dup HIGH → 0 on next rescan.
+## Maintainability — Duplication (code-fixed this wave)
 
-## Security (Accept / out of scope if still RAW)
-
-| Finding | Why |
+| Clone | Status |
 | --- | --- |
-| Docker CWE-266 | Out of scope unless non-root containers required |
+| FlightPlan ↔ TemplateFlight Step2 | **Code-fixed** — `useWizardFilterStep2Buttons` takes `store` + `mapView` |
+| FE↔BE devices re-export twin | **Code-fixed** — BE `types.ts` no longer re-exports shared types |
+
+Expect Dup HIGH → **0** on rescan.
+
+## Security
+
+| Finding | Action |
+| --- | --- |
+| Docker CWE-266 / CWE-250 (root USER) | **Accept** — no Dockerfile edits |
+| `react-router-dom` CWE-601 | **Code-fixed** — dependency bump |
 
 ## Expected post-Accept
 
-Architecture actionable independence/coupling drops after Accept of ~167 items. Duplication cleared by code.
+Architecture actionable independence/coupling/entanglement cleared in UI; Maintainability Dup cleared by code; Security Docker accepted, OSH react-router cleared by bump.

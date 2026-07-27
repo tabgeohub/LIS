@@ -4,10 +4,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
-import {
-  buildWizardStep2Selection,
-  useWizardFilterStep2Buttons,
-} from "../../../common/useWizardFilterStep2Buttons";
+import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
 import {
   runTemplateFlightCancelCleanup,
   runTemplateFlightPreviousCleanup,
@@ -22,9 +19,8 @@ function useTemplateFlightStep2Actions(setOpenFilter: (value: boolean) => void) 
 
   return useWizardFilterStep2Buttons({
     setOpenFilter,
-    selection: buildWizardStep2Selection(store, mapView),
-    step: store.step,
-    setStep: store.setStep,
+    store,
+    mapView,
     resetFilters,
     clearYellowLayers: () => yellowGraphicsLayer?.graphics.removeAll(),
     buildPrevious: (clearSelectionGraphics) => () =>
