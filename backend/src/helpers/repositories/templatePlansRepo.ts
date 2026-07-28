@@ -1,5 +1,35 @@
 import type { Queryable } from "./queryable";
 
+export async function selectTemplatePlanIdsWithRegio(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.template_plans WHERE id = ANY($1::int[])`,
+    [ids]
+  );
+}
+
+export async function selectTemplatePlanIdRegioByIds(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.template_plans WHERE id = ANY($1::int[])`,
+    [ids]
+  );
+}
+
+export async function selectTemplatePlansByIds(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.template_plans WHERE id = ANY($1::int[])`,
+    [ids]
+  );
+}
+
 export async function selectTemplatePlanByName(
   db: Queryable,
   name: string

@@ -73,6 +73,20 @@ export async function updatePointStatus(
   );
 }
 
+export async function selectPointsIdRegio(
+  db: Queryable,
+  input: { regio?: string; limit?: number }
+) {
+  const params: unknown[] = [];
+  let query = "SELECT id, regio_id FROM lis.points";
+  if (input.regio && input.regio !== "admin") {
+    params.push(input.regio.toLowerCase());
+    query += ` WHERE LOWER(regio_id) = $${params.length}`;
+  }
+  query += ` ORDER BY id DESC LIMIT ${input.limit ?? 5000}`;
+  return db.query(query, params);
+}
+
 export async function selectPointsByOmschrijving(
   db: Queryable,
   omschrijving: string

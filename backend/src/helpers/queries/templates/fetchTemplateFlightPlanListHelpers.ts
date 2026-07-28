@@ -7,13 +7,14 @@ import {
   formatTemplatePlansWithGeometries,
 } from "../geometries/formatPlanGeometries";
 import { resolveRegioFilter } from "../shared/resolveRegioFilter";
+import { TEMPLATE_PLANS_TABLE } from "../../repositories/flightPlanSelectSql";
 
 export async function loadFormattedTemplatePlans(
   req: Request
 ): Promise<unknown[]> {
   const regio_id = resolveRegioFilter(req);
   const { query, params } = buildFlightPlanQuery({
-    planTable: "lis.template_plans",
+    planTable: TEMPLATE_PLANS_TABLE,
     planAlias: "tp",
     columnPreset: "template",
     pointPreset: "template",

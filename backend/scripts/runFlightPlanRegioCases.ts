@@ -26,7 +26,7 @@ export async function runFlightPlanRegioCases(input: {
       endpoint: `${testCase.name} [RWS NN]`,
       rows: rowsRegio.rows,
       expectedRegio: input.expectedRegio,
-      table: testCase.name.includes("templateFlight") ? "lis.template_plans" : "lis.flightplans",
+      table: testCase.name.includes("templateFlight") ? "template_plans" : "flightplans",
     });
     const adminCount = rowsAdmin.rows.length;
     const regionalCount = rowsRegio.rows.length;

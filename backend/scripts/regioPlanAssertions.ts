@@ -1,11 +1,10 @@
 import { Pool } from "pg";
+import { selectFlightPlansByIds } from "../src/helpers/repositories/flightPlansRepo";
+import { selectTemplatePlansByIds } from "../src/helpers/repositories/templatePlansRepo";
 import { RegioTestReporter } from "./regioVerificationTypes";
 
-const PLAN_TABLE_BY_KEY = {
-  "lis.flightplans": "lis.flightplans",
-  "lis.template_plans": "lis.template_plans",
-} as const;
 type PlanRow = { id?: number; regio_id?: string };
+export type PlanTableKind = "flightplans" | "template_plans";
 
 function assertPlanRegios(reporter: RegioTestReporter, input: {
   endpoint: string;
@@ -23,10 +22,6 @@ function assertPlanRegios(reporter: RegioTestReporter, input: {
   return true;
 }
 
-function resolvePlanTableSql(table?: keyof typeof PLAN_TABLE_BY_KEY): string {
-  return table === "lis.template_plans" ? "lis.template_plans" : "lis.flightplans";
-}
-
 function collectPlanIds(rows: PlanRow[]): number[] {
   return rows.map((row) => row.id).filter((id): id is number => id != null);
 }
@@ -36,7 +31,7 @@ export async function assertPlanRegiosWithDb(reporter: RegioTestReporter, input:
   endpoint: string;
   rows: PlanRow[];
   expectedRegio: string;
-  table?: keyof typeof PLAN_TABLE_BY_KEY;
+  table?: PlanTableKind;
 }) {
   if (input.rows.length === 0) {
     reporter.pass(input.endpoint, "0 plan(s)");
@@ -47,9 +42,9 @@ export async function assertPlanRegiosWithDb(reporter: RegioTestReporter, input:
     reporter.fail(input.endpoint, "rows returned without plan ids");
     return false;
   }
-  const result = await input.pool.query(
-    `SELECT id, regio_id FROM ${resolvePlanTableSql(input.table)} WHERE id = ANY($1::int[])`,
-    [ids]
-  );
+  const result =
+    input.table === "template_plans"
+      ? await selectTemplatePlansByIds(input.pool, ids)
+      : await selectFlightPlansByIds(input.pool, ids);
   return assertPlanRegios(reporter, { ...input, rows: result.rows });
 }

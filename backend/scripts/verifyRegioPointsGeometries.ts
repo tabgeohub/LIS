@@ -1,48 +1,19 @@
 import { Pool } from "pg";
+import { selectPointsIdRegio } from "../src/helpers/repositories/pointsRepo";
+import { selectGeometriesWithPointRegio } from "../src/helpers/repositories/geometriesRepo";
 import type { RegioTestReporter } from "./verifyRegioFlightPlanCases";
 
 const ADMIN = "admin";
 
-async function withPoolQuery(
-  query: string,
-  params: unknown[]
-): Promise<unknown[]> {
+async function withPool<T>(
+  work: (pool: Pool) => Promise<T>
+): Promise<T> {
   const pool = new Pool();
   try {
-    const r = await pool.query(query, params);
-    return r.rows;
+    return await work(pool);
   } finally {
     await pool.end();
   }
-}
-
-async function runPointsQuery(regio: string | undefined): Promise<unknown[]> {
-  const params: unknown[] = [];
-  let query = "SELECT id, regio_id FROM lis.points";
-  if (regio && regio !== ADMIN) {
-    params.push(regio.toLowerCase());
-    query += ` WHERE LOWER(regio_id) = $${params.length}`;
-  }
-  query += " ORDER BY id DESC LIMIT 5000";
-  return withPoolQuery(query, params);
-}
-
-async function runGeometriesQuery(regio: string | undefined): Promise<unknown[]> {
-  const params: unknown[] = [];
-  let query = `
-    SELECT g.id, g.regio_id, p.regio_id AS point_regio_id
-    FROM lis.geometries g
-    JOIN lis.points p ON p.geometry_id = g.id`;
-  const conditions: string[] = [];
-  if (regio && regio !== ADMIN) {
-    params.push(regio.toLowerCase());
-    conditions.push(`LOWER(p.regio_id) = $${params.length}`);
-  }
-  if (conditions.length) {
-    query += " WHERE " + conditions.join(" AND ");
-  }
-  query += " ORDER BY g.id DESC LIMIT 5000";
-  return withPoolQuery(query, params);
 }
 
 export async function runPointsRegioCheck(input: {
@@ -50,7 +21,11 @@ export async function runPointsRegioCheck(input: {
   expectedRegio: string;
 }): Promise<void> {
   const { reporter, expectedRegio } = input;
-  const rows = (await runPointsQuery(expectedRegio)) as Array<{ regio_id?: string }>;
+  const rows = (
+    await withPool((pool) =>
+      selectPointsIdRegio(pool, { regio: expectedRegio })
+    )
+  ).rows as Array<{ regio_id?: string }>;
   const bad = rows.filter(
     (r) => (r.regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
   );
@@ -60,7 +35,9 @@ export async function runPointsRegioCheck(input: {
     reporter.pass("GET /points [RWS NN]", `${rows.length} point(s), all regio_id=${expectedRegio}`);
   }
 
-  const adminRows = (await runPointsQuery(ADMIN)) as unknown[];
+  const adminRows = (
+    await withPool((pool) => selectPointsIdRegio(pool, { regio: ADMIN }))
+  ).rows;
   if (adminRows.length >= rows.length) {
     reporter.pass(
       "GET /points [admin >= regional]",
@@ -79,11 +56,16 @@ export async function runGeometriesRegioCheck(input: {
   expectedRegio: string;
 }): Promise<void> {
   const { reporter, expectedRegio } = input;
-  const rows = (await runGeometriesQuery(expectedRegio)) as Array<{
+  const rows = (
+    await withPool((pool) =>
+      selectGeometriesWithPointRegio(pool, { regio: expectedRegio })
+    )
+  ).rows as Array<{
     point_regio_id?: string;
   }>;
   const bad = rows.filter(
-    (r) => (r.point_regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
+    (r) =>
+      (r.point_regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
   );
   if (bad.length) {
     reporter.fail("GET /geometries [RWS NN]", `${bad.length} row(s) wrong point regio`);

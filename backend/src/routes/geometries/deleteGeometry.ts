@@ -17,7 +17,7 @@ export async function deleteGeometry(req: Request, res: Response): Promise<void>
   }
 
   try {
-    if (!(await entityExists("lis.geometries", geometryId))) {
+    if (!(await entityExists("geometries", geometryId))) {
       res.status(404).json({ message: "Geometry not found" });
       return;
     }

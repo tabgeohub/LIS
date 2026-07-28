@@ -277,7 +277,7 @@ class FinishedPlanWriter {
   private async assertPointExists(pointId: number): Promise<void> {
     const exists = await pointExistsById(this.client, pointId);
     if (!exists) {
-      throw new Error(`Parent point ${pointId} not found in lis.points.`);
+      throw new Error(`Parent point ${pointId} not found.`);
     }
   }
 }

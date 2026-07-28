@@ -1,5 +1,0 @@
-ID,Path,Component,Lines of code,Duplication percentage,Start line,End line
-985676ef-362c-4007-9b21-f94bc7489715,backend/src/helpers/repositories/finishedPlansRepo.ts,backend,6,8,4,10
-985676ef-362c-4007-9b21-f94bc7489715,backend/src/helpers/repositories/finishedPlansRepo.ts,backend,6,8,19,25
-eb117f29-bab6-466a-8ce7-3dd9a72d3424,backend/src/helpers/repositories/attachmentsRepo.ts,backend,7,9.859155,4,10
-eb117f29-bab6-466a-8ce7-3dd9a72d3424,backend/src/helpers/repositories/attachmentsRepo.ts,backend,7,9.859155,23,29

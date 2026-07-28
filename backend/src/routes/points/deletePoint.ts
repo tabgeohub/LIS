@@ -16,7 +16,7 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
   }
 
   try {
-    if (!(await entityExists("lis.points", pointId))) {
+    if (!(await entityExists("points", pointId))) {
       res.status(404).json({ message: "Point not found" });
       return;
     }

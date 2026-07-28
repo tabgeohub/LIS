@@ -97,6 +97,26 @@ export async function updateFlightPlanReturning(
   );
 }
 
+export async function selectFlightPlanIdsWithRegio(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.flightplans WHERE id = ANY($1::int[])`,
+    [ids]
+  );
+}
+
+export async function selectFlightPlanIdRegioByIds(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.flightPlans WHERE id = ANY($1::int[])`,
+    [ids]
+  );
+}
+
 export async function updateFlightPlanStatus(
   db: Queryable,
   input: { id: number | string; status: string }
@@ -233,6 +253,16 @@ export async function selectFlightPlansOverlappingPointIds(
   return db.query(
     `SELECT id, points FROM lis.flightplans WHERE points && $1::int[]`,
     [pointIds]
+  );
+}
+
+export async function selectFlightPlansByIds(
+  db: Queryable,
+  ids: number[]
+) {
+  return db.query(
+    `SELECT id, regio_id FROM lis.flightplans WHERE id = ANY($1::int[])`,
+    [ids]
   );
 }
 

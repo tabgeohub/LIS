@@ -1,9 +1,17 @@
 import type { FlightPlanColumnPreset } from "./flightPlanColumns";
 import type { PointJsonPreset } from "../points/pointJson";
 import type { RegioFilterOptions } from "../shared/regioFilter";
+import {
+  FLIGHT_PLANS_TABLE,
+  TEMPLATE_PLANS_TABLE,
+} from "../../repositories/flightPlanSelectSql";
+
+export type FlightPlanTable =
+  | typeof FLIGHT_PLANS_TABLE
+  | typeof TEMPLATE_PLANS_TABLE;
 
 export type BuildFlightPlanQueryOptions = {
-  planTable?: "lis.flightPlans" | "lis.template_plans";
+  planTable?: FlightPlanTable;
   planAlias?: string;
   columnPreset: FlightPlanColumnPreset;
   pointPreset: PointJsonPreset;
@@ -26,7 +34,7 @@ function defaultPlanAlias(
   planAlias?: string
 ): string {
   if (planAlias) return planAlias;
-  return planTable === "lis.template_plans" ? "tp" : "fp";
+  return planTable === TEMPLATE_PLANS_TABLE ? "tp" : "fp";
 }
 
 function defaultRegioFilter(
@@ -72,7 +80,7 @@ function resolveFlightPlanQueryScalars(
 export function resolveFlightPlanQueryDefaults(
   options: BuildFlightPlanQueryOptions
 ) {
-  const planTable = withDefault(options.planTable, "lis.flightPlans" as const);
+  const planTable = withDefault(options.planTable, FLIGHT_PLANS_TABLE);
   const planAlias = defaultPlanAlias(planTable, options.planAlias);
 
   return {

@@ -25,10 +25,10 @@ export function parseRouteEntityId(
 }
 
 export async function entityExists(
-  table: "lis.points" | "lis.geometries",
+  table: "points" | "geometries",
   id: number
 ): Promise<boolean> {
-  if (table === "lis.points") {
+  if (table === "points") {
     return pointExistsById(pool, id);
   }
 

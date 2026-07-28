@@ -28,6 +28,27 @@ export const GEOMETRY_METADATA_UPDATE_SQL = `
       WHERE id = $7
       RETURNING *`;
 
+export async function selectGeometriesWithPointRegio(
+  db: Queryable,
+  input: { regio?: string; limit?: number }
+) {
+  const params: unknown[] = [];
+  let query = `
+    SELECT g.id, g.regio_id, p.regio_id AS point_regio_id
+    FROM lis.geometries g
+    JOIN lis.points p ON p.geometry_id = g.id`;
+  const conditions: string[] = [];
+  if (input.regio && input.regio !== "admin") {
+    params.push(input.regio.toLowerCase());
+    conditions.push(`LOWER(p.regio_id) = $${params.length}`);
+  }
+  if (conditions.length) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  query += ` ORDER BY g.id DESC LIMIT ${input.limit ?? 5000}`;
+  return db.query(query, params);
+}
+
 export async function geometryExistsById(
   db: Queryable,
   id: number | string

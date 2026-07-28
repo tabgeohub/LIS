@@ -1,3 +1,0 @@
-Description,Severity,Status,First Seen,Issue age,Lines of code,Redundant lines of code,Occurrences,Same file,Same component,Technology,Locations
-6 lines occurring 2 times,HIGH,RAW,2026-07-28,0,6,6,2,true,true,TypeScript,"backend/src/helpers/repositories/finishedPlansRepo.ts#L4:10,backend/src/helpers/repositories/finishedPlansRepo.ts#L19:25"
-7 lines occurring 2 times,HIGH,RAW,2026-07-28,0,7,7,2,true,true,TypeScript,"backend/src/helpers/repositories/attachmentsRepo.ts#L4:10,backend/src/helpers/repositories/attachmentsRepo.ts#L23:29"

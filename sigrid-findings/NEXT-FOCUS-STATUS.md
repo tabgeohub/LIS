@@ -1,45 +1,23 @@
-# NEXT-FOCUS-STATUS — Architecture Data coupling phase 2
+# NEXT-FOCUS-STATUS — Data coupling leftovers after 3.9
 
-## Scores (baseline pack 20260728)
+## Baseline (post-3.9 export)
 
-| Metric | Score | Note |
-| --- | --- | --- |
-| Architecture | **3.6** (green) | Target: greener via Data coupling |
-| Data coupling | **~1.46** | Phase 2 code complete; await rescan |
-| Maintainability | **4.4** | Untouched this wave |
+- Architecture **3.9**, Data coupling still **1.46**
+- Hot CC: flightplans 4, geometries/points 3, finished_plans/template_plans/users 2
 
-## Connected components — expected after rescan
+## Code fixes (this wave + arch wave 2)
 
-| Entity | Before | Target |
-| --- | --- | --- |
-| `flightplans` | 4 | ≤2 |
-| `geometries` | 3 | ≤2 |
-| `points` | 3 | ≤2 |
-| `finished_plans` | 2 | 1 |
-| `template_plans` | 2 | 1 |
-| `users` | 2 | 1 |
-| `attachments` / emails / getac | 1 | keep |
+Already on main from wave 2: CSV hotspot files no longer embed SQL (repos only).
 
-## Done (code)
+**Additional concentration now:**
+- Scripts `verifyRegioPointsGeometries` / `regioPlanAssertions` call repos (no embedded SQL)
+- `buildFlightPlanSelectBody` + `FLIGHT_PLANS_TABLE` / `TEMPLATE_PLANS_TABLE` in `flightPlanSelectSql.ts`
+- `entityExists("points"|"geometries")` — no `lis.*` table-name literals in routes/helpers
 
-### Wave A
-- `flightPlansRepo`: INSERT/UPDATE SQL + `selectPreparedFlightPlanIdsWithRegio`; script uses repo
-- `finishedPlansTimesliderQuery.ts`: timeslider JOIN SQL
-- **New** `geometriesRepo.ts`: exists/select/insert/update/delete
-- `pointsRepo`: `insertPointReturningRow` / `updatePointByIdReturning`; route raw SQL removed
+## Left intentionally (CC already 1)
 
-### Wave B
-- `finishedPlansQuerySql.ts` + `flightPlansByPointQuery.ts` + `flightPlanJoinSql.ts`: CTE/list/join SQL under repositories
-- **New** `templatePlansRepo.ts`, `usersRepo.ts`
+- `routes/emails/*`, `routes/devices-updates/*`, `lis.logging` helpers
 
-## Your action
+## After next Sigrid scan
 
-1. Accept Architecture Independence/coupling/entanglement in Sigrid UI ([ACCEPT-LIST.md](ACCEPT-LIST.md))
-2. Push + wait for Sigrid rescan; compare data-store-entities Connected components
-
-## Out of scope
-
-- Dockerfile / Nginx
-- Independence `*Core` / hub rewrites
-- emails / getac_devices (already CC=1)
-- Pulling `backend/scripts` into repos
+Re-export architecture-data-* CSVs. Expect Connected components for hotspot entities ≤2 (ideally 1 for secondaries).
