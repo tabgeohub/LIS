@@ -1,6 +1,11 @@
 import { Response } from "express";
 import { PoolClient } from "pg";
 import { pool } from "../../db";
+import { pointExistsById } from "../repositories/pointsRepo";
+import {
+  replaceFlightPlanPointsArray,
+  selectFlightPlansOverlappingPointIds,
+} from "../repositories/flightPlansRepo";
 
 export function parseRouteEntityId(
   rawId: string | undefined,
@@ -22,11 +27,14 @@ export async function entityExists(
   table: "lis.points" | "lis.geometries",
   id: number
 ): Promise<boolean> {
-  const sql =
-    table === "lis.geometries"
-      ? "SELECT id FROM lis.geometries WHERE id = $1"
-      : "SELECT id FROM lis.points WHERE id = $1";
-  const result = await pool.query(sql, [id]);
+  if (table === "lis.points") {
+    return pointExistsById(pool, id);
+  }
+
+  const result = await pool.query(
+    "SELECT id FROM lis.geometries WHERE id = $1",
+    [id]
+  );
   return (result.rowCount ?? 0) > 0;
 }
 
@@ -79,10 +87,10 @@ async function stripPointIdsFromFlightPlan(input: {
     (pointId: number) => !input.pointIds.includes(pointId)
   );
 
-  await input.client.query(
-    `UPDATE lis.flightplans SET points = $1::int[] WHERE id = $2`,
-    [updatedPoints, input.flightPlan.id]
-  );
+  await replaceFlightPlanPointsArray(input.client, {
+    id: input.flightPlan.id,
+    points: updatedPoints,
+  });
 }
 
 export async function removePointIdsFromFlightPlans(
@@ -93,9 +101,9 @@ export async function removePointIdsFromFlightPlans(
     return 0;
   }
 
-  const flightPlansResult = await client.query(
-    `SELECT id, points FROM lis.flightplans WHERE points && $1::int[]`,
-    [pointIds]
+  const flightPlansResult = await selectFlightPlansOverlappingPointIds(
+    client,
+    pointIds
   );
 
   for (const flightPlan of flightPlansResult.rows) {

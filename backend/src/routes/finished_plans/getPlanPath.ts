@@ -1,17 +1,12 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { selectPathsByPlanId } from "../../helpers/repositories/finishedPlansPathRepo";
 
 export async function getPlanPath(req: Request, res: Response): Promise<void> {
   const { planId } = req.params;
 
   try {
-    const result = await pool.query(
-      `
-      SELECT * from lis.finished_plans_path
-      WHERE planid = $1
-      `,
-      [planId]
-    );
+    const result = await selectPathsByPlanId(pool, planId);
 
     res.status(200).json(result.rows);
   } catch (error) {

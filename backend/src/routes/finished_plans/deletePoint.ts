@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { pool } from "../../db";
+import { runInTransaction } from "../../helpers/entities/entityDeleteHelpers";
+import { deleteAttachmentsByIds } from "../../helpers/repositories/attachmentsRepo";
+import { deleteFinishedPlanByPlanAndPoint } from "../../helpers/repositories/finishedPlansRepo";
+import { arrayRemovePointFromFlightPlan } from "../../helpers/repositories/flightPlansRepo";
 
 export async function deletePoint(req: Request, res: Response): Promise<void> {
   const { data } = req.params;
@@ -12,22 +15,21 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
   try {
     const { point_id, plan_id, attachments } = JSON.parse(data);
 
-    if (attachments && attachments.length > 0) {
-      await pool.query(
-        `DELETE FROM lis.attachments WHERE id = ANY($1::int[])`,
-        [attachments]
-      );
-    }
+    await runInTransaction(async (client) => {
+      if (attachments && attachments.length > 0) {
+        await deleteAttachmentsByIds(client, attachments);
+      }
 
-    await pool.query(
-      `DELETE FROM lis.finished_plans WHERE plan_id = $1 AND point_id = $2`,
-      [plan_id, point_id]
-    );
+      await deleteFinishedPlanByPlanAndPoint(client, {
+        planId: plan_id,
+        pointId: point_id,
+      });
 
-    await pool.query(
-      `UPDATE lis.flightplans SET points = array_remove(points, $1) WHERE id = $2`,
-      [point_id, plan_id]
-    );
+      await arrayRemovePointFromFlightPlan(client, {
+        pointId: point_id,
+        planId: plan_id,
+      });
+    });
 
     res
       .status(200)

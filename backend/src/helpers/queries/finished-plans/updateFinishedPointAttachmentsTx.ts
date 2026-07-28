@@ -1,4 +1,9 @@
 import type { PoolClient } from "pg";
+import { deleteOrphanedAttachments } from "../../repositories/attachmentsRepo";
+import {
+  lockAttachmentsIdForPlanPoint,
+  updateAttachmentsIdForPlanPoint,
+} from "../../repositories/finishedPlansRepo";
 
 type AttachmentUpdateInput = {
   client: PoolClient;
@@ -10,56 +15,15 @@ type AttachmentUpdateInput = {
 async function lockFinishedPlanAttachments(
   input: Pick<AttachmentUpdateInput, "client" | "pointId" | "planId">
 ): Promise<number[] | null> {
-  const { client, pointId, planId } = input;
-  const existing = await client.query<{ attachments_id: number[] | null }>(
-    `
-      SELECT attachments_id
-      FROM lis.finished_plans
-      WHERE point_id = $1 AND plan_id = $2
-      FOR UPDATE
-    `,
-    [pointId, planId]
-  );
+  const existing = await lockAttachmentsIdForPlanPoint(input.client, {
+    pointId: input.pointId,
+    planId: input.planId,
+  });
 
   if (existing.rows.length === 0) {
     return null;
   }
   return existing.rows[0].attachments_id || [];
-}
-
-async function applyFinishedPlanAttachmentIds(
-  input: AttachmentUpdateInput
-): Promise<Record<string, unknown>> {
-  const { client, pointId, planId, attachmentIds } = input;
-  const result = await client.query(
-    `
-      UPDATE lis.finished_plans SET attachments_id = $1
-      WHERE point_id = $2 AND plan_id = $3
-      RETURNING *;
-    `,
-    [attachmentIds, pointId, planId]
-  );
-  return result.rows[0];
-}
-
-async function deleteOrphanedAttachments(
-  client: PoolClient,
-  removed: number[]
-): Promise<void> {
-  if (removed.length === 0) {
-    return;
-  }
-  await client.query(
-    `
-      DELETE FROM lis.attachments a
-      WHERE a.id = ANY($1::int[])
-      AND NOT EXISTS (
-        SELECT 1 FROM lis.finished_plans fp
-        WHERE a.id = ANY(fp.attachments_id)
-      )
-    `,
-    [removed]
-  );
 }
 
 export async function updateFinishedPointAttachmentsTx(
@@ -80,13 +44,12 @@ export async function updateFinishedPointAttachmentsTx(
   }
 
   const removed = oldIds.filter((id) => !attachmentIds.includes(id));
-  const row = await applyFinishedPlanAttachmentIds({
-    client,
+  const result = await updateAttachmentsIdForPlanPoint(client, {
     pointId,
     planId,
     attachmentIds,
   });
   await deleteOrphanedAttachments(client, removed);
 
-  return { ok: true, row };
+  return { ok: true, row: result.rows[0] };
 }

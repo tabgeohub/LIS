@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
 import type { PointCorePayload } from "../points/pointFields";
 import {
-  buildPointUpdateAssignments,
-  buildPointUpdateParams,
-} from "../points/pointFields";
+  selectPointIdIfOwnedByGeometry,
+  updateOwnedGeometryPoint,
+} from "../../repositories/pointsRepo";
 
 type PointPayload = PointCorePayload & { id?: number };
 
@@ -18,21 +18,16 @@ async function updateOwnedPointIfValid(input: {
   const pointId = Number(raw.id);
   if (!Number.isFinite(pointId)) return null;
 
-  const owner = await client.query(
-    `SELECT id FROM lis.points WHERE id = $1 AND geometry_id = $2`,
-    [pointId, geometryId]
-  );
+  const owner = await selectPointIdIfOwnedByGeometry(client, {
+    pointId,
+    geometryId,
+  });
 
   if (owner.rowCount === 0) {
     return `Punt ${pointId} hoort niet bij deze geometrie.`;
   }
 
-  await client.query(
-    `UPDATE lis.points SET
-      ${buildPointUpdateAssignments({ coalesceColumns: ["user_id"] })}
-    WHERE id = $13 AND geometry_id = $14`,
-    [...buildPointUpdateParams(raw, pointId), geometryId]
-  );
+  await updateOwnedGeometryPoint(client, { raw, pointId, geometryId });
   return null;
 }
 

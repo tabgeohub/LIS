@@ -4,6 +4,7 @@ import {
   GEOMETRY_METADATA_UPDATE_SQL,
 } from "./geometryRouteHelpers";
 import { updateGeometryOwnedPoints } from "./updateGeometryPoints";
+import { selectPointsByGeometryId } from "../../repositories/pointsRepo";
 
 export type UpdateGeometryTransactionInput = {
   client: PoolClient;
@@ -50,9 +51,9 @@ export async function fetchGeometryWithPoints(input: {
   geometryId: number;
   geometryRow: Record<string, unknown>;
 }) {
-  const pointsResult = await input.client.query(
-    `SELECT * FROM lis.points WHERE geometry_id = $1 ORDER BY id ASC`,
-    [input.geometryId]
+  const pointsResult = await selectPointsByGeometryId(
+    input.client,
+    input.geometryId
   );
   return { ...input.geometryRow, points: pointsResult.rows };
 }

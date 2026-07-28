@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { selectFlightPlansByVluchtnummer } from "../../helpers/repositories/flightPlansRepo";
 
 export async function getFlighPlansNummer(req: Request, res: Response) {
   const { vluchtnummer } = req.params;
@@ -10,15 +11,7 @@ export async function getFlighPlansNummer(req: Request, res: Response) {
   }
 
   try {
-    const result = await pool.query(
-      `
-      SELECT *
-      FROM lis.flightPlans
-      WHERE vluchtnummer = $1
-      ORDER BY created_at DESC
-      `,
-      [vluchtnummer]
-    );
+    const result = await selectFlightPlansByVluchtnummer(pool, vluchtnummer);
 
     res.json(result.rows.length);
   } catch (err) {

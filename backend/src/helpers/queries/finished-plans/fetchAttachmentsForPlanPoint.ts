@@ -1,18 +1,15 @@
 import { pool } from "../../../db";
+import { selectAttachmentsByIds } from "../../repositories/attachmentsRepo";
+import { selectAttachmentsIdForPlanPoint } from "../../repositories/finishedPlansRepo";
 
 export async function fetchAttachmentsForPlanPoint(input: {
   planId: number;
   pointId: number;
 }): Promise<Record<string, unknown>[]> {
-  const finishedPlanResult = await pool.query<{ attachments_id: number[] | null }>(
-    `
-      SELECT attachments_id
-      FROM lis.finished_plans
-      WHERE plan_id = $1 AND point_id = $2
-      LIMIT 1;
-    `,
-    [input.planId, input.pointId]
-  );
+  const finishedPlanResult = await selectAttachmentsIdForPlanPoint(pool, {
+    planId: input.planId,
+    pointId: input.pointId,
+  });
 
   if (finishedPlanResult.rows.length === 0) return [];
 
@@ -21,15 +18,7 @@ export async function fetchAttachmentsForPlanPoint(input: {
     return [];
   }
 
-  const attachmentsResult = await pool.query(
-    `
-      SELECT *
-      FROM lis.attachments
-      WHERE id = ANY($1::int[])
-      ORDER BY taken_at ASC;
-    `,
-    [attachmentsId]
-  );
+  const attachmentsResult = await selectAttachmentsByIds(pool, attachmentsId);
 
   return attachmentsResult.rows;
 }

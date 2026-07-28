@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
+import { updateFlightPlanPointsReturning } from "../../helpers/repositories/flightPlansRepo";
 
 export async function updateVluchtPlanPoints(
   req: Request,
@@ -11,11 +12,7 @@ export async function updateVluchtPlanPoints(
   await runReturningUpdateById({
     res,
     id,
-    runQuery: () =>
-      pool.query(
-        `UPDATE lis.flightPlans SET points = $1 WHERE id = $2 RETURNING *;`,
-        [points, id]
-      ),
+    runQuery: () => updateFlightPlanPointsReturning(pool, { id, points }),
     config: {
       notFoundMessage: "Vluchtplan niet gevonden",
       successMessage: "Vluchtplan succesvol bijgewerkt",

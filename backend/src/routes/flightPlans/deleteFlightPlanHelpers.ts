@@ -1,13 +1,14 @@
 import type { Request, Response } from "express";
 import { pool } from "../../db";
 import { deleteFinishedFlightPlanCascade } from "../../helpers/queries/flight-plans/deleteFinishedFlightPlan";
+import {
+  deleteFlightPlanById,
+  selectFlightPlanIdStatus,
+} from "../../helpers/repositories/flightPlansRepo";
 import type { PoolClient } from "pg";
 
 export async function deleteSimpleFlightPlan(id: string, res: Response) {
-  const result = await pool.query(
-    "DELETE FROM lis.flightplans WHERE id = $1 RETURNING *",
-    [id]
-  );
+  const result = await deleteFlightPlanById(pool, id);
 
   if (result.rowCount === 0) {
     res.status(404).json({ error: "Vluchtplan niet gevonden" });
@@ -45,10 +46,7 @@ export async function deleteFlightPlanByStatus(
   id: string,
   res: Response
 ): Promise<void> {
-  const flightPlanResult = await pool.query(
-    "SELECT id, status FROM lis.flightplans WHERE id = $1",
-    [id]
-  );
+  const flightPlanResult = await selectFlightPlanIdStatus(pool, id);
 
   if (flightPlanResult.rowCount === 0) {
     res.status(404).json({ error: "Vluchtplan niet gevonden" });

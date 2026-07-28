@@ -1,4 +1,10 @@
 import type { PoolClient } from "pg";
+import { deleteAttachmentsByPointIds } from "../../helpers/repositories/attachmentsRepo";
+import { deleteFinishedPlansByPointIds } from "../../helpers/repositories/finishedPlansRepo";
+import {
+  deletePointsByGeometryId,
+  selectPointIdsByGeometryId,
+} from "../../helpers/repositories/pointsRepo";
 
 export async function deleteGeometryPointChildren(input: {
   client: PoolClient;
@@ -11,14 +17,8 @@ export async function deleteGeometryPointChildren(input: {
   const { client, pointIds, removePointIdsFromFlightPlans } = input;
   if (pointIds.length === 0) return;
 
-  await client.query(
-    `DELETE FROM lis.attachments WHERE point_id = ANY($1::int[])`,
-    [pointIds]
-  );
-  await client.query(
-    `DELETE FROM lis.finished_plans WHERE point_id = ANY($1::int[])`,
-    [pointIds]
-  );
+  await deleteAttachmentsByPointIds(client, pointIds);
+  await deleteFinishedPlansByPointIds(client, pointIds);
   await removePointIdsFromFlightPlans(client, pointIds);
 }
 
@@ -32,10 +32,7 @@ export async function deleteGeometryCascade(input: {
   ) => Promise<unknown>;
 }) {
   const { client, geometryId, removePointIdsFromFlightPlans } = input;
-  const pointsResult = await client.query(
-    `SELECT id FROM lis.points WHERE geometry_id = $1`,
-    [geometryId]
-  );
+  const pointsResult = await selectPointIdsByGeometryId(client, geometryId);
   const pointIds = pointsResult.rows.map((row) => row.id);
   await deleteGeometryPointChildren({
     client,
@@ -43,10 +40,7 @@ export async function deleteGeometryCascade(input: {
     removePointIdsFromFlightPlans,
   });
 
-  const pointsDeleteResult = await client.query(
-    `DELETE FROM lis.points WHERE geometry_id = $1`,
-    [geometryId]
-  );
+  const pointsDeleteResult = await deletePointsByGeometryId(client, geometryId);
   const deleteResult = await client.query(
     "DELETE FROM lis.geometries WHERE id = $1 RETURNING *",
     [geometryId]

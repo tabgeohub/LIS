@@ -1,26 +1,31 @@
-# ACCEPT-LIST — pack 20260727(2)
+# ACCEPT-LIST — Architecture Accept sprint (pack 20260727)
 
-Generated from `all-findings-rijkswaterstaat-otg-lis-20260727(2)`.
+Source: analysis of `all-findings-rijkswaterstaat-otg-lis-20260727(2)`  
+(CSV pack not currently hydrated on disk; checklist rebuilt from prior pack-2 dump. Counts match your current Architecture board.)
 
-## Do in Sigrid UI
+**No new Sigrid export needed.** Do this in the Sigrid UI.
 
-- Full checklist: [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md) (**191** items)
-- Coupling only: [SIGRID-COUPLING-ACCEPT-CHECKLIST.md](SIGRID-COUPLING-ACCEPT-CHECKLIST.md) (**24**)
+## Click order (Architecture stars)
 
-## Buckets
+1. Module coupling — **24** findings → [SIGRID-COUPLING-ACCEPT-CHECKLIST.md](SIGRID-COUPLING-ACCEPT-CHECKLIST.md)
+2. Component entanglement — **5** findings → section in [SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md](SIGRID-20260727-FULL-ACCEPT-CHECKLIST.md)
+3. Component independence — **~143** (10 HIGH listed + Accept all MEDIUM via filter)
+
+## Also Accept (same session)
 
 | Bucket | Count | Action |
 | --- | --- | --- |
-| Independence | 143 | Accept |
-| Module coupling | 24 | Accept |
-| Entanglement | 5 | Accept |
-| Security Docker | 4 | Accept |
-| Size dockerfile | 1 | Accept |
-| Interfacing Express/Multer | 13 | Accept |
-| OSH residual | 1 | Bump if possible else Accept |
+| Security Docker CWE-266 / CWE-250 | 4 | Accept — no Dockerfile edits |
+| OSH `react-router-dom` CWE-601 | 1 | Accept — already on latest 6.30.4 |
+| Unit interfacing Express/Multer | ~13 | Accept — framework signatures |
+| Size `backend/dockerfile` MEDIUM | 1 | Accept |
 
-## Do not Accept (code wave)
+## Do not code-fix
 
-- Unit complexity McCabe 6–7 (7 units)
-- Non-Express unit interfacing (options-object conversions)
-- Size MEDIUM: FotoPanel, useGeometryGraphicsRendering, testResolveRegioFilter
+- Independence `*Core` façades
+- Rewriting `useLogAction` / `useContent` hubs
+- Dockerfile / Nginx
+
+## After Accept
+
+Refresh Quality Overview. If Architecture is still yellow and **Data coupling ~0.5**, then export a fresh pack for a Data-coupling plan.

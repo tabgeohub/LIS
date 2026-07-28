@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { selectPointsByOmschrijving } from "../../helpers/repositories/pointsRepo";
 
 export async function getPointsDescription(req: Request, res: Response) {
   const { omschrijving } = req.params;
@@ -10,19 +11,14 @@ export async function getPointsDescription(req: Request, res: Response) {
   }
 
   try {
-    const result = await pool.query(
-      "SELECT * FROM lis.points WHERE omschrijving = $1",
-      [omschrijving]
-    );
+    const result = await selectPointsByOmschrijving(pool, omschrijving);
 
     res.json(result.rows.length);
   } catch (err) {
     console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
 
-    res
-      .status(500)
-      .json({
-        error: `Error: ${err instanceof Error ? err.message : String(err)}`,
-      });
+    res.status(500).json({
+      error: `Error: ${err instanceof Error ? err.message : String(err)}`,
+    });
   }
 }

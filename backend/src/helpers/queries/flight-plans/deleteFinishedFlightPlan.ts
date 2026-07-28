@@ -1,4 +1,11 @@
 import { PoolClient } from "pg";
+import { deleteAttachmentsByIds } from "../../repositories/attachmentsRepo";
+import {
+  deleteFinishedPlansByPlanId,
+  selectAttachmentsIdsByPlanId,
+} from "../../repositories/finishedPlansRepo";
+import { deleteFinishedPlanPathByPlanId } from "../../repositories/finishedPlansPathRepo";
+import { deleteFlightPlanById } from "../../repositories/flightPlansRepo";
 
 function collectAttachmentIds(
   rows: Array<{ attachments_id: number[] | null }>
@@ -25,30 +32,19 @@ export async function deleteFinishedFlightPlanCascade(
   client: PoolClient,
   planId: string
 ): Promise<FinishedPlanDeleteSummary> {
-  const finishedPlansResult = await client.query(
-    `SELECT attachments_id FROM lis.finished_plans WHERE plan_id = $1`,
-    [planId]
-  );
+  const finishedPlansResult = await selectAttachmentsIdsByPlanId(client, planId);
 
   const uniqueAttachmentIds = collectAttachmentIds(finishedPlansResult.rows);
 
   if (uniqueAttachmentIds.length > 0) {
-    await client.query(`DELETE FROM lis.attachments WHERE id = ANY($1::int[])`, [
-      uniqueAttachmentIds,
-    ]);
+    await deleteAttachmentsByIds(client, uniqueAttachmentIds);
   }
 
-  await client.query(`DELETE FROM lis.finished_plans WHERE plan_id = $1`, [planId]);
+  await deleteFinishedPlansByPlanId(client, planId);
 
-  const pathDeleteResult = await client.query(
-    `DELETE FROM lis.finished_plans_path WHERE planid = $1`,
-    [planId]
-  );
+  const pathDeleteResult = await deleteFinishedPlanPathByPlanId(client, planId);
 
-  const deleteResult = await client.query(
-    `DELETE FROM lis.flightplans WHERE id = $1 RETURNING *`,
-    [planId]
-  );
+  const deleteResult = await deleteFlightPlanById(client, planId);
 
   return {
     deletedFlightPlan: deleteResult.rows[0],

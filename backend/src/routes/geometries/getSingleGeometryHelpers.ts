@@ -1,5 +1,6 @@
 import type { Response } from "express";
 import { pool } from "../../db";
+import { selectPointsByGeometryId } from "../../helpers/repositories/pointsRepo";
 
 export async function fetchGeometryWithPoints(
   geometryId: string
@@ -13,10 +14,7 @@ export async function fetchGeometryWithPoints(
     return null;
   }
 
-  const pointsResult = await pool.query(
-    `SELECT * FROM lis.points WHERE geometry_id = $1 ORDER BY id ASC`,
-    [geometryId]
-  );
+  const pointsResult = await selectPointsByGeometryId(pool, geometryId);
 
   return {
     ...geometryResult.rows[0],

@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import { pool } from "../../db";
 import { created, serverError } from "../../helpers/http/routeResponses";
+import { insertAttachment } from "../../helpers/repositories/attachmentsRepo";
 
 export function buildAttachmentLocation(
   lat: unknown,
@@ -37,10 +38,14 @@ export async function insertAttachmentRow(
 ): Promise<void> {
   const { res, url, pointId, attachmentId, taken_at, location } = input;
   try {
-    const result = await pool.query(
-      `INSERT INTO lis.attachments (url, point_id, attachmentid, taken_at, location) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
-      [url, pointId, attachmentId, taken_at, location]
-    );
+    const result = await insertAttachment(pool, {
+      url,
+      pointId,
+      attachmentId,
+      taken_at,
+      location,
+      attachmentIdColumn: "attachmentid",
+    });
     created({
       res,
       result: result.rows[0],

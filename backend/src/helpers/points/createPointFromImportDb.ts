@@ -4,6 +4,10 @@ import {
   NormalizedImportRow,
   ReturnMode,
 } from "./importPointRowNormalization";
+import {
+  bulkInsertPointsByColumns,
+  selectPointIdsByOmschrijvingAny,
+} from "../repositories/pointsRepo";
 
 type RawImportRow = Record<string, unknown>;
 type PointWithId = RawImportRow & { id: number };
@@ -41,29 +45,6 @@ function bulkInsertRowParams(row: NormalizedImportRow, now: Date): unknown[] {
   ];
 }
 
-function buildBulkInsertQuery(
-  toInsert: NormalizedImportRow[]
-): { sql: string; params: unknown[] } {
-  const colCount = BULK_INSERT_COLUMNS.length;
-  const now = new Date();
-  const valuesSql = toInsert.map((_, index) => {
-    const base = index * colCount;
-    const placeholders = BULK_INSERT_COLUMNS.map(
-      (_col, colIndex) => `$${base + colIndex + 1}`
-    );
-    return `(${placeholders.join(", ")})`;
-  });
-  const params = toInsert.flatMap((row) => bulkInsertRowParams(row, now));
-
-  const sql = `
-    INSERT INTO lis.points (${BULK_INSERT_COLUMNS.join(", ")})
-    VALUES ${valuesSql.join(", ")}
-    RETURNING id, omschrijving
-  `;
-
-  return { sql, params };
-}
-
 /**
  * Imports point rows in an open transaction. The lookup maps are instance
  * fields so the per-row mapping methods take 0–1 parameters.
@@ -98,10 +79,7 @@ class ImportPointsWriter {
 
   private async loadExistingPointIds(): Promise<Map<string, number>> {
     const incomingOms = this.normalized.map((row) => row.omschrijving);
-    const res = await this.client.query(
-      `SELECT id, omschrijving FROM lis.points WHERE omschrijving = ANY($1::text[])`,
-      [incomingOms]
-    );
+    const res = await selectPointIdsByOmschrijvingAny(this.client, incomingOms);
     return new Map<string, number>(
       res.rows.map((row: { id: number; omschrijving: string }) => [
         row.omschrijving.toLowerCase(),
@@ -118,8 +96,11 @@ class ImportPointsWriter {
       return;
     }
 
-    const { sql, params } = buildBulkInsertQuery(toInsert);
-    const res = await this.client.query(sql, params);
+    const now = new Date();
+    const res = await bulkInsertPointsByColumns(this.client, {
+      columns: BULK_INSERT_COLUMNS,
+      rows: toInsert.map((row) => bulkInsertRowParams(row, now)),
+    });
     for (const row of res.rows as Array<{ id: number; omschrijving: string }>) {
       this.insertedMap.set(row.omschrijving.toLowerCase(), row.id);
     }

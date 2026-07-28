@@ -1,10 +1,21 @@
 import { PoolClient } from "pg";
-import {
-  buildPointInsertParams,
-  buildPointInsertSql,
-  type PointCoreColumn,
-} from "../queries/points/pointFields";
+import { type PointCoreColumn } from "../queries/points/pointFields";
 import type { IncomingPlan } from "../validators/finishedPlan";
+import {
+  insertPointReturningId,
+  pointExistsById,
+  updatePointOmschrijvingStatus,
+} from "../repositories/pointsRepo";
+import {
+  setFlightPlanStatusFinished,
+  updateFlightPlanPoints,
+} from "../repositories/flightPlansRepo";
+import { insertFinishedPlanPath } from "../repositories/finishedPlansPathRepo";
+import { insertAttachmentReturningId } from "../repositories/attachmentsRepo";
+import {
+  insertFinishedPlanRow,
+  selectMaxPointOrderForPlan,
+} from "../repositories/finishedPlansRepo";
 
 type FinishedPlanPoint = IncomingPlan["points"][number];
 type FinishedPlanAttachment = NonNullable<
@@ -111,14 +122,12 @@ class FinishedPlanWriter {
   }
 
   private async insertNewPoint(point: FinishedPlanPoint): Promise<number> {
-    const sql = `${buildPointInsertSql(["created_at", "status", "soort"])} RETURNING id`;
-    const values = buildPointInsertParams({
-      source: point,
+    const inserted = await insertPointReturningId(this.client, {
+      source: point as unknown as Record<string, unknown>,
+      extraColumns: ["created_at", "status", "soort"],
       extraValues: [new Date(), "bezocht", "adhoc"],
       overrides: buildNewPointOverrides(point, this.plan.user_id),
     });
-
-    const inserted = await this.client.query(sql, values);
     const newId = inserted.rows?.[0]?.id;
     if (!newId) {
       throw new Error("Insert point returned no id.");
@@ -127,10 +136,11 @@ class FinishedPlanWriter {
   }
 
   private async updateExistingPoint(point: FinishedPlanPoint): Promise<void> {
-    const result = await this.client.query(
-      `UPDATE lis.points SET omschrijving = $1, status = $2 WHERE id = $3`,
-      [point.omschrijving, "bezocht", point.id]
-    );
+    const result = await updatePointOmschrijvingStatus(this.client, {
+      id: point.id,
+      omschrijving: point.omschrijving,
+      status: "bezocht",
+    });
     if (result.rowCount === 0) {
       throw new Error(`Point with id ${point.id} not found for update.`);
     }
@@ -138,19 +148,19 @@ class FinishedPlanWriter {
 
   private async markFlightPlanFinished(): Promise<void> {
     const realPointIds = this.plan.points.map((p) => this.realIdOf(p));
-    const pointsRes = await this.client.query(
-      `UPDATE lis.flightplans SET points = $1 WHERE id = $2`,
-      [realPointIds, this.plan.id]
-    );
+    const pointsRes = await updateFlightPlanPoints(this.client, {
+      id: this.plan.id,
+      points: realPointIds,
+    });
     if (pointsRes.rowCount === 0) {
       throw new Error(
         `Flightplan ${this.plan.id} not found when updating points.`
       );
     }
 
-    const statusRes = await this.client.query(
-      `UPDATE lis.flightplans SET status = 'finished' WHERE id = $1`,
-      [this.plan.id]
+    const statusRes = await setFlightPlanStatusFinished(
+      this.client,
+      this.plan.id
     );
     if (statusRes.rowCount === 0) {
       throw new Error(
@@ -160,14 +170,11 @@ class FinishedPlanWriter {
   }
 
   private async insertPath(): Promise<void> {
-    await this.client.query(
-      `INSERT INTO lis.finished_plans_path (path, planid, flighttime) VALUES ($1, $2, $3)`,
-      [
-        JSON.stringify(this.plan.pathData),
-        this.plan.id,
-        JSON.stringify(this.plan.flightTime) ?? null,
-      ]
-    );
+    await insertFinishedPlanPath(this.client, {
+      path: JSON.stringify(this.plan.pathData),
+      planId: this.plan.id,
+      flightTime: JSON.stringify(this.plan.flightTime) ?? null,
+    });
   }
 
   private async insertAttachments(): Promise<void> {
@@ -205,13 +212,13 @@ class FinishedPlanWriter {
     attachment: FinishedPlanAttachment;
   }) {
     const { realPointId, point, attachment } = input;
-    return [
-      attachment.url,
-      realPointId,
-      attachment.objectId ?? null,
-      attachment.taken_at ?? null,
-      resolveAttachmentLocation(attachment, point),
-    ];
+    return {
+      url: attachment.url,
+      pointId: realPointId,
+      attachmentId: attachment.objectId ?? null,
+      taken_at: attachment.taken_at ?? null,
+      location: resolveAttachmentLocation(attachment, point),
+    };
   }
 
   private async insertAttachmentRow(input: {
@@ -219,20 +226,15 @@ class FinishedPlanWriter {
     point: FinishedPlanPoint;
     attachment: FinishedPlanAttachment;
   }): Promise<number | undefined> {
-    const ins = await this.client.query(
-      `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id`,
+    const ins = await insertAttachmentReturningId(
+      this.client,
       this.attachmentInsertValues(input)
     );
     return insertedAttachmentId(ins);
   }
 
   private async insertFinishedRows(): Promise<void> {
-    const orderRow = await this.client.query(
-      `SELECT MAX(point_order) AS max_order FROM lis.finished_plans WHERE plan_id = $1`,
-      [this.plan.id]
-    );
+    const orderRow = await selectMaxPointOrderForPlan(this.client, this.plan.id);
     this.nextOrder = Number(orderRow.rows?.[0]?.max_order ?? 0);
 
     for (const point of this.plan.points) {
@@ -257,9 +259,8 @@ class FinishedPlanWriter {
     const realPointId = this.realIdOf(point);
     await this.assertPointExists(realPointId);
 
-    await this.client.query(
-      `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    await insertFinishedPlanRow(
+      this.client,
       this.finishedRowParams(point, realPointId)
     );
   }
@@ -274,11 +275,8 @@ class FinishedPlanWriter {
   }
 
   private async assertPointExists(pointId: number): Promise<void> {
-    const exists = await this.client.query(
-      `SELECT 1 FROM lis.points WHERE id = $1`,
-      [pointId]
-    );
-    if (exists.rowCount === 0) {
+    const exists = await pointExistsById(this.client, pointId);
+    if (!exists) {
       throw new Error(`Parent point ${pointId} not found in lis.points.`);
     }
   }
