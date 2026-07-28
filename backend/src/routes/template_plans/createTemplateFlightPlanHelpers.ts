@@ -1,26 +1,14 @@
 import type { Response } from "express";
 import { pool } from "../../db";
 import { created, serverError } from "../../helpers/http/routeResponses";
+import { insertTemplatePlanReturning } from "../../helpers/repositories/templatePlansRepo";
 
 export async function insertTemplateFlightPlan(input: {
   points: unknown;
   name: string;
   regio_id: unknown;
 }): Promise<Record<string, unknown>> {
-  const result = await pool.query(
-    `INSERT INTO lis.template_plans (
-        points,
-        name,
-        regio_id
-      )
-      VALUES (
-        $1, 
-        $2,
-        $3
-      )
-      RETURNING *;`,
-    [input.points, input.name, input.regio_id]
-  );
+  const result = await insertTemplatePlanReturning(pool, input);
   return result.rows[0];
 }
 

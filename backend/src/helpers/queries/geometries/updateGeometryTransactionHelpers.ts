@@ -1,10 +1,7 @@
 import type { PoolClient } from "pg";
-import {
-  buildGeometryMetadataValues,
-  GEOMETRY_METADATA_UPDATE_SQL,
-} from "./geometryRouteHelpers";
 import { updateGeometryOwnedPoints } from "./updateGeometryPoints";
 import { selectPointsByGeometryId } from "../../repositories/pointsRepo";
+import { updateGeometryMetadata } from "../../repositories/geometriesRepo";
 
 export type UpdateGeometryTransactionInput = {
   client: PoolClient;
@@ -33,10 +30,10 @@ async function maybeUpdateOwnedPoints(
 export async function updateGeometryMetadataAndPoints(
   input: UpdateGeometryTransactionInput
 ): Promise<UpdateMetaResult> {
-  const geometryUpdate = await input.client.query(
-    GEOMETRY_METADATA_UPDATE_SQL,
-    buildGeometryMetadataValues(input.metadata, input.geometryId)
-  );
+  const geometryUpdate = await updateGeometryMetadata(input.client, {
+    metadata: input.metadata,
+    geometryId: input.geometryId,
+  });
 
   const pointError = await maybeUpdateOwnedPoints(input);
   if (pointError) {

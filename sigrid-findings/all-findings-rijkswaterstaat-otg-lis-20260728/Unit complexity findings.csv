@@ -1,0 +1,2 @@
+Description,Severity,Status,First Seen,Issue age,Unit,File,Technology,Lines of code,McCabe complexity,Number of parameters
+McCabe complexity of 6 for unit resolveRegioFilter.ts.rolesFromTokenSet(any),LOW,RAW,2026-07-28,0,resolveRegioFilter.ts.rolesFromTokenSet(any),backend/src/helpers/queries/shared/resolveRegioFilter.ts#L38:50,TypeScript,9,6,1

@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { selectAllUsers } from "../../helpers/repositories/usersRepo";
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const result = await pool.query("SELECT * FROM lis.users ORDER BY user_id");
+    const result = await selectAllUsers(pool);
 
     res.json(result.rows);
   } catch (err) {

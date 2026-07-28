@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import {
-  buildPointUpdateParams,
-  buildPointUpdateSql,
-} from "../../helpers/queries/points/pointFields";
+import { updatePointByIdReturning } from "../../helpers/repositories/pointsRepo";
 import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
@@ -12,7 +9,8 @@ export async function editPoint(req: Request, res: Response): Promise<void> {
   await runReturningUpdateById({
     res,
     id,
-    runQuery: () => pool.query(buildPointUpdateSql(), buildPointUpdateParams(req.body, id)),
+    runQuery: () =>
+      updatePointByIdReturning(pool, { source: req.body, id }),
     config: {
       notFoundMessage: "Vluchtplan niet gevonden",
       successMessage: "Vluchtplan succesvol bijgewerkt",

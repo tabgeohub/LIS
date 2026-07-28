@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { insertUserReturning } from "../../helpers/repositories/usersRepo";
 
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
@@ -24,10 +25,11 @@ export async function createUser(req: Request, res: Response) {
   const { user_name, password, role } = req.body;
 
   try {
-    const result = await pool.query(
-      "INSERT INTO lis.users (user_name, role, password) VALUES ($1, $2, $3) RETURNING *",
-      [user_name, role, password]
-    );
+    const result = await insertUserReturning(pool, {
+      user_name,
+      role,
+      password,
+    });
     res.status(201).json(result.rows[0]);
   } catch (err) {
     const message = errorMessage(err);

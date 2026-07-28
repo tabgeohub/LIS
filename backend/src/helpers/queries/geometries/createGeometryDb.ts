@@ -1,10 +1,7 @@
 import { PoolClient } from "pg";
 import { insertGeometryPoints } from "./geometryRouteHelpers";
-import {
-  buildCreateGeometryParams,
-  CREATE_GEOMETRY_SQL,
-  type CreateGeometryBody,
-} from "./createGeometryInsert";
+import type { CreateGeometryBody } from "./createGeometryInsert";
+import { insertGeometryReturningId } from "../../repositories/geometriesRepo";
 
 export type { CreateGeometryBody };
 
@@ -12,10 +9,7 @@ export async function persistNewGeometry(
   client: PoolClient,
   body: CreateGeometryBody
 ) {
-  const geometryResult = await client.query(
-    CREATE_GEOMETRY_SQL,
-    buildCreateGeometryParams(body)
-  );
+  const geometryResult = await insertGeometryReturningId(client, body);
 
   const geometryId = geometryResult.rows[0].id;
   const insertedPoints = await insertGeometryPoints({

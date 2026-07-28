@@ -1,8 +1,9 @@
-import { POINT_CORE_COLUMNS, PointCoreColumn, PointCoreSource } from "./pointCoreColumns";
+import { PointCoreColumn, PointCoreSource } from "./pointCoreColumns";
 import {
   normalizePointCoreFields,
   pointCoreValues,
 } from "./normalizePointCoreFields";
+import { POINT_CORE_COLUMNS } from "./pointCoreColumns";
 
 export const POINT_UPDATE_COLUMNS: PointCoreColumn[] = [
   ...POINT_CORE_COLUMNS.slice(0, 6),
@@ -23,15 +24,6 @@ export function buildPointUpdateAssignments(input: {
   }).join(",\n        ");
 }
 
-export function buildPointInsertSql(extraColumns: string[]): string {
-  const columns = [...POINT_CORE_COLUMNS, ...extraColumns];
-  const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
-
-  return `INSERT INTO lis.points (
-        ${columns.join(",\n        ")}
-      ) VALUES (${placeholders})`;
-}
-
 export type BuildPointInsertParamsInput = {
   source: PointCoreSource;
   extraValues: unknown[];
@@ -41,16 +33,6 @@ export type BuildPointInsertParamsInput = {
 export function buildPointInsertParams(input: BuildPointInsertParamsInput): unknown[] {
   const { source, extraValues, overrides = {} } = input;
   return [...pointCoreValues({ source, overrides }), ...extraValues];
-}
-
-const POINT_UPDATE_SQL = `
-      UPDATE lis.points SET
-        ${buildPointUpdateAssignments()}
-      WHERE id = $13
-      RETURNING *`;
-
-export function buildPointUpdateSql(): string {
-  return POINT_UPDATE_SQL;
 }
 
 export function buildPointUpdateParams(

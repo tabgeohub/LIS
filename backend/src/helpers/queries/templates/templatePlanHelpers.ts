@@ -4,9 +4,10 @@ import {
   loadFormattedTemplatePlans,
   respondTemplateListError,
 } from "./fetchTemplateFlightPlanListHelpers";
+import { selectTemplatePlanByName } from "../../repositories/templatePlansRepo";
 
 export async function findTemplatePlanByName(name: string) {
-  return pool.query(`SELECT * FROM lis.template_plans WHERE name = $1`, [name]);
+  return selectTemplatePlanByName(pool, name);
 }
 
 export function respondTemplateNameTaken(res: Response): void {

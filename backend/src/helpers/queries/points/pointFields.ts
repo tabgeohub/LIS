@@ -13,9 +13,12 @@ export {
 
 export {
   buildPointInsertParams,
-  buildPointInsertSql,
   buildPointUpdateParams,
-  buildPointUpdateSql,
   buildPointUpdateAssignments,
   POINT_UPDATE_COLUMNS,
 } from "./pointSqlBuilders";
+
+export {
+  buildPointInsertSql,
+  buildPointUpdateSql,
+} from "../../repositories/pointsRepo";

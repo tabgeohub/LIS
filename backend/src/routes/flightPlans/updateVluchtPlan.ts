@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import {
-  buildFlightPlanUpdateParams,
-  buildFlightPlanUpdateSql,
-} from "../../helpers/queries/flight-plans/flightPlanFields";
+import { updateFlightPlanReturning } from "../../helpers/repositories/flightPlansRepo";
 import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 
 export async function updateVluchtPlan(
@@ -15,8 +12,7 @@ export async function updateVluchtPlan(
   await runReturningUpdateById({
     res,
     id,
-    runQuery: () =>
-      pool.query(buildFlightPlanUpdateSql(), buildFlightPlanUpdateParams(req.body, id)),
+    runQuery: () => updateFlightPlanReturning(pool, req.body, id),
     config: {
       notFoundMessage: "Vluchtplan niet gevonden",
       successMessage: "Vluchtplan succesvol bijgewerkt",

@@ -4,6 +4,7 @@ import {
   buildGeometrySelectFields,
 } from "./geometryJson";
 import { buildTemplateGeometryGroup } from "./buildTemplateGeometryGroup";
+import { buildGeometryDataMapSql } from "../../repositories/flightPlanJoinSql";
 
 type RawPoint = Record<string, unknown> & {
   geometry_id?: number | null;
@@ -141,14 +142,7 @@ export async function fetchGeometryDataMap(
 
   const pointsAgg = buildGeometryPointsJsonAgg("coords", "p");
   const selectFields = buildGeometrySelectFields(pointsAgg);
-  const geometryQuery = `
-        SELECT
-          ${selectFields}
-        FROM lis.geometries g
-        JOIN lis.points p ON p.geometry_id = g.id
-        WHERE g.id = ANY($1)
-        GROUP BY g.id
-      `;
+  const geometryQuery = buildGeometryDataMapSql(selectFields);
 
   const geometryResult = await pool.query(geometryQuery, [geometryIds]);
   geometryResult.rows.forEach((geo: Record<string, unknown>) => {

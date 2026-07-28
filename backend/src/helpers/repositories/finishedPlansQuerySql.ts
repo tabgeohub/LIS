@@ -1,0 +1,135 @@
+import { buildAttachmentsAggregationExpr } from "../queries/points/pointJson";
+import {
+  buildAttachmentsLateralJoin,
+  buildFinishedPlanDetailsPointJsonbObject,
+} from "../queries/points/pointJson";
+
+/** CTE used by finished-plan list/time-range composers. */
+export const FINISHED_PLANS_POINTS_CTE = `
+      WITH points_per_plan AS (
+        SELECT DISTINCT plan_id, point_id
+        FROM lis.finished_plans
+      )`;
+
+export function buildSingleFinishedPlanCtes(): string {
+  return `
+      WITH ffp_rows AS (
+        SELECT *
+        FROM lis.finished_plans
+        WHERE plan_id = $1
+      ),
+      points_per_plan AS (
+        SELECT
+          plan_id,
+          point_id,
+          MAX(point_order) AS point_order,
+          MAX(pointcomment) AS point_comment
+        FROM ffp_rows
+        GROUP BY plan_id, point_id
+      ),
+      fp_point_attachments AS (
+        SELECT DISTINCT ON (point_id)
+          point_id,
+          attachments_id
+        FROM ffp_rows
+        ORDER BY point_id, point_order DESC NULLS LAST
+      ),
+      attachments_per_point AS (
+        SELECT
+          fpa.point_id,
+          ${buildAttachmentsAggregationExpr("fpa.attachments_id")} AS attachments
+        FROM fp_point_attachments fpa
+      )`;
+}
+
+export function buildFinishedFlightPlansListSelect(pointJson: string): string {
+  return `
+      SELECT
+        fp.*,
+        jsonb_agg(
+          jsonb_strip_nulls(
+            ${pointJson}
+          )
+        ) AS points_data,
+        fpp.path AS path
+      FROM lis.flightplans fp
+      JOIN lis.finished_plans ffp ON ffp.plan_id = fp.id
+      JOIN lis.points pt ON pt.id = ffp.point_id
+      ${buildAttachmentsLateralJoin("ffp.attachments_id", "att_list")}
+      LEFT JOIN lis.finished_plans_path fpp ON fpp.planid = fp.id
+      WHERE fp.status = 'finished'`;
+}
+
+export function buildFinishedFlightPlansListPointJson(): string {
+  return buildFinishedPlanDetailsPointJsonbObject({
+    pointOrderExpr: "ffp.point_order",
+    pointCommentExpr: "ffp.pointComment",
+    attachmentsExpr: "att_list.attachments",
+  });
+}
+
+export function buildFinishedPlansSelectBody(
+  whereClause: string,
+  pointJson: string
+): string {
+  return `${FINISHED_PLANS_POINTS_CTE}
+      SELECT
+        fp.*,
+        jsonb_agg(
+          jsonb_strip_nulls(
+            ${pointJson}
+          )
+          ORDER BY pt.created_at, pt.id
+        ) AS points_data
+      FROM lis.flightplans fp
+      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
+      JOIN lis.points pt ON pt.id = ppp.point_id
+      LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
+      ${whereClause}`;
+}
+
+export function buildFinishedPlansTimeRangeSelectSql(): string {
+  return `${FINISHED_PLANS_POINTS_CTE}
+      SELECT
+        MIN(fp.datum::date) AS "from",
+        MAX(fp.datum::date) AS "to"
+      FROM lis.flightplans fp
+      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
+      JOIN lis.points pt ON pt.id = ppp.point_id
+      WHERE fp.status = 'finished'
+        AND fp.datum IS NOT NULL`;
+}
+
+export function buildSingleFinishedFlightPlanSelect(pointJson: string): string {
+  return `SELECT
+        fp.*,
+        fpp.path AS path,
+        fpp.flighttime AS flighttime,
+        jsonb_agg(
+          jsonb_strip_nulls(
+            ${pointJson}
+          )
+          ORDER BY ppp.point_order NULLS LAST, pt.id
+        ) AS points_data
+      FROM lis.flightplans fp
+      JOIN points_per_plan ppp
+        ON ppp.plan_id = fp.id
+      JOIN lis.points pt
+        ON pt.id = ppp.point_id
+      LEFT JOIN attachments_per_point ap
+        ON ap.point_id = ppp.point_id
+      LEFT JOIN lis.geometries g
+        ON g.id = pt.geometry_id
+      LEFT JOIN lis.finished_plans_path fpp
+        ON fpp.planid = fp.id
+      WHERE fp.status = 'finished'
+        AND fp.id = $1
+      GROUP BY fp.id, fpp.path, fpp.flighttime;
+      `;
+}
+
+/** Fragment for orphan-attachment checks. */
+export const ATTACHMENT_IN_FINISHED_PLANS_EXISTS_SQL = `
+        SELECT 1 FROM lis.finished_plans fp
+        WHERE a.id = ANY(fp.attachments_id)
+`;

@@ -1,39 +1,52 @@
 import type { Queryable } from "./queryable";
+import { ATTACHMENT_IN_FINISHED_PLANS_EXISTS_SQL } from "./finishedPlansQuerySql";
+
+type AttachmentInsertInput = {
+  url: unknown;
+  pointId: unknown;
+  attachmentId: unknown;
+  taken_at: unknown;
+  location: string | null;
+};
+
+function attachmentInsertParams(input: AttachmentInsertInput) {
+  return [
+    input.url,
+    input.pointId,
+    input.attachmentId,
+    input.taken_at,
+    input.location,
+  ];
+}
+
+function attachmentInsertSql(
+  attachmentIdColumn: "attachmentid" | "attachmentId",
+  returning: string
+) {
+  return `INSERT INTO lis.attachments (url, point_id, ${attachmentIdColumn}, taken_at, location) VALUES ($1, $2, $3, $4, $5) ${returning}`;
+}
 
 export async function insertAttachment(
   db: Queryable,
-  input: {
-    url: unknown;
-    pointId: unknown;
-    attachmentId: unknown;
-    taken_at: unknown;
-    location: string | null;
+  input: AttachmentInsertInput & {
     /** Column casing differs historically between call sites. */
     attachmentIdColumn?: "attachmentid" | "attachmentId";
   }
 ) {
   const col = input.attachmentIdColumn ?? "attachmentid";
   return db.query(
-    `INSERT INTO lis.attachments (url, point_id, ${col}, taken_at, location) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
-    [input.url, input.pointId, input.attachmentId, input.taken_at, input.location]
+    attachmentInsertSql(col, "RETURNING *;"),
+    attachmentInsertParams(input)
   );
 }
 
 export async function insertAttachmentReturningId(
   db: Queryable,
-  input: {
-    url: unknown;
-    pointId: unknown;
-    attachmentId: unknown;
-    taken_at: unknown;
-    location: string | null;
-  }
+  input: AttachmentInsertInput
 ) {
   return db.query(
-    `INSERT INTO lis.attachments (url, point_id, attachmentId, taken_at, location)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id`,
-    [input.url, input.pointId, input.attachmentId, input.taken_at, input.location]
+    attachmentInsertSql("attachmentId", "RETURNING id"),
+    attachmentInsertParams(input)
   );
 }
 
@@ -98,8 +111,7 @@ export async function deleteOrphanedAttachments(
       DELETE FROM lis.attachments a
       WHERE a.id = ANY($1::int[])
       AND NOT EXISTS (
-        SELECT 1 FROM lis.finished_plans fp
-        WHERE a.id = ANY(fp.attachments_id)
+        ${ATTACHMENT_IN_FINISHED_PLANS_EXISTS_SQL}
       )
     `,
     [ids]

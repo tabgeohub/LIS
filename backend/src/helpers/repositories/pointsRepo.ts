@@ -1,12 +1,62 @@
 import type { Queryable } from "./queryable";
 import {
   buildPointInsertParams,
-  buildPointInsertSql,
   buildPointUpdateAssignments,
   buildPointUpdateParams,
+} from "../queries/points/pointSqlBuilders";
+import {
+  POINT_CORE_COLUMNS,
   type PointCoreColumn,
   type PointCorePayload,
-} from "../queries/points/pointFields";
+  type PointCoreSource,
+} from "../queries/points/pointCoreColumns";
+
+export type PointInsertInput = {
+  source: PointCoreSource;
+  extraColumns: string[];
+  extraValues: unknown[];
+  overrides?: Partial<Record<PointCoreColumn, unknown>>;
+};
+
+export function buildPointInsertSql(extraColumns: string[]): string {
+  const columns = [...POINT_CORE_COLUMNS, ...extraColumns];
+  const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+
+  return `INSERT INTO lis.points (
+        ${columns.join(",\n        ")}
+      ) VALUES (${placeholders})`;
+}
+
+export function buildPointUpdateSql(): string {
+  return `
+      UPDATE lis.points SET
+        ${buildPointUpdateAssignments()}
+      WHERE id = $13
+      RETURNING *`;
+}
+
+export async function insertPointReturningRow(
+  db: Queryable,
+  input: PointInsertInput
+) {
+  const sql = `${buildPointInsertSql(input.extraColumns)} RETURNING *`;
+  const values = buildPointInsertParams({
+    source: input.source,
+    extraValues: input.extraValues,
+    overrides: input.overrides,
+  });
+  return db.query(sql, values);
+}
+
+export async function updatePointByIdReturning(
+  db: Queryable,
+  input: { source: PointCoreSource; id: unknown }
+) {
+  return db.query(
+    buildPointUpdateSql(),
+    buildPointUpdateParams(input.source, input.id)
+  );
+}
 
 export async function updatePointStatus(
   db: Queryable,

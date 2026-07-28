@@ -3,16 +3,14 @@ import {
   updateGeometryMetadataAndPoints,
   type UpdateGeometryTransactionInput,
 } from "./updateGeometryTransactionHelpers";
+import { selectGeometryId } from "../../repositories/geometriesRepo";
 
 export type { UpdateGeometryTransactionInput };
 
 export async function runGeometryUpdateTransaction(
   input: UpdateGeometryTransactionInput
 ) {
-  const exists = await input.client.query(
-    `SELECT id FROM lis.geometries WHERE id = $1`,
-    [input.geometryId]
-  );
+  const exists = await selectGeometryId(input.client, input.geometryId);
 
   if (exists.rowCount === 0) {
     return { ok: false as const, status: 404, message: "Geometrie niet gevonden." };

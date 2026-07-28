@@ -1,8 +1,8 @@
-import { FINISHED_PLANS_POINTS_CTE } from "../flight-plans/flightPlanJoin";
 import {
   appendRegioFilter,
   RegioFilterOptions,
 } from "../shared/regioFilter";
+import { buildFinishedPlansTimeRangeSelectSql } from "../../repositories/finishedPlansQuerySql";
 
 export function buildFinishedPlansTimeRangeQuery(
   regio_id: unknown,
@@ -13,15 +13,7 @@ export function buildFinishedPlansTimeRangeQuery(
 ): { query: string; params: unknown[] } {
   const params: unknown[] = [];
 
-  let query = `${FINISHED_PLANS_POINTS_CTE}
-      SELECT
-        MIN(fp.datum::date) AS "from",
-        MAX(fp.datum::date) AS "to"
-      FROM lis.flightplans fp
-      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
-      JOIN lis.points pt ON pt.id = ppp.point_id
-      WHERE fp.status = 'finished'
-        AND fp.datum IS NOT NULL`;
+  let query = buildFinishedPlansTimeRangeSelectSql();
 
   query = appendRegioFilter({
     sql: query,

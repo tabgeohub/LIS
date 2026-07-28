@@ -1,9 +1,9 @@
-import { FINISHED_PLANS_POINTS_CTE } from "../flight-plans/flightPlanJoin";
 import { buildFinishedPlanPointJsonbObject } from "../points/pointJson";
 import {
   appendRegioFilter,
   type RegioFilterOptions,
 } from "../shared/regioFilter";
+import { buildFinishedPlansSelectBody as buildFinishedPlansSelectBodySql } from "../../repositories/finishedPlansQuerySql";
 
 export const DEFAULT_FINISHED_REGIO_FILTER: RegioFilterOptions = {
   caseInsensitiveAdmin: true,
@@ -34,21 +34,10 @@ export function appendFinishedDateRange(input: {
 }
 
 export function buildFinishedPlansSelectBody(whereClause: string): string {
-  const pointJson = buildFinishedPlanPointJsonbObject();
-  return `${FINISHED_PLANS_POINTS_CTE}
-      SELECT
-        fp.*,
-        jsonb_agg(
-          jsonb_strip_nulls(
-            ${pointJson}
-          )
-          ORDER BY pt.created_at, pt.id
-        ) AS points_data
-      FROM lis.flightplans fp
-      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
-      JOIN lis.points pt ON pt.id = ppp.point_id
-      LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
-      ${whereClause}`;
+  return buildFinishedPlansSelectBodySql(
+    whereClause,
+    buildFinishedPlanPointJsonbObject()
+  );
 }
 
 export function appendFinishedRegioAndOrder(input: {

@@ -1,5 +1,7 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import type { QueryResult } from "pg";
+import type { Queryable } from "../../helpers/repositories/queryable";
+import { updateUserReturning } from "../../helpers/repositories/usersRepo";
 
 export function respondMissingUserId(res: Response): boolean {
   res.status(400).json({ message: "User ID is required" });
@@ -27,7 +29,7 @@ export function respondUserUpdateError(res: Response, err: unknown): void {
 }
 
 export async function runUpdateUserQuery(
-  pool: { query: (sql: string, params: unknown[]) => Promise<QueryResult> },
+  pool: Queryable,
   body: {
     user_id: unknown;
     user_name: unknown;
@@ -35,13 +37,5 @@ export async function runUpdateUserQuery(
     password: unknown;
   }
 ) {
-  return pool.query(
-    `UPDATE lis.users
-     SET user_name = $1,
-         role = $2,
-         password = $3
-     WHERE user_id = $4
-     RETURNING *`,
-    [body.user_name, body.role, body.password, body.user_id]
-  );
+  return updateUserReturning(pool, body);
 }

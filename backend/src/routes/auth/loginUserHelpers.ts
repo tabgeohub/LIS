@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "crypto";
 import type { Response } from "express";
 import { pool } from "../../db";
+import { selectUserByUsername } from "../../helpers/repositories/usersRepo";
 
 function secretsEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a, "utf8");
@@ -22,10 +23,7 @@ export async function authenticateUser(
   username: string,
   password: string
 ): Promise<AuthenticatedUser | null> {
-  const result = await pool.query(
-    `SELECT user_id, user_name, role, password FROM lis.users WHERE LOWER(user_name) = LOWER($1)`,
-    [username]
-  );
+  const result = await selectUserByUsername(pool, username);
 
   if (result.rows.length === 0) {
     return null;

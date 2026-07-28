@@ -1,33 +1,45 @@
-# NEXT-FOCUS-STATUS — Data coupling repositories wave
+# NEXT-FOCUS-STATUS — Architecture Data coupling phase 2
 
-## Done (this wave)
+## Scores (baseline pack 20260728)
 
-Concentrated embedded SQL for **points**, **flightplans**, **attachments**, **finished_plans** (+ path) into:
+| Metric | Score | Note |
+| --- | --- | --- |
+| Architecture | **3.6** (green) | Target: greener via Data coupling |
+| Data coupling | **~1.46** | Phase 2 code complete; await rescan |
+| Maintainability | **4.4** | Untouched this wave |
 
-`backend/src/helpers/repositories/`
+## Connected components — expected after rescan
 
-- `queryable.ts`
-- `pointsRepo.ts`
-- `flightPlansRepo.ts`
-- `attachmentsRepo.ts`
-- `finishedPlansRepo.ts`
-- `finishedPlansPathRepo.ts`
+| Entity | Before | Target |
+| --- | --- | --- |
+| `flightplans` | 4 | ≤2 |
+| `geometries` | 3 | ≤2 |
+| `points` | 3 | ≤2 |
+| `finished_plans` | 2 | 1 |
+| `template_plans` | 2 | 1 |
+| `users` | 2 | 1 |
+| `attachments` / emails / getac | 1 | keep |
 
-Routes and cascades now call repos (no table SQL left in those orchestrators for the four entities). Writers (`createFinishedPlanDb`, import, attachment update/fetch) go through repos.
+## Done (code)
 
-## Still expected SQL edges (phase-2 candidates)
+### Wave A
+- `flightPlansRepo`: INSERT/UPDATE SQL + `selectPreparedFlightPlanIdsWithRegio`; script uses repo
+- `finishedPlansTimesliderQuery.ts`: timeslider JOIN SQL
+- **New** `geometriesRepo.ts`: exists/select/insert/update/delete
+- `pointsRepo`: `insertPointReturningRow` / `updatePointByIdReturning`; route raw SQL removed
 
-Multi-table join/CTE composers still embed table names by design:
+### Wave B
+- `finishedPlansQuerySql.ts` + `flightPlansByPointQuery.ts` + `flightPlanJoinSql.ts`: CTE/list/join SQL under repositories
+- **New** `templatePlansRepo.ts`, `usersRepo.ts`
 
-- `helpers/queries/finished-plans/*` list/single CTE builders
-- `helpers/queries/flight-plans/flightPlanJoin.ts`
-- `helpers/queries/points/pointJson.ts`
-- `helpers/queries/timeslider/timesliderPlanImagesQuery.ts`
+## Your action
 
-## Architecture Accept (still your UI action)
+1. Accept Architecture Independence/coupling/entanglement in Sigrid UI ([ACCEPT-LIST.md](ACCEPT-LIST.md))
+2. Push + wait for Sigrid rescan; compare data-store-entities Connected components
 
-Independence / Coupling / Entanglement Accept checklists remain the fast path for Architecture **findings**. Data coupling **0.5** should improve after the next Sigrid upload measuring this repo layer.
+## Out of scope
 
-## Verify after upload
-
-Re-export Data coupling CSVs; expect fewer connected components on points / flightplans / attachments / finished_plans.
+- Dockerfile / Nginx
+- Independence `*Core` / hub rewrites
+- emails / getac_devices (already CC=1)
+- Pulling `backend/scripts` into repos

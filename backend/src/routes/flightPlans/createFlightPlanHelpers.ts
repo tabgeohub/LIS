@@ -1,10 +1,7 @@
 import type { Response } from "express";
 import { pool } from "../../db";
-import {
-  buildFlightPlanInsertParams,
-  buildFlightPlanInsertSql,
-  type FlightPlanBodySource,
-} from "../../helpers/queries/flight-plans/flightPlanFields";
+import type { FlightPlanBodySource } from "../../helpers/queries/flight-plans/flightPlanFields";
+import { insertFlightPlanReturning } from "../../helpers/repositories/flightPlansRepo";
 import { created, serverError } from "../../helpers/http/routeResponses";
 import { getMissingFields, requireArray } from "../../helpers/http/validateBody";
 
@@ -23,10 +20,7 @@ export async function insertAndRespondFlightPlan(
   body: FlightPlanBodySource,
   res: Response
 ): Promise<void> {
-  const result = await pool.query(
-    buildFlightPlanInsertSql(),
-    buildFlightPlanInsertParams(body)
-  );
+  const result = await insertFlightPlanReturning(pool, body);
   created({
     res,
     result: result.rows[0],

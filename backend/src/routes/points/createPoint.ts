@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import {
-  buildPointInsertParams,
-  buildPointInsertSql,
-} from "../../helpers/queries/points/pointFields";
+import { insertPointReturningRow } from "../../helpers/repositories/pointsRepo";
 import {
   MISSING_FIELDS_MESSAGE_WITH_PERIOD,
   missingFields,
@@ -20,13 +17,11 @@ export async function createPoint(req: Request, res: Response): Promise<void> {
   const created_at = new Date();
 
   try {
-    const result = await pool.query(
-      `${buildPointInsertSql(["soort", "status", "created_at"])} RETURNING *`,
-      buildPointInsertParams({
-        source: req.body,
-        extraValues: ["permanent", "niet bezocht", created_at],
-      })
-    );
+    const result = await insertPointReturningRow(pool, {
+      source: req.body,
+      extraColumns: ["soort", "status", "created_at"],
+      extraValues: ["permanent", "niet bezocht", created_at],
+    });
 
     const row = result.rows[0];
     res.status(201).json({

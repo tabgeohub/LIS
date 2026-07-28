@@ -1,16 +1,17 @@
 import type { Queryable } from "./queryable";
 
+const SELECT_ATTACHMENTS_ID_SQL = `
+  SELECT attachments_id
+  FROM lis.finished_plans
+  WHERE plan_id = $1 AND point_id = $2
+`;
+
 export async function selectAttachmentsIdForPlanPoint(
   db: Queryable,
   input: { planId: number; pointId: number }
 ) {
   return db.query<{ attachments_id: number[] | null }>(
-    `
-      SELECT attachments_id
-      FROM lis.finished_plans
-      WHERE plan_id = $1 AND point_id = $2
-      LIMIT 1;
-    `,
+    `${SELECT_ATTACHMENTS_ID_SQL} LIMIT 1;`,
     [input.planId, input.pointId]
   );
 }
@@ -20,13 +21,8 @@ export async function lockAttachmentsIdForPlanPoint(
   input: { planId: number; pointId: number }
 ) {
   return db.query<{ attachments_id: number[] | null }>(
-    `
-      SELECT attachments_id
-      FROM lis.finished_plans
-      WHERE point_id = $1 AND plan_id = $2
-      FOR UPDATE
-    `,
-    [input.pointId, input.planId]
+    `${SELECT_ATTACHMENTS_ID_SQL} FOR UPDATE`,
+    [input.planId, input.pointId]
   );
 }
 

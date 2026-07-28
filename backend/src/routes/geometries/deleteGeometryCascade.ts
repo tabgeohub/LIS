@@ -5,6 +5,7 @@ import {
   deletePointsByGeometryId,
   selectPointIdsByGeometryId,
 } from "../../helpers/repositories/pointsRepo";
+import { deleteGeometryById } from "../../helpers/repositories/geometriesRepo";
 
 export async function deleteGeometryPointChildren(input: {
   client: PoolClient;
@@ -41,10 +42,7 @@ export async function deleteGeometryCascade(input: {
   });
 
   const pointsDeleteResult = await deletePointsByGeometryId(client, geometryId);
-  const deleteResult = await client.query(
-    "DELETE FROM lis.geometries WHERE id = $1 RETURNING *",
-    [geometryId]
-  );
+  const deleteResult = await deleteGeometryById(client, geometryId);
 
   return {
     deletedGeometry: deleteResult.rows[0],

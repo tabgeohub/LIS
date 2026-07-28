@@ -2,6 +2,7 @@ import { Response } from "express";
 import { PoolClient } from "pg";
 import { pool } from "../../db";
 import { pointExistsById } from "../repositories/pointsRepo";
+import { geometryExistsById } from "../repositories/geometriesRepo";
 import {
   replaceFlightPlanPointsArray,
   selectFlightPlansOverlappingPointIds,
@@ -31,11 +32,7 @@ export async function entityExists(
     return pointExistsById(pool, id);
   }
 
-  const result = await pool.query(
-    "SELECT id FROM lis.geometries WHERE id = $1",
-    [id]
-  );
-  return (result.rowCount ?? 0) > 0;
+  return geometryExistsById(pool, id);
 }
 
 export async function runInTransaction<T>(

@@ -3,6 +3,7 @@ import {
   buildGeometrySelectFields,
 } from "../../helpers/queries/geometries/geometryJson";
 import { resolveRegioFilter } from "../../helpers/queries/shared/resolveRegioFilter";
+import { buildGeometriesListFromSql } from "../../helpers/repositories/flightPlanJoinSql";
 import type { Request } from "express";
 
 function appendRegioCondition(options: {
@@ -27,18 +28,10 @@ export function buildGeometriesListQuery(req: Request): {
 
   appendRegioCondition({ conditions, params, regio });
 
-  let query = `
-      SELECT
-        ${selectFields}
-      FROM lis.geometries g
-      JOIN lis.points p ON p.geometry_id = g.id
-    `;
+  const whereSql =
+    conditions.length > 0 ? " WHERE " + conditions.join(" AND ") : "";
 
-  if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
-  }
-
-  query += " GROUP BY g.id ORDER BY g.id DESC";
+  const query = buildGeometriesListFromSql({ selectFields, whereSql });
 
   return { query, params };
 }

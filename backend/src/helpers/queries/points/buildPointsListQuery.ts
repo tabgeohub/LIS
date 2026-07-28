@@ -1,3 +1,5 @@
+import { buildPointsListSelectSql } from "../../repositories/flightPlanJoinSql";
+
 export type PointsListFilters = {
   naamAandachtspunt?: unknown;
   activiteit?: unknown;
@@ -87,12 +89,12 @@ class PointsFilterBuilder {
   }
 
   build(): QueryBuildResult {
-    let sql = "SELECT * FROM lis.points";
-    if (this.conditions.length > 0) {
-      sql += " WHERE " + this.conditions.join(" AND ");
-    }
-    sql += " ORDER BY id DESC";
-    return { sql, params: this.params };
+    const whereSql =
+      this.conditions.length > 0 ? this.conditions.join(" AND ") : "";
+    return {
+      sql: buildPointsListSelectSql(whereSql),
+      params: this.params,
+    };
   }
 }
 

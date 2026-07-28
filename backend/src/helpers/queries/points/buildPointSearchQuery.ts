@@ -1,5 +1,6 @@
 import { buildPointsUnnestJoin } from "../flight-plans/flightPlanJoin";
 import { buildPointJsonObject } from "./pointJson";
+import { buildPointSearchQuerySql } from "../../repositories/flightPlanJoinSql";
 
 export type PointSearchFilter = "omschrijving" | "planId";
 
@@ -12,13 +13,5 @@ export function buildPointSearchQuery(filter: PointSearchFilter): string {
       ? "LOWER(pt.omschrijving) LIKE LOWER($1)"
       : "fp.id = $1";
 
-  return `
-      SELECT 
-        JSON_AGG(
-          ${pointJson}
-        ) AS points
-      FROM lis.flightPlans fp
-      ${joins}
-      WHERE ${whereClause}
-    `;
+  return buildPointSearchQuerySql({ pointJson, joins, whereClause });
 }
