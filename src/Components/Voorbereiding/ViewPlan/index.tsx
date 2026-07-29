@@ -1,5 +1,5 @@
 import Filter from "./Filter";
-import Loading from "./Common/Loading";
+import Loading from "Components/Common/FlightPlanListLoading";
 import { useViewPlanCancel } from "./viewPlanSession";
 import ViewPlanSteps from "./ViewPlanSteps";
 import { useViewPlanController } from "./useViewPlanController";

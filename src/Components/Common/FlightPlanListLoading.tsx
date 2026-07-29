@@ -1,6 +1,6 @@
 import { FaMapMarkedAlt } from "react-icons/fa";
 
-export default function Loading() {
+export default function FlightPlanListLoading() {
   return (
     <div>
       <div className="flex w-[100%] h-[40px] p-2 border-b-[1px]">

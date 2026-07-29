@@ -1,44 +1,50 @@
-# NEXT-FOCUS-STATUS — Architecture Recovery executed
+# NEXT-FOCUS-STATUS — Architecture 3.6 recovery
 
-## Baseline (20260730 export)
+## What the latest scan shows
 
-Architecture **3.88** (UI ~3.8) despite adjacency ↑ and coupling ↑ — HomePage mega-component + Knowledge crash.
+Quality Overview: **Maintainability 4.3** / **Architecture 3.6** (down from ~3.8 / ~4.6 peaks).
 
-## Executed recovery (this session)
+Post-split findings pack: `sigrid-findings/all-findings-rijkswaterstaat-otg-lis-20260730/`.
+Architecture detail CSVs in git are still the **pre-split** baseline (system **3.88**, HomePage ~44k LOC) — OneDrive no longer has them on disk; re-export after next deploy.
 
-### P1 — Shrink external module surface
-- Added `hooks/zustand/ui/index.ts` barrel; retargeted **248** deep UI-store imports → `hooks/zustand/ui`
-- HomePage mutation imports: `utils/use*Data` → `api-hooks/mutations` (**45** files)
-- Deep api-hooks paths → package barrels (**4** files)
-- Added `hooks/features/index.ts`; retargeted store imports (**113** files)
+### Why Architecture dropped
 
-### P2 — ArcGISHelpers revert
-- Moved Wave-4 ArcGISHelpers cluster **back** to `src/helpers/ArcGISHelpers` (77 files)
-- Retargeted **69** import sites; HomePage no longer owns the ArcGIS helper tree
+P4 split extracted features but left **bidirectional** and **layer-bypass** edges:
 
-### P3 — Hooks without growing HomePage
-- Features/ui barrels only (no further HomePage colocation)
+1. **HIGH cycle:** `HomePage` ↔ `Voorbereiding/ViewPlan` (HomePage imported `createQuadrantGraphic` from ViewPlan; ViewPlan still imports HomePage UI/hooks heavily)
+2. HomePage + hooks still **VERY HIGH** communication density
+3. Many new **MEDIUM** density findings on split features (ViewPlan, FlightPlan, VluchtenZoeken, CreateReport, …)
+4. Flood of **LAYER_BYPASSING_DEPENDENCY** (features → `hooks` / helpers) — expected after split without a shared leaf layer
+5. `useContent` Module coupling still **HIGH / RAW** (fan-in 126) — Accept in UI
 
-### P4 — Controlled HomePage split
-- `Body/Left/Voorbereiding` → `Components/Voorbereiding`
-- `Body/Left/Nabewerking` → `Components/Nabewerking`
-- `Body/Left/Tools` → `Components/HomePageTools`
-- Fixed relative escapes + false `Common/` rewrites
+LOC now: HomePage ~20k, Voorbereiding ~12.5k, Nabewerking ~7.9k, HomePageTools ~4.5k.
 
-### Verified
-- No `TS2307` / missing exports
-- Vitest: **15 files / 39 tests passed**
+## Done this session (cycle break)
 
-## Your action
+- Moved `createQuadrantGraphic` → `helpers/ArcGISHelpers/` (HomePage + ViewPlan both import leaf helper)
+- Shared list skeleton → `Components/Common/FlightPlanListLoading` (removed Nabewerking → ViewPlan edge)
 
-1. Commit + deploy
-2. **Rescan** in Sigrid
-3. Export Architecture **summary + adjacency + coupling** again
+## Accept in Sigrid UI (do now)
+
+| Finding | Status |
+| --- | --- |
+| `src/hooks/useContent.ts` fan-in 126 | **Risk accepted** |
+| `src/hooks/useLogAction.ts` | already ACCEPTED |
+| Intentional hubs / large repos | keep ACCEPTED |
+| Independence `*Core` interface modules | **do not rewrite**; Accept if needed — no new façades |
+
+## Next Architecture wave (ordered)
+
+1. **No more HomePage stuffing / mega-moves**
+2. After deploy+rescan: export Architecture summary + adjacency + coupling (must include Voorbereiding / Nabewerking / HomePageTools rows)
+3. Reduce **HomePage → feature** surface only via composition at `Left/index` (already OK); avoid feature→feature edges
+4. Move **shared wizard/UI leaves** that many features import from HomePage into `Components/Common` or `src/hooks` **only when** they remove a HIGH/MEDIUM density edge — measure first
+5. Do **not** grind Unit size / more SQL / Dockerfile / Independence Core games
 
 ## Success criteria
 
 | Metric | Target |
 | --- | --- |
-| Architecture | ≥ **4.0** |
-| HomePage LOC weight | Much lower (features extracted) |
+| Architecture | ≥ **4.0** (first stop the bleed: clear HIGH cycle) |
 | Data coupling | stay ~**3.5** |
+| HomePage | stay ~20k; do not grow back to 40k+ |

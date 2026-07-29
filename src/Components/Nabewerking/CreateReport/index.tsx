@@ -1,4 +1,4 @@
-import Loading from "Components/Voorbereiding/ViewPlan/Common/Loading";
+import Loading from "Components/Common/FlightPlanListLoading";
 import Step1 from "./Steps/Step1";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Step1Buttons from "./Steps/Step1/Buttons";

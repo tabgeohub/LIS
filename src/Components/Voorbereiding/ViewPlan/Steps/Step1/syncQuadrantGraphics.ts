@@ -1,5 +1,5 @@
 import type { EnrichedPointType } from "Types";
-import { createQuadrantGraphic } from "../../helpers/createQuadrantGraphic";
+import { createQuadrantGraphic } from "helpers/ArcGISHelpers/createQuadrantGraphic";
 
 export function syncHoverQuadrantGraphics(input: {
   graphicsLayerHover: __esri.GraphicsLayer;

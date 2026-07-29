@@ -2,7 +2,7 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useEffect, useRef, useState } from "react";
 import { FlightPlanType } from "Types";
-import { createQuadrantGraphic } from "Components/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
+import { createQuadrantGraphic } from "helpers/ArcGISHelpers/createQuadrantGraphic";
 import FlightPlansList from "./FlightPlansList";
 import FlightPlanDetails from "./FlightPlanDetails";
 

@@ -1,0 +1,13 @@
+Description,Severity,Status,First Seen,Issue age,Type,Weakness,File,Technology,Origin,Remark,Locations
+NPM dependency axios contains 10 vulnerabilities (CWE-1321),HIGH,FIXED,2026-07-21,9,NPM dependency axios contains 10 vulnerabilities,CWE-1321,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+null (8.3) 
+null (6.9) 
+null (6.9) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1

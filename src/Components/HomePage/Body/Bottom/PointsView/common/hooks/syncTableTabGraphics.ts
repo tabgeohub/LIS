@@ -2,7 +2,7 @@ import type { RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
 import type { EnrichedPointType, FlightPlanType } from "Types";
 import type { Geometry } from "hooks/features";
-import { createQuadrantGraphic } from "Components/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
+import { createQuadrantGraphic } from "helpers/ArcGISHelpers/createQuadrantGraphic";
 import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
