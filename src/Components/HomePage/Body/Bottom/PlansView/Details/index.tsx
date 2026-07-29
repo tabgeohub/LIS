@@ -1,4 +1,4 @@
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "Components/HomePage/hooks/map/useGetFlightTimesDistance";
 

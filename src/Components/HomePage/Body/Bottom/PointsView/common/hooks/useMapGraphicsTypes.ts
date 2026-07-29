@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
 import { EnrichedPointType, FlightPlanType } from "Types";
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { Geometry } from "hooks/features";
 
 /** Shared table/star data for map graphics sync (hook input + syncTableTabGraphics). */
 export type TableTabGraphicsData = {

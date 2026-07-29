@@ -1,7 +1,7 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
-import { createGeometryGraphics } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
-import { replaceGraphics } from "Components/HomePage/helpers/ArcGISHelpers/replaceGraphics";
+import { Geometry } from "hooks/features";
+import { createGeometryGraphics } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 
 /** Sync local geometry graphics onto the geometries layer; returns cleanup. */
 export function syncLocalGeometryGraphics(input: {

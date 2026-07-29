@@ -1,8 +1,8 @@
-import { PLAN_BOUNDING_BOX_SYMBOLS } from "Components/HomePage/helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import { PLAN_BOUNDING_BOX_SYMBOLS } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 import {
   addFinishedPlanGeometryCentroidMarkers,
   createFinishedPlanBoundingBoxGraphic,
-} from "Components/HomePage/helpers/ArcGISHelpers/finishedPlanMapGraphics";
+} from "@helpers/ArcGISHelpers/finishedPlanMapGraphics";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
 export type FinishedPlanMapVariant = "createReport" | "vluchtenZoeken";

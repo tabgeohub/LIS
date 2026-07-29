@@ -1,13 +1,13 @@
 import React, { useCallback } from "react";
 import Point from "@arcgis/core/geometry/Point";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { usePointsStore } from "hooks/features";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
 import { EnrichedPointType } from "Types";
-import { useDeleteData } from "utils/useDeleteData";
+import { useDeleteData } from "api-hooks/mutations";
 import MenuItem from "./common/MenuItem";
 
 function ClickedPointFunctions({

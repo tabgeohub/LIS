@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useSearchKeyword } from "hooks/zustand/ui/searchKeyword";
+import { useSearchKeyword } from "hooks/zustand/ui";
 import { useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 import { TfiMoreAlt } from "react-icons/tfi";
@@ -9,9 +9,9 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 import GroupFunctions from "./Functions/GroupFunctions";
 import ListPointFunctions from "./Functions/ListPointsFunctions";
 import { EnrichedPointType, FlightPlanType } from "Types";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useOpenSearchedTab } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 
 export default function SearchedResults({

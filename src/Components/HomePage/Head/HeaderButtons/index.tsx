@@ -1,4 +1,4 @@
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useTabState } from "hooks/zustand/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import HeadButtonsVoorbereiding from "../HeadButtonsVoorbereiding";
 import HeadButtonsTools from "../HeadButtonsTools";

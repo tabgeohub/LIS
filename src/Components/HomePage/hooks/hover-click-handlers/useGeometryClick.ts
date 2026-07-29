@@ -1,9 +1,9 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import useDrawYellowGeometries from "./useDrawYellowGeometries";
 import { isMultiGeometryMode, UseGeometryClickOptions } from "./geometryClickTypes";
 import { useSingleGeometrySelectionGraphic } from "./useSingleGeometrySelectionGraphic";
 
-export type { ClickableGeometry } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
+export type { ClickableGeometry } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 export type { UseGeometryClickOptions } from "./geometryClickTypes";
 
 export default function useGeometryClick(options: UseGeometryClickOptions) {

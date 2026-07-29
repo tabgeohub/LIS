@@ -1,8 +1,8 @@
-import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
-import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useOpeSideBarState } from "hooks/zustand/ui";
+import { useOpenSearchedTab } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 
 /** Shared chrome/hooks for SearchedResults FlightPlans + Points dropdown menus. */

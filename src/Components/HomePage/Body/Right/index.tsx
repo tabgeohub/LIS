@@ -1,6 +1,6 @@
 import SelectedPlansPointsList from "./SelectedPlansPointsList";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
+import { useTabState } from "hooks/zustand/ui";
+import { useTimesliderState } from "hooks/zustand/ui";
 import ResizableSidebarPanel from "Components/HomePage/Body/Common/ResizableSidebarPanel";
 
 export default function Right({

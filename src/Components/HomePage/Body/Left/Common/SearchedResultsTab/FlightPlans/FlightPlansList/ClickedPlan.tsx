@@ -1,10 +1,10 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
 import { FlightPlanType } from "Types";
-import { computeFlightPlanCentroid } from "Components/HomePage/helpers/ArcGISHelpers/computeFlightPlanCentroid";
-import { getFlightPlanPoints } from "Components/HomePage/helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+import { computeFlightPlanCentroid } from "@helpers/ArcGISHelpers/computeFlightPlanCentroid";
+import { getFlightPlanPoints } from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 
 export default function ClickedPlan({
   flightPlan,

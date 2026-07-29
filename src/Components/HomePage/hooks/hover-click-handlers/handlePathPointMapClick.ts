@@ -1,5 +1,5 @@
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import type { PathPointType } from "hooks/zustand/ui/pathPointState";
+import type { PathPointType } from "hooks/zustand/ui";
 import {
   addSelectedPathHighlight,
   clearSelectedPathHighlights,

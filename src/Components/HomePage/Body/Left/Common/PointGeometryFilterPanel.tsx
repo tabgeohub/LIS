@@ -6,7 +6,7 @@ import {
   type PeriodType,
   usePointsFilterStore,
 } from "Components/HomePage/hooks/filters/usePointsFilterStore";
-import type { Geometry } from "hooks/features/useGeometriesStore";
+import type { Geometry } from "hooks/features";
 import type { EnrichedPointType } from "Types";
 
 export type PointGeometryFilterLabels = {

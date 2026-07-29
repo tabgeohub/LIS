@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect } from "react";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { usePopUpState } from "hooks/zustand/ui/popUpState";
-import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useMapViewState } from "hooks/zustand/ui";
+import { usePopUpState } from "hooks/zustand/ui";
+import { useAuth } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
+import { useTimesliderState } from "hooks/zustand/ui";
+import { usePointsStore } from "hooks/features";
 import { usePointGraphicsClick, usePointGraphicsRendering } from "./usePointGraphicsEffects";
 
 export function useRenderPoints() {

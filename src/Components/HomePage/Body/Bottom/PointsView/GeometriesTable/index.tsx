@@ -1,6 +1,6 @@
 import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { useOpenTable } from "hooks/zustand/ui";
+import { Geometry } from "hooks/features";
 import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
 import useGeometryListMapActions from "Components/HomePage/hooks/hover-click-handlers/useGeometryListMapActions";
 import { useState } from "react";

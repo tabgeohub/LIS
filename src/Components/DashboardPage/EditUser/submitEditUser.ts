@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { KeycloakUser } from "hooks/zustand/ui/usersManagementState";
+import { KeycloakUser } from "hooks/zustand/ui";
 import {
   assignKeycloakUserRoles,
   updateKeycloakUserProfile,

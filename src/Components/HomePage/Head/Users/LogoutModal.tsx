@@ -1,9 +1,9 @@
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import Modal from "Components/HomePage/Body/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { usePointsStore } from "hooks/features";
 
 export default function LogoutModal({
   isOpen,

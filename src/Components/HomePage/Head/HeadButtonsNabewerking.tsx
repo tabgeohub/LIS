@@ -1,8 +1,8 @@
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useTabState } from "hooks/zustand/ui";
+import { useOpeSideBarState } from "hooks/zustand/ui";
 import { nabewerkingTabs } from "./constants";
 import FilterTabs from "./Common/FilterTabs";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "Components/HomePage/hooks/tabs/useResetTabs";

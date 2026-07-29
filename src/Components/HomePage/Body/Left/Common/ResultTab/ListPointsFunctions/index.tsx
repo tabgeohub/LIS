@@ -1,15 +1,15 @@
 import {
   getUnstarredPoints,
   starAllPointsOnMap,
-} from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+} from "@helpers/ArcGISHelpers/createPointMapGraphics";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useOpenResultTab } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
 import { FaListAlt, FaSave } from "react-icons/fa";
 import { ImTable2 } from "react-icons/im";
 import { IoMdAdd } from "react-icons/io";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
 import { PiSelectionForegroundThin } from "react-icons/pi";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";

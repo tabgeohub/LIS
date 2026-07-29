@@ -1,4 +1,4 @@
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import { pages } from "../constants";
 import { motion } from "framer-motion";
 import Users from "../Users";

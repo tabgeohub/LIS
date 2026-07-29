@@ -1,6 +1,6 @@
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { create } from "zustand";
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { Geometry } from "hooks/features";
 
 export const useOpenTable = create<{
   openTable: boolean;

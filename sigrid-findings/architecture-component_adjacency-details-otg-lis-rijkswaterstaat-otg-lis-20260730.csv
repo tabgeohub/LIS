@@ -1,0 +1,31 @@
+Name,Status,Rating,Rating (Before),Lines Of Code,Lines Of Code (Before),Adjacent components,Adjacent components (Before)
+Otg-lis,recurring,3.03,3.03,65594,49879,-,-
+Remainder,recurring,5.5,5.5,345,275,0,0
+Root files,recurring,5.5,5.5,36,36,0,0
+backend,recurring,3.92,3.88,13695,8627,4,5
+scripts,new,5.5,-,-,-,0,-
+src/Components/Common,recurring,5.5,5.5,49,49,0,0
+src/Components/DashboardPage,recurring,5.49,5.5,1320,1005,0,0
+src/Components/DevicesUpdatesPage,recurring,5.5,5.5,265,234,1,1
+src/Components/HomePage,recurring,2.61,2.86,43989,31245,19,28
+src/Components/InstallationsPage,recurring,5.5,5.5,192,176,0,0
+src/Components/TimesliderItemDetailPage,recurring,4.07,4.22,1467,783,4,3
+src/Types,recurring,5.5,5.5,250,273,0,0
+src/api-hooks,recurring,1.92,2.39,865,420,62,28
+src/constants,recurring,5.5,5.5,21,45,0,0
+src/helpers/ArcGISHelpers,recurring,2.75,2.26,412,1293,17,37
+src/helpers/arcgis,recurring,3.5,4.36,147,97,8,2
+src/helpers/auth,new,4.36,-,51,-,2,-
+src/helpers/geo,new,3.42,-,112,-,9,-
+src/helpers/geometry,new,4.21,-,12,-,3,-
+src/helpers/http,new,3.64,-,33,-,7,-
+src/helpers/plans,new,5.5,-,22,-,1,-
+src/helpers/points,recurring,4.21,4.36,56,97,3,2
+src/helpers/timeslider,recurring,5.5,5.5,517,370,1,1
+src/helpers/tokens,recurring,4.36,4.36,92,95,2,2
+src/hooks,recurring,1.49,1.5,1411,3756,105,119
+src/lib,recurring,4.22,5.5,228,172,3,1
+src/utils,recurring,5.5,2.11,7,236,0,47
+public,removed,-,5.5,-,21,-,0
+src/api,removed,-,3.79,-,8,-,6
+src/helpers,removed,-,2.09,-,2518,-,54

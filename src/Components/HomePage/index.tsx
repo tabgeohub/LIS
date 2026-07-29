@@ -1,7 +1,7 @@
 import HeaderTabs from "./Head/HeaderTabs";
 import Body from "./Body";
 import { useEffect, useRef, useState } from "react";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useTabState } from "hooks/zustand/ui";
 
 export default function Home() {
   const headerRef = useRef<HTMLDivElement>(null);

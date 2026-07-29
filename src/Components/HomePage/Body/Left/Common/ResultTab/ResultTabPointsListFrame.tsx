@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { EnrichedPointType } from "Types";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useResultTabStarredPointActions } from "Components/HomePage/hooks/resultTab/useResultTabStarredPointActions";
 import { useResultTabTableView } from "Components/HomePage/hooks/resultTab/useResultTabTableView";
 import { useResultTabMoreMenu } from "Components/HomePage/hooks/resultTab/useResultTabMoreMenu";

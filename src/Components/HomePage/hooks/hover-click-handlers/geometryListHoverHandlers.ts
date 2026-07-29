@@ -1,4 +1,4 @@
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import {
   addGeometryHighlight,
   buildGeometryHoverState,

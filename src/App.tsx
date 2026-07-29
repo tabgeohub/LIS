@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 import "@arcgis/core/assets/esri/themes/light/main.css";
 import Dashboard from "Components/DashboardPage";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
 import ArcGISAuthProvider from "Components/Common/ArcGISAuthProvider";

@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useHoveredGraphicState } from "hooks/zustand/ui";
 import { createGeometryListHoverHandlers } from "./geometryListHoverHandlers";
 
 /** List-row hover outline for geometries on the map view. */

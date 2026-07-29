@@ -1,7 +1,7 @@
 import ChevronButton from "../Common/ChevronButton";
 import PopupModal from "../Common/PopupModal";
 import FeatureLayerPopup from "../Common/FeatureLayerPopup";
-import Bevragen from "../Left/Tools/Bevragen";
+import Bevragen from "Components/HomePageTools/Bevragen";
 import HoveredPointPopup from "./HoveredPointPopup";
 import { MapTopMessageBanner } from "./MapTopMessageBanner";
 import { MapPathPointPopup } from "./MapPathPointPopup";

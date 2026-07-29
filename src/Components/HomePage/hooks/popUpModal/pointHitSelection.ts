@@ -1,4 +1,4 @@
-import { initialPointState } from "hooks/zustand/ui/popUpState";
+import { initialPointState } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
 
 export function clearSelectedPointGraphics(

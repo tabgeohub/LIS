@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useState } from "react";
 import { BsTextParagraph } from "react-icons/bs";
 import { IoIosArrowBack } from "react-icons/io";

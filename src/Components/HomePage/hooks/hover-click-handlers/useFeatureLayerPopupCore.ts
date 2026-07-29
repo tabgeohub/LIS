@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { attachFeatureLayerPopupClick } from "./featureLayerPopupClick";
 import { createFeatureLayerPopupMarkerControllers } from "./featureLayerPopupControllers";
 

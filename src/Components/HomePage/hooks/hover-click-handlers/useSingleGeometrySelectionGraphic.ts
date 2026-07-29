@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import {
   ClickableGeometry,
   createSelectionGeometryGraphic,
-} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
+} from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 
 export function useSingleGeometrySelectionGraphic(input: {
   enabled: boolean;

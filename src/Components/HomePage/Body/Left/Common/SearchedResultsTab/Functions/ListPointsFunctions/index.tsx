@@ -1,10 +1,10 @@
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
-import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
-import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useOpenSearchedTab } from "hooks/zustand/ui";
+import { useOpeSideBarState } from "hooks/zustand/ui";
 import {
   MdDonutLarge,
   MdFolderOpen,

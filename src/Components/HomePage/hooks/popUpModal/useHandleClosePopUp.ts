@@ -1,11 +1,11 @@
 import {
   initialPointState,
   usePopUpState,
-} from "hooks/zustand/ui/popUpState";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+} from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 
 export default function useHandleClosePopUp() {
   const logAction = useLogAction();

@@ -1,4 +1,4 @@
-import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { usePopUpState } from "hooks/zustand/ui";
 import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleClosePopUp";
 import { CgClose } from "react-icons/cg";
 

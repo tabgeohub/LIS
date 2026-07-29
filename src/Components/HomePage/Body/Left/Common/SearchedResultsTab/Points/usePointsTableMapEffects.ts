@@ -4,8 +4,8 @@ import {
   getUnstarredPoints,
   mergeStarredPoints,
   syncPointsTableMapGraphics,
-} from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
+} from "@helpers/ArcGISHelpers/createPointMapGraphics";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { useEffect, useRef } from "react";
 import type { EnrichedPointType } from "Types";
 

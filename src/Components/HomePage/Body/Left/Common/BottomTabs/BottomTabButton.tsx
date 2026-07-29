@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { IconType } from "react-icons";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 
 /** Shared bottom-tab button used by Kaartlagenlijst / Searched / Result tabs. */

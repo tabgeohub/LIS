@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import type { DeviceStatus, GetacDevice } from "Types/devices";
 import {
   fetchDevicesUpdates,

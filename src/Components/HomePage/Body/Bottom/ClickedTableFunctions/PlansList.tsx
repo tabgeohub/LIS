@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import {
   MdListAlt,
@@ -7,12 +7,12 @@ import {
   MdOutlineZoomInMap,
   MdDelete,
 } from "react-icons/md";
-import { useDeleteData } from "utils/useDeleteData";
+import { useDeleteData } from "api-hooks/mutations";
 import MenuItem from "../common/MenuItem";
 import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
-} from "Components/HomePage/helpers/ArcGISHelpers/flightPlanMapActions";
+} from "@helpers/ArcGISHelpers/flightPlanMapActions";
 import { useBottomCompactListView } from "Components/HomePage/hooks/bottom/useBottomCompactListView";
 
 export default function PlansList() {

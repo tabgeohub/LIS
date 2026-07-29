@@ -1,5 +1,5 @@
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { IconType } from "react-icons";
 import { useContent } from "hooks/useContent";

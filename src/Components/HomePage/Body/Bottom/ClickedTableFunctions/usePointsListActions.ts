@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
 import useLogAction from "hooks/useLogAction";
 import {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import type { InstallerMeta } from "Types/installer";
 import {
   deleteLatestInstaller,

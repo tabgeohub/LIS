@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { createGeometryEditHighlightHandlers } from "./geometryEditHighlightHandlers";
 
 /** Yellow outline for the geometry open in an edit form (not list hover). */

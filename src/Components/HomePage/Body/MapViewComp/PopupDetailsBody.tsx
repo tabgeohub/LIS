@@ -1,4 +1,4 @@
-import type { PathPointType } from "hooks/zustand/ui/pathPointState";
+import type { PathPointType } from "hooks/zustand/ui";
 
 function DetailRow(input: { label: string; value: string }) {
   return (

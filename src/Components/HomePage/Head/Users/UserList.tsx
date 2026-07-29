@@ -1,5 +1,5 @@
 import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import LogoutModal from "./LogoutModal";

@@ -1,4 +1,4 @@
-import type { IdActiviteit, IdNaam, Regio } from "api-hooks/consts/types";
+import type { IdActiviteit, IdNaam, Regio } from "api-hooks/consts";
 
 export type ConstSelectResource = "regios" | "piloten" | "waarnemers" | "organisaties" | "activiteiten" | "luchtvaartuig";
 export type SelectOption = { label: string; value: string };

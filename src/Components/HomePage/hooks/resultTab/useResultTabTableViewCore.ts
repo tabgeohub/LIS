@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
-import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpenTable } from "hooks/zustand/ui";
+import { useOpenResultTab } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 
 export function useResultTabTableView() {

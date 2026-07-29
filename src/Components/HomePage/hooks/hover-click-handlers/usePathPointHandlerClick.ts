@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import type { PathPointType } from "hooks/zustand/ui/pathPointState";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { usePathPointState } from "hooks/zustand/ui/pathPointState";
+import type { PathPointType } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
+import { usePathPointState } from "hooks/zustand/ui";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { parsePlanPath, type PathPoint } from "./pathPlanUtils";
 import { handlePathPointMapClick } from "./handlePathPointMapClick";

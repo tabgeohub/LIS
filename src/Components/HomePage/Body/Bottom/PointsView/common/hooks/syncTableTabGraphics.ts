@@ -1,12 +1,12 @@
 import type { RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
 import type { EnrichedPointType, FlightPlanType } from "Types";
-import type { Geometry } from "hooks/features/useGeometriesStore";
-import { createQuadrantGraphic } from "../../../../Left/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
-import { syncGeometriesTableMapGraphics } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
-import { syncPointsTableMapGraphics } from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
-import { addPlanStarGraphic } from "Components/HomePage/helpers/ArcGISHelpers/planStarGraphics";
+import type { Geometry } from "hooks/features";
+import { createQuadrantGraphic } from "Components/Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";
+import { syncGeometriesTableMapGraphics } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
+import { syncPointsTableMapGraphics } from "@helpers/ArcGISHelpers/createPointMapGraphics";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { addPlanStarGraphic } from "@helpers/ArcGISHelpers/planStarGraphics";
 import type { TableTabGraphicsData } from "./useMapGraphicsTypes";
 
 type GraphicsContext = {

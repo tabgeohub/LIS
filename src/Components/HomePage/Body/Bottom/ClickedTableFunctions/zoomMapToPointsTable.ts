@@ -1,5 +1,5 @@
 import Polygon from "@arcgis/core/geometry/Polygon";
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { EnrichedPointType } from "Types";
 
 export function zoomMapToPointsTable(input: {

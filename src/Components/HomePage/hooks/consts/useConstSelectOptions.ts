@@ -1,5 +1,5 @@
 import { useLookupQuery } from "api-hooks/consts";
-import type { IdActiviteit, IdNaam, Regio } from "api-hooks/consts/types";
+import type { IdActiviteit, IdNaam, Regio } from "api-hooks/consts";
 import {
   ConstSelectResource,
   SELECT_CONFIG,

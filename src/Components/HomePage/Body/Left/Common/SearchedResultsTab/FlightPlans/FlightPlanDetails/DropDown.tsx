@@ -1,7 +1,7 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useOpeSideBarState } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import {
   MdOutlineViewList,
@@ -10,11 +10,11 @@ import {
   MdDelete,
 } from "react-icons/md";
 import { FlightPlanType } from "Types";
-import { useDeleteData } from "utils/useDeleteData";
+import { useDeleteData } from "api-hooks/mutations";
 import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
-} from "Components/HomePage/helpers/ArcGISHelpers/flightPlanMapActions";
+} from "@helpers/ArcGISHelpers/flightPlanMapActions";
 import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
 
 export default function DropDown({

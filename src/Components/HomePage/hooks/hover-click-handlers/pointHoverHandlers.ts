@@ -2,7 +2,7 @@ import { EnrichedPointType } from "Types";
 import {
   clearPointHoverGraphic,
   replacePointHoverGraphic,
-} from "Components/HomePage/helpers/ArcGISHelpers/pointHoverGraphics";
+} from "@helpers/ArcGISHelpers/pointHoverGraphics";
 
 type HoverSetter = (value: {
   id: number;

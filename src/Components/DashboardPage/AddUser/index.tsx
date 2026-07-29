@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsersManagementState } from "hooks/zustand/ui/usersManagementState";
+import { useUsersManagementState } from "hooks/zustand/ui";
 import RoleSelect from "../shared/RoleSelect";
 import { useKeycloakRoles } from "../shared/useKeycloakRoles";
 import PasswordConfirmFields from "../shared/PasswordConfirmFields";

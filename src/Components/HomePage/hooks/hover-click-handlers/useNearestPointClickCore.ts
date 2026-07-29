@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
 import { findNearestPoint } from "./nearestPoint";
 

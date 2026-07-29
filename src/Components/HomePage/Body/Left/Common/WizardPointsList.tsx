@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useMemo } from "react";
 import { EnrichedPointType } from "Types";
-import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
+import { useHoveredGraphicState } from "hooks/zustand/ui";
 import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
 import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowMarkers";
 import useNearestPointClick from "Components/HomePage/hooks/hover-click-handlers/useNearestPointClick";

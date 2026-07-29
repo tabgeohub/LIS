@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useHoveredGraphicState } from "hooks/zustand/ui";
 import { createPointHoverHandlers } from "./pointHoverHandlers";
 
 export default function usePointHover() {

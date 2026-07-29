@@ -1,4 +1,4 @@
-import { FeatureLayerAttributes } from "hooks/zustand/ui/popUpState";
+import { FeatureLayerAttributes } from "hooks/zustand/ui";
 
 const OBJECT_ID_KEYS = [
   "OBJECTID",

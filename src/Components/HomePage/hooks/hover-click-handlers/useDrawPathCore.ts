@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useRef, useState } from "react";
 import usePathPointHandlerClick from "./usePathPointHandlerClick";

@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 

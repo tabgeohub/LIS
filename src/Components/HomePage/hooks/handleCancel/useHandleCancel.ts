@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 
 export function useHandleCancel() {
   const { setSelectedTab } = useTabState();

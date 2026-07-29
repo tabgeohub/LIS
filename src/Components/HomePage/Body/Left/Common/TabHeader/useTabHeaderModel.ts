@@ -1,7 +1,7 @@
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useTabState } from "hooks/zustand/ui";
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import { useResetPointFilters } from "Components/HomePage/hooks/features/useResetPointFilters";

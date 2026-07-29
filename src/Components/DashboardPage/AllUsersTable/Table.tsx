@@ -1,4 +1,4 @@
-import { KeycloakUser } from "hooks/zustand/ui/usersManagementState";
+import { KeycloakUser } from "hooks/zustand/ui";
 
 type TableProps = {
   users: KeycloakUser[];

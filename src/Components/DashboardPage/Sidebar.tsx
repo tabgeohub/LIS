@@ -1,4 +1,4 @@
-import { useUsersManagementState } from "hooks/zustand/ui/usersManagementState";
+import { useUsersManagementState } from "hooks/zustand/ui";
 
 export default function Sidebar() {
   const activeTab = useUsersManagementState((state) => state.activeTab);

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import {
   bufferFlightPlansOnLayer,
   bufferPointsOnLayer,
-} from "Components/HomePage/helpers/ArcGISHelpers/bufferGraphics";
+} from "@helpers/ArcGISHelpers/bufferGraphics";
 import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
 
 export default function PointsBuffer({

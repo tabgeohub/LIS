@@ -1,4 +1,4 @@
-import { FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS } from "Components/HomePage/helpers/ArcGISHelpers/finishedPlanMapGraphics";
+import { FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS } from "@helpers/ArcGISHelpers/finishedPlanMapGraphics";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import {
   drawFinishedPlanHighlight,

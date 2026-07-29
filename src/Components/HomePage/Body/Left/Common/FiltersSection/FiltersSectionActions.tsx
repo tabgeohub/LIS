@@ -1,6 +1,6 @@
-import { useFilterState } from "hooks/zustand/ui/filterState";
+import { useFilterState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { usePointsStore } from "hooks/features";
 import { useResetPointFilters } from "Components/HomePage/hooks/features/useResetPointFilters";
 
 export function FiltersSectionActions() {

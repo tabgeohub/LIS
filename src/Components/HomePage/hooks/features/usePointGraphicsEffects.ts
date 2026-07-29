@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { EnrichedPointType } from "Types";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
-import { replaceGraphics } from "Components/HomePage/helpers/ArcGISHelpers/replaceGraphics";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 import { createDebouncedClickGuard } from "Components/HomePage/hooks/map/mapClickGuard";
 import { buildPointMapGraphics } from "./pointMapGraphics";
 

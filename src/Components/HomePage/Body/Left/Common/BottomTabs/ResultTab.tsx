@@ -1,5 +1,5 @@
 import { classNames } from "Components/HomePage/helpers/dom/classNames";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { FaInfoCircle } from "react-icons/fa";
 

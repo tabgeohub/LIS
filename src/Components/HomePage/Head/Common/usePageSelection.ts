@@ -1,8 +1,8 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useOpeSideBarState } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
+import { useTimesliderState } from "hooks/zustand/ui";
 import { clearRightListHover, removeTimesliderHighlights } from "@helpers/timeslider";
 import useLogAction from "hooks/useLogAction";
 import { PageType } from "Types";

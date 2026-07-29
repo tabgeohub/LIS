@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { useMapViewState } from "hooks/zustand/ui";
+import { Geometry } from "hooks/features";
 import { Dispatch, SetStateAction } from "react";
 import { createGeometryListMapActions } from "./geometryListMapActions";
 

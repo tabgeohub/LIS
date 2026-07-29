@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 
 export type MapHoverLayers = {
   mapView: __esri.MapView | null;

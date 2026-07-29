@@ -1,4 +1,4 @@
-import { Geometry } from "hooks/features/useGeometriesStore";
+import { Geometry } from "hooks/features";
 
 export type GeometryFilterCriteria = {
   herhalen: boolean;

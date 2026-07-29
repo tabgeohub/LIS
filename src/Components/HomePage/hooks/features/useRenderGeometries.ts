@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
+import { useAuth } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
+import { useTimesliderState } from "hooks/zustand/ui";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { useGeometriesStore } from "hooks/features";
 import { useGeometryGraphicsRendering } from "Components/HomePage/hooks/features/useGeometryGraphicsEffects";
 
 export function useRenderGeometries() {

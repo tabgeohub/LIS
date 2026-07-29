@@ -1,9 +1,9 @@
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useOpenTable } from "hooks/zustand/ui";
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { BsTextParagraph } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
-import { useOpenAllTable } from "hooks/zustand/ui/showAllTable";
+import { useOpenAllTable } from "hooks/zustand/ui";
 
 export default function Head({
   vluchtnummer,

@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { addPlanStarGraphics } from "Components/HomePage/helpers/ArcGISHelpers/planStarGraphics";
+import { useMapViewState } from "hooks/zustand/ui";
+import { addPlanStarGraphics } from "@helpers/ArcGISHelpers/planStarGraphics";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import {
   MdAddCircleOutline,

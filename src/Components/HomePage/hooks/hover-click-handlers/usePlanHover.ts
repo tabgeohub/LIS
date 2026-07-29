@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { createPlanHoverHandlers } from "./planHoverClickHandlers";
 
 export default function usePlanHover() {

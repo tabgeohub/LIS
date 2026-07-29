@@ -1,4 +1,4 @@
-import { FeatureLayerAttributes } from "hooks/zustand/ui/popUpState";
+import { FeatureLayerAttributes } from "hooks/zustand/ui";
 import type { FeatureLayerPopupData } from "./useFeatureLayerPopup";
 
 export function buildFeaturePopupData(input: {

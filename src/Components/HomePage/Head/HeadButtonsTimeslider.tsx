@@ -1,6 +1,6 @@
 import { getTrackBackground } from "react-range";
 import { useContent } from "hooks/useContent";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import "react-datepicker/dist/react-datepicker.css";
 import TimesliderDateField from "./timeslider/TimesliderDateField";
 import { useTimesliderRange } from "./timeslider/useTimesliderRange";

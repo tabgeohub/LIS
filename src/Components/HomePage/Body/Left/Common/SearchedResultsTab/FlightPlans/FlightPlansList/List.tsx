@@ -2,13 +2,13 @@ import { IoIosArrowForward } from "react-icons/io";
 import { TfiMoreAlt } from "react-icons/tfi";
 import ClickedPlan from "./ClickedPlan";
 import { FlightPlanType } from "Types";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { FaStar } from "react-icons/fa6";
 import useLogAction from "hooks/useLogAction";
 import {
   addPlanStarGraphic,
   removePlanStarGraphics,
-} from "Components/HomePage/helpers/ArcGISHelpers/planStarGraphics";
+} from "@helpers/ArcGISHelpers/planStarGraphics";
 import {
   clearHoveredFlightPlanFromOriginalMap,
   useHoverFlightPlanFromOriginalMap,

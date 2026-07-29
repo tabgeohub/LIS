@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { RefObject, useEffect } from "react";
-import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useAuth } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useMapInitialization } from "Components/HomePage/hooks/map/useMapInitialization";
 import { useRenderPoints } from "Components/HomePage/hooks/features/useRenderPoints";
 import { useRenderGeometries } from "Components/HomePage/hooks/features/useRenderGeometries";

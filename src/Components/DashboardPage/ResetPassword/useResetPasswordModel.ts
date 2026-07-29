@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsersManagementState } from "hooks/zustand/ui/usersManagementState";
+import { useUsersManagementState } from "hooks/zustand/ui";
 import { buildResetPasswordHandlers } from "./buildResetPasswordHandlers";
 
 export function useResetPasswordModel() {

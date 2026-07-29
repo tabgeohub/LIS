@@ -4,13 +4,13 @@ import SearchedResults from "./SearchedResults";
 import FlightPlans from "./FlightPlans";
 import { useSearchedFlightPlans } from "api-hooks/flightPlans";
 import { useSearchedPoints } from "api-hooks/points";
-import { useSearchKeyword } from "hooks/zustand/ui/searchKeyword";
+import { useSearchKeyword } from "hooks/zustand/ui";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import PointsBuffer from "./Functions/PointsBuffer";
 import PointDetails from "./Points/PointDetails";
 import Points from "./Points";
 import AddPoint from "./Functions/AddPoint";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { usePointsStore } from "hooks/features";
 
 export default function SearchedResultsTab() {
   const [fase, setFase] = useState<string>("all");

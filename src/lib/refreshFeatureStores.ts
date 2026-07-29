@@ -1,5 +1,5 @@
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore } from "hooks/features";
+import { usePointsStore } from "hooks/features";
 
 function pathNeedsPointsRefresh(path: string): boolean {
   return (

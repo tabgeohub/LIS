@@ -1,4 +1,4 @@
-import { initialPointState } from "hooks/zustand/ui/popUpState";
+import { initialPointState } from "hooks/zustand/ui";
 import type { EnrichedPointType, TabType } from "Types";
 import { createYellowCircle } from "Components/HomePage/hooks/popUpModal/createYellowCircle";
 import { isPopupTabBlocked } from "./popupBlockedTabs";

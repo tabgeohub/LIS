@@ -5,8 +5,8 @@ import ResetPassword from "./ResetPassword/index";
 import AllRoles from "./AllRoles/index";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import { useUsersManagementState } from "hooks/zustand/ui/usersManagementState";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useUsersManagementState } from "hooks/zustand/ui";
+import { useAuth } from "hooks/zustand/ui";
 
 export default function Dashboard() {
   const activeTab = useUsersManagementState((state) => state.activeTab);

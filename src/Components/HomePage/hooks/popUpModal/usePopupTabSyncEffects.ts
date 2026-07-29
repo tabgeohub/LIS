@@ -1,6 +1,6 @@
-import { usePopUpState } from "hooks/zustand/ui/popUpState";
-import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { usePopUpState } from "hooks/zustand/ui";
+import { useSelectedBottomTabState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import { useEffect } from "react";
 import { usePopupBlockedGuard } from "./usePopupBlockedGuard";
 

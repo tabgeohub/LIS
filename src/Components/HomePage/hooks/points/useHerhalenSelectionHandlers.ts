@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { usePointsStore } from "hooks/features/usePointsStore";
-import { useGeometriesStore } from "hooks/features/useGeometriesStore";
+import { usePointsStore } from "hooks/features";
+import { useGeometriesStore } from "hooks/features";
 import {
   createHerhalenSelectionHandlers,
   type HerhalenSelectionSetters,

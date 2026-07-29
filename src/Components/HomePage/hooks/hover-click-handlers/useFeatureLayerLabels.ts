@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { attachFeatureLayerLabelSync } from "./featureLayerLabelsSync";
 

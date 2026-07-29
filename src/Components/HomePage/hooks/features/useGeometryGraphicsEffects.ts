@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import type { Geometry } from "Types/geometry";
 import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
-import { replaceGraphics } from "Components/HomePage/helpers/ArcGISHelpers/replaceGraphics";
+import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
 import { buildGeometryMapGraphics } from "./geometryMapGraphics";
 
 export function shouldSkipDefaultGeometryRender(input: {

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
+import { useHoveredGraphicState } from "hooks/zustand/ui";
 
 export default function HoveredPointPopup() {
   const { hovered } = useHoveredGraphicState();

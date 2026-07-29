@@ -1,5 +1,5 @@
-import { useFilterState } from "hooks/zustand/ui/filterState";
-import { useTabState } from "hooks/zustand/ui/tabState";
+import { useFilterState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
 import { useResetFeatures } from "./useResetFeatures";
 
 export function useResetPointFilters() {

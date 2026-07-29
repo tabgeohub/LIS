@@ -1,10 +1,10 @@
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import EditPointTabs from "./EditPointTabs";
 import KaartlagenlijstTab from "./KaartlagenlijstTab";
 import SelectedTab from "./SelectedTab";
-import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
+import { useOpenResultTab } from "hooks/zustand/ui";
 import ResultTab from "./ResultTab";
-import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
+import { useOpenSearchedTab } from "hooks/zustand/ui";
 import SearchedTab from "./SearchedTab";
 
 export default function BottomTabs() {

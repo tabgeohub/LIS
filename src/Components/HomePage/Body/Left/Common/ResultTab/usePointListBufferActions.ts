@@ -1,5 +1,5 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui";
+import { useOpenTable } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { runPointListBuffer } from "./runPointListBuffer";
 

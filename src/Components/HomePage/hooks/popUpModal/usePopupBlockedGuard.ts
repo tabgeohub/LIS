@@ -1,6 +1,6 @@
-import { usePopUpState } from "hooks/zustand/ui/popUpState";
-import { useTabState } from "hooks/zustand/ui/tabState";
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { usePopUpState } from "hooks/zustand/ui";
+import { useTabState } from "hooks/zustand/ui";
+import { useMapViewState } from "hooks/zustand/ui";
 import { useCallback } from "react";
 import { clearPopupIfBlocked } from "./popupTabGuard";
 

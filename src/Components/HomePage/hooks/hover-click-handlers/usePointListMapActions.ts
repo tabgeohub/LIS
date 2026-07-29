@@ -1,4 +1,4 @@
-import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui";
 import { Dispatch, SetStateAction } from "react";
 import { EnrichedPointType } from "Types";
 import { createPointListMapActions } from "./pointListMapActions";

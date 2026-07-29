@@ -1,4 +1,4 @@
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import UserList from "./UserList";

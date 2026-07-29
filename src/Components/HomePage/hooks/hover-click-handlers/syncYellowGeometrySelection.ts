@@ -1,6 +1,6 @@
-import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
-import { buildSelectedGeometryGraphics } from "Components/HomePage/helpers/ArcGISHelpers/selectedGeometryGraphics";
-import { ClickableGeometry } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
+import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { buildSelectedGeometryGraphics } from "@helpers/ArcGISHelpers/selectedGeometryGraphics";
+import { ClickableGeometry } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
 
 export type SyncYellowGeometrySelectionInput = {
   mapView: __esri.MapView | null | undefined;

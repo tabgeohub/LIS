@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { RefObject, useRef, useEffect } from "react";
-import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useAuth } from "hooks/zustand/ui";
 import { initializeMapState } from "./initializeMapState";
 
 export function useMapInitialization(mapDiv: RefObject<HTMLDivElement>) {

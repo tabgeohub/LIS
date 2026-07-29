@@ -1,5 +1,5 @@
 import PeriodeComp from "./PeriodeComp";
-import { useFilterState } from "hooks/zustand/ui/filterState";
+import { useFilterState } from "hooks/zustand/ui";
 import FilterSelect from "./FilterSelect";
 import { useContent } from "hooks/useContent";
 import { FiltersSectionCoreFields } from "./FiltersSectionCoreFields";

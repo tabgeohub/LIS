@@ -2,7 +2,7 @@ import Head from "./Head";
 import { useState } from "react";
 import ClickedTableFunctions from "./ClickedTableFunctions";
 import PointsView from "./PointsView";
-import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useOpenTable } from "hooks/zustand/ui";
 import PlansView from "./PlansView";
 
 export default function Bottom({

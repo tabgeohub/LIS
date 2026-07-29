@@ -1,1 +1,1 @@
-export { useEntityPlanImages } from "api-hooks/planImages/useEntityPlanImages";
+export { useEntityPlanImages } from "api-hooks/planImages";

@@ -2,7 +2,7 @@ import {
   createPlanBoundingBoxGraphic,
   getFlightPlanPoints,
   PLAN_BOUNDING_BOX_SYMBOLS,
-} from "Components/HomePage/helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+} from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 import { FlightPlanType } from "Types";
 
 export function createPlanClickHandler(
