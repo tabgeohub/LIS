@@ -1,4 +1,4 @@
-import { buildHerhalenSelection } from "@helpers/points/herhalenSelection";
+import { buildHerhalenSelection } from "Components/HomePage/helpers/points/herhalenSelection";
 
 type HerhalenItem = {
   id: number;

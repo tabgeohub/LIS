@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import type { FinishedGeometryType } from "Types/finished_plans";
-import { buildPointCorePayload } from "@helpers/points/buildPointUpdatePayload";
+import { buildPointCorePayload } from "Components/HomePage/helpers/points/buildPointUpdatePayload";
 
 type GeometryPoint = NonNullable<FinishedGeometryType["points"]>[number];
 

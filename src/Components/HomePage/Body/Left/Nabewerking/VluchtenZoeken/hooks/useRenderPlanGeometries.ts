@@ -2,8 +2,8 @@
 import { useEffect } from "react";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "Components/HomePage/helpers/ArcGISHelpers/replaceGraphics";
 import { buildPlanGeometryGraphics } from "./buildPlanGeometryGraphics";
 
 /**

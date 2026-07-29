@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
-import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
-import type { NewPointCoordSetters } from "@helpers/ArcGISHelpers/newPointEventCoords";
+import { createNewPointEvent } from "Components/HomePage/helpers/ArcGISHelpers/createNewPointEvent";
+import type { NewPointCoordSetters } from "Components/HomePage/helpers/ArcGISHelpers/newPointEventCoords";
 import { isNearExistingPoint } from "./Steps/Step2/isNearExistingPoint";
 
 export type EnrichedAddPointClickInput = NewPointCoordSetters & {

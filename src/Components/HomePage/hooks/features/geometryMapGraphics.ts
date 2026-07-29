@@ -1,4 +1,4 @@
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { createGeometryGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import type { Geometry } from "hooks/features/useGeometriesStore";
 
 export function buildGeometryMapGraphics(geometries: Geometry[]) {

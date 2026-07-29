@@ -8,7 +8,7 @@ import useLogAction from "hooks/useLogAction";
 import {
   addPlanStarGraphic,
   removePlanStarGraphics,
-} from "@helpers/ArcGISHelpers/planStarGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/planStarGraphics";
 import {
   clearHoveredFlightPlanFromOriginalMap,
   useHoverFlightPlanFromOriginalMap,

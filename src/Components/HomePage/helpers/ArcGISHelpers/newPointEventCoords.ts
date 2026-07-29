@@ -1,5 +1,5 @@
-import createPoint from "@helpers/ArcGISHelpers/createPoint";
-import { getTransformedCoordinates } from "./getTransformedCoordinates";
+import createPoint from "Components/HomePage/helpers/ArcGISHelpers/createPoint";
+import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 
 export type NewPointClickCoords = {
   longitude: number;

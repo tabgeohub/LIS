@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 import type { FinishedPointType } from "Types/finished_plans";
 import { showRedMarkerAt } from "./pointMapGraphics";
 import { useEditPointCoordState } from "./useEditPointCoordState";

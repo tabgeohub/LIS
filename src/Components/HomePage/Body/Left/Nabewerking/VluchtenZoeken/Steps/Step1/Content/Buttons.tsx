@@ -6,7 +6,7 @@ import {
   calculateCenterAndZoom,
   collectPointsForCenterAndZoom,
   goToLonLatZoom,
-} from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
+} from "Components/HomePage/helpers/ArcGISHelpers/calculateCenterAndZoom";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";

@@ -1,6 +1,6 @@
 import Point from "@arcgis/core/geometry/Point";
 import MapView from "@arcgis/core/views/MapView";
-import { BaseGeometryData } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { BaseGeometryData } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import {
   calculateGeometryCentroid,
   createStarGeometryGraphic,

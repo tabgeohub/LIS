@@ -1,4 +1,4 @@
-import createPoint from "@helpers/ArcGISHelpers/createPoint";
+import createPoint from "Components/HomePage/helpers/ArcGISHelpers/createPoint";
 import type { FinishedPointType } from "Types/finished_plans";
 import {
   YELLOW_POINT_SYMBOL,

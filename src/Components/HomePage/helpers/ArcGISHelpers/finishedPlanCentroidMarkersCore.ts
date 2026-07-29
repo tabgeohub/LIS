@@ -2,7 +2,7 @@ import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { geometryCentroid } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
+import { geometryCentroid } from "Components/HomePage/helpers/ArcGISHelpers/calculateCenterAndZoom";
 
 export const FINISHED_PLAN_GEOMETRY_MARKER_SYMBOLS = {
   hover: new SimpleMarkerSymbol({

@@ -1,5 +1,5 @@
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { createYellowWgs84PointGraphic } from "@helpers/ArcGISHelpers/createYellowWgs84PointGraphic";
+import { createYellowWgs84PointGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createYellowWgs84PointGraphic";
 import { EnrichedPointType } from "Types";
 import { SelectFromSourceItemPoint } from "./mapSourceItems";
 

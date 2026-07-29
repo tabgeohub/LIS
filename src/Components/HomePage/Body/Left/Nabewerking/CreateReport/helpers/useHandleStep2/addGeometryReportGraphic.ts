@@ -2,7 +2,7 @@ import {
   BaseGeometryData,
   createGeometryGraphic,
   GEOMETRY_REPORT_SYMBOL,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import type { FinishedGeometryType } from "Types/finished_plans";
 
 export function addGeometryReportGraphic(

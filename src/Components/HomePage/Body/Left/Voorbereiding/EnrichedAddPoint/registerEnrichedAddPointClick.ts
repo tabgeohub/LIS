@@ -1,5 +1,5 @@
 import { EnrichedPointType } from "Types";
-import type { NewPointCoordSetters } from "@helpers/ArcGISHelpers/newPointEventCoords";
+import type { NewPointCoordSetters } from "Components/HomePage/helpers/ArcGISHelpers/newPointEventCoords";
 import { handleEnrichedAddPointClick } from "./handleEnrichedAddPointClick";
 
 export type MapClickInput = NewPointCoordSetters & {

@@ -2,7 +2,7 @@ import type { Geometry } from "hooks/features/useGeometriesStore";
 import {
   calculateCenterAndZoom,
   goToLonLatZoom,
-} from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
+} from "Components/HomePage/helpers/ArcGISHelpers/calculateCenterAndZoom";
 import type { GeometryEditDraft, GeometryPointRow } from "./EditForm";
 
 export function filterGeometriesByTerm(geometries: Geometry[], filterTerm: string) {

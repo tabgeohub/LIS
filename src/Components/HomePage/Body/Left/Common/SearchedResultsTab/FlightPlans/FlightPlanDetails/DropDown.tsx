@@ -14,7 +14,7 @@ import { useDeleteData } from "utils/useDeleteData";
 import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
-} from "@helpers/ArcGISHelpers/flightPlanMapActions";
+} from "Components/HomePage/helpers/ArcGISHelpers/flightPlanMapActions";
 import MenuItem from "Components/HomePage/Body/Bottom/common/MenuItem";
 
 export default function DropDown({

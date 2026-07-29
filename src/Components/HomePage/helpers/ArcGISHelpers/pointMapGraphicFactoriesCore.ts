@@ -5,7 +5,7 @@ import {
   SEARCH_RESULT_POINT_OUTLINE_SYMBOL,
   STARRED_POINT_SYMBOL,
   YELLOW_MARKER_SYMBOL,
-} from "@helpers/ArcGISHelpers/createSymbols";
+} from "Components/HomePage/helpers/ArcGISHelpers/createSymbols";
 import { EnrichedPointType } from "Types";
 
 export function createPointGeometry(point: EnrichedPointType) {

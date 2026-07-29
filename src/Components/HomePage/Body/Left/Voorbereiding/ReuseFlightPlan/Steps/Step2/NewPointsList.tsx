@@ -1,4 +1,4 @@
-import createYellowBorder from "@helpers/ArcGISHelpers/createYellowBorder";
+import createYellowBorder from "Components/HomePage/helpers/ArcGISHelpers/createYellowBorder";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
 import { useContent } from "hooks/useContent";

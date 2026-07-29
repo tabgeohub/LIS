@@ -1,4 +1,4 @@
-import { starAllPointsOnMap } from "@helpers/ArcGISHelpers/createPointMapGraphics";
+import { starAllPointsOnMap } from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import {
   downloadCsvFromRows,

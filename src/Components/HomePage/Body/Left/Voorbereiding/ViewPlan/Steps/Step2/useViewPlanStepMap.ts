@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";

@@ -3,7 +3,7 @@ import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
 import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import useLogAction from "hooks/useLogAction";
-import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
+import { pickPointCoreLogData } from "Components/HomePage/helpers/points/buildPointUpdatePayload";
 import { useDeletePointDetailsSubmit } from "../../useDeletePointDetailsSubmit";
 
 export default function Step2({

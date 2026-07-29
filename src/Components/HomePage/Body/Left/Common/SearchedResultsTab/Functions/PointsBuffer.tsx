@@ -3,7 +3,7 @@ import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import {
   bufferFlightPlansOnLayer,
   bufferPointsOnLayer,
-} from "@helpers/ArcGISHelpers/bufferGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/bufferGraphics";
 import type { SearchedResultsTargetProps } from "../shared/searchedResultsTargetProps";
 
 export default function PointsBuffer({

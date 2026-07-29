@@ -1,7 +1,7 @@
 import {
   buildPointUpdatePayload,
   type PointUpdateFormFields,
-} from "@helpers/points/buildPointUpdatePayload";
+} from "Components/HomePage/helpers/points/buildPointUpdatePayload";
 import type { EnrichedPointType } from "Types";
 import { applyDeletePointUpdateSuccess } from "./applyDeletePointUpdateSuccess";
 

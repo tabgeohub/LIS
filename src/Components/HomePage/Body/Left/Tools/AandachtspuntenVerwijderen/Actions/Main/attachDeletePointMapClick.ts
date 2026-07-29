@@ -1,4 +1,4 @@
-import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
+import { createDebouncedClickGuard } from "Components/HomePage/hooks/map/mapClickGuard";
 import type { EnrichedPointType } from "Types";
 
 async function selectPointFromHit(input: {

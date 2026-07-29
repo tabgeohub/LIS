@@ -1,5 +1,5 @@
 import Graphic from "@arcgis/core/Graphic";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { createGeometryGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 
 const YELLOW_SYMBOL = {

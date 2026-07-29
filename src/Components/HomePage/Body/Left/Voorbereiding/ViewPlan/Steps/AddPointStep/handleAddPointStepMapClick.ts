@@ -1,4 +1,4 @@
-import { createNewPointEvent } from "@helpers/ArcGISHelpers/createNewPointEvent";
+import { createNewPointEvent } from "Components/HomePage/helpers/ArcGISHelpers/createNewPointEvent";
 import type { AddPointStepMapClickState } from "./addPointStepMapClickTypes";
 
 export function handleAddPointStepMapClick(

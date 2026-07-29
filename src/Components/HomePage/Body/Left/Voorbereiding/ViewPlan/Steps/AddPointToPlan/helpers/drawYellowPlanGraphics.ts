@@ -1,6 +1,6 @@
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import { createYellowWgs84PointGraphic } from "@helpers/ArcGISHelpers/createYellowWgs84PointGraphic";
+import { createGeometryGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
+import { createYellowWgs84PointGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createYellowWgs84PointGraphic";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { EnrichedPointType } from "Types";
 

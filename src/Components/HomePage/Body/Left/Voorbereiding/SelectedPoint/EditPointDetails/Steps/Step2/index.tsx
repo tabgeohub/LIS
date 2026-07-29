@@ -9,7 +9,7 @@ import { useFetchInitialFeatures } from "Components/HomePage/hooks/features/useF
 import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useAuth } from "hooks/zustand/ui/useAuth";
-import { buildPointUpdatePayload } from "@helpers/points/buildPointUpdatePayload";
+import { buildPointUpdatePayload } from "Components/HomePage/helpers/points/buildPointUpdatePayload";
 
 export default function Step2({
   setStep,

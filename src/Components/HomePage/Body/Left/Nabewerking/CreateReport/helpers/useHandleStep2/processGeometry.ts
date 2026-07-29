@@ -1,5 +1,5 @@
-import { calculateGeometryCentroid } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
-import { BaseGeometryData } from "@helpers/ArcGISHelpers/createGeometryGraphic";
+import { calculateGeometryCentroid } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
+import { BaseGeometryData } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import {
   pickReportProcessContext,
   ProcessGeometryParams,

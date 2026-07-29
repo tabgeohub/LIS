@@ -4,7 +4,7 @@ import {
   goToEnrichedPoint,
   removeStarPointGraphics,
   starAllPointsOnMap,
-} from "@helpers/ArcGISHelpers/createPointMapGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
 import { EnrichedPointType } from "Types";
 import type { UsePointListMapActionsOptions } from "./usePointListMapActions";
 

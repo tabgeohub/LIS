@@ -3,7 +3,7 @@ import Graphic from "@arcgis/core/Graphic";
 import { EnrichedPointType } from "Types";
 import { FinishedPointType } from "Types/finished_plans";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
-import { YELLOW_MARKER_SYMBOL } from "@helpers/ArcGISHelpers/createSymbols";
+import { YELLOW_MARKER_SYMBOL } from "Components/HomePage/helpers/ArcGISHelpers/createSymbols";
 
 type PointType = EnrichedPointType | FinishedPointType;
 

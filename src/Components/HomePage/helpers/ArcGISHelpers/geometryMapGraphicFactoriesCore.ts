@@ -5,7 +5,7 @@ import {
   GEOMETRY_STAR_SYMBOL,
   GEOMETRY_TABLE_HOVER_SYMBOL,
   GEOMETRY_TABLE_YELLOW_SYMBOL,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 
 /** Compatible with DB `Geometry` and `FinishedGeometryType`. */
 export type ClickableGeometry = {

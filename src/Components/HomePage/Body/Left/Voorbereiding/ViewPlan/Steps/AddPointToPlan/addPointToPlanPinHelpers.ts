@@ -1,6 +1,6 @@
 import { EnrichedPointType } from "Types";
-import { createPin } from "@helpers/ArcGISHelpers/createPin";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { createPin } from "Components/HomePage/helpers/ArcGISHelpers/createPin";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 
 export type PinEntry = {
   outerGraphic: __esri.Graphic;

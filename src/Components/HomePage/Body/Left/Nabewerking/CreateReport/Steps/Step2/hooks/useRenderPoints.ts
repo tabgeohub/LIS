@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { createPin } from "@helpers/ArcGISHelpers/createPin";
+import { createPin } from "Components/HomePage/helpers/ArcGISHelpers/createPin";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import useLogAction from "hooks/useLogAction";
 

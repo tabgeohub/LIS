@@ -55,16 +55,47 @@ Moved to `Components/HomePage/`:
 
 Verified: no `TS2307`; no backward edges from `hooks`, `helpers`, `lib`, or `api-hooks` into HomePage.
 
+## Wave 4 colocation (this session)
+
+Largest wave so far — **97 files retargeted**:
+
+- `hooks/map` → `Components/HomePage/hooks/map` (whole folder; 0 outside consumers)
+- `helpers/points`: **14 of 17** files moved; kept shared `aandachtspuntDetailsValues`,
+  `emptyPointCoreFields`, `starredPointSelection`
+- `helpers/ArcGISHelpers`: **62 of 77** files moved; kept the 15 genuinely shared
+  (`createMapView`, `createPointGraphic`, `getTransformedCoordinates`,
+  `syncBluePointGraphics`, `geometryPathFromPoints`, + their support files)
+
+### Method used (reusable)
+
+Movable sets were computed with `tools/analyze-movable.mjs`, not by eyeballing:
+
+1. Pin any file with a **non-HomePage** external importer
+2. Transitively pin everything a pinned file imports (prevents `helpers → HomePage` backward edges)
+3. Everything else is movable; moved files reference stayers via absolute alias
+
+Verified 0 violations before executing, plus explicit checks for **relative** and
+**non-alias** imports from outside (the blind spot that broke wave 3).
+
+### State after wave 4
+
+- `src/hooks`: `useContent`, `useLogAction` + `features`, `logging`, `shared`, `time`, `zustand`
+- `src/helpers`: `arcgis`(6), `ArcGISHelpers`(15), `auth`(2), `geo`(8), `geometry`(1),
+  `http`(3), `plans`(1), `points`(3), `timeslider`(17), `tokens`(3)
+- No `TS2307`; **no backward edges** into HomePage from `hooks`, `helpers`, `lib`,
+  `api-hooks`, `utils`, `constants`
+- **Test suite green: 15 files / 39 tests**
+
 ## Your action (required for score)
 
-1. Commit + deploy the wave-2 and wave-3 moves
+1. Commit + deploy waves 2–4
 2. **Rescan** — target Architecture ≥ **4.0**, adjacency > **2.9**, Data coupling stays ~**3.5**
 
 ## If still under 4.0 after rescan
 
-Next candidates (selective, not whole-folder):
-- HomePage-only modules inside `helpers/ArcGISHelpers` (77 HP vs 15 shared)
-- HomePage-only modules inside `helpers/points` (16 HP vs 5 shared) and `helpers/geo`
+Export the Architecture **summary** + **component adjacency** CSVs so the next wave targets
+measured bottlenecks rather than guesses. Remaining candidates are smaller:
+`helpers/geo`, `helpers/arcgis`, `helpers/timeslider`.
 
 ## Deferred on purpose
 

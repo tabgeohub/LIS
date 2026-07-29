@@ -1,4 +1,4 @@
-import type { ClickableGeometry } from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
+import type { ClickableGeometry } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
 
 type SingleGeometryClickOptions = {
   selectedGeometry: ClickableGeometry | null;

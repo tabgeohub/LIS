@@ -1,5 +1,5 @@
-export type { NewPointCoordSetters as AddPointStepCoordinateSetters } from "@helpers/ArcGISHelpers/newPointEventCoords";
-import type { NewPointCoordSetters } from "@helpers/ArcGISHelpers/newPointEventCoords";
+export type { NewPointCoordSetters as AddPointStepCoordinateSetters } from "Components/HomePage/helpers/ArcGISHelpers/newPointEventCoords";
+import type { NewPointCoordSetters } from "Components/HomePage/helpers/ArcGISHelpers/newPointEventCoords";
 
 export type AddPointStepMapClickState = NewPointCoordSetters & {
   addPointStep: number;

@@ -1,4 +1,4 @@
-import { createDebouncedClickGuard } from "hooks/map/mapClickGuard";
+import { createDebouncedClickGuard } from "Components/HomePage/hooks/map/mapClickGuard";
 import {
   handleMapClickHit,
   type MapClickListenerBase,

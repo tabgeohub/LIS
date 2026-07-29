@@ -2,7 +2,7 @@ import {
   createPlanBoundingBoxGraphic,
   getFlightPlanPoints,
   PLAN_BOUNDING_BOX_SYMBOLS,
-} from "@helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
+} from "Components/HomePage/helpers/ArcGISHelpers/createPlanBoundingBoxGraphic";
 import { FlightPlanType } from "Types";
 
 function canShowPlanHover(input: {

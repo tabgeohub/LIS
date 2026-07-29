@@ -1,4 +1,4 @@
-import createPoint from "@helpers/ArcGISHelpers/createPoint";
+import createPoint from "Components/HomePage/helpers/ArcGISHelpers/createPoint";
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
 
 export function applyWgs84MapClickCoords(input: {

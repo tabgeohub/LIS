@@ -1,6 +1,6 @@
 import { EnrichedPointType } from "Types";
 import { FinishedPointType } from "Types/finished_plans";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 import { buildYellowMarkerGraphics } from "./yellowMarkerGraphics";
 
 type PointType = EnrichedPointType | FinishedPointType;

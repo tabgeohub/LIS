@@ -12,7 +12,7 @@ import { useAuth } from "hooks/zustand/ui/useAuth";
 import {
   buildPointUpdatePayload,
   pickPointCoreLogData,
-} from "@helpers/points/buildPointUpdatePayload";
+} from "Components/HomePage/helpers/points/buildPointUpdatePayload";
 
 export default function Buttons({
   setStep,

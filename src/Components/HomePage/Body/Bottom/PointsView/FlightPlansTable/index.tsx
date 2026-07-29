@@ -10,7 +10,7 @@ import Data from "./Data";
 import {
   addPlanStarGraphic,
   removePlanStarGraphics,
-} from "@helpers/ArcGISHelpers/planStarGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/planStarGraphics";
 import { useHoverFlightPlanFromOriginalMap } from "Components/HomePage/hooks/hover-click-handlers/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 

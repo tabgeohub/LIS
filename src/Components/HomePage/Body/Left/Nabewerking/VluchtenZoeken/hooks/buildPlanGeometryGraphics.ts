@@ -2,7 +2,7 @@ import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import {
   createGeometryGraphic,
   GeometryPoint,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import type { FinishedGeometryType } from "Types/finished_plans";
 
 function transformPlanGeometryPoint(

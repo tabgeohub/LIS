@@ -1,6 +1,6 @@
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-import { buildPointMarkerSymbol } from "./pointMarkerSymbol";
+import { buildPointMarkerSymbol } from "@helpers/ArcGISHelpers/pointMarkerSymbol";
 
 /** Yellow WGS84 point graphic used by ViewPlan yellow preview layers. */
 export function createYellowWgs84PointGraphic(input: {

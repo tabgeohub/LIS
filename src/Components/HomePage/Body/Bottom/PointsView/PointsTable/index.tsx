@@ -9,7 +9,7 @@ import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
 import usePointListMapActions from "Components/HomePage/hooks/hover-click-handlers/usePointListMapActions";
 
-import { POINT_CORE_DISPLAY_COLUMNS } from "@helpers/points/pointColumnKeys";
+import { POINT_CORE_DISPLAY_COLUMNS } from "Components/HomePage/helpers/points/pointColumnKeys";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPoints = [...POINT_CORE_DISPLAY_COLUMNS];

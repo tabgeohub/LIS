@@ -1,4 +1,4 @@
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
 import { registerMapHoverHandler } from "./registerMapHoverHandler";
 

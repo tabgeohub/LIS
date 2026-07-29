@@ -2,7 +2,7 @@ import { FinishedPointType } from "Types/finished_plans";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { usePointHandlers } from "./hooks/usePointHandlers";
 import { useMemo } from "react";
-import { sortPointsByImageCount } from "@helpers/points/sortPointsByImageCount";
+import { sortPointsByImageCount } from "Components/HomePage/helpers/points/sortPointsByImageCount";
 
 interface PointsProps {
   points: FinishedPointType[];

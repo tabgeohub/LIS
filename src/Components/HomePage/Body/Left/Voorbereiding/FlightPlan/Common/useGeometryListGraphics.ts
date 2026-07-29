@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import Graphic from "@arcgis/core/Graphic";
-import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
+import { createGeometryGraphic } from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
+import { replaceGraphics } from "Components/HomePage/helpers/ArcGISHelpers/replaceGraphics";
 import type { Geometry } from "hooks/features/useGeometriesStore";
 
 export function useGeometryListGraphics(input: {

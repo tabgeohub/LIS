@@ -1,4 +1,4 @@
-import { createPin } from "@helpers/ArcGISHelpers/createPin";
+import { createPin } from "Components/HomePage/helpers/ArcGISHelpers/createPin";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { EnrichedPointType } from "Types";
 import { SelectFromSourceItemPoint } from "./mapSourceItems";

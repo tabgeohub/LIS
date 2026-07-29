@@ -1,4 +1,4 @@
-import { sortPointsByImageCount } from "@helpers/points/sortPointsByImageCount";
+import { sortPointsByImageCount } from "Components/HomePage/helpers/points/sortPointsByImageCount";
 import type { FinishedFlightPlanType } from "Types/finished_plans";
 
 export function filterWaarnemingenPoints(input: {

@@ -3,8 +3,8 @@ import Point from "@arcgis/core/geometry/Point";
 import {
   createGeometryGraphic,
   GeometrySymbolOptions,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
+import { validateMapView } from "Components/HomePage/helpers/ArcGISHelpers/validateMapView";
 
 export const yellowGeometrySymbol: GeometrySymbolOptions = {
   fillColor: [255, 255, 0, 0.3],

@@ -2,11 +2,11 @@ import MapView from "@arcgis/core/views/MapView";
 import {
   createGeometryGraphic,
   GeometrySymbolOptions,
-} from "@helpers/ArcGISHelpers/createGeometryGraphic";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryGraphic";
 import {
   ClickableGeometry,
   normalizeGeometryData,
-} from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
 
 export type HoverableGeometry = ClickableGeometry;
 

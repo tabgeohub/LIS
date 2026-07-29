@@ -12,7 +12,7 @@ import MenuItem from "../common/MenuItem";
 import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
-} from "@helpers/ArcGISHelpers/flightPlanMapActions";
+} from "Components/HomePage/helpers/ArcGISHelpers/flightPlanMapActions";
 import { useBottomCompactListView } from "Components/HomePage/hooks/bottom/useBottomCompactListView";
 
 export default function PlansList() {

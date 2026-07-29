@@ -1,5 +1,5 @@
 import * as XLSX from "@e965/xlsx";
-import { PointImportRow } from "@helpers/points/pointColumnKeys";
+import { PointImportRow } from "Components/HomePage/helpers/points/pointColumnKeys";
 import {
   EMPTY_POINT_IDENTITY_FIELDS,
   EMPTY_POINT_NUMERIC_FLAGS,

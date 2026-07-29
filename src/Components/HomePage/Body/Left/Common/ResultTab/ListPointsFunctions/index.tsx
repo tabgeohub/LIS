@@ -1,7 +1,7 @@
 import {
   getUnstarredPoints,
   starAllPointsOnMap,
-} from "@helpers/ArcGISHelpers/createPointMapGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/createPointMapGraphics";
 import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
 import { useOpenTable } from "hooks/zustand/ui/showTable";

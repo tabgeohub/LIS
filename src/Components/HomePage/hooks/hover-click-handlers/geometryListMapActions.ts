@@ -3,7 +3,7 @@ import {
   createHoverGeometryTableGraphic,
   goToGeometryCentroid,
   removeStarGeometryGraphic,
-} from "@helpers/ArcGISHelpers/createGeometryMapGraphics";
+} from "Components/HomePage/helpers/ArcGISHelpers/createGeometryMapGraphics";
 import type { Geometry } from "hooks/features/useGeometriesStore";
 import type { UseGeometryListMapActionsOptions } from "./useGeometryListMapActions";
 
