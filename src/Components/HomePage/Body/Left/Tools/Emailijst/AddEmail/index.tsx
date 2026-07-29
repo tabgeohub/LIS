@@ -2,7 +2,7 @@ import { useState } from "react";
 import { EmailListStepType } from "..";
 import Loading from "./Loading";
 import { useCreateData } from "utils/useCreateData";
-import { isValidEmail } from "@helpers/dom/isValidEmail";
+import { isValidEmail } from "Components/HomePage/helpers/dom/isValidEmail";
 import toast from "react-hot-toast";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import useLogAction from "hooks/useLogAction";

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { TbCheck } from "react-icons/tb";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import { useDrawingStore } from "hooks/zustand/useDrawingStore";

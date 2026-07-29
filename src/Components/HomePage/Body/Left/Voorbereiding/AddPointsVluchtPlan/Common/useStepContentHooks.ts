@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
-import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
+import { useRenderLocalGeometries } from "Components/HomePage/hooks/features/useRenderLocalGeometries";
+import { useHoverPointsAndGeometries } from "Components/HomePage/hooks/features/useHoverPointsAndGeometries";
 import { useStepContentMapSync } from "./useStepContentMapSync";
 import { useStepContentDataInit } from "./useStepContentDataInit";
 import {

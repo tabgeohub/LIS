@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Header from "./Header";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import SinglePoint from "./SinglePoints";
 import { EnrichedPointType } from "Types";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";

@@ -1,4 +1,4 @@
-import { Geometry } from "./useGeometriesStore";
+import { Geometry } from "hooks/features/useGeometriesStore";
 import { createGeometryGraphics } from "@helpers/ArcGISHelpers/createGeometryGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";

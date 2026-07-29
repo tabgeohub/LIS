@@ -1,5 +1,5 @@
 import { createGeometryGraphic } from "@helpers/ArcGISHelpers/createGeometryGraphic";
-import type { Geometry } from "./useGeometriesStore";
+import type { Geometry } from "hooks/features/useGeometriesStore";
 
 export function buildGeometryMapGraphics(geometries: Geometry[]) {
   return geometries

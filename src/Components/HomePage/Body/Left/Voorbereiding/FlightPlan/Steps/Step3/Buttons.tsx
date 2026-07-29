@@ -5,7 +5,7 @@ import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePoint
 import { useCreateData } from "utils/useCreateData";
 import { useCancelCreateFlightPlan } from "Components/HomePage/hooks/handleCancel/useCancelCreateFlightPlan";
 import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { submitCollectedFlightPlanCreate } from "Components/HomePage/hooks/flightPlan/submitCollectedFlightPlanCreate";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";

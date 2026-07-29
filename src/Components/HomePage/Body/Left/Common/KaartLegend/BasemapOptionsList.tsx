@@ -1,4 +1,4 @@
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 import {
   BASEMAP_OPTIONS,
   BASEMAP_THUMBNAILS,

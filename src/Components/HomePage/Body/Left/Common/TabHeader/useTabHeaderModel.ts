@@ -3,8 +3,8 @@ import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereidin
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import { useContent } from "hooks/useContent";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useResetPointFilters } from "hooks/features/useResetPointFilters";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetPointFilters } from "Components/HomePage/hooks/features/useResetPointFilters";
 import { handleTabHeaderClose } from "./handleTabHeaderClose";
 import { resolveTabHeaderText } from "./resolveTabHeaderText";
 

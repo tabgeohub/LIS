@@ -2,7 +2,7 @@
 import { EnrichedPointType } from "Types";
 import { useContent } from "hooks/useContent";
 import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
-import { useWizardPointsFilterHeader } from "hooks/points/useWizardPointsFilterHeader";
+import { useWizardPointsFilterHeader } from "Components/HomePage/hooks/points/useWizardPointsFilterHeader";
 
 export default function PointsList({
   selectedPoints,

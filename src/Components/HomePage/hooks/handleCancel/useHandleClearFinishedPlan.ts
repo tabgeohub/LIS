@@ -1,5 +1,5 @@
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 
 export function useHandleClearFinishedPlan() {
   const { setOpenFilter, setSelectedPlan, setDateFrom, setDateTo, setPeriode } =

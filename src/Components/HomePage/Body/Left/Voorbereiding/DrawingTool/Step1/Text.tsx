@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { TbInfoCircle, TbMouse, TbClick } from "react-icons/tb";
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 
 export default function Text({
   selectedTool,

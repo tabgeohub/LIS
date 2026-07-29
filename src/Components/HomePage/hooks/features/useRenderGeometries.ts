@@ -7,7 +7,7 @@ import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { useGeometryGraphicsRendering } from "hooks/features/useGeometryGraphicsEffects";
+import { useGeometryGraphicsRendering } from "Components/HomePage/hooks/features/useGeometryGraphicsEffects";
 
 export function useRenderGeometries() {
   const { user } = useAuth();

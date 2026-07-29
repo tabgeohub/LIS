@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { useOpenTable } from "hooks/zustand/ui/showTable";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";

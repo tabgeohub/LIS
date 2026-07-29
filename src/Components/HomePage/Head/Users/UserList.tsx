@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";

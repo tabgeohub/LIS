@@ -1,7 +1,7 @@
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 
 export default function CommonTabBtn({
   item,

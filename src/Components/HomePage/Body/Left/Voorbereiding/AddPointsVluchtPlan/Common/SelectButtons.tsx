@@ -1,6 +1,6 @@
 import { useAddPointStates } from "../../../../../../../hooks/zustand/useAddPointStates";
 import WizardHerhalenSelectButtons from "Components/HomePage/Body/Left/Common/WizardHerhalenSelectButtons";
-import { useHerhalenSelectionHandlers } from "hooks/points/useHerhalenSelectionHandlers";
+import { useHerhalenSelectionHandlers } from "Components/HomePage/hooks/points/useHerhalenSelectionHandlers";
 
 export default function SelectButtons({
   herhalen,

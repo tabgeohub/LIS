@@ -5,7 +5,7 @@ import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
 import { useUpdateData } from "utils/useUpdateData";
 import { EnrichedPointType } from "Types";
-import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
+import { useFetchInitialFeatures } from "Components/HomePage/hooks/features/useFetchInitialFeatures";
 import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useAuth } from "hooks/zustand/ui/useAuth";

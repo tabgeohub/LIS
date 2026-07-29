@@ -6,7 +6,7 @@ import { useUpdateData } from "utils/useUpdateData";
 
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 

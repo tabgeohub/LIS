@@ -1,4 +1,4 @@
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 
 export type SelectCompProps = {
   label: string;

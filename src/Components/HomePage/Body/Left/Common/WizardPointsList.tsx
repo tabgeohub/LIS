@@ -6,9 +6,9 @@ import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers
 import useNearestPointClick from "Components/HomePage/hooks/hover-click-handlers/useNearestPointClick";
 import useLogAction from "hooks/useLogAction";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
-import { sortPointsWithSelectionOrder } from "hooks/points/sortPointsWithSelectionOrder";
+import { sortPointsWithSelectionOrder } from "Components/HomePage/hooks/points/sortPointsWithSelectionOrder";
 import { useMapPointSelectionClick } from "Components/HomePage/hooks/viewPlan/useMapPointSelectionClick";
-import { getPointsSelectionStep } from "hooks/points/pointsSelectionLog";
+import { getPointsSelectionStep } from "Components/HomePage/hooks/points/pointsSelectionLog";
 
 export type WizardPointsListProps = {
   points: EnrichedPointType[];

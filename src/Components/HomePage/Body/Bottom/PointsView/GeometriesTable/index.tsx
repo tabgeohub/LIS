@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import { PointsViewTableFrame } from "../common/PointsViewTableFrame";

@@ -5,8 +5,8 @@ import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import { CgSpinner } from "react-icons/cg";
 import { EnrichedPointType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
-import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useFetchInitialFeatures } from "Components/HomePage/hooks/features/useFetchInitialFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import {

@@ -2,7 +2,7 @@ import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/Input
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "../Buttons";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

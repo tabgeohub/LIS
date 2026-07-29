@@ -2,7 +2,7 @@ import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 

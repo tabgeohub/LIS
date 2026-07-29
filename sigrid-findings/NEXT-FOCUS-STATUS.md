@@ -41,10 +41,37 @@ Verified: no `TS2307` module errors; no remaining `hooks → Components/HomePage
 - Component entanglement: `helpers/http`, `ArcGISHelpers`, `api-hooks`, Timeslider, `helpers/arcgis`, `helpers/geo` → Risk accepted
 - Left Raw: `HomePage`, `hooks` entanglement (still adjacency targets)
 
+## Wave 3 colocation (this session)
+
+Moved to `Components/HomePage/`:
+- Whole folders: `hooks/consts`, `hooks/points`, `helpers/dom`
+- **Split `hooks/features`**: 14 HomePage-only modules moved; shared stores
+  `useGeometriesStore` + `usePointsStore` intentionally kept in `src/hooks/features`
+  (consumed by `lib/refreshFeatureStores` and `hooks/zustand/ui/showTable`)
+
+`hooks/logging` deliberately **stays** — `useLogAction` imports it relatively.
+
+`src/hooks` now: `useContent`, `useLogAction` + `features` (2 stores), `logging`, `map`, `shared`, `time`, `zustand`.
+
+Verified: no `TS2307`; no backward edges from `hooks`, `helpers`, `lib`, or `api-hooks` into HomePage.
+
 ## Your action (required for score)
 
-1. Commit + deploy the wave-2 moves
+1. Commit + deploy the wave-2 and wave-3 moves
 2. **Rescan** — target Architecture ≥ **4.0**, adjacency > **2.9**, Data coupling stays ~**3.5**
+
+## If still under 4.0 after rescan
+
+Next candidates (selective, not whole-folder):
+- HomePage-only modules inside `helpers/ArcGISHelpers` (77 HP vs 15 shared)
+- HomePage-only modules inside `helpers/points` (16 HP vs 5 shared) and `helpers/geo`
+
+## Deferred on purpose
+
+**Unit size (689)** is a Maintainability metric, not Architecture. Fixing it by extracting
+helpers adds modules and edges, which pushes adjacency the wrong way. Revisit only after
+Architecture ≥ 4.0, and then target the ~10–15 largest units along real responsibility
+seams inside their own feature folder — not into new shared `*Core` files.
 
 ## Optional leftovers (only if adjacency still weak after rescan)
 

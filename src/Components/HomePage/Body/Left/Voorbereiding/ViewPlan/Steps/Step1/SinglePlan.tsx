@@ -9,7 +9,7 @@ import { GoCheckCircleFill } from "react-icons/go";
 import { TbCancel } from "react-icons/tb";
 import dayjs from "dayjs";
 import useLogAction from "hooks/useLogAction";
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
 import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import { POINT_EXPORT_COLUMNS } from "@helpers/points/pointColumnKeys";

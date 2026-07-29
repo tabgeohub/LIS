@@ -1,6 +1,6 @@
 import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import WizardHerhalenSelectButtons from "Components/HomePage/Body/Left/Common/WizardHerhalenSelectButtons";
-import { useHerhalenSelectionHandlers } from "hooks/points/useHerhalenSelectionHandlers";
+import { useHerhalenSelectionHandlers } from "Components/HomePage/hooks/points/useHerhalenSelectionHandlers";
 
 export default function SelectButtons({ herhalen }: { herhalen: boolean }) {
   const {

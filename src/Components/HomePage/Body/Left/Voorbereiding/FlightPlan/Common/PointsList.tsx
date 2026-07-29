@@ -4,7 +4,7 @@ import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsL
 import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
 import { useEffect } from "react";
 import useLogAction from "hooks/useLogAction";
-import { getPointsSelectionStep } from "hooks/points/pointsSelectionLog";
+import { getPointsSelectionStep } from "Components/HomePage/hooks/points/pointsSelectionLog";
 
 export default function PointsList({
   selectedPoints,

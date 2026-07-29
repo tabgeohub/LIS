@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { Geometry } from "hooks/features/useGeometriesStore";
 import type { GeometryEditDraft } from "./helpers/types";
 import {

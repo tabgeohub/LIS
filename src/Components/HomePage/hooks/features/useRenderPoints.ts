@@ -5,7 +5,7 @@ import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useTabState } from "hooks/zustand/ui/tabState";
 import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
-import { usePointsStore } from "./usePointsStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
 import { usePointGraphicsClick, usePointGraphicsRendering } from "./usePointGraphicsEffects";
 
 export function useRenderPoints() {

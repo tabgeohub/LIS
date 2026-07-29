@@ -1,5 +1,5 @@
-import { usePointsStore } from "./usePointsStore";
-import { useGeometriesStore } from "./useGeometriesStore";
+import { usePointsStore } from "hooks/features/usePointsStore";
+import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 
 export function useResetFeatures() {
   const { dbPoints, setPoints } = usePointsStore();

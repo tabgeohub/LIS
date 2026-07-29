@@ -4,7 +4,7 @@ import { useCreateData } from "utils/useCreateData";
 import { useCancelCreateFlightPlan } from "Components/HomePage/hooks/handleCancel/useCancelCreateFlightPlan";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";

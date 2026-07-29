@@ -1,5 +1,5 @@
 import { useUpdateData } from "utils/useUpdateData";
-import { useRenderLocalGeometries } from "hooks/features/useRenderLocalGeometries";
+import { useRenderLocalGeometries } from "Components/HomePage/hooks/features/useRenderLocalGeometries";
 import {
   useAddPointToPlanBluePoints,
   useAddPointToPlanPins,

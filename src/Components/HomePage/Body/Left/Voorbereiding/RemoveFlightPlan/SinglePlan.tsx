@@ -1,4 +1,4 @@
-import { classNames } from "@helpers/dom/classNames";
+import { classNames } from "Components/HomePage/helpers/dom/classNames";
 import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
 import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import useLogAction from "hooks/useLogAction";

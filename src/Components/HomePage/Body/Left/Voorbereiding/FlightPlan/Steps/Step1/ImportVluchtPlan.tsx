@@ -1,7 +1,7 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";

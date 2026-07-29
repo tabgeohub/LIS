@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
 import { useOpenAllTable } from "hooks/zustand/ui/showAllTable";
 import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { EnrichedPointType } from "Types";

@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { EnrichedPointType } from "Types";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
+import { useHoverPointsAndGeometries } from "Components/HomePage/hooks/features/useHoverPointsAndGeometries";
 import { syncBluePointGraphics } from "@helpers/ArcGISHelpers/syncBluePointGraphics";
 import {
   clearAddPointToPlanPins,
