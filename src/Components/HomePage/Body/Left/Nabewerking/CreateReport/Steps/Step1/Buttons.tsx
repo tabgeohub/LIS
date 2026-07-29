@@ -1,6 +1,6 @@
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";

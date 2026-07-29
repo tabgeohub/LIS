@@ -1,16 +1,16 @@
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { ActionType } from "../..";
-import { buildFlightPlanPayloadFields } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
+import { buildFlightPlanPayloadFields } from "Components/HomePage/hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useUpdateData } from "utils/useUpdateData";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
-import { pickFlightPlanFormValues } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { pickFlightPlanFormValues } from "Components/HomePage/hooks/flightPlan/pickFlightPlanCreateFields";
 import {
   mergeFlightPlanPersistenceFields,
   pickFlightPlanPersistenceFields,
-} from "hooks/flightPlan/pickFlightPlanPersistenceFields";
+} from "Components/HomePage/hooks/flightPlan/pickFlightPlanPersistenceFields";
 
 export default function Buttons({
   setAction,

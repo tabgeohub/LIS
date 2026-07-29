@@ -1,7 +1,7 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
+import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import { generateReportZip } from "./generateReportZip";
 
 export type UseHandleStep2Input = {

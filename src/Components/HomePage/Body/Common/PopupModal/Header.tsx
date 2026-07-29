@@ -1,5 +1,5 @@
 import { usePopUpState } from "hooks/zustand/ui/popUpState";
-import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
+import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleClosePopUp";
 import { CgClose } from "react-icons/cg";
 
 export default function Header({

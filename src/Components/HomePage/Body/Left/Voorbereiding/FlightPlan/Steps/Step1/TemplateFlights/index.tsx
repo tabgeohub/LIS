@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { useTemplateFlights } from "api-hooks/templateFlights";
 import { useCreateData } from "utils/useCreateData";
-import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
+import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 
 import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";
 import Fase3 from "./Fase3";
-import { submitCollectedFlightPlanCreate } from "hooks/flightPlan/submitCollectedFlightPlanCreate";
+import { submitCollectedFlightPlanCreate } from "Components/HomePage/hooks/flightPlan/submitCollectedFlightPlanCreate";
 import type { Template } from "api-hooks/templateFlights/types";
 
 export type FlightPlanTemplate = Template;

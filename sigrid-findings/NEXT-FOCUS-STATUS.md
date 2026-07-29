@@ -22,10 +22,29 @@
    - `helpers/tableExports`
 6. **Fold** `src/api/fetchApi` → `api-hooks/fetchApi` (removed `src/api`)
 
+## Wave 2 colocation (this session)
+
+Moved 10 HomePage-only hook folders out of `src/hooks` → `Components/HomePage/hooks/`:
+`filters`, `handleCancel`, `flightPlan`, `kaartlagen`, `editPoint`, `popUpModal`, `tabs`, `viewPlan`, `bottom`, `layout` (~62 import sites retargeted).
+
+`src/hooks` now holds only: `useContent`, `useLogAction` (hubs) + shared `consts`, `features`, `logging`, `map`, `points`, `shared`, `time`, `zustand`.
+
+Also removed the **2 backward `hooks → HomePage` edges**:
+- `hooks/map/useRenderVluchtPlans` → `Components/HomePage/hooks/map/`
+- `hooks/features/useRenderGeometries` → `Components/HomePage/hooks/features/`
+
+Verified: no `TS2307` module errors; no remaining `hooks → Components/HomePage` imports.
+
+## Accepts done in Sigrid UI
+
+- Module coupling: hubs `useContent`, `useLogAction`, repos, keycloak, `useCreateDataCore`, layer builders, shared utils → Risk accepted
+- Component entanglement: `helpers/http`, `ArcGISHelpers`, `api-hooks`, Timeslider, `helpers/arcgis`, `helpers/geo` → Risk accepted
+- Left Raw: `HomePage`, `hooks` entanglement (still adjacency targets)
+
 ## Your action (required for score)
 
-1. **Accept** Independence / coupling / entanglement hubs in Sigrid UI — do **not** rewrite `useContent` / `useLogAction`
-2. Deploy + **rescan** — target Architecture ≥ **4.0**, adjacency > **2.9**, Data coupling stays ~**3.5**
+1. Commit + deploy the wave-2 moves
+2. **Rescan** — target Architecture ≥ **4.0**, adjacency > **2.9**, Data coupling stays ~**3.5**
 
 ## Optional leftovers (only if adjacency still weak after rescan)
 

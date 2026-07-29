@@ -5,8 +5,8 @@ import { useContent } from "hooks/useContent";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
-import { voorbereidingVluchtAanmakenFieldLabels } from "hooks/flightPlan/flightPlanFormLabels";
+import { useFlightPlanFormSelectOptions } from "Components/HomePage/hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { voorbereidingVluchtAanmakenFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanFormLabels";
 
 export default function Step1() {
   const { pilootOptions, waarnemerOptions, typeLuchtvaartuigOptions } =

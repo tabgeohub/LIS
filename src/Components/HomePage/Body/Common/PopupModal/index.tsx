@@ -3,7 +3,7 @@ import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabSta
 import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
 
 import ModalContainer from "./ModalContainer";
-import usePopupController from "hooks/popUpModal/usePopupController";
+import usePopupController from "Components/HomePage/hooks/popUpModal/usePopupController";
 import Header from "./Header";
 import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import useLogAction from "hooks/useLogAction";

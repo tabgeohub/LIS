@@ -1,8 +1,8 @@
-import { useFilterPoints } from "hooks/filters/useFilterPoints";
+import { useFilterPoints } from "Components/HomePage/hooks/filters/useFilterPoints";
 import {
   PeriodType,
   usePointsFilterStore,
-} from "hooks/filters/usePointsFilterStore";
+} from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import { useContent } from "hooks/useContent";
 import { EnrichedPointType } from "Types";
 

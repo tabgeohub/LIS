@@ -1,5 +1,5 @@
 import { applyCoordinateSyncPatchToSetters } from "@helpers/geo/applyCoordinateSyncPatchToSetters";
-import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
+import { useCoordinateSystemSync } from "Components/HomePage/hooks/editPoint/useCoordinateSystemSync";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
 

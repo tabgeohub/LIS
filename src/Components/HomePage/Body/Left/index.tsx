@@ -22,7 +22,7 @@ import Emailijst from "./Tools/Emailijst";
 import ToevoegenKaartlagen from "./Tools/ToevoegenKaartlagen";
 import Uploaden from "./Tools/Uploaden";
 import EditGeometry from "./Tools/EditGeometry";
-import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
+import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import ResultTab from "./Common/ResultTab";
 import SearchedResultsTab from "./Common/SearchedResultsTab";
 import TemplateFlight from "./Voorbereiding/TemplateFlight";

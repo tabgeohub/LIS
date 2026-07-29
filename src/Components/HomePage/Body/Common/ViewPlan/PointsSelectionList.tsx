@@ -5,8 +5,8 @@ import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePoi
 import {
   togglePointSelection,
   useMapPointSelectionClick,
-} from "hooks/viewPlan/useMapPointSelectionClick";
-import { useSortedPointSelection } from "hooks/viewPlan/useSortedPointSelection";
+} from "Components/HomePage/hooks/viewPlan/useMapPointSelectionClick";
+import { useSortedPointSelection } from "Components/HomePage/hooks/viewPlan/useSortedPointSelection";
 
 export default function PointsSelectionList({
   points,

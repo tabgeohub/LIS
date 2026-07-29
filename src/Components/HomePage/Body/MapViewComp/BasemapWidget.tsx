@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
+import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import { BASEMAP_LABELS, BASEMAP_THUMBNAILS } from "./basemapWidgetMeta";
 import { BasemapWidgetPanel } from "./BasemapWidgetPanel";
 

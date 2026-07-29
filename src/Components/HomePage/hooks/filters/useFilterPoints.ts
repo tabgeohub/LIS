@@ -1,4 +1,4 @@
-import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
+import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { EnrichedPointType } from "Types";
 import { filterPointsByCriteria } from "./filterPointsByCriteria";

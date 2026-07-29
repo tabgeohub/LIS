@@ -4,7 +4,7 @@ import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereidin
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanStandardSelectProps } from "hooks/flightPlan/useFlightPlanStandardSelectProps";
+import { useFlightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function Form({
   vluchtnummer,

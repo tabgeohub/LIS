@@ -1,13 +1,13 @@
 import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { useCreateData } from "utils/useCreateData";
-import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
-import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
+import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
+import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
-import { assembleFlightPlanCreateAttributes } from "hooks/flightPlan/assembleFlightPlanCreateAttributes";
+import { assembleFlightPlanCreateAttributes } from "Components/HomePage/hooks/flightPlan/assembleFlightPlanCreateAttributes";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";

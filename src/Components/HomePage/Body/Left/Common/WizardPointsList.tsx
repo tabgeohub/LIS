@@ -7,7 +7,7 @@ import useNearestPointClick from "Components/HomePage/hooks/hover-click-handlers
 import useLogAction from "hooks/useLogAction";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 import { sortPointsWithSelectionOrder } from "hooks/points/sortPointsWithSelectionOrder";
-import { useMapPointSelectionClick } from "hooks/viewPlan/useMapPointSelectionClick";
+import { useMapPointSelectionClick } from "Components/HomePage/hooks/viewPlan/useMapPointSelectionClick";
 import { getPointsSelectionStep } from "hooks/points/pointsSelectionLog";
 
 export type WizardPointsListProps = {

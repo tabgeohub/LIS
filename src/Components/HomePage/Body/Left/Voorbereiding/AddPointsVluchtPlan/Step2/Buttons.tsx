@@ -1,4 +1,4 @@
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";

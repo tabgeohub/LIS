@@ -13,7 +13,7 @@ import {
   panMapToFlightPlan,
   zoomMapToFlightPlan,
 } from "@helpers/ArcGISHelpers/flightPlanMapActions";
-import { useBottomCompactListView } from "hooks/bottom/useBottomCompactListView";
+import { useBottomCompactListView } from "Components/HomePage/hooks/bottom/useBottomCompactListView";
 
 export default function PlansList() {
   const { mapView } = useMapViewState();

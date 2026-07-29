@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ResizeHandleSide,
   useResizableSidebar,
-} from "hooks/layout/useResizableSidebar";
+} from "Components/HomePage/hooks/layout/useResizableSidebar";
 
 const RESIZE_HANDLE_TITLE = "Versleep om de breedte van het paneel aan te passen";
 

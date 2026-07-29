@@ -1,6 +1,6 @@
 import useLogAction from "hooks/useLogAction";
 import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";

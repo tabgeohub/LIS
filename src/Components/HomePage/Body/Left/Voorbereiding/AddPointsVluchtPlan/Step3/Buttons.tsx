@@ -1,6 +1,6 @@
 import { useUpdateData } from "utils/useUpdateData";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";

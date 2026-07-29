@@ -1,13 +1,13 @@
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "hooks/map/useGetFlightTimesDistance";
-import { usePopulateFlightPlanFormEffect } from "hooks/flightPlan/usePopulateFlightPlanFormEffect";
+import { usePopulateFlightPlanFormEffect } from "Components/HomePage/hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanFormSelectOptions } from "hooks/flightPlan/useFlightPlanFormSelectOptions";
-import { nabewerkingVluchtenZoekenFieldLabels } from "hooks/flightPlan/flightPlanFormLabels";
+import { useFlightPlanFormSelectOptions } from "Components/HomePage/hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { nabewerkingVluchtenZoekenFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanFormLabels";
 
 export default function FormElements() {
   const { pilootOptions, typeLuchtvaartuigOptions } =

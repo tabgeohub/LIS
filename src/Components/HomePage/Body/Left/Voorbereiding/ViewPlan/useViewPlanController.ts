@@ -1,5 +1,5 @@
 import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useRenderVluchtplans } from "hooks/map/useRenderVluchtPlans";
+import { useRenderVluchtplans } from "Components/HomePage/hooks/map/useRenderVluchtPlans";
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
 import { useFlightPlansList } from "api-hooks/flightPlans";

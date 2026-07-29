@@ -1,5 +1,5 @@
 import { useAuth } from "hooks/zustand/ui/useAuth";
-import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { FlightPlanType } from "Types";

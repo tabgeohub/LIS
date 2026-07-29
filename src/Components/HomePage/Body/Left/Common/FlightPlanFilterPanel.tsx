@@ -1,5 +1,5 @@
-import { useFilterPlans } from "hooks/filters/useFilterPlans";
-import type { PeriodType } from "hooks/filters/usePlansFilterStore";
+import { useFilterPlans } from "Components/HomePage/hooks/filters/useFilterPlans";
+import type { PeriodType } from "Components/HomePage/hooks/filters/usePlansFilterStore";
 import { useContent } from "hooks/useContent";
 import type { FlightPlanType } from "Types";
 

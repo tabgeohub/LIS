@@ -6,7 +6,7 @@ import {
   buildViewPlanUpdatePayload,
   replacePlanInList,
 } from "./helpers/buildUpdatedPlanFromForm";
-import { pickFlightPlanFormValues } from "hooks/flightPlan/pickFlightPlanCreateFields";
+import { pickFlightPlanFormValues } from "Components/HomePage/hooks/flightPlan/pickFlightPlanCreateFields";
 import type { FlightPlanFormFieldValues } from "hooks/zustand/shared/flightPlanFormFields";
 
 export function canSubmitViewPlanStep2(input: {

@@ -1,4 +1,4 @@
-import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
+import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
 
 export function useHandleLayerChange(setLayers: any) {
   const { selectedLayers, setSelectedLayers } = kaartlagenState();

@@ -4,7 +4,7 @@ import FlightPlanStandardFields, {
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
 import { useHydrateDuplicateFlightPlanForm } from "./useHydrateDuplicateFlightPlanForm";
 import { DuplicateFlightPlanFormHeader } from "./DuplicateFlightPlanFormHeader";
-import { useFlightPlanStandardSelectProps } from "hooks/flightPlan/useFlightPlanStandardSelectProps";
+import { useFlightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function Form() {
   const selectProps = useFlightPlanStandardSelectProps();

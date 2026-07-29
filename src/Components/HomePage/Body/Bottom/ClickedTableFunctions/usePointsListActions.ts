@@ -8,7 +8,7 @@ import {
   exportPointsPlansXlsx,
   exportPointsShapefile,
 } from "Components/HomePage/helpers/tableExports/pointsPlansTableExport";
-import { useBottomCompactListView } from "hooks/bottom/useBottomCompactListView";
+import { useBottomCompactListView } from "Components/HomePage/hooks/bottom/useBottomCompactListView";
 import { zoomMapToPointsTable } from "./zoomMapToPointsTable";
 
 export function usePointsListActions() {

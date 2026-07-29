@@ -1,5 +1,5 @@
 import FlightPlanFilterPanel from "Components/HomePage/Body/Left/Common/FlightPlanFilterPanel";
-import { usePlansFilterStore } from "hooks/filters/usePlansFilterStore";
+import { usePlansFilterStore } from "Components/HomePage/hooks/filters/usePlansFilterStore";
 import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import type { FlightPlanType } from "Types";
 

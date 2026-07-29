@@ -9,7 +9,7 @@ import { useRenderPoints } from "./hooks/useRenderPoints";
 import { useRenderGeometries } from "./hooks/useRenderGeometries";
 import Points from "./Points";
 import Geometries from "./Geometries";
-import { filterPointsForPlan } from "hooks/filters/filterPlanPoints";
+import { filterPointsForPlan } from "Components/HomePage/hooks/filters/filterPlanPoints";
 
 export default function Step2() {
   const {

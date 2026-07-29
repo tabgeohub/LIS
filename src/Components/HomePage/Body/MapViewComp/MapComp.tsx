@@ -4,7 +4,7 @@ import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useMapInitialization } from "hooks/map/useMapInitialization";
 import { useRenderPoints } from "hooks/features/useRenderPoints";
-import { useRenderGeometries } from "hooks/features/useRenderGeometries";
+import { useRenderGeometries } from "Components/HomePage/hooks/features/useRenderGeometries";
 import BasemapWidget from "./BasemapWidget";
 import { resolveUserRegionGoTo } from "./mapRegionGoTo";
 import { useMapHoverHighlight } from "./useMapHoverHighlight";
