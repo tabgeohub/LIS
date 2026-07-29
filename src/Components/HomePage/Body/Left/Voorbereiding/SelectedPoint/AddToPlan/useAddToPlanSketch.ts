@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { startPolygonDrawer } from "./polygonDrawer";
 import { usePolygonSketchCleanup } from "./usePolygonSketchCleanup";

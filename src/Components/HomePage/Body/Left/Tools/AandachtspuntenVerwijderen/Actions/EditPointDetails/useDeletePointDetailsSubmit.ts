@@ -1,10 +1,10 @@
 import {
   pickDeletePointFormFields,
   useDeletePointState,
-} from "hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useUpdateData } from "utils/useUpdateData";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { submitDeletePointDetailsUpdate } from "./submitDeletePointDetailsUpdate";
 
 /** Shared Step1/Step2 submit wiring for delete-point edit details. */

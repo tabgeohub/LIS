@@ -1,9 +1,9 @@
 import useLogAction from "hooks/useLogAction";
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {

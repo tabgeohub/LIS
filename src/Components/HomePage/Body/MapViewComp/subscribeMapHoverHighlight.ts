@@ -1,4 +1,4 @@
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
 import { createMapPointerHoverHandler } from "./mapPointerHoverHandler";
 import type { MapHoverLayers } from "./useMapHoverLayers";
 

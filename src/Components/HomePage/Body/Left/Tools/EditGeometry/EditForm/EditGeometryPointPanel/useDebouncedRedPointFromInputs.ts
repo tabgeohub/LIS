@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import type { PointFormState } from "../helpers/pointForm";
 import { resolveDebouncedPointWgs84 } from "./resolveDebouncedPointWgs84";

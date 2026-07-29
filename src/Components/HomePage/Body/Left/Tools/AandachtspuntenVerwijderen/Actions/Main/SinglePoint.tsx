@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { EnrichedPointType } from "Types";
 import ActionButtons from "./ActionButtons";
-import usePointClick from "hooks/hover-click-handlers/usePointClick";
-import usePointHover from "hooks/hover-click-handlers/usePointHover";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
+import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import useLogAction from "hooks/useLogAction";
 import { useEffect } from "react";
 

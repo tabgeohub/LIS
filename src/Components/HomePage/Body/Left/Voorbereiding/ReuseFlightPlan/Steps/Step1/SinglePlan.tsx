@@ -1,5 +1,5 @@
-import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
+import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
+import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";

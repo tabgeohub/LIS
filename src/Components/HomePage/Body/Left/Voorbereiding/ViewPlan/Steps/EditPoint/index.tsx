@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import Buttons from "./Buttons";
 import Form from "./Form";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 
 export default function EditPoint() {
   const { clickedPoint } = useViewPlanState();

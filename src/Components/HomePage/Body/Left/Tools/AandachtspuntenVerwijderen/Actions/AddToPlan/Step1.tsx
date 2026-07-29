@@ -1,7 +1,7 @@
 import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 
 export default function Step1({
   answer,

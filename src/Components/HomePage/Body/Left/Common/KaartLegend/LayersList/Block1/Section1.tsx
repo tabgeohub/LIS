@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import LegendSection from "../Common/LegendSection";
 
 const ALL_REGIOS = ["ZD", "NN", "WNN", "MN", "WNZ", "ON", "ZN"];

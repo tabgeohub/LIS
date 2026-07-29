@@ -6,9 +6,9 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import Loading from "./Content/Loading";
 import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useFilterAndSortPlans } from "../../hooks/useFilterAndSortPlans";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 
 export default function Step1() {
   const [filterTerm, setFilterTerm] = useState("");

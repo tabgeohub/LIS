@@ -1,12 +1,12 @@
 import { CgClose } from "react-icons/cg";
 import { useEffect, useState } from "react";
 
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 
 import Step1 from "./Steps/Step1";
 import { Form, Formik } from "formik";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import Step2 from "./Steps/Step2";
 import { EnrichedPointType } from "Types";
 import useLogAction from "hooks/useLogAction";

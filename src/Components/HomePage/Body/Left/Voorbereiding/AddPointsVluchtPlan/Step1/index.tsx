@@ -5,7 +5,7 @@ import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { FlightPlanType } from "Types";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 
 export default function Step1() {
   const { setStep, selectedPlan, setSelectedPlan, clear } = useAddPointStates();

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { SelectedListItem } from "@helpers/timeslider";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
 import { buildTimesliderItemDetailHref } from "../Common/buildTimesliderItemDetailHref";
 import SelectedPlanGeometryImagesPanel from "../Images/SelectedPlanGeometryImagesPanel";

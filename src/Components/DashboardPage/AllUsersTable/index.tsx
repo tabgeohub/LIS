@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
+import { KeycloakUser } from "hooks/zustand/ui/usersManagementState";
 import Table from "./Table";
 import DeleteConfirmModal from "./DeleteConfirmModal";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { useUsersManagementState } from "@helpers/ZustandStates/usersManagementState";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
+import { useUsersManagementState } from "hooks/zustand/ui/usersManagementState";
 import { filterUnwantedRoleNames } from "../shared/keycloakRoleTypes";
 import { deleteKeycloakUser, removeDeletedUserFromList } from "./deleteUserHelpers";
 

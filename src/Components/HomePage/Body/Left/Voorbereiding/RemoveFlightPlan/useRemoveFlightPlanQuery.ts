@@ -1,4 +1,4 @@
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
 import { useFlightPlansList } from "api-hooks/flightPlans";
 

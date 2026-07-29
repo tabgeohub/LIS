@@ -1,6 +1,6 @@
 import MapView from "@arcgis/core/views/MapView";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import { useDrawingStore } from "hooks/zustand/useDrawingStore";
 import { useEffect, useRef } from "react";
 import {

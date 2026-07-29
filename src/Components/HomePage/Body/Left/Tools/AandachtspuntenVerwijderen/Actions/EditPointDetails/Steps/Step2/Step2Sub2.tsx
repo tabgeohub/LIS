@@ -7,7 +7,7 @@ import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync
 import {
   pickDeletePointCoordinateFields,
   useDeletePointState,
-} from "hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { useState } from "react";
 import { applyDeletePointCoordinatePatch } from "./applyDeletePointCoordinatePatch";
 

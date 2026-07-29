@@ -1,23 +1,40 @@
-# NEXT-FOCUS-STATUS — Data coupling leftovers after 3.9
+# NEXT-FOCUS-STATUS — Max Architecture Push
 
-## Baseline (post-3.9 export)
+## Baseline (architecture exports 20260728)
 
-- Architecture **3.9**, Data coupling still **1.46**
-- Hot CC: flightplans 4, geometries/points 3, finished_plans/template_plans/users 2
+| Metric | Score |
+| --- | --- |
+| Architecture | **~3.98** |
+| Data coupling | **3.5** (all entities CC=1 — done) |
+| Component adjacency | **2.9** (main target) |
 
-## Code fixes (this wave + arch wave 2)
+## Done (code)
 
-Already on main from wave 2: CSV hotspot files no longer embed SQL (repos only).
+1. **ZustandStates → `hooks/zustand/ui/`** — out of `helpers/`
+2. **Nest Timeslider** into `hooks/`, `builders/`, `query/`
+3. **Nest helpers roots** into `http/`, `geo/`, `dom/`, `auth/`, `plans/`
+4. **Nest hooks roots** into `map/`, `time/`, `tabs/` — hubs `useContent` / `useLogAction` stay at root
+5. **Colocate** under HomePage:
+   - `hooks/wizard`
+   - `zustand/{nabewerking,voorbereiding,tools}`
+   - `hooks/hover-click-handlers`
+   - `hooks/resultTab`
+   - `helpers/tableExports`
+6. **Fold** `src/api/fetchApi` → `api-hooks/fetchApi` (removed `src/api`)
 
-**Additional concentration now:**
-- Scripts `verifyRegioPointsGeometries` / `regioPlanAssertions` call repos (no embedded SQL)
-- `buildFlightPlanSelectBody` + `FLIGHT_PLANS_TABLE` / `TEMPLATE_PLANS_TABLE` in `flightPlanSelectSql.ts`
-- `entityExists("points"|"geometries")` — no `lis.*` table-name literals in routes/helpers
+## Your action (required for score)
 
-## Left intentionally (CC already 1)
+1. **Accept** Independence / coupling / entanglement hubs in Sigrid UI — do **not** rewrite `useContent` / `useLogAction`
+2. Deploy + **rescan** — target Architecture ≥ **4.0**, adjacency > **2.9**, Data coupling stays ~**3.5**
 
-- `routes/emails/*`, `routes/devices-updates/*`, `lis.logging` helpers
+## Optional leftovers (only if adjacency still weak after rescan)
 
-## After next Sigrid scan
+- More HP-only ArcGIS helpers colocation (`createPoint` / `createPin` stay shared for now — used by ArcGISHelpers internals)
+- Remaining raw HTTP behind api-hooks (modest Data access)
 
-Re-export architecture-data-* CSVs. Expect Connected components for hotspot entities ≤2 (ideally 1 for secondaries).
+## Out of scope
+
+- Dockerfile / Nginx
+- Independence `*Core` façades
+- Further Data-coupling SQL
+- Size LOW grinding

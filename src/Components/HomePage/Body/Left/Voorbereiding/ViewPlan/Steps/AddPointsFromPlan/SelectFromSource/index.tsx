@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import { filterPointsNotInPlan } from "./helpers/mapSourceItems";
 import { useSelectFromSourceMapEffects } from "./useSelectFromSourceMapEffects";

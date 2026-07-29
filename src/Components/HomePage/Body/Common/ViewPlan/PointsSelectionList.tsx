@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { EnrichedPointType } from "Types";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
-import usePointHover from "hooks/hover-click-handlers/usePointHover";
+import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
 import {
   togglePointSelection,
   useMapPointSelectionClick,

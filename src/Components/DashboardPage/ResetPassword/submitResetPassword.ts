@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 async function putResetPassword(userId: string, password: string) {
   const response = await fetch(

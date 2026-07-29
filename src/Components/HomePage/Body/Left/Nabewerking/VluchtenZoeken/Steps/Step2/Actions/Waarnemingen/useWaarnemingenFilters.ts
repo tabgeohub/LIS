@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useWaarnemingenFilteredCollections } from "./useWaarnemingenFilteredCollections";
 
 export function useWaarnemingenFilters() {

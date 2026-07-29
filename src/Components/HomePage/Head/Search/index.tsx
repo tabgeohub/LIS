@@ -1,7 +1,7 @@
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useSearchKeyword } from "@helpers/ZustandStates/searchKeyword";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useSearchKeyword } from "hooks/zustand/ui/searchKeyword";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
 import useLogAction from "hooks/useLogAction";
 import { FiSearch } from "react-icons/fi";
 

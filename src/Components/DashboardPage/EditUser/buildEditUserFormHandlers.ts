@@ -1,4 +1,4 @@
-import { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
+import { KeycloakUser } from "hooks/zustand/ui/usersManagementState";
 import { submitEditUser, type EditUserFormData } from "./submitEditUser";
 import { createDashboardSubmitHandlers } from "../shared/createDashboardSubmitHandlers";
 

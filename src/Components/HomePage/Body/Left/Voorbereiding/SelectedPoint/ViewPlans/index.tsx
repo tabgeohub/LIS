@@ -3,7 +3,7 @@ import { useState } from "react";
 import PlanInformation from "./PlanInformation";
 import { usePointFlightPlans } from "api-hooks/flightPlans";
 import { FlightPlanType } from "Types";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 
 export default function ViewPlans() {
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);

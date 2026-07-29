@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import TabHeader from "../TabHeader";
-import { useFilterState } from "@helpers/ZustandStates/filterState";
+import { useFilterState } from "hooks/zustand/ui/filterState";
 import { useContent } from "hooks/useContent";
 import { useEffect } from "react";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { FiltersSectionFields } from "./FiltersSectionFields";
 import { FiltersSectionActions } from "./FiltersSectionActions";
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import useLogAction from "hooks/useLogAction";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";

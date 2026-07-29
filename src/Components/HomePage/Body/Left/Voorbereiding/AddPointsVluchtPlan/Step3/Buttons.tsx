@@ -2,8 +2,8 @@ import { useUpdateData } from "utils/useUpdateData";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 

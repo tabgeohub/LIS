@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import {
   calculateCenterAndZoom,
   collectPointsForCenterAndZoom,
   goToLonLatZoom,
 } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
   const { withLog, labels } = useWizardButtons("First step");

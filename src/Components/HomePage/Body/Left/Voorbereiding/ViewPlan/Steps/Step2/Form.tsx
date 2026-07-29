@@ -1,6 +1,6 @@
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";

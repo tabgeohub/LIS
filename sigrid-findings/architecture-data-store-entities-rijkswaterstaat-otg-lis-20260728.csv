@@ -1,0 +1,12 @@
+Entity,Data store,Connected components
+attachments,SQL database,1
+emails,SQL database,1
+finished_plans,SQL database,1
+finished_plans_path,SQL database,1
+flightplans,SQL database,1
+geometries,SQL database,1
+getac_devices,SQL database,1
+points,SQL database,1
+template_plans,SQL database,1
+users,SQL database,1
+logging,SQL database,

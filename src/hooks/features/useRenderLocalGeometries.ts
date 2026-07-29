@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { Geometry } from "./useGeometriesStore";
 import { syncLocalGeometryGraphics } from "./syncLocalGeometryGraphics";
 

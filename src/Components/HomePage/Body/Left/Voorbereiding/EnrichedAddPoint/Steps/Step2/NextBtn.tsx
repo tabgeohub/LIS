@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import React from "react";

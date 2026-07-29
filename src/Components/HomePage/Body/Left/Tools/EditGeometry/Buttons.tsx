@@ -1,6 +1,6 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
   const { labels } = useWizardButtons("Edit geometry");

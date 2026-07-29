@@ -1,5 +1,5 @@
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { buildPointsViewLengths } from "./buildPointsViewLengths";
 import { useMapGraphics } from "./useMapGraphics";
 import { usePointsViewLayoutController } from "./usePointsViewLayoutController";

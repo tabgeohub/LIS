@@ -1,7 +1,7 @@
 import Form from "./Form";
 import Buttons from "./Buttons";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import { useDrawingStore } from "hooks/zustand/useDrawingStore";
 import { useDrawingToolStep2Lifecycle } from "../helpers/useDrawingToolLifecycle";
 

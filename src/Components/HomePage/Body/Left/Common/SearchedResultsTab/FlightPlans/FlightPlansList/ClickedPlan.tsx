@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";

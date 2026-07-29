@@ -1,4 +1,4 @@
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import {
   createWizardSelectionGraphicsControls,
   type WizardSelectionGraphics,

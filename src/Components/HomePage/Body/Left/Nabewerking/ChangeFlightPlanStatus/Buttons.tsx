@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import ConfirmModal from "./ConfirmModal";
-import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
+import { useChangePlanStatusState } from "Components/HomePage/hooks/zustand/nabewerking/useChangePlanStatusState";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
   const { withLog, labels } = useWizardButtons("Change flight plan status");

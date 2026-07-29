@@ -1,4 +1,4 @@
-import { useFilterState } from "@helpers/ZustandStates/filterState";
+import { useFilterState } from "hooks/zustand/ui/filterState";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useResetPointFilters } from "hooks/features/useResetPointFilters";

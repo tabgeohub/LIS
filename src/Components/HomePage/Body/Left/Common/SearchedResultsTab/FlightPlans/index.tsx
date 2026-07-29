@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEffect, useRef, useState } from "react";
 import { FlightPlanType } from "Types";
 import { createQuadrantGraphic } from "../../../Voorbereiding/ViewPlan/helpers/createQuadrantGraphic";

@@ -1,6 +1,6 @@
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import {
   AttachmentType,
   FinishedFlightPlanType,

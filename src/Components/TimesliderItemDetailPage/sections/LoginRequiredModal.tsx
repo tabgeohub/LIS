@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiLogIn } from "react-icons/fi";
 import { useContent } from "hooks/useContent";
-import { getKeycloakLoginUrlWithReturn } from "@helpers/getLoginUrlWithReturn";
+import { getKeycloakLoginUrlWithReturn } from "@helpers/auth/getLoginUrlWithReturn";
 
 type Props = {
   open: boolean;

@@ -1,6 +1,6 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useCreateData } from "utils/useCreateData";
 import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
@@ -8,8 +8,8 @@ import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { submitCollectedFlightPlanCreate } from "hooks/flightPlan/submitCollectedFlightPlanCreate";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 

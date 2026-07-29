@@ -2,7 +2,7 @@ import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import Modal from "Components/HomePage/Body/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useState } from "react";
 import { useDeleteData } from "utils/useDeleteData";
 

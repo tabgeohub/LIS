@@ -1,7 +1,7 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEffect } from "react";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import HeaderButtons from "./HeaderButtons";
 import Pages from "./Common/Pages";
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import type { PointPlanImageRow } from "./types";
 
 type EntityPlanImagesInput = {

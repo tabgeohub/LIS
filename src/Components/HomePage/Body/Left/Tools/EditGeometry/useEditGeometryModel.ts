@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import useLogAction from "hooks/useLogAction";
-import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
-import useGeometryEditHighlight from "hooks/hover-click-handlers/useGeometryEditHighlight";
+import useGeometryListHover from "Components/HomePage/hooks/hover-click-handlers/useGeometryListHover";
+import useGeometryEditHighlight from "Components/HomePage/hooks/hover-click-handlers/useGeometryEditHighlight";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { filterGeometriesByTerm } from "./editGeometryHelpers";
 import { useEditGeometryUiState } from "./useEditGeometryUiState";

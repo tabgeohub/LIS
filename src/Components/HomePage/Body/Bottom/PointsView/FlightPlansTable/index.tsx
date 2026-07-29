@@ -1,7 +1,7 @@
 import Graphic from "@arcgis/core/Graphic";
 import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
@@ -11,7 +11,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { useHoverFlightPlanFromOriginalMap } from "hooks/hover-click-handlers/planHoverClickHandlers";
+import { useHoverFlightPlanFromOriginalMap } from "Components/HomePage/hooks/hover-click-handlers/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [

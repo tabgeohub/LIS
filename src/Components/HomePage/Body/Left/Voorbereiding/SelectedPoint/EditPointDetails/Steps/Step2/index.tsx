@@ -1,14 +1,14 @@
 import { useFormikContext } from "formik";
 import { useState } from "react";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
 import { useUpdateData } from "utils/useUpdateData";
 import { EnrichedPointType } from "Types";
 import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { buildPointUpdatePayload } from "@helpers/points/buildPointUpdatePayload";
 
 export default function Step2({

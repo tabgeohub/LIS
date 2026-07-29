@@ -1,9 +1,9 @@
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import Loading from "./Loading";
 import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import { useDeletePointDetailsSubmit } from "../../useDeletePointDetailsSubmit";
 
 export default function Buttons({

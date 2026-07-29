@@ -2,10 +2,10 @@
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "../../Common/ScrollButtonsLayout";
 import { useFullPreparedFlightPlans } from "api-hooks/flightPlans";
-import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
+import { useChangePlanStatusState } from "Components/HomePage/hooks/zustand/nabewerking/useChangePlanStatusState";
 import Filter from "./Filter";
 import { useContent } from "hooks/useContent";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { ChangeFlightPlanStatusList } from "./ChangeFlightPlanStatusList";
 import { useChangeFlightPlanStatusFilter } from "./useChangeFlightPlanStatusFilter";
 

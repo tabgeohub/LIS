@@ -1,4 +1,4 @@
-import { refreshToken } from "@helpers/refreshToken";
+import { refreshToken } from "@helpers/http/refreshToken";
 
 const AUTH_RETRY_STATUSES = new Set([401, 498]);
 

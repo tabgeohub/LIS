@@ -1,5 +1,5 @@
-import usePointClick from "hooks/hover-click-handlers/usePointClick";
-import usePointHover from "hooks/hover-click-handlers/usePointHover";
+import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
+import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
 import useLogAction from "hooks/useLogAction";
 import { FinishedPointType } from "Types/finished_plans";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";

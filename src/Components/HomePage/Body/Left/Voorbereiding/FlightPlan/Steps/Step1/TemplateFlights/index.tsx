@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { useTemplateFlights } from "api-hooks/templateFlights";
 import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 
 import Fase1 from "./Fase1";
 import Fase2 from "./Fase2";

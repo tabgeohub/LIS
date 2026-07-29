@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import type { EnrichedPointType } from "Types";
 import { SelectFromSourceItem } from "./helpers/mapSourceItems";
 import {

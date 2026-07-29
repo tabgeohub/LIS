@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Geometry } from "hooks/features/useGeometriesStore";
-import useGeometryClick from "hooks/hover-click-handlers/useGeometryClick";
+import useGeometryClick from "Components/HomePage/hooks/hover-click-handlers/useGeometryClick";
 import { getHerhalenFilterFromGeometries } from "./geometryHerhalen";
 import { selectGeometryFromMapClick } from "./selectGeometryFromMapClick";
 

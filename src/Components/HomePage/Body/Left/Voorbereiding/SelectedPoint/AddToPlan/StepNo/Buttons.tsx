@@ -1,4 +1,4 @@
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import useLogAction from "hooks/useLogAction";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { AddToPlanStepButtonBar } from "../AddToPlanStepButtonBar";

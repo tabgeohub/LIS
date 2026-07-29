@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import KaartLegend from "./Common/KaartLegend";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import SelectedPointTabs from "./Voorbereiding/SelectedPointTabs";
 import Layout from "./Common/Layout";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import FiltersSection from "./Common/FiltersSection";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import TabHeader from "./Common/TabHeader";
 import AddPointsVluchtPlan from "./Voorbereiding/AddPointsVluchtPlan";
 import EnrichedAddPoint from "./Voorbereiding/EnrichedAddPoint";

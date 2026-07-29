@@ -1,6 +1,6 @@
 import { flightPlanKeys } from "lib/queryKeys";
 import { FlightPlanType } from "Types";
-import { fetchApi } from "api/fetchApi";
+import { fetchApi } from "api-hooks/fetchApi";
 
 export function searchedFlightPlansQuery(debounced: string) {
   return {

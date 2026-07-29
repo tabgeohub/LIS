@@ -1,5 +1,5 @@
 import BottomTabs from "../BottomTabs";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
 import ResizableSidebarPanel from "Components/HomePage/Body/Common/ResizableSidebarPanel";
 
 export default function Layout({

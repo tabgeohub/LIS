@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useContent } from "hooks/useContent";
 import { resolveLoginBannerTheme } from "./notLoggedInBannerTheme";
 import {

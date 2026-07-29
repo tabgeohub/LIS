@@ -1,5 +1,5 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import { useFilterState } from "@helpers/ZustandStates/filterState";
+import { useFilterState } from "hooks/zustand/ui/filterState";
 import { FilterInput } from "./FilterInput";
 import FilterSelect from "./FilterSelect";
 import { useContent } from "hooks/useContent";

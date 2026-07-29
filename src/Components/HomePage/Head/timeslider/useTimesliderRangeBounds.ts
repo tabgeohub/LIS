@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useTimeRange } from "hooks/useTimeRange";
+import { useTimeRange } from "hooks/time/useTimeRange";
 import {
   createTimesliderConversions,
   parseTimesliderRange,

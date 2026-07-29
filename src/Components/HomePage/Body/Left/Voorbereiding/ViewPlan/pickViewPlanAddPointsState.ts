@@ -1,4 +1,4 @@
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 
 /** Shared ViewPlan slice used by AddPointToPlan + SelectFromSource button bars. */
 export function useViewPlanAddPointsState() {

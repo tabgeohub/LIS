@@ -1,13 +1,13 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
 
 import ModalContainer from "./ModalContainer";
 import usePopupController from "hooks/popUpModal/usePopupController";
 import Header from "./Header";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import useLogAction from "hooks/useLogAction";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useContent } from "hooks/useContent";
 
 export default function PopupModal() {

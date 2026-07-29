@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 
 import { useState } from "react";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";

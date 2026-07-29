@@ -1,5 +1,5 @@
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";

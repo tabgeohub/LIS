@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { filterPlans } from "@helpers/filterPlans";
+import { filterPlans } from "@helpers/plans/filterPlans";
 import type { FlightPlanType } from "Types";
 
 export function useViewPlanFilteredPlans(input: {

@@ -7,7 +7,7 @@ import {
   normalizeExportNumber,
   normalizeJaNee,
 } from "./flightPlanPointExcel";
-import { buildXlsxBuffer } from "@helpers/tableExports/xlsxExport";
+import { buildXlsxBuffer } from "Components/HomePage/helpers/tableExports/xlsxExport";
 
 describe("flight plan point Excel export", () => {
   it("normalizes spreadsheet values using the existing rules", () => {

@@ -1,8 +1,8 @@
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import { useDrawingStore } from "hooks/zustand/useDrawingStore";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import { useDrawingToolRootLifecycle } from "./helpers/useDrawingToolLifecycle";
 
 export default function DrawingTool() {

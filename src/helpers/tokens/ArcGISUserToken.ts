@@ -1,5 +1,5 @@
-import { getBackEndUrl } from "../getBackEndUrl";
-import { ARCGIS_TOKEN_SERVERS } from "../arcgisTokenRegistration";
+import { getBackEndUrl } from "../http/getBackEndUrl";
+import { ARCGIS_TOKEN_SERVERS } from "../auth/arcgisTokenRegistration";
 import {
   configureArcGisProxy,
   enableArcGisIdentity,

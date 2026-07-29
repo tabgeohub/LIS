@@ -3,8 +3,8 @@ import HeaderSection from "./sections/HeaderSection";
 import LoginRequiredModal from "./sections/LoginRequiredModal";
 import TimesliderPlansOverlay from "./sections/TimesliderPlansOverlay";
 import TimesliderImageViewer from "./sections/TimesliderImageViewer";
-import { useTimesliderImagePageData } from "./useTimesliderImagePageData";
-import { buildTimesliderPageShell } from "./buildTimesliderPageShell";
+import { useTimesliderImagePageData } from "./hooks/useTimesliderImagePageData";
+import { buildTimesliderPageShell } from "./builders/buildTimesliderPageShell";
 
 export default function TimesliderItemDetailPage() {
   const [plansSectionVisible, setPlansSectionVisible] = useState(false);

@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { IoCloseOutline } from "react-icons/io5";
-import useFeatureLayerPopup from "hooks/hover-click-handlers/useFeatureLayerPopup";
+import useFeatureLayerPopup from "Components/HomePage/hooks/hover-click-handlers/useFeatureLayerPopup";
 import { useEffect, useState } from "react";
 import {
   buildPopupDisplayAttributes,

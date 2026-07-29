@@ -1,9 +1,9 @@
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
-import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Step1Buttons() {

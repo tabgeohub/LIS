@@ -1,4 +1,4 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import { useContent } from "hooks/useContent";
 import { cleanupDrawingToolMap } from "../helpers/drawingToolMapCleanup";
 import { resetSketchSession } from "../helpers/resetSketchSession";

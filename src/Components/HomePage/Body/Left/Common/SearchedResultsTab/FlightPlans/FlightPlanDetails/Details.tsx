@@ -1,4 +1,4 @@
-import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
+import { useGetFlightTimesDistance } from "hooks/map/useGetFlightTimesDistance";
 import { FlightPlanType } from "Types";
 
 export default function Details({

@@ -1,7 +1,7 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useContent } from "hooks/useContent";
 import {
   MdOutlineViewList,

@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import SinglePlan from "./SinglePlan";
 import Buttons from "./Buttons";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import {
   syncHoverQuadrantGraphics,
   syncSelectedQuadrantGraphics,

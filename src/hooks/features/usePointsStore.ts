@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { EnrichedPointType } from "Types";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 type PointsFilters = {
   activiteit?: string;

@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import type { AddToPlanStepButtonsProps } from "../addToPlanStepButtonsProps";
 import { AddToPlanStepButtonBar } from "../AddToPlanStepButtonBar";

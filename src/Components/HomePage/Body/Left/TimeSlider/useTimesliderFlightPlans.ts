@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import {
   useDrawTimesliderHighlights,
   useLoadTimesliderPlans,

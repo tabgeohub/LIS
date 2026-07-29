@@ -1,6 +1,6 @@
 import Form from "./Form";
 import PointsList from "./PointsList";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import PointsAdding from "./PointsAdding";

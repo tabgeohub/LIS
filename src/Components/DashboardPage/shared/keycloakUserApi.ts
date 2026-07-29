@@ -1,4 +1,4 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 function optionalField(value: string | undefined): string | undefined {
   return value || undefined;

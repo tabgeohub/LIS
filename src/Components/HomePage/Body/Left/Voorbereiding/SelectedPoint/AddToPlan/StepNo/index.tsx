@@ -1,7 +1,7 @@
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import { useState } from "react";
 import { FlightPlanType } from "Types";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { usePrepreparedFlightPlans } from "api-hooks/flightPlans";
 import Buttons from "./Buttons";
 import useLogAction from "hooks/useLogAction";

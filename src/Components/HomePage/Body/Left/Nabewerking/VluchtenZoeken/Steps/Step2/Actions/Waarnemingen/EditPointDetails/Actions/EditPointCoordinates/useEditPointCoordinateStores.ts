@@ -1,5 +1,5 @@
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEditPointCoordinateInputs } from "./useEditPointCoordinateInputs";
 
 export function useEditPointCoordinateStores() {

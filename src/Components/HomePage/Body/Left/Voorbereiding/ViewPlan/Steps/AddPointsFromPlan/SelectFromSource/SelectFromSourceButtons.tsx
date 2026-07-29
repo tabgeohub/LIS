@@ -1,8 +1,8 @@
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useUpdateData } from "utils/useUpdateData";
 import { useViewPlanAddPointsState } from "../../../pickViewPlanAddPointsState";
 import { buildSubmitSelectedPointsResult } from "./helpers/selectFromSourceGraphics";

@@ -1,9 +1,9 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useStarredAll } from "@helpers/ZustandStates/starredAll";
-import usePointListMapActions from "hooks/hover-click-handlers/usePointListMapActions";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useStarredAll } from "hooks/zustand/ui/starredAll";
+import usePointListMapActions from "Components/HomePage/hooks/hover-click-handlers/usePointListMapActions";
 import { useRef, useState } from "react";
 import { EnrichedPointType } from "Types";
 import Header from "./Header";

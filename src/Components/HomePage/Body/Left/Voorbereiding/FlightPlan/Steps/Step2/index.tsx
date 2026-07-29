@@ -10,7 +10,7 @@ import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButt
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore, Geometry } from "hooks/features/useGeometriesStore";
 
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import Header from "../../Common/Header";
 import PointsList from "../../Common/PointsList";
 import GeometriesList from "../../Common/GeometriesList";

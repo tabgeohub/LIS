@@ -1,9 +1,9 @@
 import { ReactNode, useState } from "react";
 import { EnrichedPointType } from "Types";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useResultTabStarredPointActions } from "hooks/resultTab/useResultTabStarredPointActions";
-import { useResultTabTableView } from "hooks/resultTab/useResultTabTableView";
-import { useResultTabMoreMenu } from "hooks/resultTab/useResultTabMoreMenu";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useResultTabStarredPointActions } from "Components/HomePage/hooks/resultTab/useResultTabStarredPointActions";
+import { useResultTabTableView } from "Components/HomePage/hooks/resultTab/useResultTabTableView";
+import { useResultTabMoreMenu } from "Components/HomePage/hooks/resultTab/useResultTabMoreMenu";
 import ResultTabClickedPointPopup from "./ResultTabClickedPointPopup";
 import ResultTabPointRow from "./ResultTabPointRow";
 import ResultTabPointsFooter from "./ResultTabPointsFooter";

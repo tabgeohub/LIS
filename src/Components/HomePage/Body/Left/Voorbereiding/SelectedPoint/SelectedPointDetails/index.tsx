@@ -1,8 +1,8 @@
 import { CgClose } from "react-icons/cg";
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import { initialPointState, usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { initialPointState, usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import { buildSelectedPointDetails } from "./selectedPointDetailsData";

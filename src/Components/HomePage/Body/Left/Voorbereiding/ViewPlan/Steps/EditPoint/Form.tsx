@@ -1,6 +1,6 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
 import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";

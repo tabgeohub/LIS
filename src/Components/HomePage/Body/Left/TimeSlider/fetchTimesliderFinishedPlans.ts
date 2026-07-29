@@ -1,6 +1,6 @@
 import axios from "axios";
 import dayjs from "dayjs";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import { sortPlansNewestFirst } from "@helpers/timeslider";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
 import type { EnrichedPointType } from "Types";
 import {
   removeOwnedBluePointGraphics,

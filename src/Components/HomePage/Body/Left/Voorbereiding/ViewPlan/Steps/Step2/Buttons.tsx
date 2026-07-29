@@ -1,18 +1,18 @@
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 
 import { useUpdateData } from "utils/useUpdateData";
 
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 

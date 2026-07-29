@@ -1,8 +1,8 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {

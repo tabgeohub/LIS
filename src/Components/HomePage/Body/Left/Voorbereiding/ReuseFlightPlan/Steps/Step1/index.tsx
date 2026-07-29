@@ -7,7 +7,7 @@ import { FlightPlanType } from "Types";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import Filter from "../../Common/Filter";
 import Loading from "../../Common/Loading";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
 import { useFlightPlansList } from "api-hooks/flightPlans";
 

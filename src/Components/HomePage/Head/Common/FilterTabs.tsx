@@ -1,7 +1,7 @@
-import { classNames } from "@helpers/classNames";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { classNames } from "@helpers/dom/classNames";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useContent } from "hooks/useContent";
 import { useResetPointFilters } from "hooks/features/useResetPointFilters";
 import { IoReloadCircle } from "react-icons/io5";

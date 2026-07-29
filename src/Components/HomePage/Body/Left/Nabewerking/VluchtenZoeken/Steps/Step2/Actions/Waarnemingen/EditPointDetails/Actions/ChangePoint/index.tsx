@@ -5,7 +5,7 @@ import { usePointsStore } from "hooks/features/usePointsStore";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import SinglePoint from "./SinglePoints";
 import { EnrichedPointType } from "Types";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import Buttons from "./Buttons";
 import Filter from "./Filter";
 import { useUpdateData } from "utils/useUpdateData";

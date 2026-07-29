@@ -1,4 +1,4 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 /** Build the backend proxy URL used to display an ArcGIS attachment safely. */
 export function attachmentDisplayUrl(raw: string): string {

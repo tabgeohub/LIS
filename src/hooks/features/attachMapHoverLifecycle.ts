@@ -1,5 +1,5 @@
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
 import { registerMapHoverHandler } from "./registerMapHoverHandler";
 
 type PinRefMap = Map<

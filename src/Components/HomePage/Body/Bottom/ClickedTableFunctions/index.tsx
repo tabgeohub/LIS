@@ -1,4 +1,4 @@
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import PointsList from "./PointsList";
 import PlansList from "./PlansList";
 

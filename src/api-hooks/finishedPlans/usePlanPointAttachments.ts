@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "api/fetchApi";
+import { fetchApi } from "api-hooks/fetchApi";
 import { finishedPlanKeys } from "lib/queryKeys";
 import { AttachmentType } from "Types/finished_plans";
 

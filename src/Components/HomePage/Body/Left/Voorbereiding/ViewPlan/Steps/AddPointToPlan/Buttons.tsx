@@ -1,8 +1,8 @@
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { useViewPlanAddPointsState } from "../../pickViewPlanAddPointsState";

@@ -1,7 +1,7 @@
 import Modal from "Components/HomePage/Body/Common/Modal";
 import { useState } from "react";
 import Step1 from "./Steps/Step1";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { saveAs } from "file-saver";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";

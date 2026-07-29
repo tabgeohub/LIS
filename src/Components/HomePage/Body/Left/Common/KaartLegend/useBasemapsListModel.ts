@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { BasemapsType } from "Types";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import {

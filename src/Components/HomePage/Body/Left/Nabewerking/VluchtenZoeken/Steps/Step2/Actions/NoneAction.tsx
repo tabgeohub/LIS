@@ -1,5 +1,5 @@
 import { useContent } from "hooks/useContent";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 
 export default function NoneAction() {
   const { selectedPlan } = useFinishedPlansState();

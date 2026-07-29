@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useRef, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import Search from "@arcgis/core/widgets/Search";

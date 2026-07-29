@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { RefObject, useEffect } from "react";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useMapInitialization } from "hooks/useMapInitialization";
+import { useAuth } from "hooks/zustand/ui/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useMapInitialization } from "hooks/map/useMapInitialization";
 import { useRenderPoints } from "hooks/features/useRenderPoints";
 import { useRenderGeometries } from "hooks/features/useRenderGeometries";
 import BasemapWidget from "./BasemapWidget";

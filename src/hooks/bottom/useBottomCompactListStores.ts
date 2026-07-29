@@ -1,10 +1,10 @@
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
-import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
-import { useOpenSearchedTab } from "@helpers/ZustandStates/showSearchedTab";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpenAllTable } from "hooks/zustand/ui/showAllTable";
+import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
+import { useOpenSearchedTab } from "hooks/zustand/ui/showSearchedTab";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
 
 export function useBottomCompactListStores() {

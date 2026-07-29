@@ -1,5 +1,5 @@
 import { TbPolygon, TbLine } from "react-icons/tb";
-import useGeometryListHover from "hooks/hover-click-handlers/useGeometryListHover";
+import useGeometryListHover from "Components/HomePage/hooks/hover-click-handlers/useGeometryListHover";
 import ActionButtons from "./ActionButtons";
 import { geometryDisplayName } from "./EditForm/helpers/labels";
 import type { EditGeometryActionProps } from "./editGeometryActionProps";

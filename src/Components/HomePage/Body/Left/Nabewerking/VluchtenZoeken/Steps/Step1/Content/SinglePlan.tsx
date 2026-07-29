@@ -1,8 +1,8 @@
 import useLogAction from "hooks/useLogAction";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { LuWaypoints } from "react-icons/lu";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlanMapHighlight } from "hooks/hover-click-handlers/useFinishedPlanMapHighlight";
+import { useFinishedPlanMapHighlight } from "Components/HomePage/hooks/hover-click-handlers/useFinishedPlanMapHighlight";
 import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
 import FlightPlanClickableRow from "Components/HomePage/Body/Left/Common/FlightPlanClickableRow";
 import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";

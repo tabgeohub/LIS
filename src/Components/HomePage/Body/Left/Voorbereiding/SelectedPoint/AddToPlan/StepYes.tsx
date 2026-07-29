@@ -1,9 +1,9 @@
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
 import { useState } from "react";
 import { LuHexagon } from "react-icons/lu";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 export default function StepYes({
   setStep,

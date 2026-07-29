@@ -1,6 +1,6 @@
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import { EnrichedPointType } from "Types";
 import { useContent } from "hooks/useContent";
 import ResultTabPointsListFrame from "./ResultTabPointsListFrame";

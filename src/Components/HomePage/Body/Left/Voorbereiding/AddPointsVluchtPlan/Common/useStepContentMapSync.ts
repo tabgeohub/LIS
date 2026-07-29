@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useHoveredGraphicState } from "@helpers/ZustandStates/hoveredGraphic";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useHoveredGraphicState } from "hooks/zustand/ui/hoveredGraphic";
 import {
   removeOwnedBluePointGraphics,
   syncBluePointGraphics,

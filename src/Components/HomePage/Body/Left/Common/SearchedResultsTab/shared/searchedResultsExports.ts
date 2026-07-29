@@ -4,7 +4,7 @@ import {
   downloadEnrichedPointsShapefile,
   downloadXlsxFromRows,
   exportFlightPlansShapefile,
-} from "@helpers/tableExports/pointsPlansTableExport";
+} from "Components/HomePage/helpers/tableExports/pointsPlansTableExport";
 
 export function exportSearchedPointsCsv(points: EnrichedPointType[]) {
   downloadCsvFromRows({ rows: points, filename: "points_export.csv" });

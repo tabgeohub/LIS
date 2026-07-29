@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import { FlightPlanType } from "Types";
 import { usePlanPointAttachments } from "api-hooks/finishedPlans";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";

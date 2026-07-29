@@ -2,7 +2,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { TfiMoreAlt } from "react-icons/tfi";
 import ClickedPlan from "./ClickedPlan";
 import { FlightPlanType } from "Types";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { FaStar } from "react-icons/fa6";
 import useLogAction from "hooks/useLogAction";
 import {
@@ -12,7 +12,7 @@ import {
 import {
   clearHoveredFlightPlanFromOriginalMap,
   useHoverFlightPlanFromOriginalMap,
-} from "hooks/hover-click-handlers/planHoverClickHandlers";
+} from "Components/HomePage/hooks/hover-click-handlers/planHoverClickHandlers";
 
 export default function List({
   flightPlansData,

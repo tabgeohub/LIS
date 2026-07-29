@@ -1,10 +1,10 @@
 import { RefObject } from "react";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useOpenAllTable } from "@helpers/ZustandStates/showAllTable";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePathPointState } from "@helpers/ZustandStates/pathPointState";
-import useFeatureLayerLabels from "hooks/hover-click-handlers/useFeatureLayerLabels";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useOpenAllTable } from "hooks/zustand/ui/showAllTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { usePathPointState } from "hooks/zustand/ui/pathPointState";
+import useFeatureLayerLabels from "Components/HomePage/hooks/hover-click-handlers/useFeatureLayerLabels";
 import { useMapViewBottomPanel } from "./useMapViewBottomPanel";
 
 export type MapViewCompProps = {

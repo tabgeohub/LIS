@@ -1,0 +1,21 @@
+Name,Status,Rating,Rating (Before),Lines Of Code,Lines Of Code (Before),Churn,Churn (Before),Average weekly churn,Average weekly churn (Before),Expected weekly churn,Expected weekly churn (Before)
+Otg-lis,recurring,5.36,3.49,65594,49378,36893,13260,18.75,3.36,1.1,1.1
+Remainder,recurring,4.69,2.03,345,275,101,7,9.76,0.32,1.1,1.1
+Root files,recurring,3.96,3.89,36,36,5,12,4.63,4.17,1.1,1.1
+backend,recurring,5.44,4.43,13695,8126,7941,5154,19.33,7.93,1.1,1.1
+scripts,new,-,-,-,-,0,-,0,-,-,-
+src/Components/Common,recurring,0.5,0.5,49,49,0,0,0,0,1.1,1.1
+src/Components/DashboardPage,recurring,5.48,0.5,1320,1005,760,0,19.19,0,1.1,1.1
+src/Components/DevicesUpdatesPage,recurring,0.5,5.49,265,234,0,316,0,16.88,1.1,1.1
+src/Components/HomePage,recurring,5.37,3.33,36697,31245,18757,4876,17.04,1.95,1.1,1.1
+src/Components/InstallationsPage,recurring,0.5,1.29,192,176,0,1,0,0.07,1.1,1.1
+src/Components/TimesliderItemDetailPage,recurring,5.49,0.5,1467,783,1051,0,23.88,0,1.1,1.1
+src/Types,recurring,4.32,3.71,250,273,52,66,6.93,3.02,1.1,1.1
+src/api-hooks,recurring,5.49,5.19,857,420,481,477,18.71,14.2,1.1,1.1
+src/api,recurring,0.5,5.17,8,8,0,9,0,14.06,1.1,1.1
+src/constants,recurring,5.5,3.01,21,45,17,4,26.98,1.11,1.1,1.1
+src/helpers,recurring,5.5,3.85,4107,2518,3536,851,28.7,4.22,1.1,1.1
+src/hooks,recurring,5.48,3.79,6050,3756,4038,1114,22.25,3.71,1.1,1.1
+src/lib,recurring,5.5,5.36,228,172,153,217,22.37,15.77,1.1,1.1
+src/utils,recurring,3.98,4.52,7,236,1,156,4.76,8.26,1.1,1.1
+public,removed,-,0.5,-,21,-,0,-,0,-,1.1

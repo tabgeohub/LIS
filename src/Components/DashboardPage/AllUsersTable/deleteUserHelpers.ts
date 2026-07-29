@@ -1,5 +1,5 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import type { KeycloakUser } from "@helpers/ZustandStates/usersManagementState";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
+import type { KeycloakUser } from "hooks/zustand/ui/usersManagementState";
 
 export async function deleteKeycloakUser(userId: string): Promise<void> {
   const response = await fetch(

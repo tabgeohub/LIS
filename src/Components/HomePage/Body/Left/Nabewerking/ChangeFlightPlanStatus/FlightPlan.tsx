@@ -1,7 +1,7 @@
-import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
+import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
+import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import useLogAction from "hooks/useLogAction";
-import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
+import { useChangePlanStatusState } from "Components/HomePage/hooks/zustand/nabewerking/useChangePlanStatusState";
 import { FlightPlanType } from "Types";
 import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
 import FlightPlanClickableRow from "Components/HomePage/Body/Left/Common/FlightPlanClickableRow";

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import EditPointDetails from "./EditPointDetails";
 import EditGeometryDetails from "./EditGeometryDetails";
 import { ActionType } from "../..";

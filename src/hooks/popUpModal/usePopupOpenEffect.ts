@@ -1,8 +1,8 @@
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import useLogAction from "hooks/useLogAction";
 import { useEffect } from "react";

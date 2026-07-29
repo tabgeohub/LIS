@@ -1,4 +1,4 @@
-import { base64ToBlob } from "@helpers/base64ToBlob";
+import { base64ToBlob } from "@helpers/http/base64ToBlob";
 
 export function readImageFileAsBlob(
   file: File,

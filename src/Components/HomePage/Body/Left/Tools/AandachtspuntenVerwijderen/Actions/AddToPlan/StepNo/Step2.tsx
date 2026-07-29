@@ -1,7 +1,7 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { FlightPlanType } from "Types";
 
 export default function Step2({

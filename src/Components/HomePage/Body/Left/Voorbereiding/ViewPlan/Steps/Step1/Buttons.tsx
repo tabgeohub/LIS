@@ -1,11 +1,11 @@
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import toast from "react-hot-toast";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { usePlanDuplicateState } from "../../helpers/usePlanDuplicateState";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   handleCancel,

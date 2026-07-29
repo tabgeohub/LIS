@@ -1,5 +1,5 @@
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 
 /** Shared cancel navigation for SelectedPoint AddToPlan step button bars. */
 export function useAddToPlanWizardNavigation() {

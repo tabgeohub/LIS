@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import type { Geometry } from "Types/geometry";
 
 export type { Geometry } from "Types/geometry";

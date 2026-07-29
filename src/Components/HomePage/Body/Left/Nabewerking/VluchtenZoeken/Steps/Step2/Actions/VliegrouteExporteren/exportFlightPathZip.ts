@@ -2,7 +2,7 @@ import { FeatureCollection, LineString } from "geojson";
 import JSZip from "jszip";
 import shpwrite from "@mapbox/shp-write";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 export function buildFlightPathGeoJson(
   plan: FinishedFlightPlanType

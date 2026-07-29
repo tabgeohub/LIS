@@ -1,7 +1,7 @@
 import Modal from "Components/HomePage/Body/Common/Modal";
 import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
 import { IoMdClose } from "react-icons/io";
-import { useChangePlanStatusState } from "hooks/zustand/nabewerking/useChangePlanStatusState";
+import { useChangePlanStatusState } from "Components/HomePage/hooks/zustand/nabewerking/useChangePlanStatusState";
 import { useUpdateData } from "utils/useUpdateData";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

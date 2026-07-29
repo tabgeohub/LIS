@@ -1,6 +1,6 @@
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEffect, useRef } from "react";
 import { setupClickListener } from "./setupClickListener";
 import { isPopupTabBlocked } from "./popupBlockedTabs";

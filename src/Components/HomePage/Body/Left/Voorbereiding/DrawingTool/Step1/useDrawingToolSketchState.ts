@@ -1,8 +1,8 @@
 import { useState } from "react";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import { useDrawingToolStep1Lifecycle } from "../helpers/useDrawingToolLifecycle";
 import { useGraphicsLayerHasItems } from "../helpers/useGraphicsLayerHasItems";
 

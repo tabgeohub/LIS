@@ -1,8 +1,8 @@
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useAddPointStates } from "hooks/zustand/useAddPointStates";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {

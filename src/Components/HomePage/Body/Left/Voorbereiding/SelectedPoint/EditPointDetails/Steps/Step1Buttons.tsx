@@ -1,14 +1,14 @@
 import { useFormikContext } from "formik";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
 import { CgSpinner } from "react-icons/cg";
 import { EnrichedPointType } from "Types";
 import { useUpdateData } from "utils/useUpdateData";
 import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useLogAction from "hooks/useLogAction";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import {
   buildPointUpdatePayload,
   pickPointCoreLogData,

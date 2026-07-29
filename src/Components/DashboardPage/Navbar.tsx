@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";

@@ -4,17 +4,17 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaLock } from "react-icons/fa6";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { saveAs } from "file-saver";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { GoCheckCircleFill } from "react-icons/go";
 import { TbCancel } from "react-icons/tb";
 import dayjs from "dayjs";
 import useLogAction from "hooks/useLogAction";
-import { classNames } from "@helpers/classNames";
-import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
+import { classNames } from "@helpers/dom/classNames";
+import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
+import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import { POINT_EXPORT_COLUMNS } from "@helpers/points/pointColumnKeys";
 import { buildFlightPlanPointExportRows } from "@helpers/points/flightPlanPointExcel";
-import { buildXlsxBuffer } from "@helpers/tableExports/xlsxExport";
+import { buildXlsxBuffer } from "Components/HomePage/helpers/tableExports/xlsxExport";
 
 export default function SinglePlan({
   plan,

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "api/fetchApi";
+import { fetchApi } from "api-hooks/fetchApi";
 import { pointKeys } from "lib/queryKeys";
 import { EnrichedPointType } from "Types";
 import { useDebouncedValue } from "lib/useDebouncedValue";

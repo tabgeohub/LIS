@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { FlightPlanType } from "Types";

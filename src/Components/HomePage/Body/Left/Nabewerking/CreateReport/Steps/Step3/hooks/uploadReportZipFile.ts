@@ -1,4 +1,4 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import type { DownloadInfo } from "../types";
 
 function buildSafeZipFilename(omschrijving: string): string {

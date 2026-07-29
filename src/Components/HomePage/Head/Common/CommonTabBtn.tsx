@@ -1,5 +1,5 @@
-import { classNames } from "@helpers/classNames";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { classNames } from "@helpers/dom/classNames";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 

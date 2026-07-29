@@ -1,7 +1,7 @@
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { useState } from "react";
 import { FlightPlanType } from "Types";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { usePrepreparedFlightPlans } from "api-hooks/flightPlans";
 import Buttons from "./Buttons";
 import Step2 from "./Step2";

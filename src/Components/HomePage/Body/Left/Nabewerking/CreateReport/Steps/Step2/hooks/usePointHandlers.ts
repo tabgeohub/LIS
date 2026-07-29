@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { createPin } from "@helpers/ArcGISHelpers/createPin";
 import { FinishedPointType } from "Types/finished_plans";
 

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { IoCloseOutline } from "react-icons/io5";
-import type { PathPointType } from "@helpers/ZustandStates/pathPointState";
+import type { PathPointType } from "hooks/zustand/ui/pathPointState";
 import { PopupDetailsBody } from "./PopupDetailsBody";
 
 export function MapPathPointPopup(input: {

@@ -1,4 +1,4 @@
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import Vluchtnummer from "./Vluchtnummer";
 import Buttons from "./Buttons";
 import { useContent } from "hooks/useContent";

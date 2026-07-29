@@ -3,7 +3,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useState } from "react";
 import { EnrichedPointType } from "Types";
 import DropDown from "./DropDown";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 
 export default function Header({
   pointsData,

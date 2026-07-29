@@ -1,4 +1,4 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import type { GetacDevice } from "Types/devices";
 
 const API_BASE = `${getBackEndUrl()}/api/devices-updates`;

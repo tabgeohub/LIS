@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import { buildListItems, collectSelectedData } from "@helpers/timeslider";
 
 export function useSelectedPlansListData() {

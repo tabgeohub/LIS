@@ -1,6 +1,6 @@
 import createYellowBorder from "@helpers/ArcGISHelpers/createYellowBorder";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import usePointClick from "hooks/hover-click-handlers/usePointClick";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";

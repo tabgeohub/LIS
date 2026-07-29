@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
 import { useUploadZip } from "./hooks/useUploadZip";
 import { useCopyLink } from "./hooks/useCopyLink";
 import { useDirectDownload } from "./hooks/useDirectDownload";

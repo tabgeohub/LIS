@@ -1,10 +1,10 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import { buildCreatePointPayload } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/buildCreatePointPayload";
 import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
 

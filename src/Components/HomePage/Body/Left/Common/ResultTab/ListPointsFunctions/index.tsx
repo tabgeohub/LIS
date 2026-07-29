@@ -2,14 +2,14 @@ import {
   getUnstarredPoints,
   starAllPointsOnMap,
 } from "@helpers/ArcGISHelpers/createPointMapGraphics";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useOpenResultTab } from "@helpers/ZustandStates/showResultTab";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useOpenResultTab } from "hooks/zustand/ui/showResultTab";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import { FaListAlt, FaSave } from "react-icons/fa";
 import { ImTable2 } from "react-icons/im";
 import { IoMdAdd } from "react-icons/io";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { EnrichedPointType } from "Types";
 import { PiSelectionForegroundThin } from "react-icons/pi";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
@@ -18,12 +18,12 @@ import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import {
   downloadCsvFromRows,
   downloadEnrichedPointsShapefile,
   downloadXlsxFromRows,
-} from "@helpers/tableExports/pointsPlansTableExport";
+} from "Components/HomePage/helpers/tableExports/pointsPlansTableExport";
 
 export default function ListPointFunctions({
   starredPoints,

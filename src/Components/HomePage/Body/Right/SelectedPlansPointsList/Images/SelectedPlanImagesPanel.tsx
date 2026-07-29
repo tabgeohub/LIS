@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 import {
   pointPlanImagesToAttachments,

@@ -1,6 +1,6 @@
 import { CgClose } from "react-icons/cg";
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 
 export function EditPointDetailsHeader({ title }: { title: string }) {
   const { setSelectedTab } = useTabState();

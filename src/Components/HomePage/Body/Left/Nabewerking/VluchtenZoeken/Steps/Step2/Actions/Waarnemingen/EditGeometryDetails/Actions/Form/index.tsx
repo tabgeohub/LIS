@@ -1,5 +1,5 @@
 import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "../Buttons";
 import { useResetFeatures } from "hooks/features/useResetFeatures";

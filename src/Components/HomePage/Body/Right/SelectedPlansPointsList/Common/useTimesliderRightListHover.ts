@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { getPointCoordinates } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { FinishedGeometryType, FinishedPointType } from "Types/finished_plans";
 import {

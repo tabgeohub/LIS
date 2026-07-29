@@ -1,4 +1,4 @@
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 export function useHandleClearFinishedPlan() {

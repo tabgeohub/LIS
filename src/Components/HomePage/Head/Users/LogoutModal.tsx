@@ -1,5 +1,5 @@
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import Modal from "Components/HomePage/Body/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";

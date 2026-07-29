@@ -6,9 +6,9 @@ import Step2Buttons from "./Steps/Step2/Buttons";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
 import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
-import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 
 export default function CreateReport() {
   const { user } = useAuth();

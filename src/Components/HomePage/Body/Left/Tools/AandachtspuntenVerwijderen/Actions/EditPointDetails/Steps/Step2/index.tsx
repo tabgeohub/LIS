@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Step2Sub1 from "./Step2Sub1";
 import Step2Sub2 from "./Step2Sub2";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import useLogAction from "hooks/useLogAction";
 import { pickPointCoreLogData } from "@helpers/points/buildPointUpdatePayload";
 import { useDeletePointDetailsSubmit } from "../../useDeletePointDetailsSubmit";

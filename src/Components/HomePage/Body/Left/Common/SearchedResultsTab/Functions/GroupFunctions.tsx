@@ -1,4 +1,4 @@
-import { useStarredAll } from "@helpers/ZustandStates/starredAll";
+import { useStarredAll } from "hooks/zustand/ui/starredAll";
 import { FaListAlt, FaSave, FaFolderOpen } from "react-icons/fa";
 import { BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx } from "react-icons/bs";
 import { MdDeleteOutline } from "react-icons/md";

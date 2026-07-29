@@ -1,6 +1,6 @@
-import { classNames } from "@helpers/classNames";
-import { usePlanClick } from "hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "hooks/hover-click-handlers/usePlanHover";
+import { classNames } from "@helpers/dom/classNames";
+import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
+import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
 import useLogAction from "hooks/useLogAction";
 import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
 import { FaLock } from "react-icons/fa6";

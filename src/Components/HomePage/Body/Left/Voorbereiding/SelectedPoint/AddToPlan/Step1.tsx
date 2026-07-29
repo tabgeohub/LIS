@@ -1,6 +1,6 @@
 import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
 import { createAddToPlanStep1Handlers } from "./createAddToPlanStep1Handlers";
 

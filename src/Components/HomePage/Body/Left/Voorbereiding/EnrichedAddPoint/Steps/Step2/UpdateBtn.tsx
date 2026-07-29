@@ -1,4 +1,4 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
 import { createNewPoint } from "../../helpers/createNewPoint";

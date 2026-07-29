@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import {
   filterGeometriesNotInPlan,
   filterPointsNotInPlan,

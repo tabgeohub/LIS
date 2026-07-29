@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useTimesliderState } from "@helpers/ZustandStates/useTimesliderState";
+import { useTimesliderState } from "hooks/zustand/ui/useTimesliderState";
 import { usePublishTimesliderRange } from "./useTimesliderEffects";
 import { useTimesliderRangeResets } from "./useTimesliderRangeResets";
 import type { useTimesliderRangeState } from "./useTimesliderRangeState";

@@ -1,14 +1,14 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useOpeSideBarState } from "@helpers/ZustandStates/openSideBar";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useOpeSideBarState } from "hooks/zustand/ui/openSideBar";
 import { toolsTabs } from "./constants";
 import FilterTabs from "./Common/FilterTabs";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useState } from "react";
 import Exporter from "../Body/Left/Tools/Exporter";
 import Uploaden from "../Body/Left/Tools/Uploaden";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "hooks/popUpModal/useHandleClosePopUp";
-import useResetTabs from "hooks/useResetTabs";
+import useResetTabs from "hooks/tabs/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
 import { useContent } from "hooks/useContent";
 import { handleToolsTabClick } from "./handleToolsTabClick";

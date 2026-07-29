@@ -1,13 +1,13 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { findSpecificPoint } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/findSpecificPoint";
 import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
 import { useCreateData } from "utils/useCreateData";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import { useUpdateData } from "utils/useUpdateData";
 import { EnrichedPointType } from "Types";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
 import { buildCreatePointPayload } from "Components/HomePage/Body/Left/Voorbereiding/EnrichedAddPoint/helpers/buildCreatePointPayload";

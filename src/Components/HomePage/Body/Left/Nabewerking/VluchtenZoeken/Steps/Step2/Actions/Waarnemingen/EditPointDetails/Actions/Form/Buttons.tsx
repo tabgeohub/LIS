@@ -1,7 +1,7 @@
 import DeletePoint from "../DeletePoint";
 import { FinishedPointType } from "Types/finished_plans";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import type { EditObservationButtonsProps } from "../../../common/editObservationFormProps";
 
 export default function Buttons({

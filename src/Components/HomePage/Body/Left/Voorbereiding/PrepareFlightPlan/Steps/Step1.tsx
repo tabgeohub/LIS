@@ -1,4 +1,4 @@
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";

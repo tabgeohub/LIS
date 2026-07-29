@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 import { EnrichedPointType } from "Types";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHoverPointsAndGeometries } from "hooks/features/useHoverPointsAndGeometries";
 import { syncBluePointGraphics } from "@helpers/ArcGISHelpers/syncBluePointGraphics";
 import {

@@ -1,14 +1,14 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
-import { useTabState } from "@helpers/ZustandStates/tabState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
+import { useTabState } from "hooks/zustand/ui/tabState";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { CgClose, CgSpinner } from "react-icons/cg";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "utils/useUpdateData";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 
 export default function DeletePoint() {
   const logAction = useLogAction();

@@ -1,5 +1,5 @@
-import { usePopUpState } from "@helpers/ZustandStates/popUpState";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { usePopUpState } from "hooks/zustand/ui/popUpState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import SelectedPointDetails from "../SelectedPoint/SelectedPointDetails";
 import EditPointDetails from "../SelectedPoint/EditPointDetails";
 import DeletePoint from "../SelectedPoint/DeletePoint";

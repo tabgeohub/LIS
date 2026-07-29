@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "api/fetchApi";
+import { fetchApi } from "api-hooks/fetchApi";
 import { constsQueryOptions } from "./queryOptions";
 import { LOOKUP_CONFIG, type LookupResource } from "./lookupConfig";
 

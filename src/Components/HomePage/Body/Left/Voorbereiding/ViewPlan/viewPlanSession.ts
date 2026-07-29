@@ -1,8 +1,8 @@
-import { useTabState } from "@helpers/ZustandStates/tabState";
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useTabState } from "hooks/zustand/ui/tabState";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useViewPlanState } from "hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
 import {
   applyFlightPlanFormValues,
   viewPlanFlightPlanFormDefaults,

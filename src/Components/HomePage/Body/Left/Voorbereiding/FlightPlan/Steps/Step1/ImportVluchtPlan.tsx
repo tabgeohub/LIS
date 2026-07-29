@@ -2,11 +2,11 @@ import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useState } from "react";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useCreateData } from "utils/useCreateData";
-import { useFlightPlanState } from "hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
 import { useContent } from "hooks/useContent";
 import { PointImportRow } from "@helpers/points/pointColumnKeys";
 import {

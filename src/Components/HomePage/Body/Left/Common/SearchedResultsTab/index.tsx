@@ -4,7 +4,7 @@ import SearchedResults from "./SearchedResults";
 import FlightPlans from "./FlightPlans";
 import { useSearchedFlightPlans } from "api-hooks/flightPlans";
 import { useSearchedPoints } from "api-hooks/points";
-import { useSearchKeyword } from "@helpers/ZustandStates/searchKeyword";
+import { useSearchKeyword } from "hooks/zustand/ui/searchKeyword";
 import { EnrichedPointType, FlightPlanType } from "Types";
 import PointsBuffer from "./Functions/PointsBuffer";
 import PointDetails from "./Points/PointDetails";

@@ -1,12 +1,12 @@
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useCreateData } from "utils/useCreateData";
 import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
 import { useTemplateFlightState } from "../../templateFlightStates";
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 import {

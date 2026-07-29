@@ -1,4 +1,4 @@
-import { fetchApi } from "api/fetchApi";
+import { fetchApi } from "api-hooks/fetchApi";
 import { finishedPlanKeys } from "lib/queryKeys";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { appendRegioQuery } from "../shared/regioQuery";

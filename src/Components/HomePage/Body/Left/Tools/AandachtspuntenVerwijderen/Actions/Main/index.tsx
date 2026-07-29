@@ -3,7 +3,7 @@ import Header from "./Header";
 import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import { usePointsStore } from "hooks/features/usePointsStore";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { sortPointsWithSelectedFirst } from "./sortDeletePoints";
 import { useDeletePointMapSelection } from "./useDeletePointMapSelection";
 import { DeletePointsList } from "./DeletePointsList";

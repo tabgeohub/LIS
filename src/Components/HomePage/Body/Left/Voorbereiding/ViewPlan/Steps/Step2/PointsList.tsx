@@ -1,4 +1,4 @@
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
 import useLogAction from "hooks/useLogAction";
 import { TbPolygon, TbLine } from "react-icons/tb";
 

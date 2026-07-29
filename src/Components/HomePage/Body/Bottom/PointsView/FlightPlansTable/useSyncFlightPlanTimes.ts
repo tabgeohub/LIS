@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useOpenTable } from "@helpers/ZustandStates/showTable";
-import { useGetFlightTimesDistance } from "hooks/useGetFlightTimesDistance";
+import { useOpenTable } from "hooks/zustand/ui/showTable";
+import { useGetFlightTimesDistance } from "hooks/map/useGetFlightTimesDistance";
 import { useEffect } from "react";
 import { FlightPlanType } from "Types";
-import type { FlightPathMetrics } from "hooks/flightPathMetrics";
+import type { FlightPathMetrics } from "hooks/map/flightPathMetrics";
 
 function hasCompleteFlightMetrics(metrics: FlightPathMetrics): boolean {
   return Boolean(

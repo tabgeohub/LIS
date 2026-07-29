@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { useCreateReportState } from "hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
 import { usePointsStore } from "hooks/features/usePointsStore";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useSingleFinishedPlan } from "api-hooks/finishedPlans";
-import useDrawYellowMarkers from "hooks/hover-click-handlers/useDrawYellowMarkers";
+import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowMarkers";
 import { useRenderPoints } from "./hooks/useRenderPoints";
 import { useRenderGeometries } from "./hooks/useRenderGeometries";
 import Points from "./Points";

@@ -1,15 +1,15 @@
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
 import { useCreateData } from "utils/useCreateData";
 import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
-import { useMapViewState } from "@helpers/ZustandStates/mapViewState";
+import { useMapViewState } from "hooks/zustand/ui/mapViewState";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features/useGeometriesStore";
 import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
 import { assembleFlightPlanCreateAttributes } from "hooks/flightPlan/assembleFlightPlanCreateAttributes";
-import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
 import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
 import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
 

@@ -1,9 +1,9 @@
-import { useAuth } from "@helpers/ZustandStates/useAuth";
+import { useAuth } from "hooks/zustand/ui/useAuth";
 import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import UserList from "./UserList";
 import useLogAction from "hooks/useLogAction";
-import { getBackEndUrl } from "@helpers/getBackEndUrl";
+import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 export default function Users() {
   const logAction = useLogAction();

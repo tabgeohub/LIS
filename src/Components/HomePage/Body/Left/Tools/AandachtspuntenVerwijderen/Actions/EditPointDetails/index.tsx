@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Step1 from "./Steps/Step1";
 import Step2 from "./Steps/Step2";
-import { useDeletePointState } from "hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
 import { EditPointDetailsHeader } from "./EditPointDetailsHeader";
 import { syncSelectedPointToDeleteState } from "./syncSelectedPointToDeleteState";
 

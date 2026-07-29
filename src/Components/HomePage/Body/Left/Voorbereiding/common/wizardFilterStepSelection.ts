@@ -1,4 +1,4 @@
-import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
+import { clearMapSelectionGraphics } from "Components/HomePage/hooks/wizard/clearMapSelectionGraphics";
 import { createFilterStepAdvanceHandler } from "./createFilterStepAdvanceHandler";
 
 export type WizardSelectionGraphics = {

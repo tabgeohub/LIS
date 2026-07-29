@@ -1,6 +1,6 @@
 import esriConfig from "@arcgis/core/config";
 import * as urlUtils from "@arcgis/core/core/urlUtils";
-import { ARCGIS_TOKEN_SERVERS } from "../arcgisTokenRegistration";
+import { ARCGIS_TOKEN_SERVERS } from "../auth/arcgisTokenRegistration";
 
 export function configureArcGisProxy(backendUrl: string): void {
   const proxyUrl = `${backendUrl}/api/arcgis/proxy`;

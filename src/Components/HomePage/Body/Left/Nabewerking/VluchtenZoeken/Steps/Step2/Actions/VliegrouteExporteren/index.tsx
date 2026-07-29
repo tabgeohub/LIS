@@ -1,5 +1,5 @@
 import { ActionType } from "../..";
-import { useFinishedPlansState } from "hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";

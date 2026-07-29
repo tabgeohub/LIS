@@ -1,5 +1,5 @@
 import Head from "./Head";
-import { useSelectedBottomTabState } from "@helpers/ZustandStates/selectedBottomTabState";
+import { useSelectedBottomTabState } from "hooks/zustand/ui/selectedBottomTabState";
 import LayersList from "./LayersList";
 import BasemapsList from "./BasemapsList";
 
