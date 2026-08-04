@@ -1,0 +1,5 @@
+ID,Path,Component,Lines of code,Duplication percentage,Start line,End line
+d9912fc0-fbd7-436a-9399-e140121d53e0,backend/src/helpers/repositories/flightPlansRepo.ts,backend,9,4.972376,192,201
+d9912fc0-fbd7-436a-9399-e140121d53e0,backend/src/helpers/repositories/flightPlansRepo.ts,backend,9,4.972376,216,225
+9e355934-e11f-48d9-a08b-0a1fea066fc9,backend/scripts/verifyRegioPointsGeometries.ts,backend,6,11.111111,20,25
+9e355934-e11f-48d9-a08b-0a1fea066fc9,backend/scripts/verifyRegioPointsGeometries.ts,backend,6,11.111111,55,60

@@ -5,6 +5,11 @@ import type { RegioTestReporter } from "./verifyRegioFlightPlanCases";
 
 const ADMIN = "admin";
 
+type RegioCheckInput = {
+  reporter: RegioTestReporter;
+  expectedRegio: string;
+};
+
 async function withPool<T>(
   work: (pool: Pool) => Promise<T>
 ): Promise<T> {
@@ -16,28 +21,54 @@ async function withPool<T>(
   }
 }
 
-export async function runPointsRegioCheck(input: {
-  reporter: RegioTestReporter;
-  expectedRegio: string;
-}): Promise<void> {
-  const { reporter, expectedRegio } = input;
-  const rows = (
-    await withPool((pool) =>
-      selectPointsIdRegio(pool, { regio: expectedRegio })
-    )
-  ).rows as Array<{ regio_id?: string }>;
-  const bad = rows.filter(
-    (r) => (r.regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
-  );
-  if (bad.length) {
-    reporter.fail("GET /points [RWS NN]", `${bad.length} point(s) wrong regio`);
-  } else {
-    reporter.pass("GET /points [RWS NN]", `${rows.length} point(s), all regio_id=${expectedRegio}`);
-  }
+async function fetchRowsWithPool<T>(
+  work: (pool: Pool) => Promise<{ rows: T[] }>
+): Promise<T[]> {
+  return (await withPool(work)).rows;
+}
 
-  const adminRows = (
-    await withPool((pool) => selectPointsIdRegio(pool, { regio: ADMIN }))
-  ).rows;
+function filterWrongRegio<T>(
+  rows: T[],
+  expectedRegio: string,
+  getRegio: (row: T) => string | undefined
+): T[] {
+  const expected = expectedRegio.toLowerCase();
+  return rows.filter((row) => (getRegio(row) ?? "").toLowerCase() !== expected);
+}
+
+function reportRegioMatch(
+  reporter: RegioTestReporter,
+  label: string,
+  badCount: number,
+  passDetail: string,
+  failDetail: string
+): void {
+  if (badCount) {
+    reporter.fail(label, failDetail);
+  } else {
+    reporter.pass(label, passDetail);
+  }
+}
+
+export async function runPointsRegioCheck(
+  input: RegioCheckInput
+): Promise<void> {
+  const { reporter, expectedRegio } = input;
+  const rows = await fetchRowsWithPool<{ regio_id?: string }>((pool) =>
+    selectPointsIdRegio(pool, { regio: expectedRegio })
+  );
+  const bad = filterWrongRegio(rows, expectedRegio, (r) => r.regio_id);
+  reportRegioMatch(
+    reporter,
+    "GET /points [RWS NN]",
+    bad.length,
+    `${rows.length} point(s), all regio_id=${expectedRegio}`,
+    `${bad.length} point(s) wrong regio`
+  );
+
+  const adminRows = await fetchRowsWithPool((pool) =>
+    selectPointsIdRegio(pool, { regio: ADMIN })
+  );
   if (adminRows.length >= rows.length) {
     reporter.pass(
       "GET /points [admin >= regional]",
@@ -51,28 +82,19 @@ export async function runPointsRegioCheck(input: {
   }
 }
 
-export async function runGeometriesRegioCheck(input: {
-  reporter: RegioTestReporter;
-  expectedRegio: string;
-}): Promise<void> {
+export async function runGeometriesRegioCheck(
+  input: RegioCheckInput
+): Promise<void> {
   const { reporter, expectedRegio } = input;
-  const rows = (
-    await withPool((pool) =>
-      selectGeometriesWithPointRegio(pool, { regio: expectedRegio })
-    )
-  ).rows as Array<{
-    point_regio_id?: string;
-  }>;
-  const bad = rows.filter(
-    (r) =>
-      (r.point_regio_id ?? "").toLowerCase() !== expectedRegio.toLowerCase()
+  const rows = await fetchRowsWithPool<{ point_regio_id?: string }>((pool) =>
+    selectGeometriesWithPointRegio(pool, { regio: expectedRegio })
   );
-  if (bad.length) {
-    reporter.fail("GET /geometries [RWS NN]", `${bad.length} row(s) wrong point regio`);
-  } else {
-    reporter.pass(
-      "GET /geometries [RWS NN]",
-      `${rows.length} geometry-point row(s), all point regio=${expectedRegio}`
-    );
-  }
+  const bad = filterWrongRegio(rows, expectedRegio, (r) => r.point_regio_id);
+  reportRegioMatch(
+    reporter,
+    "GET /geometries [RWS NN]",
+    bad.length,
+    `${rows.length} geometry-point row(s), all point regio=${expectedRegio}`,
+    `${bad.length} row(s) wrong point regio`
+  );
 }

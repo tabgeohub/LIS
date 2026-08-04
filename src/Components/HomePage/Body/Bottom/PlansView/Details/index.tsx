@@ -1,6 +1,6 @@
 import { useOpenTable } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
-import { useGetFlightTimesDistance } from "Components/HomePage/hooks/map/useGetFlightTimesDistance";
+import { useGetFlightTimesDistance } from "hooks/map/useGetFlightTimesDistance";
 
 type DetailFieldProps = {
   label: string;

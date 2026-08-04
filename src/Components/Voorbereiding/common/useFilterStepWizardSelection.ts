@@ -1,9 +1,7 @@
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
-import {
-  createWizardFilterStepNext,
-  createWizardSelectionGraphicsControls,
-  type WizardSelectionGraphics,
-} from "./wizardFilterStepSelection";
+import { createWizardFilterStepNext } from "./createWizardFilterStepNext";
+import { createWizardSelectionGraphicsControls } from "./createWizardSelectionGraphicsControls";
+import type { WizardSelectionGraphics } from "./wizardSelectionGraphicsTypes";
 
 /** Shared Step2 selection + next wiring for FlightPlan / TemplateFlight. */
 export function useFilterStepWizardSelection(input: {

@@ -1,0 +1,27 @@
+Description,Severity,Status,First Seen,Issue age,Type,Weakness,File,Technology,Origin,Remark,Locations
+Missing User Instruction (CWE-266),HIGH,RAW,2026-06-04,61,Missing User Instruction,CWE-266,dockerfile#L22,Docker,KICS,-,dockerfile#L22
+Missing User Instruction (CWE-266),HIGH,RAW,2026-06-04,61,Missing User Instruction,CWE-266,backend/dockerfile#L4,Docker,KICS,-,backend/dockerfile#L4
+NPM dependency axios contains 10 vulnerabilities (CWE-1321),HIGH,FIXED,2026-07-21,14,NPM dependency axios contains 10 vulnerabilities,CWE-1321,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+null (8.3) 
+null (6.9) 
+null (6.9) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+null (6.3) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+"By not specifying a USER, a program in the container may run as 'root' (CWE-250)",HIGH,RAW,2026-07-27,8,"By not specifying a USER, a program in the container may run as 'root'",CWE-250,backend/dockerfile#L85,Docker,Semgrep,-,backend/dockerfile#L85
+"By not specifying a USER, a program in the container may run as 'root' (CWE-250)",HIGH,RAW,2026-07-27,8,"By not specifying a USER, a program in the container may run as 'root'",CWE-250,dockerfile#L32,Docker,Semgrep,-,dockerfile#L32
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-21,14,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/csvExportCore.ts#L29,-,Semgrep,-,src/helpers/tableExports/csvExportCore.ts#L29
+Untrusted user input in redirect() can result in Open Redirect vulnerability (CWE-601),MEDIUM,FIXED,2026-06-04,61,Untrusted user input in redirect() can result in Open Redirect vulnerability,CWE-601,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L12,TypeScript,NodeJS Scan,-,backend/src/routes/auth/authKeycloak/callbackHandler.ts#L12
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-04,31,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/pointsPlansTableExport.ts#L11,-,Semgrep,-,src/helpers/tableExports/pointsPlansTableExport.ts#L11
+NPM dependency react-router-dom contains 1 vulnerability (CWE-601),MEDIUM,RAW,2026-07-27,8,NPM dependency react-router-dom contains 1 vulnerability,CWE-601,package-lock.json#L1,-,SIG Open Source Health,"This dependency contains the following vulnerabilities: 
+CVE-2026-53668 (6.9) 
+For further details, please visit Sigrid's Open Source Health page.",package-lock.json#L1
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-13,22,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/pointsPlansTableExport.ts#L18,-,Semgrep,-,src/helpers/tableExports/pointsPlansTableExport.ts#L18
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-17,18,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/csvExport.ts#L20,-,Semgrep,-,src/helpers/tableExports/csvExport.ts#L20
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-14,21,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/pointsPlansTableExport.ts#L18,-,Semgrep,-,src/helpers/tableExports/pointsPlansTableExport.ts#L18
+User controlled data in a HTML string may result in XSS (CWE-79),MEDIUM,FIXED,2026-07-18,17,User controlled data in a HTML string may result in XSS,CWE-79,src/helpers/tableExports/csvExportCore.ts#L24,-,Semgrep,-,src/helpers/tableExports/csvExportCore.ts#L24

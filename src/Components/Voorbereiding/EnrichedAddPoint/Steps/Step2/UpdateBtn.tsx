@@ -1,10 +1,10 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/EnrichedAddPoint/state/pickEnrichedCoordinateControls";
-import { createNewPoint } from "../../helpers/createNewPoint";
+import { createNewPoint } from "Components/Voorbereiding/common/createNewPoint";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { syncEnrichedCoordsForPreview } from "./syncEnrichedCoordsForPreview";
+import { syncEnrichedCoordsForPreview } from "Components/Voorbereiding/common/syncEnrichedCoordsForPreview";
 
 export default function UpdateBtn() {
   const { redGraphicsLayer } = useMapViewState();

@@ -182,13 +182,14 @@ export async function selectFlightPlansByVluchtnummer(
   );
 }
 
-export async function selectPreparedFlightPlans(
-  db: Queryable,
-  regio_id: string | undefined
-) {
+function buildPreparedFlightPlansQuery(
+  selectColumns: string,
+  regio_id: string | undefined,
+  options?: { orderByCreatedAtDesc?: boolean }
+): { query: string; params: unknown[] } {
   const params: unknown[] = [];
   let query = `
-      SELECT id, vluchtnummer, omschrijving, datum, created_at, user_id, points
+      SELECT ${selectColumns}
       FROM lis.flightPlans
       WHERE status = 'prepared'
     `;
@@ -200,7 +201,23 @@ export async function selectPreparedFlightPlans(
     column: "regio_id",
     options: { caseInsensitiveAdmin: true },
   });
-  query += ` ORDER BY created_at DESC`;
+
+  if (options?.orderByCreatedAtDesc) {
+    query += ` ORDER BY created_at DESC`;
+  }
+
+  return { query, params };
+}
+
+export async function selectPreparedFlightPlans(
+  db: Queryable,
+  regio_id: string | undefined
+) {
+  const { query, params } = buildPreparedFlightPlansQuery(
+    "id, vluchtnummer, omschrijving, datum, created_at, user_id, points",
+    regio_id,
+    { orderByCreatedAtDesc: true }
+  );
 
   return db.query(query, params);
 }
@@ -210,20 +227,10 @@ export async function selectPreparedFlightPlanIdsWithRegio(
   db: Queryable,
   regio_id: string | undefined
 ) {
-  const params: unknown[] = [];
-  let query = `
-      SELECT id, regio_id
-      FROM lis.flightPlans
-      WHERE status = 'prepared'
-    `;
-
-  query = appendRegioFilter({
-    sql: query,
-    params,
-    regio_id,
-    column: "regio_id",
-    options: { caseInsensitiveAdmin: true },
-  });
+  const { query, params } = buildPreparedFlightPlansQuery(
+    "id, regio_id",
+    regio_id
+  );
 
   return db.query(query, params);
 }

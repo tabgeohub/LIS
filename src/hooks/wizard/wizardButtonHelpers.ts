@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import useLogAction from "hooks/useLogAction";
 
 export function createWizardLogStep(input: {

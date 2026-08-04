@@ -2,7 +2,7 @@ export {
   addStarPointGraphic,
   removeStarPointGraphics,
   addStarPointGraphics,
-  goToEnrichedPoint,
-  starAllPointsOnMap,
-  syncPointsTableMapGraphics,
-} from "./pointMapGraphicActionsCore";
+} from "./starPointGraphicsActions";
+export { goToEnrichedPoint } from "./goToEnrichedPoint";
+export { starAllPointsOnMap } from "./starAllPointsOnMap";
+export { syncPointsTableMapGraphics } from "./syncPointsTableMapGraphics";

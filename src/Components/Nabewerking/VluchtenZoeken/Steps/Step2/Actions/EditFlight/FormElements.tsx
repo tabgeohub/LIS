@@ -1,6 +1,6 @@
 import InputComp from "Components/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
-import { useGetFlightTimesDistance } from "Components/HomePage/hooks/map/useGetFlightTimesDistance";
+import { useGetFlightTimesDistance } from "hooks/map/useGetFlightTimesDistance";
 import { usePopulateFlightPlanFormEffect } from "Components/HomePage/hooks/flightPlan/usePopulateFlightPlanFormEffect";
 import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import FlightPlanStandardFields, {

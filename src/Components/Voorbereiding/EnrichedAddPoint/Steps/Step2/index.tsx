@@ -6,7 +6,7 @@ import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint
 import CancelModal from "Components/Common/CancelModal";
 import UpdateBtn from "./UpdateBtn";
 import NextBtn from "./NextBtn";
-import useCoordinatesWatcher from "./useCoordinatesWatcher";
+import useCoordinatesWatcher from "Components/Voorbereiding/common/useCoordinatesWatcher";
 import CoordinatesInput from "./CoordinatesInput";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

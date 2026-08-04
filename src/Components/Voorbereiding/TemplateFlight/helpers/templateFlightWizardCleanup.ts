@@ -1,8 +1,6 @@
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
-import {
-  createWizardSelectionGraphicsControls,
-  type WizardSelectionGraphics,
-} from "../../common/wizardFilterStepSelection";
+import { createWizardSelectionGraphicsControls } from "../../common/createWizardSelectionGraphicsControls";
+import type { WizardSelectionGraphics } from "../../common/wizardSelectionGraphicsTypes";
 
 /** Shared clearSelectionGraphics for TemplateFlight Step2 / Step3. */
 export function createTemplateFlightClearSelectionGraphics(

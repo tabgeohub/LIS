@@ -1,8 +1,9 @@
 import { useTabState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
 import { useCreateData } from "api-hooks/mutations";
-import { buildLogEntry, LogActionInput } from "./logging/logEntry";
-import { enqueueLogEntry, initializeLogQueue } from "./logging/logQueue";
+import { buildLogContextFromSession } from "./logging/buildLogContextFromSession";
+import { createLogActionHandler } from "./logging/createLogActionHandler";
+import { initializeLogQueue } from "./logging/logQueue";
 
 export default function useLogAction() {
   const { user } = useAuth();
@@ -10,14 +11,7 @@ export default function useLogAction() {
   const { create } = useCreateData("/logs/podLogs");
   initializeLogQueue(create);
 
-  return (input: LogActionInput) =>
-    enqueueLogEntry(
-      buildLogEntry(input, {
-        userId: user?.user_id,
-        userName: user?.user_name,
-        userRole: user?.role,
-        selectedTab,
-        selectedPage,
-      })
-    );
+  return createLogActionHandler(
+    buildLogContextFromSession({ user, selectedTab, selectedPage })
+  );
 }

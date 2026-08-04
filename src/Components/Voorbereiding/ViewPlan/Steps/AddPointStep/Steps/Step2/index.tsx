@@ -5,11 +5,11 @@ import { useState } from "react";
 import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/EnrichedAddPoint/state/pickEnrichedCoordinateControls";
 import CancelModal from "Components/Common/CancelModal";
-import { createNewPoint } from "Components/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
+import { createNewPoint } from "Components/Voorbereiding/common/createNewPoint";
 import { useContent } from "hooks/useContent";
 import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
-import useCoordinatesWatcher from "Components/Voorbereiding/EnrichedAddPoint/Steps/Step2/useCoordinatesWatcher";
-import { syncEnrichedCoordsForPreview } from "Components/Voorbereiding/EnrichedAddPoint/Steps/Step2/syncEnrichedCoordsForPreview";
+import useCoordinatesWatcher from "Components/Voorbereiding/common/useCoordinatesWatcher";
+import { syncEnrichedCoordsForPreview } from "Components/Voorbereiding/common/syncEnrichedCoordsForPreview";
 
 export default function Step2({
   handleCancel,

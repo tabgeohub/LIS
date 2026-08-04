@@ -1,5 +1,4 @@
 import { getTransformedCoordinates } from "@helpers/ArcGISHelpers/getTransformedCoordinates";
-import { transformWgs84ToRd } from "@helpers/geo/transformWgs84ToRd";
 import type { EditPointCoordSnapshot } from "./editPointCoordSnapshot";
 
 export function syncFromRd(
@@ -21,7 +20,12 @@ export function syncFromWgs84(
   latitude: number
 ): Partial<EditPointCoordSnapshot> | null {
   if (!longitude || !latitude) return null;
-  const transformed = transformWgs84ToRd(longitude, latitude);
+  const transformed = getTransformedCoordinates({
+    fromProjection: "WGS84",
+    toProjection: "RD",
+    x: longitude,
+    y: latitude,
+  });
   return {
     xcoordinaat_rd: transformed.x,
     ycoordinaat_rd: transformed.y,
