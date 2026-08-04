@@ -1,6 +1,6 @@
 import InputComp, {
   type InputCompProps,
-} from "../FormComponents/InputComp";
+} from "Components/Common/FormComponents/InputComp";
 
 type FilterInputProps = Omit<InputCompProps, "nativeDate" | "min"> & {
   minToday?: boolean;

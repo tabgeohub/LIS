@@ -1,4 +1,3 @@
-import SelectComp from "./FormComponents/SelectComp";
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useFilterGeometries } from "Components/HomePage/hooks/filters/useFilterGeometries";
 import { useFilterPoints } from "Components/HomePage/hooks/filters/useFilterPoints";
@@ -8,6 +7,7 @@ import {
 } from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import type { Geometry } from "hooks/features";
 import type { EnrichedPointType } from "Types";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
 
 export type PointGeometryFilterLabels = {
   activity: string;

@@ -1,6 +1,6 @@
 import SelectComp, {
   type SelectCompProps,
-} from "../FormComponents/SelectComp";
+} from "Components/Common/FormComponents/SelectComp";
 
 export default function FilterSelect(props: SelectCompProps) {
   return (

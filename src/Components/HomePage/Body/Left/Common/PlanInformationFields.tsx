@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import type { FlightPlanType } from "Types";
-import InputComp from "./FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 
 export default function PlanInformationFields({
   plan,

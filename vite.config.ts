@@ -19,8 +19,10 @@ export default defineConfig({
       '@types': path.resolve(__dirname, './src/types'),
       '@constants': path.resolve(__dirname, './src/constants'),
       // Add aliases for baseUrl imports (relative to src) - Vite handles subpaths automatically
+      'helpers': path.resolve(__dirname, './src/helpers'),
       'hooks': path.resolve(__dirname, './src/hooks'),
       'Components': path.resolve(__dirname, './src/Components'),
+      'Types': path.resolve(__dirname, './src/Types'),
       'utils': path.resolve(__dirname, './src/utils'),
       'lib': path.resolve(__dirname, './src/lib'),
       'api': path.resolve(__dirname, './src/api'),

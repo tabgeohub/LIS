@@ -1,5 +1,5 @@
-import type { EnrichedPointType } from "Types";
 import { createQuadrantGraphic } from "helpers/ArcGISHelpers/createQuadrantGraphic";
+import type { EnrichedPointType } from "Types";
 
 export function syncHoverQuadrantGraphics(input: {
   graphicsLayerHover: __esri.GraphicsLayer;
@@ -7,7 +7,9 @@ export function syncHoverQuadrantGraphics(input: {
 }): void {
   input.graphicsLayerHover.removeAll();
   input.hoveredPoints?.forEach(() => {
-    input.graphicsLayerHover.add(createQuadrantGraphic(input.hoveredPoints));
+    input.graphicsLayerHover.add(
+      createQuadrantGraphic(input.hoveredPoints ?? [])
+    );
   });
 }
 
@@ -19,6 +21,6 @@ export function syncSelectedQuadrantGraphics(input: {
   input.graphicsLayerHover.removeAll();
   input.graphicsLayer?.removeAll();
   input.hoveredPoints?.forEach(() => {
-    input.graphicsLayer?.add(createQuadrantGraphic(input.hoveredPoints));
+    input.graphicsLayer?.add(createQuadrantGraphic(input.hoveredPoints ?? []));
   });
 }

@@ -3,7 +3,7 @@ import {
   GalleryCloseButton,
   GalleryDeleteButton,
   GalleryLocationButton,
-} from "./ImageGalleryToolbarButtons";
+} from "Components/HomePage/Body/Common/ImageGalleryToolbarButtons";
 
 function resolveActiveLocation(
   attachments: AttachmentType[],
