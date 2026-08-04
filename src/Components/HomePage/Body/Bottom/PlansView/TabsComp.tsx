@@ -1,4 +1,4 @@
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 
 export default function TabsComp({
   activeTab,

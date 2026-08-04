@@ -1,5 +1,5 @@
 import { useContent } from "hooks/useContent";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { usePointsStore } from "hooks/features";
 
 export default function Header({

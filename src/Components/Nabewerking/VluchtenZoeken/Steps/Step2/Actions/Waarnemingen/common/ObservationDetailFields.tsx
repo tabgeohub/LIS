@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
+import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
 
 type ObservationDetailFieldsProps = {

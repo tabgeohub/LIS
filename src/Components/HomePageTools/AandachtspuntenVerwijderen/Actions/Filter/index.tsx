@@ -1,4 +1,4 @@
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 
 export default function Filter() {
   const { setMainStep } = useDeletePointState();

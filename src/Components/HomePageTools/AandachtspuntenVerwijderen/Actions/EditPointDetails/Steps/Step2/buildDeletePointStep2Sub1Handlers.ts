@@ -1,5 +1,5 @@
 import useLogAction from "hooks/useLogAction";
-import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
+import type { EditPointMapStepProps } from "Components/Common/EditPoint/EditPointMapStepProps";
 
 export function buildDeletePointStep2Sub1Handlers(options: {
   props: EditPointMapStepProps;

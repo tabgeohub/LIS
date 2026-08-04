@@ -1,8 +1,8 @@
 import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
 import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
 import {

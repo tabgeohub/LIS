@@ -1,5 +1,5 @@
-import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/AandachtspuntDetailsFields";
-import { useDrawingStore } from "hooks/zustand/useDrawingStore";
+import AandachtspuntDetailsFields from "Components/Common/AandachtspuntDetailsFields";
+import { useDrawingStore } from "Components/Voorbereiding/DrawingTool/useDrawingStore";
 import GeometryOmschrijvingField from "./GeometryOmschrijvingField";
 
 export default function Form() {

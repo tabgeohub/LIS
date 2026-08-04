@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { EnrichedPointType } from "Types";
 import { usePointsStore } from "hooks/features";
-import PointsSelectionHeader from "Components/HomePage/Body/Common/ViewPlan/PointsSelectionHeader";
-import PointsSelectionList from "Components/HomePage/Body/Common/ViewPlan/PointsSelectionList";
+import PointsSelectionHeader from "Components/Common/ViewPlan/PointsSelectionHeader";
+import PointsSelectionList from "Components/Common/ViewPlan/PointsSelectionList";
 
 type Point = { id: number; omschrijving: string };
 type ItemModel = { id: number; title: string; points: Point[] };

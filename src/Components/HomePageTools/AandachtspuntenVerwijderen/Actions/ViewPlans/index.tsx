@@ -2,9 +2,9 @@ import PlansList from "./PlansList";
 import { useState } from "react";
 import PlanInformation from "./PlanInformation";
 import { usePointFlightPlans } from "api-hooks/flightPlans";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { FlightPlanType } from "Types";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 
 export default function ViewPlans() {
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);

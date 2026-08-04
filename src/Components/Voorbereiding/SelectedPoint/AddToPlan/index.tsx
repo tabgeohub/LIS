@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTabState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { usePointsStore } from "hooks/features";
-import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowMarkers";
+import useDrawYellowMarkers from "hooks/hover-click/useDrawYellowMarkers";
 import { useAddToPlanSketch } from "./useAddToPlanSketch";
 import { AddToPlanHeader } from "./AddToPlanHeader";
 import { AddToPlanSteps } from "./AddToPlanSteps";

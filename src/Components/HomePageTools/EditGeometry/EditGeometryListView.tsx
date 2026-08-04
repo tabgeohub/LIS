@@ -1,5 +1,5 @@
 import Header from "./Header";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import SingleGeometry from "./SingleGeometry";
 import type { Geometry } from "hooks/features";

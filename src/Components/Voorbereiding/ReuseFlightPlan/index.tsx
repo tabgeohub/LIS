@@ -1,5 +1,5 @@
 import Step1 from "./Steps/Step1";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import Step2 from "./Steps/Step2";
 
 export default function ReuseFlightPlan() {

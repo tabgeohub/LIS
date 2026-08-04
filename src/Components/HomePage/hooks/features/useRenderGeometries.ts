@@ -4,8 +4,8 @@ import { useAuth } from "hooks/zustand/ui";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import { useTimesliderState } from "hooks/zustand/ui";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import { useGeometriesStore } from "hooks/features";
 import { useGeometryGraphicsRendering } from "Components/HomePage/hooks/features/useGeometryGraphicsEffects";
 

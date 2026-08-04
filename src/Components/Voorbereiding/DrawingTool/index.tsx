@@ -1,6 +1,6 @@
 import Step1 from "./Step1";
 import Step2 from "./Step2";
-import { useDrawingStore } from "hooks/zustand/useDrawingStore";
+import { useDrawingStore } from "Components/Voorbereiding/DrawingTool/useDrawingStore";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import { useDrawingToolRootLifecycle } from "./helpers/useDrawingToolLifecycle";

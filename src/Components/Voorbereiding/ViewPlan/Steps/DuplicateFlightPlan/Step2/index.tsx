@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Buttons from "./Buttons";
 import Form from "./Form";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 
 export default function Step2({
   handleCancel,

@@ -2,7 +2,7 @@ import Form from "./Form";
 import Buttons from "./Buttons";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
-import { useDrawingStore } from "hooks/zustand/useDrawingStore";
+import { useDrawingStore } from "Components/Voorbereiding/DrawingTool/useDrawingStore";
 import { useDrawingToolStep2Lifecycle } from "../helpers/useDrawingToolLifecycle";
 
 export default function Step2() {

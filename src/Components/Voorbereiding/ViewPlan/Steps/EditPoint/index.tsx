@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import Buttons from "./Buttons";
 import Form from "./Form";
 import { useOpenTable } from "hooks/zustand/ui";

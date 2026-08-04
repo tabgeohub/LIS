@@ -1,4 +1,4 @@
-import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/AandachtspuntDetailsFields";
+import AandachtspuntDetailsFields from "Components/Common/AandachtspuntDetailsFields";
 import { deletePointStep1FieldProps } from "./deletePointStep1FieldProps";
 import { deletePointStep1Slots } from "./deletePointStep1Slots";
 import type { useDeletePointStep1FormModel } from "./useDeletePointStep1FormModel";

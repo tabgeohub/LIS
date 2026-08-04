@@ -5,7 +5,7 @@ import { cloneGeometryPoints } from "./helpers/pointTypes";
 import type { PointFormState } from "./helpers/pointForm";
 import type { GeometryEditDraft } from "./helpers/types";
 import type { GeometryPointRow } from "./helpers/pointTypes";
-import useEditGeometryVerticesOnMap from "Components/HomePage/hooks/hover-click-handlers/useEditGeometryVerticesOnMap";
+import useEditGeometryVerticesOnMap from "hooks/hover-click/useEditGeometryVerticesOnMap";
 import {
   useClearVerticesOnMetadata,
   useResetEditFormOnGeometryChange,

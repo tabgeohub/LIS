@@ -1,4 +1,4 @@
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { buildStep2WizardButtons } from "./buildStep2WizardButtons";
 import { useStep2ButtonsModel } from "./useStep2ButtonsModel";
 

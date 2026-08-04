@@ -2,7 +2,7 @@ import { useContent } from "hooks/useContent";
 import {
   pickDeletePointFormFields,
   useDeletePointState,
-} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 
 export function useDeletePointStep1FormModel() {
   const content = useContent();

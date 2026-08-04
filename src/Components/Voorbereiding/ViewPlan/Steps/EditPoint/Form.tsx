@@ -1,10 +1,10 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { useOpenTable } from "hooks/zustand/ui";
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
-import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
+import CheckBoxComp from "Components/Common/FormComponents/CheckBoxComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
+import { InputCompNum } from "Components/Common/FormComponents/InputCompNum";
 
 export default function Form({
   omschrijving,

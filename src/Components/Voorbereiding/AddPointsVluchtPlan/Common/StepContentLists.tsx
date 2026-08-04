@@ -1,7 +1,7 @@
 import PointsList from "Components/Voorbereiding/AddPointsVluchtPlan/Common/PointsList";
 import GeometriesList from "../../FlightPlan/Common/GeometriesList";
 import Header from "Components/Voorbereiding/AddPointsVluchtPlan/Common/Header";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import type { StepContentListSelectionProps } from "./stepContentListSelectionProps";
 
 function pickHeaderProps(

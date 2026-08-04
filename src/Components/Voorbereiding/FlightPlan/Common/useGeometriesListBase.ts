@@ -1,5 +1,5 @@
 import { Geometry, useGeometriesStore } from "hooks/features";
-import useGeometryListHover from "Components/HomePage/hooks/hover-click-handlers/useGeometryListHover";
+import useGeometryListHover from "hooks/hover-click/useGeometryListHover";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useGeometryListInteractions } from "./useGeometryListMapClick";
 import { useGeometryListGraphics } from "./useGeometryListGraphics";

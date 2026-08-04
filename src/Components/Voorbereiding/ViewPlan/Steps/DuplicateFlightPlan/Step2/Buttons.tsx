@@ -1,14 +1,14 @@
 import { useOpenTable } from "hooks/zustand/ui";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { usePlanDuplicateState } from "../../../helpers/usePlanDuplicateState";
 import { useCreateData } from "api-hooks/mutations";
 import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import { useAuth } from "hooks/zustand/ui";
 import { assembleFlightPlanCreateAttributes } from "Components/HomePage/hooks/flightPlan/assembleFlightPlanCreateAttributes";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 export default function Buttons({
   handleCancel,

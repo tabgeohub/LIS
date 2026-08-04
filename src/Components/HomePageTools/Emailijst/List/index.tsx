@@ -5,7 +5,7 @@ import DeleteEmailModal from "../DeleteEmail";
 import { EmailType } from "Types";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 
 export default function List({
   selectedEmail,

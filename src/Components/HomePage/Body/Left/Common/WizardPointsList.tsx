@@ -1,9 +1,9 @@
 import { ReactNode, useCallback, useMemo } from "react";
 import { EnrichedPointType } from "Types";
 import { useHoveredGraphicState } from "hooks/zustand/ui";
-import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
-import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowMarkers";
-import useNearestPointClick from "Components/HomePage/hooks/hover-click-handlers/useNearestPointClick";
+import usePointHover from "hooks/hover-click/usePointHover";
+import useDrawYellowMarkers from "hooks/hover-click/useDrawYellowMarkers";
+import useNearestPointClick from "hooks/hover-click/useNearestPointClick";
 import useLogAction from "hooks/useLogAction";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
 import { sortPointsWithSelectionOrder } from "Components/HomePage/hooks/points/sortPointsWithSelectionOrder";

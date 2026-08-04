@@ -1,4 +1,4 @@
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { AttachmentType } from "Types/finished_plans";
 import FotoPanel from "../../../common/Foto/FotoPanel";
 import { syncPointAttachmentsInPlan } from "../../../common/Foto/syncAttachmentsInPlan";

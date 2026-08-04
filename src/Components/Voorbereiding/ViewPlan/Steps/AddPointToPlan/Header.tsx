@@ -1,5 +1,5 @@
 import { EnrichedPointType } from "Types";
-import PointsSelectionHeader from "Components/HomePage/Body/Common/ViewPlan/PointsSelectionHeader";
+import PointsSelectionHeader from "Components/Common/ViewPlan/PointsSelectionHeader";
 
 export default function Header({
   setSelectedPointIds,

@@ -1,8 +1,8 @@
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { useDeletePointMapClick } from "./useDeletePointMapClick";
-import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
+import type { EditPointMapStepProps } from "Components/Common/EditPoint/EditPointMapStepProps";
 
 export function useDeletePointStep2Sub1Wire(props: EditPointMapStepProps) {
   const logAction = useLogAction();

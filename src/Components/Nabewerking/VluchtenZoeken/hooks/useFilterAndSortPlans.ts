@@ -1,5 +1,5 @@
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { useBindFilteredSortedPlans } from "Components/HomePage/hooks/filters/useFilteredSortedPlans";
 
 /**

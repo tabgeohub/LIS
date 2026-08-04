@@ -1,5 +1,5 @@
 import { useDuplicateOmschrijvingCount } from "api-hooks/points";
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
 
 export default function Omschrijving({

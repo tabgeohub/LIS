@@ -1,4 +1,4 @@
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { useContent } from "hooks/useContent";
 import type { TabType } from "Types";
 import { ActionType } from "../..";

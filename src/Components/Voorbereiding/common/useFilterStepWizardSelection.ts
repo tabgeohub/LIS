@@ -1,4 +1,4 @@
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import {
   createWizardFilterStepNext,
   createWizardSelectionGraphicsControls,

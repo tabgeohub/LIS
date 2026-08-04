@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
-import useGeometryListHover from "Components/HomePage/hooks/hover-click-handlers/useGeometryListHover";
-import useDrawYellowMarkers from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowMarkers";
-import useDrawYellowGeometries from "Components/HomePage/hooks/hover-click-handlers/useDrawYellowGeometries";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
+import usePointHover from "hooks/hover-click/usePointHover";
+import useGeometryListHover from "hooks/hover-click/useGeometryListHover";
+import useDrawYellowMarkers from "hooks/hover-click/useDrawYellowMarkers";
+import useDrawYellowGeometries from "hooks/hover-click/useDrawYellowGeometries";
 import { useContent } from "hooks/useContent";
 import { useMapViewState } from "hooks/zustand/ui";
 import {

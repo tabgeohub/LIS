@@ -4,8 +4,8 @@ import { useHoveredPlanState } from "hooks/zustand/hoveredPlanState";
 import { useMapViewState } from "hooks/zustand/ui";
 import SinglePlan from "./SinglePlan";
 import Buttons from "./Buttons";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import {
   syncHoverQuadrantGraphics,
   syncSelectedQuadrantGraphics,

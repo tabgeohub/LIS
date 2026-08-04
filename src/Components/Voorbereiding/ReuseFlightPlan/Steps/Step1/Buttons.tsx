@@ -1,9 +1,9 @@
 import { useMapViewState } from "hooks/zustand/ui";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {
   const { graphicsLayer } = useMapViewState();

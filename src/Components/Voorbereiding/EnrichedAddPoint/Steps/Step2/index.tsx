@@ -2,8 +2,8 @@
 import { useMapViewState } from "hooks/zustand/ui";
 
 import { useState } from "react";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import CancelModal from "Components/HomePage/Body/Common/CancelModal";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import CancelModal from "Components/Common/CancelModal";
 import UpdateBtn from "./UpdateBtn";
 import NextBtn from "./NextBtn";
 import useCoordinatesWatcher from "./useCoordinatesWatcher";

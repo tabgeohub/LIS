@@ -1,4 +1,4 @@
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useEditPointCoordinateInputs } from "./useEditPointCoordinateInputs";
 

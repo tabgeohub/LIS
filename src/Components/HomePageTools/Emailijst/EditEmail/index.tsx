@@ -3,7 +3,7 @@ import { EmailListStepType } from "..";
 import Loading from "./Loading";
 import { EmailType } from "Types";
 import { useUpdateData } from "api-hooks/mutations";
-import { isValidEmail } from "Components/HomePage/helpers/dom/isValidEmail";
+import { isValidEmail } from "helpers/dom/isValidEmail";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

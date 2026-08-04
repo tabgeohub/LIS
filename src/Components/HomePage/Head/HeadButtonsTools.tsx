@@ -6,7 +6,7 @@ import { useMapViewState } from "hooks/zustand/ui";
 import { useState } from "react";
 import Exporter from "Components/HomePageTools/Exporter";
 import Uploaden from "Components/HomePageTools/Uploaden";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "Components/HomePage/hooks/tabs/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";

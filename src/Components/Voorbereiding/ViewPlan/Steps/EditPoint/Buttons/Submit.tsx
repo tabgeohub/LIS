@@ -1,5 +1,5 @@
 import { useOpenTable } from "hooks/zustand/ui";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { useUpdateData } from "api-hooks/mutations";
 import { useContent } from "hooks/useContent";
 import type { EditPointDetailFields } from "./editPointDetailFields";

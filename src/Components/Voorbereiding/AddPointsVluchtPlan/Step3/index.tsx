@@ -1,6 +1,6 @@
 import Buttons from "./Buttons";
 import AddPointsVluchtPlanStepContent from "Components/Voorbereiding/AddPointsVluchtPlan/Common/AddPointsVluchtPlanStepContent";
-import { useAddPointStates } from "hooks/zustand/useAddPointStates";
+import { useAddPointStates } from "Components/Voorbereiding/AddPointsVluchtPlan/useAddPointStates";
 
 export default function Step3() {
   const { selectedPoints2, setSelectedPoints2 } = useAddPointStates();

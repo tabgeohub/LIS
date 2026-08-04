@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenAllTable } from "hooks/zustand/ui";
 import { useOpenTable } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
@@ -7,7 +7,7 @@ import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";
-import usePointListMapActions from "Components/HomePage/hooks/hover-click-handlers/usePointListMapActions";
+import usePointListMapActions from "hooks/hover-click/usePointListMapActions";
 
 import { POINT_CORE_DISPLAY_COLUMNS } from "Components/HomePage/helpers/points/pointColumnKeys";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";

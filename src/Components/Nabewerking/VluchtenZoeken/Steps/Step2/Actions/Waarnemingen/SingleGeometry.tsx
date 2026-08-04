@@ -1,7 +1,7 @@
 import { FinishedGeometryType } from "Types/finished_plans";
 import useLogAction from "hooks/useLogAction";
-import useGeometryClick from "Components/HomePage/hooks/hover-click-handlers/useGeometryClick";
-import useGeometryListHover from "Components/HomePage/hooks/hover-click-handlers/useGeometryListHover";
+import useGeometryClick from "hooks/hover-click/useGeometryClick";
+import useGeometryListHover from "hooks/hover-click/useGeometryListHover";
 import { SingleGeometryCardBody } from "./SingleGeometryCardBody";
 
 type Props = {

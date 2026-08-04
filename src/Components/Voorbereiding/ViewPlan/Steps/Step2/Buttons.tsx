@@ -4,17 +4,17 @@ import { useOpenTable } from "hooks/zustand/ui";
 
 import { useUpdateData } from "api-hooks/mutations";
 
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 
 import { useMapViewState } from "hooks/zustand/ui";
 
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 import {
 

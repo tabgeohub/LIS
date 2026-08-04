@@ -1,5 +1,5 @@
 import StepContent from "Components/Voorbereiding/AddPointsVluchtPlan/Common/StepContent";
-import { useAddPointStates } from "hooks/zustand/useAddPointStates";
+import { useAddPointStates } from "Components/Voorbereiding/AddPointsVluchtPlan/useAddPointStates";
 
 type AddPointsVluchtPlanStepContentProps = {
   herhalen: boolean;

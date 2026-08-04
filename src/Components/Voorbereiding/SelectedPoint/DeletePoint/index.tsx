@@ -4,7 +4,7 @@ import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { usePointsStore } from "hooks/features";
-import { useFetchInitialFeatures } from "Components/HomePage/hooks/features/useFetchInitialFeatures";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
 import { CgClose, CgSpinner } from "react-icons/cg";
 import { useContent } from "hooks/useContent";
 import { useUpdateData } from "api-hooks/mutations";

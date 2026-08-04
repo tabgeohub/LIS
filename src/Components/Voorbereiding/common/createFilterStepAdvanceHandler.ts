@@ -1,4 +1,4 @@
-import { clearMapSelectionGraphics } from "Components/HomePage/hooks/wizard/clearMapSelectionGraphics";
+import { clearMapSelectionGraphics } from "hooks/wizard/clearMapSelectionGraphics";
 
 type SelectionGraphicsInput = {
   mapView: __esri.MapView | null;

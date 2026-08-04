@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import useLogAction from "hooks/useLogAction";
 import { useState } from "react";
-import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
+import type { EditPointMapStepProps } from "Components/Common/EditPoint/EditPointMapStepProps";
 import { buildEditPointStep2Sub1Handlers } from "./buildEditPointStep2Sub1Handlers";
 import { useEditPointFormMapClick } from "./useEditPointFormMapClick";
 import type { EditPointFormValues } from "./editPointFormValues";

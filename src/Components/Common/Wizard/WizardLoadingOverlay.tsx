@@ -1,4 +1,4 @@
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 
 type WizardLoadingOverlayProps = {
   show: boolean;

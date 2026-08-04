@@ -1,14 +1,14 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import { useCreateData } from "api-hooks/mutations";
-import { useCancelCreateFlightPlan } from "Components/HomePage/hooks/handleCancel/useCancelCreateFlightPlan";
+import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useAuth } from "hooks/zustand/ui";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import {
   createTemplateFlightClearSelectionGraphics,
   runTemplateFlightCancelCleanup,

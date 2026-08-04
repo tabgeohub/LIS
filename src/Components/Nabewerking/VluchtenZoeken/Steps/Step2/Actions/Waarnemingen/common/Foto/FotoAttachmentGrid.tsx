@@ -1,4 +1,4 @@
-import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
+import ImageGallery from "Components/Common/ImageGallery";
 import { MdLocationOn } from "react-icons/md";
 import { attachmentDisplayUrl } from "@helpers/arcgis/attachmentDisplayUrl";
 import { AttachmentType } from "Types/finished_plans";

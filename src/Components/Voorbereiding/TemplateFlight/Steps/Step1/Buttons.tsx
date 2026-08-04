@@ -1,7 +1,7 @@
 import { useTemplateFlightState } from "../../templateFlightStates";
 import { useCreateData } from "api-hooks/mutations";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({ name }: { name: string }) {
   const { logStep, labels } = useWizardButtons("First step");

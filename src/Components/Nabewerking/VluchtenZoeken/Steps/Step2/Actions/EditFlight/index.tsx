@@ -1,8 +1,8 @@
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { ActionType } from "../..";
 import Buttons from "./Buttons";
 import FormElements from "./FormElements";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 
 export default function EditFlight({
   setAction,

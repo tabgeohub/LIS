@@ -1,4 +1,4 @@
-import Modal from "Components/HomePage/Body/Common/Modal";
+import Modal from "Components/Common/Modal";
 import { IoMdClose } from "react-icons/io";
 import Step1 from "./Step1";
 

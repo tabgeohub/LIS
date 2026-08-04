@@ -1,9 +1,9 @@
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 import { useOpeSideBarState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
-import { useResetPointFilters } from "Components/HomePage/hooks/features/useResetPointFilters";
+import { useResetPointFilters } from "hooks/features/useResetPointFilters";
 import { IoReloadCircle } from "react-icons/io5";
 import { TbFilterQuestion } from "react-icons/tb";
 

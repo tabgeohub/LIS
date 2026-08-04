@@ -1,7 +1,7 @@
 import Header from "./Header";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import PointsList from "./PointsList";
 import GeometriesList from "../../../FlightPlan/Common/GeometriesList";
 import type { useAddPointToPlanModel } from "./useAddPointToPlanModel";

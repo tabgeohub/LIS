@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useContent } from "hooks/useContent";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { useEffect, useState } from "react";
 import {
   useGeometriesStore,

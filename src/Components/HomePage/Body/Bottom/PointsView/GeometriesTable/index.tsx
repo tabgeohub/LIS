@@ -1,8 +1,8 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useOpenTable } from "hooks/zustand/ui";
 import { Geometry } from "hooks/features";
 import { PointsViewTableFrame } from "../common/PointsViewTableFrame";
-import useGeometryListMapActions from "Components/HomePage/hooks/hover-click-handlers/useGeometryListMapActions";
+import useGeometryListMapActions from "hooks/hover-click/useGeometryListMapActions";
 import { useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { TfiMoreAlt } from "react-icons/tfi";

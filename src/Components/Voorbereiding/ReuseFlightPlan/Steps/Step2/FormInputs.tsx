@@ -1,9 +1,9 @@
 import { usePopulateFlightPlanFormEffect } from "Components/HomePage/hooks/flightPlan/usePopulateFlightPlanFormEffect";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import Vluchtnummer from "./Vluchtnummer";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
-} from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+} from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
 import { useFlightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function FormInputs() {

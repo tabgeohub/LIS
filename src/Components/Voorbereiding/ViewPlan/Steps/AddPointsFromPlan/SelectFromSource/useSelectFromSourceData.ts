@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import {
   buildPlanPointIdSet,
   mapSourceToItems,

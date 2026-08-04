@@ -1,8 +1,8 @@
 import { useTabState } from "hooks/zustand/ui";
 import { EmailListStepType } from "..";
 import { EmailType } from "Types";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons({
   setStep,

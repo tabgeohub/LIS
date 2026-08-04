@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { TbTrash } from "react-icons/tb";
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 
 interface ClearButtonProps {
   onClear: () => void;

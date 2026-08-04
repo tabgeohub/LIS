@@ -1,6 +1,6 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { CgSpinner } from "react-icons/cg";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { usePointsStore } from "hooks/features";
 import { useDeleteData } from "api-hooks/mutations";
 import useLogAction from "hooks/useLogAction";

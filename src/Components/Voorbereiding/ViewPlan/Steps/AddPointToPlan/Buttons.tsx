@@ -4,7 +4,7 @@ import { usePointsStore } from "hooks/features";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useOpenTable } from "hooks/zustand/ui";
 import { useGeometriesStore } from "hooks/features";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { useViewPlanAddPointsState } from "../../pickViewPlanAddPointsState";
 import { submitAddPointsToPlan } from "./helpers/submitAddPointsToPlan";
 

@@ -1,10 +1,10 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { ActionType } from ".";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
-import { useHandleClearFinishedPlan } from "Components/HomePage/hooks/handleCancel/useHandleClearFinishedPlan";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
+import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFinishedPlan";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { clearFinishedPlanStep2Layers } from "./clearFinishedPlanStep2Layers";
 import { runFinishedPlanStep2ExitCleanup } from "./runFinishedPlanStep2ExitCleanup";
 

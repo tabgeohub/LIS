@@ -1,7 +1,7 @@
-import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/Nabewerking/CreateReport/state/useCreateReportState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlanMapHighlight } from "Components/HomePage/hooks/hover-click-handlers/useFinishedPlanMapHighlight";
-import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
+import { useFinishedPlanMapHighlight } from "hooks/hover-click/useFinishedPlanMapHighlight";
+import FlightPlanSummary from "Components/Common/FlightPlanSummary";
 import { useCreateReportPlanClick } from "./useCreateReportPlanClick";
 
 export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {

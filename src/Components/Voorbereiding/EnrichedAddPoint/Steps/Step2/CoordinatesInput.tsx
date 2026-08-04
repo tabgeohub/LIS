@@ -1,7 +1,7 @@
 import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 
 export default function CoordinatesInput() {
   const pointState = useEnrichedPointState();

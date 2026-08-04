@@ -2,11 +2,11 @@
 import { useState } from "react";
 import SinglePlan from "./Content/SinglePlan";
 import Buttons from "./Content/Buttons";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Loading from "./Content/Loading";
 import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { useFilterAndSortPlans } from "../../hooks/useFilterAndSortPlans";
 import { useAuth } from "hooks/zustand/ui";
 

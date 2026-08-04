@@ -1,4 +1,4 @@
-import { useAddPointStates } from "hooks/zustand/useAddPointStates";
+import { useAddPointStates } from "Components/Voorbereiding/AddPointsVluchtPlan/useAddPointStates";
 import WizardHerhalenSelectButtons from "Components/HomePage/Body/Left/Common/WizardHerhalenSelectButtons";
 import { useHerhalenSelectionHandlers } from "Components/HomePage/hooks/points/useHerhalenSelectionHandlers";
 

@@ -5,12 +5,12 @@ import isBetween from "dayjs/plugin/isBetween";
 
 import Buttons from "./Buttons";
 import Filter from "Components/Voorbereiding/FlightPlan/Common/Filter";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 
 import { usePointsStore } from "hooks/features";
 import { useGeometriesStore, Geometry } from "hooks/features";
 
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import Header from "Components/Voorbereiding/FlightPlan/Common/Header";
 import PointsList from "Components/Voorbereiding/FlightPlan/Common/PointsList";
 import GeometriesList from "Components/Voorbereiding/FlightPlan/Common/GeometriesList";

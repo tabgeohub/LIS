@@ -2,7 +2,7 @@ import createPoint from "@helpers/ArcGISHelpers/createPoint";
 import {
   applyWgs84MapClickCoords,
   isValidMapClickPoint,
-} from "Components/HomePage/Body/Common/EditPoint/editPointMapClickCoords";
+} from "Components/Common/EditPoint/editPointMapClickCoords";
 
 export type DeletePointCoordSetter = (coords: {
   rdX: number;

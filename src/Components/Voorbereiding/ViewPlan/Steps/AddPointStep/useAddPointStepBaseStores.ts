@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { useTabState } from "hooks/zustand/ui";
 import { useOpenTable } from "hooks/zustand/ui";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 
 export function useAddPointStepBaseStores() {
   const [addPointStep, setAddPointStep] = useState(1);

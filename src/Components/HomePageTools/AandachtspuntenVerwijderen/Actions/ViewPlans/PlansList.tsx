@@ -1,6 +1,6 @@
-import FlightPlanPickerList from "Components/HomePage/Body/Common/EditPoint/FlightPlanPickerList";
+import FlightPlanPickerList from "Components/Common/EditPoint/FlightPlanPickerList";
 import useLogAction from "hooks/useLogAction";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { FlightPlanType } from "Types";
 
 export default function PlansList({

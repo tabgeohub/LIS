@@ -4,7 +4,7 @@ import { voorbereidingTabs } from "./constants";
 import { useAuth } from "hooks/zustand/ui";
 import FilterTabs from "./Common/FilterTabs";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleClosePopUp";
 import useResetTabs from "Components/HomePage/hooks/tabs/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";

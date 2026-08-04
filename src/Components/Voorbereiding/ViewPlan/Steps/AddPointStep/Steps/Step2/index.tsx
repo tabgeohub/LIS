@@ -2,9 +2,9 @@
 import { useMapViewState } from "hooks/zustand/ui";
 
 import { useState } from "react";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
-import CancelModal from "Components/HomePage/Body/Common/CancelModal";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/EnrichedAddPoint/state/pickEnrichedCoordinateControls";
+import CancelModal from "Components/Common/CancelModal";
 import { createNewPoint } from "Components/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
 import { useContent } from "hooks/useContent";
 import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";

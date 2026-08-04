@@ -3,7 +3,7 @@ import { FinishedFlightPlanType } from "Types/finished_plans";
 import type { PathPointType } from "hooks/zustand/ui";
 import { useMapViewState } from "hooks/zustand/ui";
 import { usePathPointState } from "hooks/zustand/ui";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { parsePlanPath, type PathPoint } from "./pathPlanUtils";
 import { handlePathPointMapClick } from "./handlePathPointMapClick";
 

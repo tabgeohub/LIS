@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Step1 from "./Steps/Step1";
 import CongfirmationModal from "./Steps/CongfirmationModal";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 import { useUpdateData } from "api-hooks/mutations";
 import { FlightPlanType } from "Types";
 import { useContent } from "hooks/useContent";

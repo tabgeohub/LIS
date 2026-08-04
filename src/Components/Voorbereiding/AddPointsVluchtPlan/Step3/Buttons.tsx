@@ -1,11 +1,11 @@
 import { useUpdateData } from "api-hooks/mutations";
-import { useAddPointStates } from "hooks/zustand/useAddPointStates";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import { useAddPointStates } from "Components/Voorbereiding/AddPointsVluchtPlan/useAddPointStates";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 
 export default function Buttons() {
   const { resetFeatures } = useResetFeatures();

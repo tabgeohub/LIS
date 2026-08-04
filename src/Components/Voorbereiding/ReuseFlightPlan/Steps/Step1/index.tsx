@@ -2,9 +2,9 @@
 import { useMemo } from "react";
 import SinglePlan from "./SinglePlan";
 import Buttons from "./Buttons";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { FlightPlanType } from "Types";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import Filter from "Components/Voorbereiding/ReuseFlightPlan/Common/Filter";
 import Loading from "Components/Voorbereiding/ReuseFlightPlan/Common/Loading";
 import { useAuth } from "hooks/zustand/ui";

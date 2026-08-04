@@ -1,4 +1,4 @@
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 
 interface TabButtonsProps {
   tab: string;

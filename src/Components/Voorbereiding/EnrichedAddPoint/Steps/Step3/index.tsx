@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Buttons from "./Buttons";
 import Form from "./Form";
-import CancelModal from "Components/HomePage/Body/Common/CancelModal";
+import CancelModal from "Components/Common/CancelModal";
 
 export default function Step3({ handleCancel }: { handleCancel: () => void }) {
   const [openCancelModal, setOpenCancelModal] = useState(false);

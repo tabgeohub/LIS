@@ -1,10 +1,10 @@
 import useLogAction from "hooks/useLogAction";
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {
   const { vluchtnummer, waarnemer, datum, setStep, clear } = useFlightPlanState();

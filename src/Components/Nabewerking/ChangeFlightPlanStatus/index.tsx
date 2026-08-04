@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Buttons from "./Buttons";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { useFullPreparedFlightPlans } from "api-hooks/flightPlans";
-import { useChangePlanStatusState } from "Components/HomePage/hooks/zustand/nabewerking/useChangePlanStatusState";
+import { useChangePlanStatusState } from "Components/Nabewerking/ChangeFlightPlanStatus/useChangePlanStatusState";
 import Filter from "./Filter";
 import { useContent } from "hooks/useContent";
 import { useAuth } from "hooks/zustand/ui";

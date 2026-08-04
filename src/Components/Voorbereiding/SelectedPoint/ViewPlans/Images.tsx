@@ -2,7 +2,7 @@ import { useState } from "react";
 import { usePopUpState } from "hooks/zustand/ui";
 import { FlightPlanType } from "Types";
 import { usePlanPointAttachments } from "api-hooks/finishedPlans";
-import ImageGallery from "Components/HomePage/Body/Common/ImageGallery";
+import ImageGallery from "Components/Common/ImageGallery";
 import PlanAttachmentGrid from "./PlanAttachmentGrid";
 import { resolvePlanImagesState } from "./planImagesState";
 

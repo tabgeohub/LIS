@@ -1,12 +1,12 @@
 import Loading from "Components/Common/FlightPlanListLoading";
 import Step1 from "./Steps/Step1";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Step1Buttons from "./Steps/Step1/Buttons";
 import Step2Buttons from "./Steps/Step2/Buttons";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
 import { usePartialFinishedPlans } from "api-hooks/finishedPlans";
-import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/Nabewerking/CreateReport/state/useCreateReportState";
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useAuth } from "hooks/zustand/ui";
 

@@ -1,6 +1,6 @@
 import useLogAction from "hooks/useLogAction";
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useFinishedPlanMapHighlight } from "Components/HomePage/hooks/hover-click-handlers/useFinishedPlanMapHighlight";
+import { useFinishedPlanMapHighlight } from "hooks/hover-click/useFinishedPlanMapHighlight";
 import { createReportPlanClickLogData } from "./createReportPlanClickLogData";
 
 export function useCreateReportPlanClick(

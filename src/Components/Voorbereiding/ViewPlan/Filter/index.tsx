@@ -1,6 +1,6 @@
 import FlightPlanFilterPanel from "Components/HomePage/Body/Left/Common/FlightPlanFilterPanel";
 import { usePlansFilterStore } from "Components/HomePage/hooks/filters/usePlansFilterStore";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import type { FlightPlanType } from "Types";
 
 export default function Filter({ plans }: { plans: FlightPlanType[] }) {

@@ -1,5 +1,5 @@
-import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
+import { InputCompNum } from "Components/Common/FormComponents/InputCompNum";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
 import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Common/editPointStep2Sub2Props";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
@@ -7,7 +7,7 @@ import { useCoordinateSystemSync } from "Components/HomePage/hooks/editPoint/use
 import {
   pickDeletePointCoordinateFields,
   useDeletePointState,
-} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { useState } from "react";
 import { applyDeletePointCoordinatePatch } from "./applyDeletePointCoordinatePatch";
 

@@ -7,9 +7,9 @@ import {
   collectPointsForCenterAndZoom,
   goToLonLatZoom,
 } from "@helpers/ArcGISHelpers/calculateCenterAndZoom";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
 export default function Buttons() {
   const { withLog, labels } = useWizardButtons("First step");

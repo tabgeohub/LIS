@@ -1,5 +1,5 @@
 import { CgClose } from "react-icons/cg";
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { initialPointState, usePopUpState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";

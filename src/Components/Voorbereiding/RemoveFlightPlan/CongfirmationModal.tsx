@@ -1,8 +1,8 @@
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
-import Modal from "Components/HomePage/Body/Common/Modal";
+import LoadingBars from "Components/Common/LoadingBars";
+import Modal from "Components/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
+import { useDeleteFlightPlan } from "Components/Voorbereiding/RemoveFlightPlan/useDeleteFlightPlan";
 import { IoMdClose } from "react-icons/io";
 import { useDeleteData } from "api-hooks/mutations";
 

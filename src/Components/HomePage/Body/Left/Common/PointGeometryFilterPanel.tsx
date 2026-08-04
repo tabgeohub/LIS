@@ -1,5 +1,5 @@
 import SelectComp from "./FormComponents/SelectComp";
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useFilterGeometries } from "Components/HomePage/hooks/filters/useFilterGeometries";
 import { useFilterPoints } from "Components/HomePage/hooks/filters/useFilterPoints";
 import {

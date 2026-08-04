@@ -2,7 +2,7 @@ import { useMapViewState } from "hooks/zustand/ui";
 import { useOpenTable } from "hooks/zustand/ui";
 import { usePointsStore } from "hooks/features";
 import { useUpdateData } from "api-hooks/mutations";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { useContent } from "hooks/useContent";
 import {
   applyRemovePointSuccessState,

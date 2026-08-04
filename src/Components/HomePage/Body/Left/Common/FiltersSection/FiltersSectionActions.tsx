@@ -1,7 +1,7 @@
 import { useFilterState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features";
-import { useResetPointFilters } from "Components/HomePage/hooks/features/useResetPointFilters";
+import { useResetPointFilters } from "hooks/features/useResetPointFilters";
 
 export function FiltersSectionActions() {
   const { fetchPoints } = usePointsStore();

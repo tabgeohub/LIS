@@ -1,5 +1,5 @@
 import { useOpenTable } from "hooks/zustand/ui";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { BsTextParagraph } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";

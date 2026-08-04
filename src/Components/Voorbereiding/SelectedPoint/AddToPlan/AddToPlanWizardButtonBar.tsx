@@ -1,5 +1,5 @@
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/Common/Wizard/wizardButtonBarClass";
 
 /** Shared Vorige / Volgende / Annuleren bar for AddToPlan step buttons. */
 export function AddToPlanWizardButtonBar(props: {

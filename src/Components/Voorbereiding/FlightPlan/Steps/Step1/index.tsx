@@ -1,10 +1,10 @@
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import Vluchtnummer from "./Vluchtnummer";
 import Buttons from "./Buttons";
 import { useContent } from "hooks/useContent";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
-} from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+} from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
 import { useFlightPlanFormSelectOptions } from "Components/HomePage/hooks/flightPlan/useFlightPlanFormSelectOptions";
 import { voorbereidingVluchtAanmakenFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanFormLabels";
 

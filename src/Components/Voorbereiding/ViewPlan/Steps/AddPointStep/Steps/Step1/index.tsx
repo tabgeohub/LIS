@@ -2,10 +2,10 @@ import { useState } from "react";
 import { CiWarning } from "react-icons/ci";
 
 import SearchWidget from "Components/Voorbereiding/EnrichedAddPoint/Common/SearchWidget";
-import CancelModal from "Components/HomePage/Body/Common/CancelModal";
+import CancelModal from "Components/Common/CancelModal";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 
 export default function Step1({
   handleCancel,

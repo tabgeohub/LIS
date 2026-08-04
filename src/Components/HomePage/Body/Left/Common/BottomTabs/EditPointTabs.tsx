@@ -1,4 +1,4 @@
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 import { usePopUpState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";

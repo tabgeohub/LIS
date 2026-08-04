@@ -1,5 +1,5 @@
-import Modal from "Components/HomePage/Body/Common/Modal";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import Modal from "Components/Common/Modal";
+import LoadingBars from "Components/Common/LoadingBars";
 import { IoMdClose } from "react-icons/io";
 import { EnrichedPointType } from "Types";
 import useLogAction from "hooks/useLogAction";

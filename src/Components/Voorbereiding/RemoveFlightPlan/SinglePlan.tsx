@@ -1,13 +1,13 @@
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
-import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
+import { classNames } from "helpers/dom/classNames";
+import { usePlanClick } from "hooks/hover-click/usePlanClick";
+import usePlanHover from "hooks/hover-click/usePlanHover";
 import useLogAction from "hooks/useLogAction";
-import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
+import { useDeleteFlightPlan } from "Components/Voorbereiding/RemoveFlightPlan/useDeleteFlightPlan";
 import { FaLock } from "react-icons/fa6";
 import { GoCheckCircleFill } from "react-icons/go";
 import { TbCancel } from "react-icons/tb";
 import { FlightPlanType } from "Types";
-import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
+import FlightPlanSummary from "Components/Common/FlightPlanSummary";
 
 export default function SinglePlan({ plan }: { plan: FlightPlanType }) {
   const { handleClick } = usePlanClick();

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { createPointGraphics } from "@helpers/ArcGISHelpers/createPointGraphic";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";

@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { Field } from "formik";
 import InputFormik from "Components/Voorbereiding/SelectedPoint/Common/InputFormik";
 import SelectFormik from "Components/Voorbereiding/SelectedPoint/Common/SelectFormik";

@@ -1,5 +1,5 @@
 import Buttons from "./Buttons";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Filter from "./Filter";
 import CongfirmationModal from "./CongfirmationModal";
 import { useContent } from "hooks/useContent";

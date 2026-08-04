@@ -1,4 +1,4 @@
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features";
 import { useMapViewState } from "hooks/zustand/ui";

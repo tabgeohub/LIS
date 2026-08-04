@@ -1,11 +1,11 @@
-import { usePlanClick } from "Components/HomePage/hooks/hover-click-handlers/usePlanClick";
-import usePlanHover from "Components/HomePage/hooks/hover-click-handlers/usePlanHover";
+import { usePlanClick } from "hooks/hover-click/usePlanClick";
+import usePlanHover from "hooks/hover-click/usePlanHover";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { FlightPlanType } from "Types";
-import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
-import FlightPlanClickableRow from "Components/HomePage/Body/Left/Common/FlightPlanClickableRow";
+import FlightPlanSummary from "Components/Common/FlightPlanSummary";
+import FlightPlanClickableRow from "Components/Common/FlightPlanClickableRow";
 import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";
 
 export default function SinglePlan({ plan }: { plan: FlightPlanType }) {

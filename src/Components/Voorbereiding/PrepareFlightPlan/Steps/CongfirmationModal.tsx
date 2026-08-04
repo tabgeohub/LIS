@@ -1,4 +1,4 @@
-import Modal from "Components/HomePage/Body/Common/Modal";
+import Modal from "Components/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { IoMdClose } from "react-icons/io";

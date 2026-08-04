@@ -1,5 +1,5 @@
-import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
-import usePointHover from "Components/HomePage/hooks/hover-click-handlers/usePointHover";
+import usePointClick from "hooks/hover-click/usePointClick";
+import usePointHover from "hooks/hover-click/usePointHover";
 import useLogAction from "hooks/useLogAction";
 import { EnrichedPointType } from "Types";
 import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";

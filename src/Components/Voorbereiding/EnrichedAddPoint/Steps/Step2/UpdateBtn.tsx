@@ -1,6 +1,6 @@
 import { useMapViewState } from "hooks/zustand/ui";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/EnrichedAddPoint/state/pickEnrichedCoordinateControls";
 import { createNewPoint } from "../../helpers/createNewPoint";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";

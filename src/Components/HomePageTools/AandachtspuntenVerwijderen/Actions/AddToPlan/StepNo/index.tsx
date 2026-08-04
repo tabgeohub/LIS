@@ -1,4 +1,4 @@
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { useState } from "react";
 import { FlightPlanType } from "Types";
 import { useAuth } from "hooks/zustand/ui";

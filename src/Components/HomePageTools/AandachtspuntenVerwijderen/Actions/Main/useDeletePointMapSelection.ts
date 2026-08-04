@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { usePointsStore } from "hooks/features";
 import { attachDeletePointMapClick } from "./attachDeletePointMapClick";
 

@@ -1,8 +1,8 @@
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
-import Modal from "Components/HomePage/Body/Common/Modal";
+import LoadingBars from "Components/Common/LoadingBars";
+import Modal from "Components/Common/Modal";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { useState } from "react";
 import { useDeleteData } from "api-hooks/mutations";
 

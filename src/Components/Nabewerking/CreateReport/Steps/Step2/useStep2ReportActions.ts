@@ -1,6 +1,6 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useHandleStep2 } from "../../helpers/useHandleStep2";
-import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/Nabewerking/CreateReport/state/useCreateReportState";
 
 export function useStep2ReportActions() {
   const activities = useConstSelectOptions("activiteiten");

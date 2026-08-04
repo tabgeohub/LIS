@@ -1,13 +1,13 @@
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import InputComp from "Components/Common/FormComponents/InputComp";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import { useEffect, useState } from "react";
 import Buttons from "./Buttons";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useUpdateData } from "api-hooks/mutations";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { submitEditPointDetails } from "./submitEditPointDetails";
 import type { EditObservationFormProps } from "../../../common/editObservationFormProps";
 import { ObservationDetailFields } from "../../../common/ObservationDetailFields";

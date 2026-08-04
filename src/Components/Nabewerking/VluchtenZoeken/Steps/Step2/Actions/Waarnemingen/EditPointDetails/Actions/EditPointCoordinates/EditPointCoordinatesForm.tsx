@@ -1,5 +1,5 @@
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
-import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
+import { InputCompNum } from "Components/Common/FormComponents/InputCompNum";
 
 type EditPointCoordinatesFormProps = {
   coordinateSystem: string;

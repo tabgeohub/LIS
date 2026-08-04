@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 
 export function useFlightPlanFormSelectOptions() {
   const pilootOptions = useConstSelectOptions("piloten");

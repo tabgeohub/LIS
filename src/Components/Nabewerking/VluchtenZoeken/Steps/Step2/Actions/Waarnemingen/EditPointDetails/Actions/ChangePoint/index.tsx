@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import Header from "./Header";
 import { usePointsStore } from "hooks/features";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import SinglePoint from "./SinglePoints";
 import { EnrichedPointType } from "Types";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import Buttons from "./Buttons";
 import Filter from "./Filter";
 import { useUpdateData } from "api-hooks/mutations";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
 
 export default function ChangePoint({

@@ -1,5 +1,5 @@
 import { LuWaypoints } from "react-icons/lu";
-import FlightPlanSummary from "Components/HomePage/Body/Left/Common/FlightPlanSummary";
+import FlightPlanSummary from "Components/Common/FlightPlanSummary";
 import { useTimesliderFlightPlans } from "./useTimesliderFlightPlans";
 
 export default function FlightPlansListCheckbox() {

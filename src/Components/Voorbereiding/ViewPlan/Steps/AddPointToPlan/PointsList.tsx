@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { EnrichedPointType } from "Types";
-import PointsSelectionList from "Components/HomePage/Body/Common/ViewPlan/PointsSelectionList";
+import PointsSelectionList from "Components/Common/ViewPlan/PointsSelectionList";
 
 export default function PointsList({
   filteredPoints,

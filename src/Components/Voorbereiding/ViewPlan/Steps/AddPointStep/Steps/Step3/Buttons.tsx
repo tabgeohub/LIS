@@ -1,15 +1,15 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
 import { findSpecificPoint } from "Components/Voorbereiding/EnrichedAddPoint/helpers/findSpecificPoint";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { useCreateData } from "api-hooks/mutations";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { useUpdateData } from "api-hooks/mutations";
 import { EnrichedPointType } from "Types";
 import { useOpenTable } from "hooks/zustand/ui";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/Common/Wizard/wizardButtonBarClass";
 import { buildCreatePointPayload } from "Components/Voorbereiding/EnrichedAddPoint/helpers/buildCreatePointPayload";
 
 export default function Buttons({

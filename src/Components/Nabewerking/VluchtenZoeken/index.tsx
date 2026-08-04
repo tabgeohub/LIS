@@ -1,7 +1,7 @@
 import Step1 from "./Steps/Step1";
 import Step2 from "./Steps/Step2";
 import PeriodFilter from "Components/HomePage/Body/Left/Common/PeriodFilter";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 
 export default function VluchtenZoeken() {
   const { openFilter, step } = useFinishedPlansState();

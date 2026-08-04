@@ -1,17 +1,17 @@
 import { useAuth } from "hooks/zustand/ui";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { useCreateData } from "api-hooks/mutations";
 import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
 import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features";
 import { buildReuseFlightPlanPointIds } from "./helpers/buildReusePlanPointIds";
 import { assembleFlightPlanCreateAttributes } from "Components/HomePage/hooks/flightPlan/assembleFlightPlanCreateAttributes";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 
 export default function Buttons() {
   const store = useReuseFlightPlan();

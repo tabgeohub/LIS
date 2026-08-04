@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { usePointsStore } from "hooks/features";
 import { useDeleteData } from "api-hooks/mutations";
 import ConfirmationModal from "./ConfirmationModal";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import { runMultiPointDelete } from "./runMultiPointDelete";
 
 export default function Buttons() {

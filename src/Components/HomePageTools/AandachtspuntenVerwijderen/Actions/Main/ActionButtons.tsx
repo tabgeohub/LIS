@@ -1,6 +1,6 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
-import { useDeletePointState } from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { EnrichedPointType } from "Types";
 
 export default function ActionButtons({ point }: { point: EnrichedPointType }) {

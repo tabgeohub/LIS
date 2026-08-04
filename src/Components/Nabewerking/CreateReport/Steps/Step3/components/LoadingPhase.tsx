@@ -1,6 +1,6 @@
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 import { useContent } from "hooks/useContent";
-import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/Nabewerking/CreateReport/state/useCreateReportState";
 
 interface LoadingPhaseProps {
   zippingStatus: string;

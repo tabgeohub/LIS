@@ -1,4 +1,4 @@
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import WizardHerhalenSelectButtons from "Components/HomePage/Body/Left/Common/WizardHerhalenSelectButtons";
 import { useHerhalenSelectionHandlers } from "Components/HomePage/hooks/points/useHerhalenSelectionHandlers";
 

@@ -1,7 +1,7 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
-import CheckBoxComp from "Components/HomePage/Body/Left/Common/FormComponents/CheckBoxComp";
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
+import CheckBoxComp from "Components/Common/FormComponents/CheckBoxComp";
+import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
 import { ReactNode } from "react";
 import type {

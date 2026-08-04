@@ -1,4 +1,4 @@
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 
 export function ReadOnlyPointFields({ values, labels }: { values: any; labels: any }) {
   return <>

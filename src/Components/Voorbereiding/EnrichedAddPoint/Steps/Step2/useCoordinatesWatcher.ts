@@ -1,7 +1,7 @@
 import { applyCoordinateSyncPatchToSetters } from "@helpers/geo/applyCoordinateSyncPatchToSetters";
 import { useCoordinateSystemSync } from "Components/HomePage/hooks/editPoint/useCoordinateSystemSync";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import { pickEnrichedCoordinateControls } from "hooks/zustand/pickEnrichedCoordinateControls";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/EnrichedAddPoint/state/pickEnrichedCoordinateControls";
 
 export default function useCoordinatesWatcher() {
   const coords = pickEnrichedCoordinateControls(useEnrichedPointState());

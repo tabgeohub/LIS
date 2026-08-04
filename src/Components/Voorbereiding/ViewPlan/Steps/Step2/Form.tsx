@@ -1,9 +1,9 @@
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import { useAuth } from "hooks/zustand/ui";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
-} from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+} from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
 import { useFlightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/useFlightPlanStandardSelectProps";
 
 export default function Form({

@@ -1,6 +1,6 @@
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import { vluchtnummerRegex } from "@constants/vluchtnummerRegex";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { useVluchtnummerExists } from "api-hooks/flightPlans";
 
 export default function Vluchtnummer() {

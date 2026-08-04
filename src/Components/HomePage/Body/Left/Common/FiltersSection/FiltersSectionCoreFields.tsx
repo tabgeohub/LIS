@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import { useFilterState } from "hooks/zustand/ui";
 import { FilterInput } from "./FilterInput";
 import FilterSelect from "./FilterSelect";

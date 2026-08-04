@@ -4,7 +4,7 @@ import { useOpenTable } from "hooks/zustand/ui";
 import { useOpenAllTable } from "hooks/zustand/ui";
 import { useMapViewState } from "hooks/zustand/ui";
 import { usePathPointState } from "hooks/zustand/ui";
-import useFeatureLayerLabels from "Components/HomePage/hooks/hover-click-handlers/useFeatureLayerLabels";
+import useFeatureLayerLabels from "hooks/hover-click/useFeatureLayerLabels";
 import { useMapViewBottomPanel } from "./useMapViewBottomPanel";
 
 export type MapViewCompProps = {

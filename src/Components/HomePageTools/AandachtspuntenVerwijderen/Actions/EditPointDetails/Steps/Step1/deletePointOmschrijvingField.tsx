@@ -1,4 +1,4 @@
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
+import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 import type { useDeletePointStep1FormModel } from "./useDeletePointStep1FormModel";
 
 type Model = ReturnType<typeof useDeletePointStep1FormModel>;

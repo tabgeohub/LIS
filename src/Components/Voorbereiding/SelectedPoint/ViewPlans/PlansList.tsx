@@ -1,6 +1,6 @@
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
-import FlightPlanPickerList from "Components/HomePage/Body/Common/EditPoint/FlightPlanPickerList";
+import FlightPlanPickerList from "Components/Common/EditPoint/FlightPlanPickerList";
 import useLogAction from "hooks/useLogAction";
 import { FlightPlanType } from "Types";
 

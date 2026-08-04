@@ -1,4 +1,4 @@
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { useEffect, useMemo, useState } from "react";
 import { FlightPlanType } from "Types";
 import { FlightPlanPickerRow } from "./FlightPlanPickerRow";

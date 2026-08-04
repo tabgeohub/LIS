@@ -4,7 +4,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import MapView from "@arcgis/core/views/MapView";
-import { classNames } from "Components/HomePage/helpers/dom/classNames";
+import { classNames } from "helpers/dom/classNames";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { destroySketchViewModel } from "../helpers/resetSketchSession";
 import {

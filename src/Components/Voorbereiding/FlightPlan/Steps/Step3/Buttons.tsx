@@ -1,17 +1,17 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
 import { useCreateData } from "api-hooks/mutations";
-import { useCancelCreateFlightPlan } from "Components/HomePage/hooks/handleCancel/useCancelCreateFlightPlan";
+import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
 import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features";
 import { submitCollectedFlightPlanCreate } from "Components/HomePage/hooks/flightPlan/submitCollectedFlightPlanCreate";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 
 function mergeIdLists(...lists: Array<unknown>): number[] {
   return lists.flatMap((list) => (Array.isArray(list) ? list : []));

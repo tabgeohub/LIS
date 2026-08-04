@@ -1,4 +1,4 @@
-import Modal from "Components/HomePage/Body/Common/Modal";
+import Modal from "Components/Common/Modal";
 import { useState } from "react";
 import Step1 from "./Steps/Step1";
 import { useMapViewState } from "hooks/zustand/ui";

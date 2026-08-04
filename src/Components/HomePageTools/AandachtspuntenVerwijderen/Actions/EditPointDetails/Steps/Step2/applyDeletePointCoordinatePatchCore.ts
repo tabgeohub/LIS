@@ -4,7 +4,7 @@ import {
   pickDeletePointCoordinateFields,
   type DeletePointCoordinateFields,
   useDeletePointState,
-} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 
 function toCoordinateSetters(state: DeletePointCoordinateFields) {
   return {

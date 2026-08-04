@@ -1,6 +1,6 @@
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/AandachtspuntDetailsFields";
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import AandachtspuntDetailsFields from "Components/Common/AandachtspuntDetailsFields";
+import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 
 export default function Form() {
   const pointState = useEnrichedPointState();

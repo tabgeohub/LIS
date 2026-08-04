@@ -1,4 +1,4 @@
-import Modal from "Components/HomePage/Body/Common/Modal";
+import Modal from "Components/Common/Modal";
 import Loading from "./Loading";
 import { EmailType } from "Types";
 import { useDeleteData } from "api-hooks/mutations";

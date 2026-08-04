@@ -18,7 +18,7 @@ import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import {
   downloadCsvFromRows,
   downloadEnrichedPointsShapefile,

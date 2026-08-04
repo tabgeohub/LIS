@@ -1,5 +1,5 @@
 import { FinishedFlightPlanType } from "Types/finished_plans";
-import { useCreateReportState } from "Components/HomePage/hooks/zustand/nabewerking/useCreateReportState";
+import { useCreateReportState } from "Components/Nabewerking/CreateReport/state/useCreateReportState";
 import { useBindFilteredSortedPlans } from "Components/HomePage/hooks/filters/useFilteredSortedPlans";
 
 /** Bind CreateReport period/filter store to shared filtered-sorted plans helper. */

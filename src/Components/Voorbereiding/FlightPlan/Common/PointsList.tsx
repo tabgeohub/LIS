@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { WizardPointsListSelectionProps } from "Components/HomePage/Body/Left/Common/wizardPointsListSelectionProps";
 import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
-import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
+import usePointClick from "hooks/hover-click/usePointClick";
 import { useEffect } from "react";
 import useLogAction from "hooks/useLogAction";
 import { getPointsSelectionStep } from "Components/HomePage/hooks/points/pointsSelectionLog";

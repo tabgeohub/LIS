@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { EnrichedPointType } from "Types";
 import useLogAction from "hooks/useLogAction";
-import usePointListMapActions from "Components/HomePage/hooks/hover-click-handlers/usePointListMapActions";
+import usePointListMapActions from "hooks/hover-click/usePointListMapActions";
 
 export function useResultTabStarredPointActions() {
   const logAction = useLogAction();

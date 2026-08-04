@@ -3,7 +3,7 @@ import { useOpeSideBarState } from "hooks/zustand/ui";
 import { usePopUpState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useStarredAll } from "hooks/zustand/ui";
-import usePointListMapActions from "Components/HomePage/hooks/hover-click-handlers/usePointListMapActions";
+import usePointListMapActions from "hooks/hover-click/usePointListMapActions";
 import { useRef, useState } from "react";
 import { EnrichedPointType } from "Types";
 import Header from "./Header";

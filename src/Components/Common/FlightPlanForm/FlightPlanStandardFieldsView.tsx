@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
-import { InputCompNum } from "Components/HomePage/Body/Left/Common/FormComponents/InputCompNum";
-import SelectComp from "Components/HomePage/Body/Left/Common/FormComponents/SelectComp";
-import TextAreaComp from "Components/HomePage/Body/Left/Common/FormComponents/TextAreaComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
+import { InputCompNum } from "Components/Common/FormComponents/InputCompNum";
+import SelectComp from "Components/Common/FormComponents/SelectComp";
+import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 import {
   FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,

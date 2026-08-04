@@ -1,8 +1,8 @@
 import { useTabState } from "hooks/zustand/ui";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useDeleteFlightPlan } from "hooks/zustand/useDeleteFlightPlan";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import { useDeleteFlightPlan } from "Components/Voorbereiding/RemoveFlightPlan/useDeleteFlightPlan";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 export default function Buttons() {
   const { withLog, labels } = useWizardButtons("Remove flight plan");

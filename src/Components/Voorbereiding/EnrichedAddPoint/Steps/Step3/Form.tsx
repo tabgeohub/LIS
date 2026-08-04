@@ -1,5 +1,5 @@
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import AandachtspuntDetailsFields from "Components/HomePage/Body/Left/Common/AandachtspuntDetailsFields";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import AandachtspuntDetailsFields from "Components/Common/AandachtspuntDetailsFields";
 import Omschrijving from "./Omschrijving";
 
 export default function Form() {

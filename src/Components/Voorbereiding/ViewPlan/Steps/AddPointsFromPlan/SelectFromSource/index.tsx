@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useAuth } from "hooks/zustand/ui";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { filterPointsNotInPlan } from "./helpers/mapSourceItems";
 import { useSelectFromSourceMapEffects } from "./useSelectFromSourceMapEffects";
 import { useSelectFromSourceData } from "./useSelectFromSourceData";
@@ -8,7 +8,7 @@ import SelectFromSourceButtons from "./SelectFromSourceButtons";
 import PlansList from "./PlansList";
 import PointsList from "./PointsList";
 import { useUpdateData } from "api-hooks/mutations";
-import WizardLoadingOverlay from "Components/HomePage/Body/Common/Wizard/WizardLoadingOverlay";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import { usePointsStore } from "hooks/features";
 
 type Source = "flightPlans" | "templates";

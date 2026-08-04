@@ -1,4 +1,4 @@
-import { useConstSelectOptions } from "Components/HomePage/hooks/consts/useConstSelectOptions";
+import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
 import CompactPointItem from "./CompactPointItem";
 import DefaultPointItem from "./DefaultPointItem";
 import { countPointAttachments, PointItemPoint } from "./pointItemTypes";

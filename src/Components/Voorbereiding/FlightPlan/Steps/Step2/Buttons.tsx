@@ -1,9 +1,9 @@
 import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
-import { useFlightPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useFlightPlanState";
+import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useHandleCancel } from "Components/HomePage/hooks/handleCancel/useHandleCancel";
-import { useResetFeatures } from "Components/HomePage/hooks/features/useResetFeatures";
-import { runWizardCleanup } from "Components/HomePage/hooks/wizard/useWizardCleanup";
+import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
+import { useResetFeatures } from "hooks/features/useResetFeatures";
+import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 import { FilterStepWizardButtons } from "../../../common/FilterStepWizardButtons";
 import { useWizardFilterStep2Buttons } from "../../../common/useWizardFilterStep2Buttons";
 

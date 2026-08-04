@@ -1,11 +1,11 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/Common/Wizard/wizardButtonBarClass";
 import { buildCreatePointPayload } from "Components/Voorbereiding/EnrichedAddPoint/helpers/buildCreatePointPayload";
-import { useFetchInitialFeatures } from "Components/HomePage/hooks/features/useFetchInitialFeatures";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useFetchInitialFeatures } from "hooks/features/useFetchInitialFeatures";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { useCreateData } from "api-hooks/mutations";
 
 export default function Buttons({ handleCancel }: { handleCancel: () => void }) {

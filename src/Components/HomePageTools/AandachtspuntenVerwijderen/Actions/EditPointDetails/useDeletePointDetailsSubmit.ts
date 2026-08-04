@@ -1,7 +1,7 @@
 import {
   pickDeletePointFormFields,
   useDeletePointState,
-} from "Components/HomePage/hooks/zustand/tools/useDeletePointState";
+} from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import { usePointsStore } from "hooks/features";
 import { useUpdateData } from "api-hooks/mutations";
 import { useMapViewState } from "hooks/zustand/ui";

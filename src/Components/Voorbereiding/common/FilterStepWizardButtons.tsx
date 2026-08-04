@@ -1,4 +1,4 @@
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 
 type WizardLabels = {
   vorige: string;

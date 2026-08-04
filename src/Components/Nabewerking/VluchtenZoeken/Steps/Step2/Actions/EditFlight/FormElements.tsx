@@ -1,11 +1,11 @@
-import InputComp from "Components/HomePage/Body/Left/Common/FormComponents/InputComp";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import { useContent } from "hooks/useContent";
 import { useGetFlightTimesDistance } from "Components/HomePage/hooks/map/useGetFlightTimesDistance";
 import { usePopulateFlightPlanFormEffect } from "Components/HomePage/hooks/flightPlan/usePopulateFlightPlanFormEffect";
-import { useFinishedPlansState } from "Components/HomePage/hooks/zustand/nabewerking/useFinishedPlansState";
+import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
-} from "Components/HomePage/Body/Left/Common/FlightPlanForm/FlightPlanStandardFields";
+} from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
 import { useFlightPlanFormSelectOptions } from "Components/HomePage/hooks/flightPlan/useFlightPlanFormSelectOptions";
 import { nabewerkingVluchtenZoekenFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanFormLabels";
 

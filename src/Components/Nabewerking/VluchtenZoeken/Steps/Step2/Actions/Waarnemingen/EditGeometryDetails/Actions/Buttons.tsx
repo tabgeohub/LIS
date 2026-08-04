@@ -1,7 +1,7 @@
 import { useContent } from "hooks/useContent";
 import { FinishedGeometryType } from "Types/finished_plans";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 import type { EditObservationButtonsProps } from "../../common/editObservationFormProps";
 
 export default function Buttons({

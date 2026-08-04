@@ -1,4 +1,4 @@
-import { useDrawingStore } from "hooks/zustand/useDrawingStore";
+import { useDrawingStore } from "Components/Voorbereiding/DrawingTool/useDrawingStore";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
 import { useCreateData } from "api-hooks/mutations";
@@ -13,9 +13,9 @@ import {
   resolveCombinedGeometryType,
 } from "../helpers/buildGeometryPointsFromDrawn";
 import { pickDrawingGeometryFormFields } from "../helpers/pickDrawingGeometryFormFields";
-import { useWizardButtons } from "Components/HomePage/hooks/wizard/useWizardButtons";
-import WizardButtonBar from "Components/HomePage/Body/Common/Wizard/WizardButtonBar";
-import { WIZARD_BUTTON_BAR_CLASS } from "Components/HomePage/Body/Common/Wizard/wizardButtonBarClass";
+import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
+import { WIZARD_BUTTON_BAR_CLASS } from "Components/Common/Wizard/wizardButtonBarClass";
 
 export default function Buttons() {
   const store = useDrawingStore();

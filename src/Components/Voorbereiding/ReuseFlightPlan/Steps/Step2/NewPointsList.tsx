@@ -1,9 +1,9 @@
 import createYellowBorder from "@helpers/ArcGISHelpers/createYellowBorder";
 import { useMapViewState } from "hooks/zustand/ui";
-import usePointClick from "Components/HomePage/hooks/hover-click-handlers/usePointClick";
+import usePointClick from "hooks/hover-click/usePointClick";
 import { useContent } from "hooks/useContent";
 import { usePointsStore } from "hooks/features";
-import { useReuseFlightPlan } from "hooks/zustand/useReuseFlightPlan";
+import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { useEffect } from "react";
 
 export default function NewPointsList() {

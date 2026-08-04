@@ -1,4 +1,4 @@
-import AddToPlanQuestionStep from "Components/HomePage/Body/Common/EditPoint/AddToPlanQuestionStep";
+import AddToPlanQuestionStep from "Components/Common/EditPoint/AddToPlanQuestionStep";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";

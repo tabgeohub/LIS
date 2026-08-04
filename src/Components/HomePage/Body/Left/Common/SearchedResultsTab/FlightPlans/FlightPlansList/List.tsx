@@ -12,7 +12,7 @@ import {
 import {
   clearHoveredFlightPlanFromOriginalMap,
   useHoverFlightPlanFromOriginalMap,
-} from "Components/HomePage/hooks/hover-click-handlers/planHoverClickHandlers";
+} from "hooks/hover-click/planHoverClickHandlers";
 
 export default function List({
   flightPlansData,

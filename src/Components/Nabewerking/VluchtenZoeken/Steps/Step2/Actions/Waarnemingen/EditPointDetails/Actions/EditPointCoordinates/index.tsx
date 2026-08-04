@@ -1,6 +1,6 @@
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { useContent } from "hooks/useContent";
-import LoadingBars from "Components/HomePage/Body/Common/LoadingBars";
+import LoadingBars from "Components/Common/LoadingBars";
 import { useEditPointCoordinates } from "./useEditPointCoordinates";
 import { EditPointCoordinatesButtons } from "./EditPointCoordinatesButtons";
 import { EditPointCoordinatesForm } from "./EditPointCoordinatesForm";

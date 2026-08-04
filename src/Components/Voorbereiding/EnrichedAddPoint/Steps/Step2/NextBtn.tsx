@@ -1,5 +1,5 @@
 import { useMapViewState } from "hooks/zustand/ui";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 import { usePointsStore } from "hooks/features";
 import React from "react";
 import useLogAction from "hooks/useLogAction";

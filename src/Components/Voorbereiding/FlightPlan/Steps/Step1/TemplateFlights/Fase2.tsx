@@ -5,7 +5,7 @@ import { LuWaypoints } from "react-icons/lu";
 import { TbPolygon, TbLine } from "react-icons/tb";
 import { FlightPlanTemplate } from ".";
 import { useMemo, useState } from "react";
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 
 export default function Fase2({
   setFase,

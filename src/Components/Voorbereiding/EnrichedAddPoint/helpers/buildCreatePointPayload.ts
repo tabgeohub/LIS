@@ -1,5 +1,5 @@
 import type { UserType } from "Types";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
 
 type EnrichedPointState = ReturnType<typeof useEnrichedPointState.getState>;
 

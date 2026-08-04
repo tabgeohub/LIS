@@ -1,6 +1,6 @@
 import { useAuth } from "hooks/zustand/ui";
 import { useRenderVluchtplans } from "Components/HomePage/hooks/map/useRenderVluchtPlans";
-import { useViewPlanState } from "Components/HomePage/hooks/zustand/voorbereiding/useViewPlanState";
+import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import { EMPTY_FLIGHT_PLANS } from "@constants/emptyFlightPlans";
 import { useFlightPlansList } from "api-hooks/flightPlans";
 import { useViewPlanFilteredPlans } from "./useViewPlanFilteredPlans";

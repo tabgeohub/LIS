@@ -11,7 +11,7 @@ import {
   addPlanStarGraphic,
   removePlanStarGraphics,
 } from "@helpers/ArcGISHelpers/planStarGraphics";
-import { useHoverFlightPlanFromOriginalMap } from "Components/HomePage/hooks/hover-click-handlers/planHoverClickHandlers";
+import { useHoverFlightPlanFromOriginalMap } from "hooks/hover-click/planHoverClickHandlers";
 import DraggableTableHeader from "../common/components/DraggableTableHeader";
 
 const allColumnsPlans = [

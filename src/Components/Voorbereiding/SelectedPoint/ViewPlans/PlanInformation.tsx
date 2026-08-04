@@ -1,4 +1,4 @@
-import { PlanInformationPanel } from "Components/HomePage/Body/Left/Common/PlanInformationPanel";
+import { PlanInformationPanel } from "Components/Common/PlanInformationPanel";
 import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
 import Images from "./Images";
 

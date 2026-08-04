@@ -1,4 +1,4 @@
-import ScrollButtonsLayout from "Components/HomePage/Body/Left/Common/ScrollButtonsLayout";
+import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import CurrentPointsList from "./CurrentPointsList";
 import CurrentGeometriesList from "./CurrentGeometriesList";

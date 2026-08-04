@@ -1,4 +1,4 @@
-import type { EditPointMapStepProps } from "Components/HomePage/Body/Common/EditPoint/EditPointMapStepProps";
+import type { EditPointMapStepProps } from "Components/Common/EditPoint/EditPointMapStepProps";
 import useLogAction from "hooks/useLogAction";
 
 export function buildEditPointStep2Sub1Handlers(input: {

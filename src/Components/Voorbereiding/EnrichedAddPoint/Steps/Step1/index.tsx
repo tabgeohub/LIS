@@ -2,8 +2,8 @@ import { useState } from "react";
 import { CiWarning } from "react-icons/ci";
 
 import SearchWidget from "Components/Voorbereiding/EnrichedAddPoint/Common/SearchWidget";
-import { useEnrichedPointState } from "hooks/zustand/useEnrichedPointState";
-import CancelModal from "Components/HomePage/Body/Common/CancelModal";
+import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";
+import CancelModal from "Components/Common/CancelModal";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 
