@@ -78,6 +78,12 @@ RUN npm ci --omit=dev
 COPY --from=build /usr/src/app/dist ./dist
 COPY .env ./
 
+# Run as non-root
+RUN groupadd --system appgroup \
+ && useradd --system --gid appgroup --create-home --home-dir /home/appuser appuser \
+ && chown -R appuser:appgroup /usr/src/app
+USER appuser
+
 # Adjust if your app listens on another port
 EXPOSE 80
 
