@@ -1,12 +1,11 @@
-import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
+import { getBackEndUrl } from "./getBackEndUrl";
 import {
   configureArcgisProxy,
   fetchArcgisToken,
   registerArcgisToken,
-} from "./arcgisTokenRegistration";
+} from "../auth/arcgisTokenRegistration";
 
-/** Refresh ArcGIS proxy + credential token from the backend. */
-export async function refreshArcgisToken() {
+export async function refreshToken() {
   const backendUrl = getBackEndUrl();
   configureArcgisProxy(`${backendUrl}/api/arcgis/proxy`);
   registerArcgisToken(await fetchArcgisToken(`${backendUrl}/api/arcgis/token`));

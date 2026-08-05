@@ -4,6 +4,8 @@ export {
   usePrepreparedFlightPlans,
   useFullPreparedFlightPlans,
 } from "./useRegionalFlightPlanQueries";
-export { useVluchtnummerExists } from "./useVluchtnummerExists";
-export { useSearchedFlightPlans } from "./useSearchedFlightPlans";
-export { usePointFlightPlans } from "./usePointFlightPlans";
+export {
+  useVluchtnummerExists,
+  useSearchedFlightPlans,
+  usePointFlightPlans,
+} from "./useFlightPlanLookupQueries";

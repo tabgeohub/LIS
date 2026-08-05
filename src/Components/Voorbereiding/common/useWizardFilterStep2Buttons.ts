@@ -1,5 +1,5 @@
 import { useFilterStepWizardSelection } from "./useFilterStepWizardSelection";
-import type { WizardSelectionGraphics } from "./wizardSelectionGraphicsTypes";
+import type { WizardSelectionGraphics } from "./wizardFilterStepSelection";
 import { buildWizardStep2Selection } from "./buildWizardStep2Selection";
 
 export { buildWizardStep2Selection } from "./buildWizardStep2Selection";

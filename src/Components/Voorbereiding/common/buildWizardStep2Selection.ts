@@ -1,4 +1,4 @@
-import type { WizardSelectionGraphics } from "./wizardSelectionGraphicsTypes";
+import type { WizardSelectionGraphics } from "./wizardFilterStepSelection";
 
 type WizardStep2SelectionStore = {
   selectedGraphics: __esri.Graphic[];

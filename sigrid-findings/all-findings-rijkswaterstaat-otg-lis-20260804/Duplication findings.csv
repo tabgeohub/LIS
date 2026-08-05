@@ -1,3 +1,0 @@
-Description,Severity,Status,First Seen,Issue age,Lines of code,Redundant lines of code,Occurrences,Same file,Same component,Technology,Locations
-9 lines occurring 2 times,HIGH,RAW,2026-07-28,7,9,9,2,true,true,TypeScript,"backend/src/helpers/repositories/flightPlansRepo.ts#L192:201,backend/src/helpers/repositories/flightPlansRepo.ts#L216:225"
-6 lines occurring 2 times,HIGH,RAW,2026-07-28,7,6,6,2,true,true,TypeScript,"backend/scripts/verifyRegioPointsGeometries.ts#L20:25,backend/scripts/verifyRegioPointsGeometries.ts#L55:60"

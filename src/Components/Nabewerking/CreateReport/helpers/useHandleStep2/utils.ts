@@ -1,11 +1,11 @@
-import { refreshArcgisToken } from "@helpers/auth/refreshArcgisToken";
+import { refreshToken } from "@helpers/http/refreshToken";
 
 const AUTH_RETRY_STATUSES = new Set([401, 498]);
 
 async function refreshAuthIfNeeded(status: number): Promise<void> {
   if (!AUTH_RETRY_STATUSES.has(status)) return;
   try {
-    await refreshArcgisToken();
+    await refreshToken();
   } catch {
     // ignore refresh failures; caller will retry or throw
   }
