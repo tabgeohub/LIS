@@ -1,5 +1,5 @@
 import { useContent } from "hooks/useContent";
-import { useFilterPlans } from "Components/HomePage/hooks/filters/useFilterPlans";
+import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import type { PeriodFilterSetters, PeriodFilterValues } from "hooks/zustand/shared/periodFilterState";
 import type { PlanListFilterSetters, PlanListFilterValues } from "hooks/zustand/shared/flightPlanFormFields";
 

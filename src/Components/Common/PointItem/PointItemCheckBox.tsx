@@ -20,8 +20,11 @@ type SelectOption = { value: unknown; label: string };
 function resolveOptionLabel(
   options: SelectOption[],
   value: unknown
-): unknown {
-  return options.find((item) => item.value === value)?.label || value;
+): string {
+  const label = options.find((item) => item.value === value)?.label;
+  if (typeof label === "string") return label;
+  if (value == null) return "";
+  return String(value);
 }
 
 export default function PointItemCheckBox({

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { useFilterPlans } from "Components/HomePage/hooks/filters/useFilterPlans";
+import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import { useChangePlanStatusState } from "Components/Nabewerking/ChangeFlightPlanStatus/useChangePlanStatusState";
 import type { FlightPlanType } from "Types";
 

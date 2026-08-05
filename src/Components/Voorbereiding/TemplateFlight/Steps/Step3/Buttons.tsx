@@ -1,5 +1,5 @@
 import { useMapViewState } from "hooks/zustand/ui";
-import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
+import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useCreateData } from "api-hooks/mutations";
 import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
 import { useTemplateFlightState } from "../../templateFlightStates";

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { EnrichedPointType } from "Types";
-import { sortPointsWithSelectionOrder } from "Components/HomePage/hooks/points/sortPointsWithSelectionOrder";
+import { sortPointsWithSelectionOrder } from "helpers/points/sortPointsWithSelectionOrder";
 
 export function useSortedPointSelection(
   points: EnrichedPointType[],

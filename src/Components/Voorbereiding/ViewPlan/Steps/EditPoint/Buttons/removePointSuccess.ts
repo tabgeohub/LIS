@@ -5,7 +5,7 @@ import type { FlightPlanType } from "Types";
 import {
   mergeFlightPlanPersistenceFields,
   pickFlightPlanPersistenceFields,
-} from "Components/HomePage/hooks/flightPlan/pickFlightPlanPersistenceFields";
+} from "helpers/plans/pickFlightPlanPersistenceFields";
 
 export function buildRemainingPlanPointGraphics(
   points: FlightPlanType["points"]

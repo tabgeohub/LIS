@@ -1,9 +1,9 @@
 import { InputCompNum } from "Components/Common/FormComponents/InputCompNum";
 import SelectComp from "Components/Common/FormComponents/SelectComp";
-import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Common/editPointStep2Sub2Props";
+import type { EditPointStep2Sub2Props } from "Components/Common/EditPoint/editPointStep2Sub2Props";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { useCoordinateSystemSync } from "Components/HomePage/hooks/editPoint/useCoordinateSystemSync";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import {
   pickDeletePointCoordinateFields,
   useDeletePointState,

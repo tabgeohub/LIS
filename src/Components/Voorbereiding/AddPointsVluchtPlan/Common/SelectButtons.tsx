@@ -1,5 +1,5 @@
 import { useAddPointStates } from "Components/Voorbereiding/AddPointsVluchtPlan/useAddPointStates";
-import WizardHerhalenSelectButtons from "Components/HomePage/Body/Left/Common/WizardHerhalenSelectButtons";
+import WizardHerhalenSelectButtons from "Components/Common/WizardHerhalenSelectButtons";
 import { useHerhalenSelectionHandlers } from "Components/HomePage/hooks/points/useHerhalenSelectionHandlers";
 
 export default function SelectButtons({

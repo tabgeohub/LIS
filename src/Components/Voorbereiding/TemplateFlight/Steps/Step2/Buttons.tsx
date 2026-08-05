@@ -1,4 +1,4 @@
-import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
+import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useTemplateFlightState } from "../../templateFlightStates";

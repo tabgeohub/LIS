@@ -5,7 +5,7 @@ import { useChangePlanStatusState } from "Components/Nabewerking/ChangeFlightPla
 import { FlightPlanType } from "Types";
 import FlightPlanSummary from "Components/Common/FlightPlanSummary";
 import FlightPlanClickableRow from "Components/Common/FlightPlanClickableRow";
-import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";
+import { logFlightPlanRowClick } from "Components/Common/logFlightPlanRowClick";
 
 export default function SinglePlan({ plan }: { plan: FlightPlanType }) {
   const logAction = useLogAction();

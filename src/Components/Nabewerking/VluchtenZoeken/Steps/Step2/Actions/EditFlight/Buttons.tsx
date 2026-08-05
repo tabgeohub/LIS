@@ -10,7 +10,7 @@ import { pickFlightPlanFormValues } from "Components/HomePage/hooks/flightPlan/p
 import {
   mergeFlightPlanPersistenceFields,
   pickFlightPlanPersistenceFields,
-} from "Components/HomePage/hooks/flightPlan/pickFlightPlanPersistenceFields";
+} from "helpers/plans/pickFlightPlanPersistenceFields";
 
 export default function Buttons({
   setAction,

@@ -1,5 +1,5 @@
 import { PlanInformationPanel } from "Components/Common/PlanInformationPanel";
-import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
+import type { PlanInformationProps } from "Components/Common/planInformationProps";
 import Images from "./Images";
 
 export default function PlanInformation(props: PlanInformationProps) {

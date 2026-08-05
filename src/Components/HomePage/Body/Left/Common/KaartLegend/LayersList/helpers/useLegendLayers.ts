@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useAuth } from "hooks/zustand/ui";
-import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
+import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useMemo, useState } from "react";
 import { LegendLayerDefinition } from "./layerTypes";
 import { useHandleLayerChange } from "./useHandleLayerChange";

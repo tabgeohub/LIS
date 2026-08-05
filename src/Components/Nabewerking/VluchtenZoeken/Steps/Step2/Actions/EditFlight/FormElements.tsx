@@ -6,7 +6,7 @@ import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/use
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanFormSelectOptions } from "Components/HomePage/hooks/flightPlan/useFlightPlanFormSelectOptions";
+import { useFlightPlanFormSelectOptions } from "Components/Common/FlightPlanForm/useFlightPlanFormSelectOptions";
 import { nabewerkingVluchtenZoekenFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanFormLabels";
 
 export default function FormElements() {

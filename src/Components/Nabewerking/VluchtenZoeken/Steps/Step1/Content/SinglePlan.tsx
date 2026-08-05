@@ -5,7 +5,7 @@ import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlanMapHighlight } from "hooks/hover-click/useFinishedPlanMapHighlight";
 import FlightPlanSummary from "Components/Common/FlightPlanSummary";
 import FlightPlanClickableRow from "Components/Common/FlightPlanClickableRow";
-import { logFlightPlanRowClick } from "Components/HomePage/Body/Left/Common/logFlightPlanRowClick";
+import { logFlightPlanRowClick } from "Components/Common/logFlightPlanRowClick";
 
 export default function SinglePlan({ plan }: { plan: FinishedFlightPlanType }) {
   const { selectedPlan, setSelectedPlan } = useFinishedPlansState();

@@ -1,10 +1,10 @@
 import { useFormikContext } from "formik";
 import InputFormik from "Components/Voorbereiding/SelectedPoint/Common/InputFormik";
 import SelectFormik from "Components/Voorbereiding/SelectedPoint/Common/SelectFormik";
-import type { EditPointStep2Sub2Props } from "Components/HomePage/Body/Left/Common/editPointStep2Sub2Props";
+import type { EditPointStep2Sub2Props } from "Components/Common/EditPoint/editPointStep2Sub2Props";
 import { SpatialReference } from "Types";
 import useLogAction from "hooks/useLogAction";
-import { useCoordinateSystemSync } from "Components/HomePage/hooks/editPoint/useCoordinateSystemSync";
+import { useCoordinateSystemSync } from "hooks/editPoint/useCoordinateSystemSync";
 import {
   coordinateSystemChangeLogMessage,
   nextValuesAfterCoordinatePatch,

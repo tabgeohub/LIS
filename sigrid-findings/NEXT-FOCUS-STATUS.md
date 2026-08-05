@@ -33,13 +33,20 @@ LOC now: HomePage ~20k, Voorbereiding ~12.5k, Nabewerking ~7.9k, HomePageTools ~
 | Intentional hubs / large repos | keep ACCEPTED |
 | Independence `*Core` interface modules | **do not rewrite**; Accept if needed — no new façades |
 
+## Done — yellow Adjacency + Freshness wave (2026-08-05)
+
+- Broke **Common → HomePage** inversions (PlanInformation, PointItem, ImageGallery, flightPlan select props, selection hooks)
+- Cut EditPointDetails inbound leaves → `helpers/points`, `hooks/editPoint`, `Common/EditPoint`
+- Evacuated shared UI/stores → `Components/Common`, `src/hooks/filters`, `src/hooks/kaartlagen`, `helpers/plans`
+- Added [`sigrid.yaml`](../sigrid.yaml) Utility roles for intentional hubs
+- Freshness: `auth2`/`devices-updates`/`emails` OpenAPI docs, AllRoles split helper, DevicesUpdates errors, Emailijst InputComp, Exporter→`base64ToBlob`
+
 ## Next Architecture wave (ordered)
 
 1. **No more HomePage stuffing / mega-moves**
-2. After deploy+rescan: export Architecture summary + adjacency + coupling (must include Voorbereiding / Nabewerking / HomePageTools rows)
-3. Reduce **HomePage → feature** surface only via composition at `Left/index` (already OK); avoid feature→feature edges
-4. Move **shared wizard/UI leaves** that many features import from HomePage into `Components/Common` or `src/hooks` **only when** they remove a HIGH/MEDIUM density edge — measure first
-5. Do **not** grind Unit size / more SQL / Dockerfile / Independence Core games
+2. Deploy + rescan; confirm Adjacency / Freshness move toward 4★
+3. Reduce remaining feature→HomePage edges only when they cut density (measure first)
+4. Do **not** grind Unit size / more SQL / Dockerfile / Independence Core games
 
 ## Success criteria
 

@@ -29,3 +29,13 @@ export function filterUnwantedRoleNames(roles: string[]): string[] {
 export function filterRealmRoles(roles: AvailableRole[]): AvailableRole[] {
   return roles.filter((role) => !isUnwantedRole(role.name));
 }
+
+/** Split assignable realm roles into EXT (external) vs internal for dashboard views. */
+export function splitExternalInternalRoles(roles: AvailableRole[]): {
+  externalRoles: AvailableRole[];
+  internalRoles: AvailableRole[];
+} {
+  const externalRoles = roles.filter((role) => role.name.includes("EXT"));
+  const internalRoles = roles.filter((role) => !role.name.includes("EXT"));
+  return { externalRoles, internalRoles };
+}
