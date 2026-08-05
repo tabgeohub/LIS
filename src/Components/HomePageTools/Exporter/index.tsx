@@ -44,7 +44,10 @@ export default function Exporter({
     if (blob) {
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-      saveAs(blob, value === "PDF" ? "map-export.pdf" : `map-export.${value}`);
+      saveAs(
+        blob,
+        value.toLowerCase() === "pdf" ? "map-export.pdf" : `map-export.${value}`
+      );
     } else {
       console.error("No data available to download.");
     }

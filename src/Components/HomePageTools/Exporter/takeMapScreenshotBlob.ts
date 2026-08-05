@@ -26,7 +26,7 @@ export async function takeMapScreenshotBlob(
     width: mapView.width * scale,
     height: mapView.height * scale,
   });
-  if (value === "PDF") {
+  if (value.toLowerCase() === "pdf") {
     return screenshotDataUrlToPdfBlob(screenshot.dataUrl);
   }
   return base64ToBlob(screenshot.dataUrl);

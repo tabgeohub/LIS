@@ -1,7 +1,7 @@
 import Modal from "Components/Common/Modal";
+import ConfirmModalChrome from "Components/Common/ConfirmModalChrome";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
-import { IoMdClose } from "react-icons/io";
 import { FlightPlanType } from "Types";
 
 export default function CongfirmationModal({
@@ -17,6 +17,7 @@ export default function CongfirmationModal({
 }) {
   const logAction = useLogAction();
   const content = useContent();
+  const modal = content.voorbereiding.vluchtplanVoorbereiding.confirmModal;
 
   return (
     <Modal
@@ -24,39 +25,15 @@ export default function CongfirmationModal({
       isOpen={openModal}
       setIsOpen={setOpenModal}
     >
-      <div>
-        <div className="flex justify-between items-center px-2 py-2">
-          <p></p>
-
-          <p className="text-gray-500 text-[16px]">
-            {content.voorbereiding.vluchtplanVoorbereiding.confirmModal.title}
-          </p>
-
-          <button onClick={() => setOpenModal(false)}>
-            <IoMdClose className="text-gray-500 text-lg" />
-          </button>
-        </div>
-
-        <div className="w-full h-0.5 bg-gray-300" />
-
-        <div className="py-2 px-3">
-          <p className="text-[14px] text-gray-700">
-            {
-              content.voorbereiding.vluchtplanVoorbereiding.confirmModal
-                .messageP1
-            }{" "}
-            <strong>{selectedPlan?.vluchtnummer}</strong>{" "}
-            {
-              content.voorbereiding.vluchtplanVoorbereiding.confirmModal
-                .messageP2
-            }
-          </p>
-
-          <div className="flex justify-end mt-6 gap-x-2">
+      <ConfirmModalChrome
+        title={modal.title}
+        onClose={() => setOpenModal(false)}
+        actions={
+          <>
             <button
+              type="button"
               onClick={() => {
                 handleConfirm();
-
                 logAction({
                   message:
                     "User clicked 'Confirm' button to prepare the flight plan",
@@ -65,10 +42,10 @@ export default function CongfirmationModal({
               }}
               className="gray-button"
             >
-              {content.voorbereiding.vluchtplanVoorbereiding.confirmModal.ok}
+              {modal.ok}
             </button>
-
             <button
+              type="button"
               onClick={() => {
                 setOpenModal(false);
                 logAction({
@@ -78,14 +55,16 @@ export default function CongfirmationModal({
               }}
               className="gray-button"
             >
-              {
-                content.voorbereiding.vluchtplanVoorbereiding.confirmModal
-                  .annuleren
-              }
+              {modal.annuleren}
             </button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      >
+        <p className="text-[14px] text-gray-700">
+          {modal.messageP1} <strong>{selectedPlan?.vluchtnummer}</strong>{" "}
+          {modal.messageP2}
+        </p>
+      </ConfirmModalChrome>
     </Modal>
   );
 }

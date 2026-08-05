@@ -23,11 +23,14 @@ import templateFlightsRouter from "../routes/template_plans";
 import timesliderRouter from "../routes/timeslider";
 import usersRouter from "../routes/users";
 
+/** Mount HTTP routes. OpenAPI coverage lives in `backend/src/docs/*.docs.ts`. */
 export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use(legacyAuthUsageMonitor);
+  // Public / auth entrypoints
   app.use("/", main);
   app.use("/auth", authKeycloak);
   app.use("/auth2", auth2Router);
+  // Session-protected APIs
   app.use("/api/keycloak", requireSessionAuth, keycloakRouter);
   app.use("/api/auth", requireSessionAuth, authRouter);
   app.use("/api/users", requireSessionAuth, usersRouter);

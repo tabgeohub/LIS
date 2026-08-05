@@ -2,19 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import { useAuth } from "hooks/zustand/ui";
 import type { InstallerMeta } from "Types/installer";
+import { formatBytes } from "helpers/format/formatBytes";
 import {
   deleteLatestInstaller,
   fetchLatestInstaller,
   uploadInstaller,
 } from "./installersApi";
-
-function formatSize(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  const exp = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-  const size = bytes / Math.pow(1024, exp);
-  return `${size.toFixed(size >= 10 || exp === 0 ? 0 : 1)} ${units[exp]}`;
-}
 
 export default function InstallationsPage() {
   const { user } = useAuth();
@@ -116,7 +109,8 @@ export default function InstallationsPage() {
                 <span className="font-medium">Version:</span> {installer.version || "Not set"}
               </p>
               <p>
-                <span className="font-medium">Size:</span> {formatSize(installer.size)}
+                <span className="font-medium">Size:</span>{" "}
+                {formatBytes(installer.size)}
               </p>
               <p>
                 <span className="font-medium">Uploaded:</span>{" "}

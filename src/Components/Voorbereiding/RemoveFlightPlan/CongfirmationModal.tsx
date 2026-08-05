@@ -1,9 +1,9 @@
-import LoadingBars from "Components/Common/LoadingBars";
 import Modal from "Components/Common/Modal";
+import ConfirmModalChrome from "Components/Common/ConfirmModalChrome";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useDeleteFlightPlan } from "Components/Voorbereiding/RemoveFlightPlan/useDeleteFlightPlan";
-import { IoMdClose } from "react-icons/io";
 import { useDeleteData } from "api-hooks/mutations";
 
 export default function CongfirmationModal({
@@ -12,27 +12,25 @@ export default function CongfirmationModal({
   refetch: () => void;
 }) {
   const logAction = useLogAction();
-
   const { selectedPlan, setOpenDeleteModal, openDeleteModal } =
     useDeleteFlightPlan();
-
   const { deleteData, loading } = useDeleteData("/flightPlans");
+  const content = useContent();
+  const modal = content.voorbereiding.vluchtplanVerwijderen.comfirmModal;
 
   function handleDeletePlan() {
-    deleteData({ id: String(selectedPlan?.id), onSuccess: () => {
-      refetch();
-      setOpenDeleteModal(false);
-    },
-
+    deleteData({
+      id: String(selectedPlan?.id),
+      onSuccess: () => {
+        refetch();
+        setOpenDeleteModal(false);
+      },
     });
-
     logAction({
       message: `User clicked 'Delete' button to delete flight plan  : ${selectedPlan?.vluchtnummer}`,
       step: "Confirm modal",
     });
   }
-
-  const content = useContent();
 
   return (
     <Modal
@@ -40,37 +38,22 @@ export default function CongfirmationModal({
       isOpen={openDeleteModal}
       setIsOpen={setOpenDeleteModal}
     >
-      <div className="">
-        <div className="flex justify-between items-center px-2 py-2">
-          <p></p>
-
-          <p className="text-gray-500 text-[16px]">
-            {content.voorbereiding.vluchtplanVerwijderen.comfirmModal.header}
-          </p>
-
-          <button onClick={() => setOpenDeleteModal(false)}>
-            <IoMdClose className="text-gray-500 text-lg" />
-          </button>
-        </div>
-
-        <div className="w-full h-0.5 bg-gray-300" />
-
-        <div className="py-2 px-3">
-          <p className="text-[14px] text-gray-700">
-            {content.voorbereiding.vluchtplanVerwijderen.comfirmModal.messageP1}{" "}
-            <strong>{selectedPlan?.vluchtnummer}</strong>
-            {content.voorbereiding.vluchtplanVerwijderen.comfirmModal.messageP2}
-          </p>
-
-          <div className="flex justify-end mt-6 gap-x-2">
-            <button onClick={handleDeletePlan} className="gray-button">
+      <ConfirmModalChrome
+        title={modal.header}
+        onClose={() => setOpenDeleteModal(false)}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={handleDeletePlan}
+              className="gray-button"
+            >
               {content.common.ok}
             </button>
-
             <button
+              type="button"
               onClick={() => {
                 setOpenDeleteModal(false);
-
                 logAction({
                   message: "User clicked 'Cancel' button",
                   step: "Confirm modal",
@@ -80,21 +63,15 @@ export default function CongfirmationModal({
             >
               {content.common.annuleren}
             </button>
-          </div>
-        </div>
-      </div>
-
-      {loading && (
-        <div className="absolute top-0 left-0 w-full h-full ">
-          <div className="relative h-full w-full">
-            <div className="absolute top-0 left-0 h-full w-full bg-gray-500/20 bg-opacity-50 z-10" />
-
-            <div className="absolute top-[30%] left-[50%] translate-x-[-50%] z-20">
-              <LoadingBars />
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        }
+      >
+        <p className="text-[14px] text-gray-700">
+          {modal.messageP1} <strong>{selectedPlan?.vluchtnummer}</strong>
+          {modal.messageP2}
+        </p>
+      </ConfirmModalChrome>
+      <WizardLoadingOverlay show={loading} variant="stacked" />
     </Modal>
   );
 }

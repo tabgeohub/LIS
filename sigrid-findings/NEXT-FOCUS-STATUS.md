@@ -41,10 +41,20 @@ LOC now: HomePage ~20k, Voorbereiding ~12.5k, Nabewerking ~7.9k, HomePageTools ~
 - Added [`sigrid.yaml`](../sigrid.yaml) Utility roles for intentional hubs
 - Freshness: `auth2`/`devices-updates`/`emails` OpenAPI docs, AllRoles split helper, DevicesUpdates errors, Emailijst InputComp, Exporter→`base64ToBlob`
 
+## Done — Component freshness wave (2026-08-05)
+
+Spread real maintenance across low-density components (target Freshness ≥ 3.5–4.0):
+
+- Shared `ConfirmModalChrome` + `WizardLoadingOverlay` across Voorbereiding / Nabewerking / Dashboard
+- Emailijst EditEmail + Loading dedupe; Exporter PDF casing fix
+- Installations `formatBytes`; PrepareFlightPlan typed select; Timeslider header helper
+- Backend OpenAPI: logs / installers / fileDownload / reportUpload + swagger tags
+- Configure route registration comments
+
 ## Next Architecture wave (ordered)
 
 1. **No more HomePage stuffing / mega-moves**
-2. Deploy + rescan; confirm Adjacency / Freshness move toward 4★
+2. Deploy + rescan; confirm Freshness move toward 4★ (Adjacency already ~4.4)
 3. Reduce remaining feature→HomePage edges only when they cut density (measure first)
 4. Do **not** grind Unit size / more SQL / Dockerfile / Independence Core games
 

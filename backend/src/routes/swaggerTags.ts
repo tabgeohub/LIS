@@ -9,4 +9,10 @@ export const swaggerTags = [
   { name: "Users", description: "User management" },
   { name: "Emails", description: "Email templates & sending" },
   { name: "Auth", description: "Legacy login (Keycloak used in production)" },
+  { name: "Auth2", description: "Keycloak-backed session auth (verify / login / me / logout)" },
+  { name: "DevicesUpdates", description: "Getac device update agent & admin APIs" },
+  { name: "Logs", description: "Flight and pod logging" },
+  { name: "Installers", description: "Desktop installer upload/download" },
+  { name: "FileDownload", description: "Password-gated file downloads" },
+  { name: "ReportUpload", description: "Finished-plan report package upload" },
 ];
