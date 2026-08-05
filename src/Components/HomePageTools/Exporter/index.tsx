@@ -1,11 +1,12 @@
 import Modal from "Components/Common/Modal";
+import ConfirmModalChrome from "Components/Common/ConfirmModalChrome";
+import { renderWizardStep } from "Components/Common/Wizard/renderWizardStep";
 import { useState } from "react";
 import Step1 from "./Steps/Step1";
 import { useMapViewState } from "hooks/zustand/ui";
 import { saveAs } from "file-saver";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
-import { IoMdClose } from "react-icons/io";
 import { useContent } from "hooks/useContent";
 import { takeMapScreenshotBlob } from "./takeMapScreenshotBlob";
 
@@ -37,6 +38,7 @@ export default function Exporter({
       setLoading(false);
     } catch (err) {
       console.error("Failed to take screenshot:", err);
+      setLoading(false);
     }
   };
 
@@ -59,25 +61,19 @@ export default function Exporter({
   };
 
   return (
-    <>
-      <Modal
-        className="w-full max-w-md rounded bg-white shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
-        isOpen={openExporter}
-        setIsOpen={setOpenExporter}
+    <Modal
+      className="w-full max-w-md rounded bg-white shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+      isOpen={openExporter}
+      setIsOpen={setOpenExporter}
+    >
+      <ConfirmModalChrome
+        title={content.tools.exporteer.modal.title}
+        onClose={() => setOpenExporter(false)}
       >
-        <div className="relative">
-          <div className="flex justify-between items-center px-2 py-2">
-            <p className="text-gray-500 text-[16px]">
-              {content.tools.exporteer.modal.title}
-            </p>
-            <button onClick={() => setOpenExporter(false)}>
-              <IoMdClose className="text-gray-500 text-lg" />
-            </button>
-          </div>
-          <div className="w-full h-0.5 bg-gray-300" />
-          {!loading && (
-            <>
-              {step === 1 && (
+        {loading
+          ? <Step2 />
+          : renderWizardStep(step, {
+              1: (
                 <Step1
                   setValue={setValue}
                   value={value}
@@ -85,13 +81,10 @@ export default function Exporter({
                   inclusief={inclusief}
                   exportMap={exportMap}
                 />
-              )}
-              {step === 2 && <Step3 downloadMap={downloadMap} />}
-            </>
-          )}
-          {loading && <Step2 />}
-        </div>
-      </Modal>
-    </>
+              ),
+              2: <Step3 downloadMap={downloadMap} />,
+            })}
+      </ConfirmModalChrome>
+    </Modal>
   );
 }

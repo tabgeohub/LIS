@@ -20,7 +20,9 @@ export default function ChangeFlightPlanStatus() {
   const content = useContent();
   useChangeFlightPlanStatusFilter(preparedFlightPlans);
 
-  if (openFilter) return <Filter />;
+  if (openFilter) {
+    return <Filter />;
+  }
 
   return (
     <ScrollButtonsLayout

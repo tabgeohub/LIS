@@ -6,6 +6,12 @@ import { getRegios } from "./getRegios";
 import { getWaarnemers } from "./getWaarnemers";
 import { getLuchtvaartuig } from "./getLuchtvaartuig";
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Consts
+ *     description: Lookup tables for forms (activiteiten, organisaties, regio's, etc.)
+ */
 const router = Router();
 
 router.get("/activiteiten", getActiviteiten);

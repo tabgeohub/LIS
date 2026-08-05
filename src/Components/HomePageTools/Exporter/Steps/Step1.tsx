@@ -1,4 +1,5 @@
 import { useContent } from "hooks/useContent";
+import { EXPORT_IMAGE_FORMATS } from "./exportFormats";
 
 export default function Step1({
   setValue,
@@ -14,22 +15,24 @@ export default function Step1({
   exportMap: () => void;
 }) {
   const content = useContent();
+  const modal = content.tools.exporteer.modal;
 
   return (
     <>
-      <div className="pt-4 px-2">
-        <p className="text-gray-500">{content.tools.exporteer.modal.text}</p>
+      <div className="pt-2">
+        <p className="text-gray-500">{modal.text}</p>
 
         <select
           className="inputClass"
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          aria-label={modal.text}
         >
-          <option value="bmp">BMP</option>
-          <option value="jpeg">JPEG</option>
-          <option value="png">PNG</option>
-          <option value="tiff">TIFF</option>
-          <option value="pdf">PDF</option>
+          {EXPORT_IMAGE_FORMATS.map((format) => (
+            <option key={format.value} value={format.value}>
+              {format.label}
+            </option>
+          ))}
         </select>
 
         <div className="flex items-center mt-2 gap-x-1">
@@ -41,17 +44,15 @@ export default function Step1({
           />
 
           <label htmlFor="inclusief" className="labelClass -mt-0.5">
-            {content.tools.exporteer.modal.inclusiefGeoreferentie}
+            {modal.inclusiefGeoreferentie}
           </label>
         </div>
       </div>
 
-      <div className="py-2 px-3">
-        <div className="flex justify-end mt-6">
-          <button className="gray-button" onClick={exportMap}>
-            {content.tools.exporteer.modal.afbeeldingAanmaken}
-          </button>
-        </div>
+      <div className="flex justify-end mt-6">
+        <button type="button" className="gray-button" onClick={exportMap}>
+          {modal.afbeeldingAanmaken}
+        </button>
       </div>
     </>
   );

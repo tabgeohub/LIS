@@ -5,7 +5,7 @@ type ConfirmModalChromeProps = {
   title: string;
   onClose: () => void;
   children: ReactNode;
-  actions: ReactNode;
+  actions?: ReactNode;
   className?: string;
 };
 
@@ -29,7 +29,9 @@ export default function ConfirmModalChrome({
       <div className="w-full h-0.5 bg-gray-300" />
       <div className="py-2 px-3">
         {children}
-        <div className="flex justify-end mt-6 gap-x-2">{actions}</div>
+        {actions != null ? (
+          <div className="flex justify-end mt-6 gap-x-2">{actions}</div>
+        ) : null}
       </div>
     </div>
   );

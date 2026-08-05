@@ -3,6 +3,7 @@ import Step2 from "./Step2";
 import { useDrawingStore } from "Components/Voorbereiding/DrawingTool/useDrawingStore";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useTabState } from "hooks/zustand/ui";
+import { renderWizardStep } from "Components/Common/Wizard/renderWizardStep";
 import { useDrawingToolRootLifecycle } from "./helpers/useDrawingToolLifecycle";
 
 export default function DrawingTool() {
@@ -18,10 +19,11 @@ export default function DrawingTool() {
   });
 
   return (
-    <div>
-      {step === 1 && <Step1 />}
-
-      {step === 2 && <Step2 />}
+    <div className="h-full">
+      {renderWizardStep(step, {
+        1: <Step1 />,
+        2: <Step2 />,
+      })}
     </div>
   );
 }
