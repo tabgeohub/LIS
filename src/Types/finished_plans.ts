@@ -43,6 +43,8 @@ export interface FinishedPointType
   attachments: AttachmentType[];
   spoed?: boolean;
   spoedemail?: string;
+  /** When the point was finished via Desktop Opslaan (ISO from DB). */
+  finished_at?: string | null;
 }
 
 export interface FinishedGeometryType {

@@ -1,9 +1,15 @@
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { IoMdImage } from "react-icons/io";
 import { PointItemViewProps } from "./pointItemTypes";
+import { formatFinishedAtDisplay } from "Components/Nabewerking/VluchtenZoeken/Steps/Step2/Actions/Waarnemingen/common/formatFinishedAtDisplay";
 
 export default function CompactPointItem(props: PointItemViewProps) {
   const { point } = props;
+  const finishedAtDisplay =
+    "finished_at" in point
+      ? formatFinishedAtDisplay(point.finished_at)
+      : undefined;
+
   return (
     <div
       onMouseEnter={props.onMouseEnter}
@@ -22,6 +28,7 @@ export default function CompactPointItem(props: PointItemViewProps) {
         <p>Specific letten op: {point.specifiek_letten_op}</p>
         <p>Organisatie: {props.organizationLabel}</p>
         <p>Activiteit: {props.activityLabel}</p>
+        {finishedAtDisplay ? <p>Afgerond op: {finishedAtDisplay}</p> : null}
       </div>
       {props.attachmentCount > 0 && (
         <div className="absolute mt-4 bottom-0 right-4">
