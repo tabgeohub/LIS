@@ -1,4 +1,4 @@
-import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
+import CoordinateFields from "Components/Common/CoordinateFields";
 import { useContent } from "hooks/useContent";
 import useLogAction from "hooks/useLogAction";
 import { useEnrichedPointState } from "Components/Voorbereiding/EnrichedAddPoint/state/useEnrichedPointState";

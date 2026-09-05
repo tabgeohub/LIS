@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useDeleteFlightPlan } from "Components/Voorbereiding/RemoveFlightPlan/useDeleteFlightPlan";
-import { useFilterPlans } from "Components/HomePage/hooks/filters/useFilterPlans";
+import { useFilterPlans } from "hooks/filters/useFilterPlans";
 import {
   useRemoveFlightPlanFilterEffects,
   visibleRemovePlans,

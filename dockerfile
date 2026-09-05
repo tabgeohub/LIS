@@ -25,8 +25,14 @@ WORKDIR /usr/share/nginx/html
 # Copy the built frontend from build stage
 COPY --from=build /usr/src/app/build/ ./
 
-# Optional custom nginx config
+# Optional custom nginx config (listens on 8080 for non-root)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+# Run as non-root (nginx image provides uid/gid 101)
+RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx/conf.d \
+ && sed -i 's|^pid .*|pid /tmp/nginx.pid;|' /etc/nginx/nginx.conf \
+ && sed -i 's/user  nginx;/# user nginx;/' /etc/nginx/nginx.conf
+USER nginx
+
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

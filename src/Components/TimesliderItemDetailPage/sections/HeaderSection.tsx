@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import ReadOnlyVanTotRange from "./ReadOnlyVanTotRange";
 
+function normalizeVluchtnummerLabel(vluchtnummer?: string | null): string | null {
+  const trimmed = vluchtnummer?.trim();
+  return trimmed ? trimmed : null;
+}
+
 type Props = {
   itemName: string;
   /** Flight number for the selected plan; shown under the point/geometry name when set. */
@@ -17,10 +22,7 @@ export default function HeaderSection({
   dateTo,
   onAllPlansClick,
 }: Props) {
-  const vluchtLabel =
-    vluchtnummer != null && vluchtnummer.trim() !== ""
-      ? vluchtnummer.trim()
-      : null;
+  const vluchtLabel = normalizeVluchtnummerLabel(vluchtnummer);
 
   return (
     <header className="grid min-h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-gray-200 bg-white px-4 py-2">

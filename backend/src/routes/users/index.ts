@@ -3,9 +3,14 @@ import { getUsers } from "./getUsers";
 import { createUser } from "./createUser";
 import { updateUser } from "./updateUser";
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Users
+ *     description: Application user list and profile updates
+ */
 const router = Router();
 
-// Get
 router.get("/", getUsers);
 
 // Post

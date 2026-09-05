@@ -4,6 +4,7 @@ import Loading from "./Loading";
 import { EmailType } from "Types";
 import { useUpdateData } from "api-hooks/mutations";
 import { isValidEmail } from "helpers/dom/isValidEmail";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import toast from "react-hot-toast";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
@@ -20,59 +21,51 @@ export default function EditEmail({
   refetch: () => void;
 }) {
   const logAction = useLogAction();
-
   const [emailToEdit, setEmailToEdit] = useState(selectedEmail);
-
   const { update, loading } = useUpdateData(`/emails/${selectedEmail.id}`);
+  const content = useContent();
 
   function handleUpdate() {
     if (isValidEmail(emailToEdit.email)) {
-      update({ data: { id: selectedEmail.id, email: emailToEdit.email }, onSuccess: () => {
-        setStep("list");
-        setSelectedEmail(null);
-        toast.success(content.tools.emailijst.edit.successToast);
-        refetch();
-      },});
-
+      update({
+        data: { id: selectedEmail.id, email: emailToEdit.email },
+        onSuccess: () => {
+          setStep("list");
+          setSelectedEmail(null);
+          toast.success(content.tools.emailijst.edit.successToast);
+          refetch();
+        },
+      });
       logAction({
         message: "User clicked 'Save' button",
         step: "Emailijst - Edit email",
-        newData: {
-          email: emailToEdit.email,
-        },
+        newData: { email: emailToEdit.email },
       });
     } else {
       toast.error(content.tools.emailijst.edit.failToast);
     }
   }
 
-  const content = useContent();
-
   return (
     <div className="py-2 relative h-full">
-      <div className="grid grid-cols-3 gap-x-10 pr-10 pl-4 mt-4">
-        <p className="labelClass">{content.tools.emailijst.edit.emailadres}</p>
-
-        <input
+      <div className="pr-10 pl-4 mt-4">
+        <InputComp
+          label={content.tools.emailijst.edit.emailadres}
           value={emailToEdit.email}
+          setValue={(email) => setEmailToEdit({ ...emailToEdit, email })}
           type="text"
-          onChange={(e) => {
-            setEmailToEdit({ ...emailToEdit, email: e.target.value });
-          }}
-          placeholder="E-mailadres"
-          className="inputClass col-span-2"
+          inputClassName="!col-span-2"
         />
       </div>
 
       <div className="flex items-center justify-end gap-x-2 mt-4 mr-4">
-        <button onClick={handleUpdate} className="gray-button">
+        <button type="button" onClick={handleUpdate} className="gray-button">
           {content.common.wijzigen}
         </button>
-
         <button
+          type="button"
           onClick={() => {
             setStep("list");
-
             logAction({
               message: "User clicked 'Cancel' button",
               step: "Emailijst - Edit email",

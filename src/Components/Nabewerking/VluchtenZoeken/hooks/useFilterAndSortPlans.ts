@@ -1,6 +1,6 @@
 import { FinishedFlightPlanType } from "Types/finished_plans";
 import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
-import { useBindFilteredSortedPlans } from "Components/HomePage/hooks/filters/useFilteredSortedPlans";
+import { useBindFilteredSortedPlans } from "hooks/filters/useFilteredSortedPlans";
 
 /**
  * Hook to filter and sort plans based on filter criteria

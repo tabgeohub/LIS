@@ -1,8 +1,8 @@
 import { useAuth } from "hooks/zustand/ui";
 import { useReuseFlightPlan } from "Components/Voorbereiding/ReuseFlightPlan/useReuseFlightPlan";
 import { useCreateData } from "api-hooks/mutations";
-import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
-import { useSelectedBasemapState } from "Components/HomePage/hooks/kaartlagen/useBasemapStore";
+import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
+import { useSelectedBasemapState } from "hooks/kaartlagen/useBasemapStore";
 import { useMapViewState } from "hooks/zustand/ui";
 import { useHandleCancel } from "hooks/handleCancel/useHandleCancel";
 import { useGeometriesStore } from "hooks/features";

@@ -4,36 +4,35 @@ import PlanInformation from "./PlanInformation";
 import { usePointFlightPlans } from "api-hooks/flightPlans";
 import { FlightPlanType } from "Types";
 import { usePopUpState } from "hooks/zustand/ui";
+import { renderWizardStep } from "Components/Common/Wizard/renderWizardStep";
 
 export default function ViewPlans() {
   const [selectedPlan, setSelectedPlan] = useState<FlightPlanType | null>(null);
-
   const { clickedPoint } = usePopUpState();
-
   const [step, setStep] = useState(1);
-
   const { data: plans } = usePointFlightPlans(clickedPoint?.id);
 
   if (!plans) return null;
 
   return (
     <div className="p-1 h-full">
-      {step === 1 && (
-        <PlansList
-          selectedPlan={selectedPlan}
-          setSelectedPlan={setSelectedPlan}
-          plans={plans}
-          setStep={setStep}
-        />
-      )}
-
-      {step === 2 && selectedPlan && (
-        <PlanInformation
-          setSelectedPlan={setSelectedPlan}
-          setStep={setStep}
-          selectedPlan={selectedPlan}
-        />
-      )}
+      {renderWizardStep(step, {
+        1: (
+          <PlansList
+            selectedPlan={selectedPlan}
+            setSelectedPlan={setSelectedPlan}
+            plans={plans}
+            setStep={setStep}
+          />
+        ),
+        2: selectedPlan ? (
+          <PlanInformation
+            setSelectedPlan={setSelectedPlan}
+            setStep={setStep}
+            selectedPlan={selectedPlan}
+          />
+        ) : null,
+      })}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Vluchtnummer from "./Vluchtnummer";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
 } from "Components/Common/FlightPlanForm/FlightPlanStandardFields";
-import { useFlightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/useFlightPlanStandardSelectProps";
+import { useFlightPlanStandardSelectProps } from "Components/Common/FlightPlanForm/useFlightPlanStandardSelectProps";
 
 export default function FormInputs() {
   const selectProps = useFlightPlanStandardSelectProps();

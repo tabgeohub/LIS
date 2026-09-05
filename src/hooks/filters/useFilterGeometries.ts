@@ -1,4 +1,4 @@
-import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
+import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useGeometriesStore, Geometry } from "hooks/features";
 import { filterGeometriesByCriteria } from "./geometryFilterPredicates";
 

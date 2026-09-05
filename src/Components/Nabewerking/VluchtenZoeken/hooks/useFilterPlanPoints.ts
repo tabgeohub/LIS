@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { usePointsStore } from "hooks/features";
 import { useFinishedPlansState } from "Components/Nabewerking/VluchtenZoeken/useFinishedPlansState";
-import { filterPointsForPlan } from "Components/HomePage/hooks/filters/filterPlanPoints";
+import { filterPointsForPlan } from "hooks/filters/filterPlanPoints";
 
 /**
  * Hook to filter points store to only include points from the selected plan

@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { WizardPointsListSelectionProps } from "Components/HomePage/Body/Left/Common/wizardPointsListSelectionProps";
-import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
+import type { WizardPointsListSelectionProps } from "Components/Common/wizardPointsListSelectionProps";
+import WizardPointsList from "Components/Common/WizardPointsList";
 import usePointClick from "hooks/hover-click/usePointClick";
 import { useEffect } from "react";
 import useLogAction from "hooks/useLogAction";
-import { getPointsSelectionStep } from "Components/HomePage/hooks/points/pointsSelectionLog";
+import { getPointsSelectionStep } from "helpers/points/pointsSelectionLog";
 
 export default function PointsList({
   selectedPoints,

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
-
+import { renderWizardStep } from "Components/Common/Wizard/renderWizardStep";
 import Step2 from "./Steps/Step2";
 import Step3 from "./Steps/Step3";
 import Step1 from "./Steps/Step1";
@@ -15,13 +15,12 @@ export default function FlightPlan({
 
   return (
     <div className="h-full">
-      {step === 1 && <Step1 />}
-
-      {step === 2 && <TemplateFlight basemapString={basemapString} />}
-
-      {step === 3 && <Step2 />}
-
-      {step === 4 && <Step3 basemapString={basemapString} />}
+      {renderWizardStep(step, {
+        1: <Step1 />,
+        2: <TemplateFlight basemapString={basemapString} />,
+        3: <Step2 />,
+        4: <Step3 basemapString={basemapString} />,
+      })}
     </div>
   );
 }

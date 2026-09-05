@@ -1,7 +1,7 @@
 import * as XLSX from "@e965/xlsx";
 import { describe, expect, it } from "vitest";
 import type { FlightPlanType } from "Types";
-import { POINT_EXPORT_COLUMNS } from "./pointColumnKeys";
+import { POINT_EXPORT_COLUMNS } from "helpers/points/pointColumnKeys";
 import {
   buildFlightPlanPointExportRows,
   normalizeExportNumber,

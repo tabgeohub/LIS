@@ -1,28 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "hooks/zustand/ui";
-import type { DeviceStatus, GetacDevice } from "Types/devices";
+import type { GetacDevice } from "Types/devices";
 import {
   fetchDevicesUpdates,
   isWaitingForDeviceCommand,
   queueDeviceAction,
   resetDeviceUpdate,
 } from "./devicesUpdatesApi";
+import {
+  deviceStatusLabel,
+  formatDeviceDate,
+} from "./deviceStatusLabels";
+import AdminPageHeader from "Components/Common/AdminPageHeader";
 import { useDeviceActionPolling } from "./useDeviceActionPolling";
-
-const STATUS_LABELS: Record<DeviceStatus, string> = {
-  unknown: "Unknown",
-  checking: "Checking...",
-  up_to_date: "Up to date",
-  updates_available: "Updates available",
-  updating: "Updating...",
-  reboot_required: "Reboot required",
-  failed: "Failed",
-};
-
-function formatDate(value: string | null): string {
-  if (!value) return "Never";
-  return new Date(value).toLocaleString();
-}
 
 export default function DevicesUpdatesPage() {
   const { user } = useAuth();
@@ -101,20 +91,10 @@ export default function DevicesUpdatesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Device Updates</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage Windows updates on Getac devices. Actions run only when you click a button.
-            </p>
-          </div>
-          <a
-            href="/"
-            className="rounded-md bg-white px-4 py-2 text-sm text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-100"
-          >
-            Back to LIS
-          </a>
-        </div>
+        <AdminPageHeader
+          title="Device Updates"
+          description="Manage Windows updates on Getac devices. Actions run only when you click a button."
+        />
 
         {error && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
@@ -163,7 +143,7 @@ export default function DevicesUpdatesPage() {
                         </td>
                         <td className="px-4 py-3">
                           <span className="font-medium text-gray-900">
-                            {STATUS_LABELS[device.status]}
+                            {deviceStatusLabel(device.status)}
                           </span>
                           {device.last_error && (
                             <div className="mt-1 text-xs text-red-600">{device.last_error}</div>
@@ -173,10 +153,10 @@ export default function DevicesUpdatesPage() {
                           {device.pending_update_count}
                         </td>
                         <td className="px-4 py-3 text-gray-700">
-                          {formatDate(device.last_checked_at)}
+                          {formatDeviceDate(device.last_checked_at)}
                         </td>
                         <td className="px-4 py-3 text-gray-700">
-                          {formatDate(device.last_seen_at)}
+                          {formatDeviceDate(device.last_seen_at)}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex gap-2">

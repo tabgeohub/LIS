@@ -1,15 +1,13 @@
 import { useKeycloakRoles } from "../shared/useKeycloakRoles";
-import { filterRealmRoles } from "../shared/keycloakRoleTypes";
+import {
+  filterRealmRoles,
+  splitExternalInternalRoles,
+} from "../shared/keycloakRoleTypes";
 
 export default function AllRoles() {
   const { availableRoles, loadingRoles, filteredRealmRoles } = useKeycloakRoles();
-
-  const externalRoles = filteredRealmRoles.filter((role) =>
-    role.name.includes("EXT")
-  );
-  const internalRoles = filteredRealmRoles.filter(
-    (role) => !role.name.includes("EXT")
-  );
+  const { externalRoles, internalRoles } =
+    splitExternalInternalRoles(filteredRealmRoles);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">

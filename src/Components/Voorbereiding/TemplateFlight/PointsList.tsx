@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { EnrichedPointType } from "Types";
 import { useContent } from "hooks/useContent";
-import WizardPointsList from "Components/HomePage/Body/Left/Common/WizardPointsList";
+import WizardPointsList from "Components/Common/WizardPointsList";
 import { useWizardPointsFilterHeader } from "Components/HomePage/hooks/points/useWizardPointsFilterHeader";
 
 export default function PointsList({

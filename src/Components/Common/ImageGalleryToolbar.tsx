@@ -3,13 +3,13 @@ import {
   GalleryCloseButton,
   GalleryDeleteButton,
   GalleryLocationButton,
-} from "Components/HomePage/Body/Common/ImageGalleryToolbarButtons";
+} from "Components/Common/ImageGalleryToolbarButtons";
 
 function resolveActiveLocation(
   attachments: AttachmentType[],
   activeIndex: number
 ): string | undefined {
-  return attachments[activeIndex]?.location;
+  return attachments[activeIndex]?.location ?? undefined;
 }
 
 function LocationToolbarButton(props: {

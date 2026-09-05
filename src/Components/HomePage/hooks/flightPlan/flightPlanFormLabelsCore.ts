@@ -1,5 +1,5 @@
 import type { Content } from "hooks/useContent";
-import type { FlightPlanFieldLabels } from "./flightPlanStandardSelectProps";
+import type { FlightPlanFieldLabels } from "Components/Common/FlightPlanForm/flightPlanStandardSelectProps";
 
 export function nabewerkingVluchtenZoekenFieldLabels(
   content: Content

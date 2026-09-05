@@ -1,10 +1,10 @@
 import { useMapViewState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
 import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
-import { usePointsFilterStore } from "Components/HomePage/hooks/filters/usePointsFilterStore";
+import { usePointsFilterStore } from "hooks/filters/usePointsFilterStore";
 import { useCreateData } from "api-hooks/mutations";
 import { useCancelCreateFlightPlan } from "hooks/handleCancel/useCancelCreateFlightPlan";
-import { kaartlagenState } from "Components/HomePage/hooks/kaartlagen/kaartlagenState";
+import { kaartlagenState } from "hooks/kaartlagen/kaartlagenState";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useGeometriesStore } from "hooks/features";
 import { submitCollectedFlightPlanCreate } from "Components/HomePage/hooks/flightPlan/submitCollectedFlightPlanCreate";

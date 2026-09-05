@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import PlanInformationFields from "Components/HomePage/Body/Left/Common/PlanInformationFields";
-import type { PlanInformationProps } from "Components/HomePage/Body/Left/Common/planInformationProps";
-import { goBackFromPlanInformation } from "Components/HomePage/Body/Left/Common/goBackFromPlanInformation";
-import { formatPlanSpoedLabel } from "Components/HomePage/Body/Left/Common/formatPlanSpoedLabel";
+import PlanInformationFields from "Components/Common/PlanInformationFields";
+import type { PlanInformationProps } from "Components/Common/planInformationProps";
+import { goBackFromPlanInformation } from "Components/Common/goBackFromPlanInformation";
+import { formatPlanSpoedLabel } from "Components/Common/formatPlanSpoedLabel";
 import ScrollButtonsLayout from "./ScrollButtonsLayout";
 
 type PlanInformationPanelProps = PlanInformationProps & {

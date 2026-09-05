@@ -10,9 +10,14 @@ import { getPointsDescription } from "./getPointsDescription";
 import { createPointFromImport } from "./createPointFromImport";
 import { editPointStatus } from "./editPointStatus";
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Points
+ *     description: Aandachtspunten CRUD, search, and plan membership
+ */
 const router = Router();
 
-// Post
 router.post("/", createPoint);
 router.post("/import", createPointFromImport);
 

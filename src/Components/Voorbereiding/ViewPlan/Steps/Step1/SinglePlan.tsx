@@ -12,7 +12,7 @@ import useLogAction from "hooks/useLogAction";
 import { classNames } from "helpers/dom/classNames";
 import { usePlanClick } from "hooks/hover-click/usePlanClick";
 import usePlanHover from "hooks/hover-click/usePlanHover";
-import { POINT_EXPORT_COLUMNS } from "Components/HomePage/helpers/points/pointColumnKeys";
+import { POINT_EXPORT_COLUMNS } from "helpers/points/pointColumnKeys";
 import { buildFlightPlanPointExportRows } from "Components/HomePage/helpers/points/flightPlanPointExcel";
 import { buildXlsxBuffer } from "Components/HomePage/helpers/tableExports/xlsxExport";
 

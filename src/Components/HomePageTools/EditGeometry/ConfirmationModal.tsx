@@ -1,6 +1,6 @@
 import Modal from "Components/Common/Modal";
-import LoadingBars from "Components/Common/LoadingBars";
-import { IoMdClose } from "react-icons/io";
+import ConfirmModalChrome from "Components/Common/ConfirmModalChrome";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import { Geometry } from "hooks/features";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
@@ -25,6 +25,9 @@ export default function ConfirmationModal({
 }: ConfirmationModalProps) {
   const logAction = useLogAction();
   const content = useContent();
+  const label = selectedGeometry
+    ? geometryDisplayName(selectedGeometry)
+    : "deze geometrie";
 
   return (
     <Modal
@@ -32,43 +35,18 @@ export default function ConfirmationModal({
       isOpen={isOpen}
       setIsOpen={setIsOpen}
     >
-      <div className="">
-        <div className="relative flex items-center justify-center px-2 py-2">
-          <p className="text-gray-500 text-[16px]">
-            {content.common.verwijderen}
-          </p>
-          <button
-            type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5"
-            onClick={() => setIsOpen(false)}
-            aria-label="Sluiten"
-          >
-            <IoMdClose className="text-gray-500 text-lg" />
-          </button>
-        </div>
-
-        <div className="w-full h-0.5 bg-gray-300" />
-
-        <div className="py-2 px-3">
-          <p className="text-[14px] text-gray-700">
-            Weet je zeker dat je{" "}
-            <strong>
-              {selectedGeometry
-                ? geometryDisplayName(selectedGeometry)
-                : "deze geometrie"}
-            </strong>{" "}
-            wilt verwijderen?
-          </p>
-
-          <div className="flex justify-end mt-6 gap-x-2">
-            <button onClick={handleDelete} className="gray-button">
+      <ConfirmModalChrome
+        title={content.common.verwijderen}
+        onClose={() => setIsOpen(false)}
+        actions={
+          <>
+            <button type="button" onClick={handleDelete} className="gray-button">
               {content.common.ok}
             </button>
-
             <button
+              type="button"
               onClick={() => {
                 setIsOpen(false);
-
                 logAction({
                   message: "User clicked 'Cancel' in delete confirmation modal",
                   step: "Edit Geometry",
@@ -78,22 +56,14 @@ export default function ConfirmationModal({
             >
               {content.common.annuleren}
             </button>
-          </div>
-        </div>
-      </div>
-
-      {(loading || isDeleting) && (
-        <div className="absolute top-0 left-0 w-full h-full ">
-          <div className="relative h-full w-full">
-            <div className="absolute top-0 left-0 h-full w-full bg-gray-500/20 bg-opacity-50 z-10" />
-
-            <div className="absolute top-[30%] left-[50%] translate-x-[-50%] z-20">
-              <LoadingBars />
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        }
+      >
+        <p className="text-[14px] text-gray-700">
+          Weet je zeker dat je <strong>{label}</strong> wilt verwijderen?
+        </p>
+      </ConfirmModalChrome>
+      <WizardLoadingOverlay show={loading || isDeleting} variant="stacked" />
     </Modal>
   );
 }
-

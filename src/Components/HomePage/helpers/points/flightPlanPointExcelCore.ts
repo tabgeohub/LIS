@@ -1,5 +1,5 @@
 import type { EnrichedPointType, FlightPlanType } from "Types";
-import { POINT_EXPORT_COLUMNS } from "./pointColumnKeys";
+import { POINT_EXPORT_COLUMNS } from "helpers/points/pointColumnKeys";
 
 export type FlightPlanPointExportRow = {
   [Key in (typeof POINT_EXPORT_COLUMNS)[number]]: string | number | undefined;

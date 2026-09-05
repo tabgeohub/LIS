@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Step1 from "./Steps/Step1";
 import CongfirmationModal from "./Steps/CongfirmationModal";
-import LoadingBars from "Components/Common/LoadingBars";
+import WizardLoadingOverlay from "Components/Common/Wizard/WizardLoadingOverlay";
 import { useUpdateData } from "api-hooks/mutations";
 import { FlightPlanType } from "Types";
 import { useContent } from "hooks/useContent";
@@ -13,6 +13,8 @@ export default function PrepareFlightPlan() {
 
   const { update } = useUpdateData(`/flightPlans/updateFlightPlanStatus`);
   const content = useContent();
+  const loadingMessage =
+    content.voorbereiding.vluchtplanVoorbereiding.confirmModal.loadingMessage;
 
   function handleConfirm() {
     setOpenModal(false);
@@ -32,7 +34,7 @@ export default function PrepareFlightPlan() {
   }
 
   return (
-    <>
+    <div className="relative h-full min-h-[12rem]">
       {!isPreparing && (
         <Step1
           selectedPlan={selectedPlan}
@@ -48,18 +50,7 @@ export default function PrepareFlightPlan() {
         handleConfirm={handleConfirm}
       />
 
-      {isPreparing && (
-        <div>
-          <LoadingBars />
-
-          <p className="text-center text-[12px] mt-1.5 mx-2">
-            {
-              content.voorbereiding.vluchtplanVoorbereiding.confirmModal
-                .loadingMessage
-            }
-          </p>
-        </div>
-      )}
-    </>
+      <WizardLoadingOverlay show={isPreparing} message={loadingMessage} />
+    </div>
   );
 }

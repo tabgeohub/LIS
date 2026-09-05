@@ -1,10 +1,10 @@
 import { useConstSelectOptions } from "hooks/consts/useConstSelectOptions";
-import { useFilterGeometries } from "Components/HomePage/hooks/filters/useFilterGeometries";
-import { useFilterPoints } from "Components/HomePage/hooks/filters/useFilterPoints";
+import { useFilterGeometries } from "hooks/filters/useFilterGeometries";
+import { useFilterPoints } from "hooks/filters/useFilterPoints";
 import {
   type PeriodType,
   usePointsFilterStore,
-} from "Components/HomePage/hooks/filters/usePointsFilterStore";
+} from "hooks/filters/usePointsFilterStore";
 import type { Geometry } from "hooks/features";
 import type { EnrichedPointType } from "Types";
 import SelectComp from "Components/Common/FormComponents/SelectComp";

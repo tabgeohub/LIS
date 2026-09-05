@@ -22,6 +22,7 @@ export default function ReadOnlyVanTotRange({ dateFrom, dateTo }: Props) {
     <div
       className="pointer-events-none flex shrink-0 select-none items-center gap-3"
       aria-label={ariaLabel}
+      title={ariaLabel}
     >
       <ReadOnlyVanPill label={fromLabel} />
       <ReadOnlyRangeTrack />

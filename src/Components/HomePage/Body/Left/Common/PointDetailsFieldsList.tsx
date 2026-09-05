@@ -1,5 +1,5 @@
 import { EnrichedPointType } from "Types";
-import { POINT_CORE_IDENTITY_KEYS } from "Components/HomePage/helpers/points/pointCoreIdentityKeys";
+import { POINT_CORE_IDENTITY_KEYS } from "helpers/points/pointCoreIdentityKeys";
 
 const POINT_DETAIL_EXTRA_FIELDS = [
   "herhalen",

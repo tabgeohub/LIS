@@ -7,7 +7,7 @@ import {
   FlightPlanFormFieldSetters,
   FlightPlanFormFieldValues,
 } from "hooks/zustand/shared/flightPlanFormFields";
-import type { FlightPlanFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanStandardSelectProps";
+import type { FlightPlanFieldLabels } from "Components/Common/FlightPlanForm/flightPlanStandardSelectProps";
 
 type SelectOption = { label: string; value: string };
 

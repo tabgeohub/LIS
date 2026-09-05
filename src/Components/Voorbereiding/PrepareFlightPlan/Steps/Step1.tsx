@@ -5,6 +5,13 @@ import useLogAction from "hooks/useLogAction";
 import { FlightPlanType } from "Types";
 import { useUnPreparedPlans } from "api-hooks/flightPlans";
 
+type PlanOption = Pick<FlightPlanType, "id" | "vluchtnummer">;
+
+const PLACEHOLDER_OPTION: PlanOption = {
+  id: 0,
+  vluchtnummer: "Selecteer een vlucht",
+};
+
 export default function Step1({
   setOpenModal,
   selectedPlan,
@@ -16,32 +23,31 @@ export default function Step1({
 }) {
   const logAction = useLogAction();
   const { user } = useAuth();
-
   const { data: unPreparedPlans } = useUnPreparedPlans({
     regioId: user.role,
     userId: user.user_id,
   });
+  const handleCancel = useHandleCancel();
+  const content = useContent();
 
-  const options = [
-    { id: 0, vluchtnummer: "Selecteer een vlucht" },
+  const options: PlanOption[] = [
+    PLACEHOLDER_OPTION,
     ...(unPreparedPlans || []),
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = Number(e.target.value);
-    const selected = options.find((opt) => opt.id === selectedId) || null;
-
-    // @ts-ignore
+    if (selectedId === 0) {
+      setSelectedPlan(null);
+      return;
+    }
+    const selected =
+      unPreparedPlans?.find((opt) => opt.id === selectedId) ?? null;
     setSelectedPlan(selected);
-
     logAction({
       message: `User selected ${selected?.vluchtnummer} plan`,
     });
   };
-
-  const handleCancel = useHandleCancel();
-
-  const content = useContent();
 
   return (
     <div className="p-2">
@@ -50,11 +56,8 @@ export default function Step1({
       </p>
 
       <div className="mt-[65px]">
-        <p className="text-[14px] italic text-gray-600"></p>
-
         <div className="flex mt-6 gap-x-20 items-center">
           <p className="text-[12px] text-gray-800">
-            {" "}
             {content.voorbereiding.vluchtplanVoorbereiding.vluchtnummer}:
           </p>
           {unPreparedPlans && (
@@ -72,7 +75,6 @@ export default function Step1({
                   {content.voorbereiding.vluchtplanVoorbereiding.noOptions}
                 </option>
               )}
-
               {options
                 .filter(
                   (option) =>
@@ -98,26 +100,22 @@ export default function Step1({
 
         <div className="flex justify-end mt-10 gap-x-2">
           <button
+            type="button"
             onClick={() => {
               setOpenModal(true);
-              logAction({
-                message: "User clicked 'Next' button",
-              });
+              logAction({ message: "User clicked 'Next' button" });
             }}
             disabled={selectedPlan === null}
             className="gray-button"
           >
             {content.common.volgende}
           </button>
-
           <button
+            type="button"
             onClick={() => {
               handleCancel();
               setSelectedPlan(null);
-
-              logAction({
-                message: "User clicked 'Cancel' button",
-              });
+              logAction({ message: "User clicked 'Cancel' button" });
             }}
             className="gray-button"
           >

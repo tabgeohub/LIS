@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { EnrichedPointType } from "Types";
-import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
+import PointItemCheckBox from "Components/Common/PointItem/PointItemCheckBox";
 import usePointHover from "hooks/hover-click/usePointHover";
 import {
   togglePointSelection,
   useMapPointSelectionClick,
-} from "Components/HomePage/hooks/viewPlan/useMapPointSelectionClick";
-import { useSortedPointSelection } from "Components/HomePage/hooks/viewPlan/useSortedPointSelection";
+} from "hooks/viewPlan/useMapPointSelectionClick";
+import { useSortedPointSelection } from "hooks/viewPlan/useSortedPointSelection";
 
 export default function PointsSelectionList({
   points,

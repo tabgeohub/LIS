@@ -15,21 +15,21 @@ export default function ViewPlan({
   const { initialPlans, step, openFilter, loading, refetch } =
     useViewPlanController();
 
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (openFilter) {
+    return <Filter plans={initialPlans} />;
+  }
+
   return (
-    <>
-      {loading && <Loading />}
-
-      {!openFilter && !loading && (
-        <ViewPlanSteps
-          step={step}
-          vluchtnummer={vluchtnummer}
-          setVluchtnummer={setVluchtnummer}
-          handleCancel={handleCancel}
-          refetch={refetch}
-        />
-      )}
-
-      {openFilter && <Filter plans={initialPlans} />}
-    </>
+    <ViewPlanSteps
+      step={step}
+      vluchtnummer={vluchtnummer}
+      setVluchtnummer={setVluchtnummer}
+      handleCancel={handleCancel}
+      refetch={refetch}
+    />
   );
 }

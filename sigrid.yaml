@@ -1,0 +1,16 @@
+# Sigrid analysis scope — Architecture Quality
+# Utility components are intentional shared hubs; they are excluded from
+# Component Coupling and Component Adjacency scoring (role inherited by children).
+architecture:
+  component_roles:
+    - role: utility
+      include:
+        - "src/hooks"
+        - "src/api-hooks"
+        - "src/helpers/ArcGISHelpers"
+        - "src/helpers/http"
+        - "src/helpers/arcgis"
+        - "src/helpers/geo"
+        - "src/helpers/points"
+        - "src/helpers/plans"
+        - "src/Components/Common"

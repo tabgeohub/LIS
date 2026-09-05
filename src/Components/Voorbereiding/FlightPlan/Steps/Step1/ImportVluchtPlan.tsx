@@ -8,7 +8,7 @@ import useLogAction from "hooks/useLogAction";
 import { useCreateData } from "api-hooks/mutations";
 import { useFlightPlanState } from "Components/Voorbereiding/FlightPlan/useFlightPlanState";
 import { useContent } from "hooks/useContent";
-import { PointImportRow } from "Components/HomePage/helpers/points/pointColumnKeys";
+import { PointImportRow } from "helpers/points/pointColumnKeys";
 import {
   isCsvFileName,
   mapImportRowsToPoints,

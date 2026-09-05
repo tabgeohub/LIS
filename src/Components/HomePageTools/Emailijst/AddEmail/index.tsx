@@ -3,6 +3,7 @@ import { EmailListStepType } from "..";
 import Loading from "./Loading";
 import { useCreateData } from "api-hooks/mutations";
 import { isValidEmail } from "helpers/dom/isValidEmail";
+import InputComp from "Components/Common/FormComponents/InputComp";
 import toast from "react-hot-toast";
 import { useAuth } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
@@ -46,15 +47,13 @@ export default function AddEmail({
 
   return (
     <div className="py-2 relative h-full">
-      <div className="grid grid-cols-3 gap-x-10 pr-10 pl-4 mt-4">
-        <p className="labelClass">{content.tools.emailijst.edit.emailadres}</p>
-
-        <input
+      <div className="pr-10 pl-4 mt-4">
+        <InputComp
+          label={content.tools.emailijst.edit.emailadres}
           value={emailToAdd}
+          setValue={setEmailToAdd}
           type="text"
-          onChange={(e) => setEmailToAdd(e.target.value)}
-          placeholder="E-mailadres"
-          className="inputClass col-span-2"
+          inputClassName="!col-span-2"
         />
       </div>
 

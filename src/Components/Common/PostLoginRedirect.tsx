@@ -16,13 +16,22 @@ export default function PostLoginRedirect({
   useEffect(() => {
     if (!pendingClientPath) return;
 
-    const targetPath = pendingClientPath.split("?")[0];
+    // Only allow same-app relative paths (blocks //… and backslash open-redirect forms).
+    const safePath =
+      pendingClientPath.startsWith("/") &&
+      !pendingClientPath.startsWith("//") &&
+      !pendingClientPath.includes("\\")
+        ? pendingClientPath
+        : null;
+    if (!safePath) return;
+
+    const targetPath = safePath.split("?")[0];
     const currentPath = location.pathname;
-    if (targetPath === currentPath && pendingClientPath === location.pathname + location.search) {
+    if (targetPath === currentPath && safePath === location.pathname + location.search) {
       return;
     }
 
-    navigate(pendingClientPath, { replace: true });
+    navigate(safePath, { replace: true });
   }, [pendingClientPath, navigate, location.pathname, location.search]);
 
   return null;

@@ -7,7 +7,7 @@ import { pickEnrichedCoordinateControls } from "Components/Voorbereiding/Enriche
 import CancelModal from "Components/Common/CancelModal";
 import { createNewPoint } from "Components/Voorbereiding/EnrichedAddPoint/helpers/createNewPoint";
 import { useContent } from "hooks/useContent";
-import CoordinateFields from "Components/HomePage/Body/Left/Common/CoordinateFields";
+import CoordinateFields from "Components/Common/CoordinateFields";
 import useCoordinatesWatcher from "Components/Voorbereiding/EnrichedAddPoint/Steps/Step2/useCoordinatesWatcher";
 import { syncEnrichedCoordsForPreview } from "Components/Voorbereiding/EnrichedAddPoint/Steps/Step2/syncEnrichedCoordsForPreview";
 

@@ -4,8 +4,8 @@ import {
 } from "hooks/zustand/shared/flightPlanFormFields";
 import FlightPlanStandardFieldsView from "./FlightPlanStandardFieldsView";
 
-export type { FlightPlanFieldLabels } from "Components/HomePage/hooks/flightPlan/flightPlanStandardSelectProps";
-export { flightPlanStandardSelectProps } from "Components/HomePage/hooks/flightPlan/flightPlanStandardSelectProps";
+export type { FlightPlanFieldLabels } from "Components/Common/FlightPlanForm/flightPlanStandardSelectProps";
+export { flightPlanStandardSelectProps } from "Components/Common/FlightPlanForm/flightPlanStandardSelectProps";
 export type { FlightPlanStandardFieldsProps } from "./FlightPlanStandardFieldsView";
 
 export function pickFlightPlanFormFields(

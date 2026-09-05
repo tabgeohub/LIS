@@ -1,6 +1,6 @@
 import { useDeletePointState } from "Components/HomePageTools/AandachtspuntenVerwijderen/state/useDeletePointState";
 import Loading from "./Loading";
-import { pickPointCoreLogData } from "Components/HomePage/helpers/points/buildPointUpdatePayload";
+import { pickPointCoreLogData } from "helpers/points/buildPointUpdatePayload";
 import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { WIZARD_BUTTON_BAR_CLASS } from "Components/Common/Wizard/wizardButtonBarClass";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";

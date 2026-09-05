@@ -12,6 +12,12 @@ import { sendEmail } from "./sendEmail";
 
 dayjs.locale("nl");
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Emails
+ *     description: Email list CRUD and spoed report send
+ */
 const router = Router();
 
 router.get("/", getAllEmails);

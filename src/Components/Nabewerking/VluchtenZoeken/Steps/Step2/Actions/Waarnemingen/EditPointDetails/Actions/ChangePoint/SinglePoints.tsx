@@ -2,7 +2,7 @@ import usePointClick from "hooks/hover-click/usePointClick";
 import usePointHover from "hooks/hover-click/usePointHover";
 import useLogAction from "hooks/useLogAction";
 import { EnrichedPointType } from "Types";
-import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
+import PointItemCheckBox from "Components/Common/PointItem/PointItemCheckBox";
 
 export default function SinglePoint({
   point,

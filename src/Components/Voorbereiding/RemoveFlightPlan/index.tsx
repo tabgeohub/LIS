@@ -9,28 +9,34 @@ import { RemoveFlightPlanList } from "./RemoveFlightPlanList";
 export default function RemoveFlightPlan() {
   const model = useRemoveFlightPlanModel();
   const content = useContent();
+  const emptyMessage =
+    content.voorbereiding.vluchtplanVerwijderen.noPlans + " ";
+
+  if (model.openFilter && model.plans) {
+    return (
+      <div className="h-full">
+        <Filter plans={model.plans} />
+        <CongfirmationModal refetch={model.refetch} />
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full ">
-      {!model.openFilter && (
-        <ScrollButtonsLayout
-          setFilterTerm={model.setFilterTerm}
-          className="h-full "
-          buttons={<Buttons />}
-        >
-          <RemoveFlightPlanList
-            showAllPlans={model.showAllPlans}
-            setShowAllPlans={model.setShowAllPlans}
-            loading={model.loading}
-            allPlans={model.allPlans}
-            emptyMessage={
-              content.voorbereiding.vluchtplanVerwijderen.noPlans + " "
-            }
-          />
-        </ScrollButtonsLayout>
-      )}
+    <div className="h-full">
+      <ScrollButtonsLayout
+        setFilterTerm={model.setFilterTerm}
+        className="h-full"
+        buttons={<Buttons />}
+      >
+        <RemoveFlightPlanList
+          showAllPlans={model.showAllPlans}
+          setShowAllPlans={model.setShowAllPlans}
+          loading={model.loading}
+          allPlans={model.allPlans}
+          emptyMessage={emptyMessage}
+        />
+      </ScrollButtonsLayout>
       <CongfirmationModal refetch={model.refetch} />
-      {model.openFilter && model.plans && <Filter plans={model.plans} />}
     </div>
   );
 }

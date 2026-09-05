@@ -5,10 +5,10 @@ import usePointHover from "hooks/hover-click/usePointHover";
 import useDrawYellowMarkers from "hooks/hover-click/useDrawYellowMarkers";
 import useNearestPointClick from "hooks/hover-click/useNearestPointClick";
 import useLogAction from "hooks/useLogAction";
-import PointItemCheckBox from "Components/HomePage/Body/Left/Common/PointItemCheckBox";
-import { sortPointsWithSelectionOrder } from "Components/HomePage/hooks/points/sortPointsWithSelectionOrder";
-import { useMapPointSelectionClick } from "Components/HomePage/hooks/viewPlan/useMapPointSelectionClick";
-import { getPointsSelectionStep } from "Components/HomePage/hooks/points/pointsSelectionLog";
+import PointItemCheckBox from "Components/Common/PointItem/PointItemCheckBox";
+import { sortPointsWithSelectionOrder } from "helpers/points/sortPointsWithSelectionOrder";
+import { useMapPointSelectionClick } from "hooks/viewPlan/useMapPointSelectionClick";
+import { getPointsSelectionStep } from "helpers/points/pointsSelectionLog";
 
 export type WizardPointsListProps = {
   points: EnrichedPointType[];

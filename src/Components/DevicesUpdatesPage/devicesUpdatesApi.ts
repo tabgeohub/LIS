@@ -3,9 +3,17 @@ import type { GetacDevice } from "Types/devices";
 
 const API_BASE = `${getBackEndUrl()}/api/devices-updates`;
 
+type DevicesUpdatesErrorBody = {
+  error?: string;
+  message?: string;
+};
+
 async function parseError(response: Response, fallback: string) {
-  const body = await response.json().catch(() => null);
-  throw new Error(body?.error || fallback);
+  const body = (await response.json().catch(() => null)) as
+    | DevicesUpdatesErrorBody
+    | null;
+  const detail = body?.error || body?.message;
+  throw new Error(detail ? `${fallback}: ${detail}` : fallback);
 }
 
 export async function fetchDevicesUpdates(): Promise<GetacDevice[]> {
