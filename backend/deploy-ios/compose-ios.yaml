@@ -1,0 +1,20 @@
+# Standalone project; never merge with or replace the baseline compose configuration.
+name: lis-ios-bootstrap
+services:
+  ios-bootstrap:
+    image: lis-ios-bootstrap:${IOS_IMAGE_TAG:?Set an immutable revision tag}
+    build:
+      context: ..
+      dockerfile: dockerfile-ios
+    init: true
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    ports: ["127.0.0.1:5001:5001"]
+    environment:
+      NODE_ENV: production
+      IOS_HOST: 0.0.0.0
+      IOS_PORT: "5001"
+      IOS_PUBLIC_BASE_URL: http://acc-lis.rws.nl/backend/
+    stop_grace_period: 15s

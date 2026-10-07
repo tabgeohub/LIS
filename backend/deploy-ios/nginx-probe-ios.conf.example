@@ -1,0 +1,10 @@
+# REVIEW ONLY. Insert into the ACTUAL acceptance server block only after approval.
+# Baseline location /backend/ and every other route must remain unchanged.
+location = /backend/api/ios/bootstrap/probe {
+    proxy_pass http://127.0.0.1:5001/api/ios/bootstrap/probe;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Connection "";
+    proxy_connect_timeout 3s;
+    proxy_read_timeout 5s;
+}

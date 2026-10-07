@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "outDir": "./dist-ios" },
+  "include": ["src/server-ios.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist-test-ios"
+  },
+  "include": [
+    "src/bootstrap-ios.test.ts",
+    "src/Types/express-session.d.ts",
+    "src/server.ts",
+    "src/server-ios.ts"
+  ]
+}
