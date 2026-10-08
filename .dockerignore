@@ -1,6 +1,5 @@
 # .dockerignore
 node_modules
-backend
 .git
 .vscode
 npm-debug.log
