@@ -22,10 +22,13 @@ import reportUploadRouter from "../routes/reportUpload";
 import templateFlightsRouter from "../routes/template_plans";
 import timesliderRouter from "../routes/timeslider";
 import usersRouter from "../routes/users";
+import { createBootstrapProbeRouter } from "../routes/bootstrapProbe";
 
 /** Mount HTTP routes. OpenAPI coverage lives in `backend/src/docs/*.docs.ts`. */
 export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use(legacyAuthUsageMonitor);
+  // Local startup/registration readiness only; no identity or service checks.
+  app.use("/api/ios/bootstrap", createBootstrapProbeRouter());
   // Public / auth entrypoints
   app.use("/", main);
   app.use("/auth", authKeycloak);
