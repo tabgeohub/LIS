@@ -3,6 +3,11 @@ import { getOidcClientFor } from "../auth/oidc";
 import { attemptPasswordGrant, classifyGrantFailure } from "./grantHelpers";
 import type { KeycloakUserLookupResult } from "./keycloakUserLookup";
 import { persistLoginSession } from "./persistLoginSession";
+import {
+  requireLinkedIosIdentity,
+  resolveAuthenticatedIdentity,
+} from "./authIdentity";
+import { isIosClient } from "./authClientHeader";
 
 export type VerifyLookupDecision =
   | { kind: "invalid_username" }
@@ -64,7 +69,9 @@ export async function authenticatePasswordCredentials(input: {
     password: input.password,
   });
   const userInfo = await client.userinfo(tokenSet.access_token!);
-  await persistLoginSession({ req: input.req, tokenSet, userInfo });
+  const identity = await resolveAuthenticatedIdentity({ tokenSet, userInfo });
+  requireLinkedIosIdentity(isIosClient(input.req), identity);
+  await persistLoginSession({ req: input.req, tokenSet, userInfo, identity });
   return {
     username: userInfo.preferred_username || userInfo.email,
     name: userInfo.name,

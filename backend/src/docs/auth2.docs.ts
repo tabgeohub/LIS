@@ -5,25 +5,25 @@
  *     tags:
  *       - Auth2
  *     summary: Verify credentials (step 1) without creating a session
- *     description: Part of the Keycloak-backed auth2 flow. Requires the auth client header. Rate-limited.
+ *     description: Part of the Keycloak-backed auth2 flow. When AUTH2_REQUIRE_CLIENT_HEADER is enabled, requires x-lis-client: desktop or ios. Rate-limited.
  *     security: []
  *     parameters:
  *       - in: header
- *         name: x-auth-client
- *         required: true
+ *         name: x-lis-client
+ *         required: false
  *         schema:
  *           type: string
+ *           enum: [desktop, ios]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email, password]
+ *             required: [username, password]
  *             properties:
- *               email:
+ *               username:
  *                 type: string
- *                 format: email
  *               password:
  *                 type: string
  *                 format: password
@@ -45,14 +45,15 @@
  *     tags:
  *       - Auth2
  *     summary: Complete login and establish session
- *     description: Completes the auth2 login (password and/or OTP step). Requires the auth client header. Rate-limited.
+ *     description: Completes the auth2 login (password and/or OTP step). When AUTH2_REQUIRE_CLIENT_HEADER is enabled, requires x-lis-client: desktop or ios. Rate-limited.
  *     security: []
  *     parameters:
  *       - in: header
- *         name: x-auth-client
- *         required: true
+ *         name: x-lis-client
+ *         required: false
  *         schema:
  *           type: string
+ *           enum: [desktop, ios]
  *     requestBody:
  *       required: true
  *       content:
@@ -60,9 +61,8 @@
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               username:
  *                 type: string
- *                 format: email
  *               password:
  *                 type: string
  *                 format: password
@@ -87,10 +87,11 @@
  *     summary: Current authenticated user
  *     parameters:
  *       - in: header
- *         name: x-auth-client
- *         required: true
+ *         name: x-lis-client
+ *         required: false
  *         schema:
  *           type: string
+ *           enum: [desktop, ios]
  *     responses:
  *       200:
  *         description: Current user profile and roles
@@ -107,10 +108,11 @@
  *     summary: End the current session
  *     parameters:
  *       - in: header
- *         name: x-auth-client
- *         required: true
+ *         name: x-lis-client
+ *         required: false
  *         schema:
  *           type: string
+ *           enum: [desktop, ios]
  *     responses:
  *       200:
  *         description: Logged out

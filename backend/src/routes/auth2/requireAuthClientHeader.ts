@@ -3,8 +3,9 @@ import { isAllowedAuthClient } from "./authClientHeader";
 import { logAuthSecurityEvent } from "./authSecurityLog";
 
 /**
- * When AUTH2_REQUIRE_CLIENT_HEADER=true, auth2 endpoints require X-LIS-Client: desktop.
- * Applied to verify-credentials, login, me, and logout for consistent client separation.
+ * When AUTH2_REQUIRE_CLIENT_HEADER=true, auth2 endpoints require X-LIS-Client:
+ * desktop or ios. Applied to verify-credentials, login, me, and logout for
+ * consistent client separation.
  */
 export const requireAuthClientHeader: RequestHandler = (req, res, next) => {
   if (isAllowedAuthClient(req)) {

@@ -13,7 +13,10 @@ Desktop-oriented authentication under `/auth2/*`. Uses Keycloak password grant +
 
 ## Client header
 
-Set `AUTH2_REQUIRE_CLIENT_HEADER=true` to require `X-LIS-Client: desktop` on all auth2 routes above.
+Set `AUTH2_REQUIRE_CLIENT_HEADER=true` to require `X-LIS-Client: desktop` or
+`X-LIS-Client: ios` on all auth2 routes above. Requests with another value (or
+without the header) receive `403 CLIENT_HEADER_REQUIRED`. With the setting
+disabled, the existing web-compatible header-optional behavior is unchanged.
 
 Desktop sends this header on verify, login, logout, and `/auth2/me`.
 
@@ -34,6 +37,30 @@ Environment:
 If the Express cookie expires before Keycloak refresh tokens, the client must log in again even if Keycloak would still accept a refresh.
 
 `/auth2/me` calls `ensureFreshSession`, which can refresh Keycloak tokens while the backend session cookie is still valid.
+
+## Identity contract
+
+Successful `/auth2/login` and successful non-OTP `/auth2/verify-credentials`
+responses add `identity`; `/auth2/me` includes the same field. For a linked
+account it is:
+
+```json
+{
+  "user_id": 42,
+  "regio_id": "RWS EXAMPLE",
+  "is_admin": false
+}
+```
+
+`user_id` is selected from `lis.users.user_id` by the authenticated Keycloak
+`preferred_username` (or verified email fallback), case-insensitively. It is
+never guessed from a display name or OIDC `sub`. `regio_id` comes from the same
+realm-role selection used by existing region filters; `admin` yields
+`is_admin: true`. Desktop/web logins remain compatible when no legacy LIS user
+row is present and receive `identity: null`. iOS login/verification rejects an
+authenticated but unlinked account with `403 IDENTITY_NOT_LINKED` before a
+session is persisted, so native callers never receive a successful login
+without a numeric LIS user ID.
 
 ## OTP verify step
 

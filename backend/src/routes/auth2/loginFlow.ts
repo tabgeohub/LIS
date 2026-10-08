@@ -3,6 +3,11 @@ import { getOidcClientFor } from "../auth/oidc";
 import { attemptPasswordGrant } from "./grantHelpers";
 import { persistLoginSession } from "./persistLoginSession";
 import {
+  requireLinkedIosIdentity,
+  resolveAuthenticatedIdentity,
+} from "./authIdentity";
+import { isIosClient } from "./authClientHeader";
+import {
   respondToMappedLoginFailure,
   respondToStep2OtpFailure,
 } from "./loginFlowHelpers";
@@ -13,7 +18,9 @@ export async function authenticateLogin(req: Request, credentials: LoginCredenti
   const { client } = await getOidcClientFor(req);
   const tokenSet = await attemptPasswordGrant({ client, ...credentials });
   const userInfo = await client.userinfo(tokenSet.access_token!);
-  await persistLoginSession({ req, tokenSet, userInfo });
+  const identity = await resolveAuthenticatedIdentity({ tokenSet, userInfo });
+  requireLinkedIosIdentity(isIosClient(req), identity);
+  await persistLoginSession({ req, tokenSet, userInfo, identity });
   return {
     username: userInfo.preferred_username || userInfo.email,
     name: userInfo.name,

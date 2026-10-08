@@ -28,6 +28,11 @@ export function hasExplicitOtpRejectedSignal(normalized: string): boolean {
   return (
     normalized.includes("invalid totp") ||
     normalized.includes("invalid otp") ||
+    normalized.includes("expired totp") ||
+    normalized.includes("totp expired") ||
+    normalized.includes("expired otp") ||
+    normalized.includes("otp expired") ||
+    normalized.includes("expired authenticator") ||
     normalized.includes("wrong totp") ||
     normalized.includes("wrong otp") ||
     normalized.includes("totp validation")

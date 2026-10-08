@@ -27,6 +27,7 @@ export const meHandler: RequestHandler = async (req, res) => {
   return res.json({
     authenticated: true,
     ...body,
+    identity: auth.identity ?? null,
     ...(accessTokenExpiresAt
       ? { session: { accessTokenExpiresAt } }
       : {}),
