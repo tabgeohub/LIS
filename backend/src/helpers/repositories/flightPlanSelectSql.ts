@@ -32,6 +32,7 @@ export function buildFlightPlanSelectBody(input: {
         ${planColumns}
         JSON_AGG(
           ${pointJson}
+          ORDER BY plan_member.member_order
         ) AS points
       FROM ${input.planTable} ${input.planAlias}
       ${joins}`;

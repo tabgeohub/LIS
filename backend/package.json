@@ -11,6 +11,7 @@
     "test:bootstrap-probe": "npx ts-node --transpile-only src/routes/bootstrapProbe.test.ts",
     "test:server-lifecycle": "npx ts-node --transpile-only src/serverLifecycle.test.ts",
     "test:auth2-ios-contract": "npx ts-node --transpile-only src/routes/auth2/auth2IosContract.test.ts",
+    "test:flight-plan-claims": "npx ts-node --transpile-only src/routes/flightPlans/planClaims.test.ts",
     "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts",
     "test:post-login-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/resolvePostLoginRedirect.test.ts",
     "test:safe-server-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeServerRedirect.test.ts"

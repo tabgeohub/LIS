@@ -16,6 +16,7 @@ const POINT_JSON_FIELDS = {
   geometry_id: "'geometry_id', pt.geometry_id",
   geometry_type: "'geometry_type', g.type",
   geometry_omschrijving: "'geometry_omschrijving', g.omschrijving",
+  geometry_member_order: "'geometry_member_order', plan_member.member_order",
   datum: "'datum', pt.created_at",
 } as const;
 
@@ -45,6 +46,7 @@ const POINT_GEOMETRY_FIELDS = [
   "geometry_id",
   "geometry_type",
   "geometry_omschrijving",
+  "geometry_member_order",
 ] as const satisfies readonly PointJsonFieldKey[];
 const POINT_META_FIELDS = ["created_at"] as const satisfies readonly PointJsonFieldKey[];
 

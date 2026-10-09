@@ -13,6 +13,7 @@ import { deleteFlightPlan } from "./deleteFlightPlan";
 import { getPreparedFlightPlans } from "./getPreparedFlightPlans";
 import { getFullPreparedFlightPlans } from "./getFullPreparedFlightPlans";
 import { getSearchedFlightPlans } from "./getSearchedFlightPlans";
+import { claimPreparedPlanHandler, getPreparedPlanClaim } from "./planClaimHandlers";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get("/vluchtnummer/:vluchtnummer", getFlighPlansNummer);
 router.get("/unPreparedPlans", getUnPreparedPlans);
 router.get("/preparedFlighPlans", getPreparedFlightPlans);
 router.get("/fullPreparedFlightPlans", getFullPreparedFlightPlans);
+router.get("/flightplan/:id/claim", getPreparedPlanClaim);
 
 // Delete
 router.delete("/:id", deleteFlightPlan);
@@ -35,6 +37,7 @@ router.post("/", createFlightPlan);
 // Patch
 router.patch("/vluchtplans", updateVluchtPlan);
 router.patch("/updateFlightPlanStatus", updateFlightPlanStatus);
+router.put("/flightplan/:id/claim", claimPreparedPlanHandler);
 router.patch("/vluchtplans/points", updateVluchtPlanPoints);
 
 export default router;

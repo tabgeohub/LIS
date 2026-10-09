@@ -2,8 +2,11 @@ export function buildPointsUnnestJoin(
   planAlias: string,
   includeGeometry = false
 ): string {
-  const join = `JOIN LATERAL UNNEST(${planAlias}.points) AS point_id ON TRUE
-      JOIN lis.points pt ON pt.id = point_id`;
+  // The array is the only existing membership/vertex ordering source for a
+  // flight plan. Preserve its ordinality all the way to the JSON aggregate;
+  // point id ordering would silently change a line/polygon's vertex order.
+  const join = `JOIN LATERAL UNNEST(${planAlias}.points) WITH ORDINALITY AS plan_member(point_id, member_order) ON TRUE
+      JOIN lis.points pt ON pt.id = plan_member.point_id`;
 
   if (!includeGeometry) {
     return join;
