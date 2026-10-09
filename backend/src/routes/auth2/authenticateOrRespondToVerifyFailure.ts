@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import type { KeycloakUserLookupResult } from "./keycloakUserLookup";
 import { authenticatePasswordCredentials } from "./verifyCredentialsFlow";
 import { respondToVerifyGrantFailure } from "./respondToVerifyGrantFailure";
-import { isAuth2IdentityNotLinkedError } from "./authIdentity";
+import { isAuth2IdentityUnavailableError } from "./authIdentity";
 
 export async function authenticateOrRespondToVerifyFailure(input: {
   req: Request;
@@ -22,11 +22,11 @@ export async function authenticateOrRespondToVerifyFailure(input: {
       identity: input.req.session.auth?.identity ?? null,
     });
   } catch (error: unknown) {
-    if (isAuth2IdentityNotLinkedError(error)) {
-      return input.res.status(403).json({
+    if (isAuth2IdentityUnavailableError(error)) {
+      return input.res.status(502).json({
         success: false,
-        code: "IDENTITY_NOT_LINKED",
-        message: "Authenticated account is not linked to a LIS user",
+        code: "IDENTITY_UNAVAILABLE",
+        message: "Authenticated Keycloak response is missing a valid subject",
       });
     }
     return respondToVerifyGrantFailure({ ...input, error });

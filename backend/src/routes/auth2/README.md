@@ -38,29 +38,33 @@ If the Express cookie expires before Keycloak refresh tokens, the client must lo
 
 `/auth2/me` calls `ensureFreshSession`, which can refresh Keycloak tokens while the backend session cookie is still valid.
 
-## Identity contract
+## Identity contract v2 — Keycloak-only accounts
 
 Successful `/auth2/login` and successful non-OTP `/auth2/verify-credentials`
-responses add `identity`; `/auth2/me` includes the same field. For a linked
-account it is:
+responses add `identity`; `/auth2/me` derives the same field from the authenticated
+session userinfo and token roles (also for older/website sessions):
 
 ```json
 {
-  "user_id": 42,
+  "subject": "verified-keycloak-user-subject",
   "regio_id": "RWS EXAMPLE",
   "is_admin": false
 }
 ```
 
-`user_id` is selected from `lis.users.user_id` by the authenticated Keycloak
-`preferred_username` (or verified email fallback), case-insensitively. It is
-never guessed from a display name or OIDC `sub`. `regio_id` comes from the same
-realm-role selection used by existing region filters; `admin` yields
-`is_admin: true`. Desktop/web logins remain compatible when no legacy LIS user
-row is present and receive `identity: null`. iOS login/verification rejects an
-authenticated but unlinked account with `403 IDENTITY_NOT_LINKED` before a
-session is persisted, so native callers never receive a successful login
-without a numeric LIS user ID.
+`subject` is taken from the OIDC client's authenticated Keycloak userinfo `sub`,
+never from an incoming request, username or display name. Accounts and permissions
+are managed in Keycloak; no `lis.users` lookup or numeric `user_id` is required.
+`regio_id` comes from the existing realm-role selection; `admin` yields
+`is_admin: true`. If authenticated userinfo lacks a valid subject, iOS gets
+`502 IDENTITY_UNAVAILABLE` before persistence. Website/Desktop login behavior,
+cookie/session fixation prevention, OTP, limiters, refresh and logout are retained.
+No `IDENTITY_NOT_LINKED` restriction remains.
+
+This supersedes identity v1: native clients must consume `subject` instead of
+`user_id` and update with this backend change. Numeric identifiers needed by later
+upload endpoints require a separate contract; do not hash/truncate a UUID or
+create database users automatically. The existing routes are unchanged.
 
 ## OTP verify step
 

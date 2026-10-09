@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { ensureFreshSession } from "../../helpers/auth/ensureFreshSession";
+import { resolveAuthenticatedIdentity } from "./authIdentity";
 import {
   buildAuth2MeBody,
   unauthenticatedMeBody,
@@ -22,12 +23,16 @@ export const meHandler: RequestHandler = async (req, res) => {
   }
 
   const body = buildAuth2MeBody(req.session, auth);
+  // Also supports sessions created before identity v2 (including website login).
+  const identity = auth.userInfo
+    ? await resolveAuthenticatedIdentity({ tokenSet: auth.tokenSet, userInfo: auth.userInfo })
+    : null;
   const accessTokenExpiresAt = formatAccessTokenExpiry(auth.tokenSet.expires_at);
 
   return res.json({
     authenticated: true,
     ...body,
-    identity: auth.identity ?? null,
+    identity,
     ...(accessTokenExpiresAt
       ? { session: { accessTokenExpiresAt } }
       : {}),

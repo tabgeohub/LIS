@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import { logAuthSecurityEvent } from "./authSecurityLog";
 import { authenticateLogin, respondToLoginFailure } from "./loginFlow";
 import { parseLoginInput } from "./validateLoginInput";
-import { isAuth2IdentityNotLinkedError } from "./authIdentity";
+import { isAuth2IdentityUnavailableError } from "./authIdentity";
 
 export const loginHandler: RequestHandler = async (req, res) => {
   const credentials = parseLoginInput(req.body);
@@ -27,11 +27,11 @@ export const loginHandler: RequestHandler = async (req, res) => {
       identity: req.session.auth?.identity ?? null,
     });
   } catch (error: unknown) {
-    if (isAuth2IdentityNotLinkedError(error)) {
-      return res.status(403).json({
+    if (isAuth2IdentityUnavailableError(error)) {
+      return res.status(502).json({
         success: false,
-        code: "IDENTITY_NOT_LINKED",
-        message: "Authenticated account is not linked to a LIS user",
+        code: "IDENTITY_UNAVAILABLE",
+        message: "Authenticated Keycloak response is missing a valid subject",
       });
     }
     return respondToLoginFailure({ req, res, error, credentials });

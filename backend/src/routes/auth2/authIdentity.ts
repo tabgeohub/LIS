@@ -1,5 +1,4 @@
 import type { TokenSet, UserinfoResponse } from "openid-client";
-import type { Queryable } from "../../helpers/repositories/queryable";
 import {
   isAdminRegioValue,
   pickRegioRoleFromRealmRoles,
@@ -7,8 +6,8 @@ import {
 import { decodeJwtPayload } from "../auth/jwt";
 
 export type Auth2Identity = {
-  /** Numeric LIS database identifier, never inferred from an OIDC subject. */
-  user_id: number;
+  /** Verified Keycloak userinfo subject; independent of display name/username. */
+  subject: string;
   /** Existing LIS region-role value, or null when the account has no region role. */
   regio_id: string | null;
   is_admin: boolean;
@@ -19,13 +18,6 @@ type TokenClaims = {
 };
 
 type AuthIdentityTokenSet = Pick<TokenSet, "access_token" | "claims">;
-
-function defaultDatabase(): Queryable {
-  // Loading the pool lazily keeps header/validator-only paths and local mocked
-  // tests from opening a database connection. Production identity resolution
-  // still uses the shared application pool.
-  return (require("../../db") as { pool: Queryable }).pool;
-}
 
 function stringRoles(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -50,56 +42,44 @@ export function canonicalAuthenticatedUsername(
 }
 
 /**
- * Resolves the numeric LIS user record from the authenticated Keycloak account
- * name. Display names and JWT `sub` are intentionally never used as a mapping
- * source: neither is the LIS database user identifier.
+ * Consumes userinfo returned by the authenticated OIDC client after a successful
+ * grant. Never takes account identity or roles from the incoming request body.
  */
 export async function resolveAuthenticatedIdentity(input: {
   tokenSet: AuthIdentityTokenSet;
-  userInfo: Pick<UserinfoResponse, "preferred_username" | "email">;
-  db?: Queryable;
+  userInfo: Partial<Pick<UserinfoResponse, "sub" | "preferred_username" | "email">>;
 }): Promise<Auth2Identity | null> {
-  const username = canonicalAuthenticatedUsername(input.userInfo);
-  if (!username) return null;
-
-  const result = await (input.db ?? defaultDatabase()).query(
-    `SELECT user_id FROM lis.users
-     WHERE LOWER(user_name) = LOWER($1)
-     LIMIT 1`,
-    [username]
-  );
-  const candidate = result.rows[0]?.user_id;
-  const userId = typeof candidate === "number" ? candidate : Number(candidate);
-  if (!Number.isSafeInteger(userId) || userId <= 0) return null;
+  const subject = input.userInfo.sub;
+  if (typeof subject !== "string" || !subject.trim() || subject !== subject.trim()) return null;
 
   const regio_id = pickRegioRoleFromRealmRoles(
     realmRolesFromTokenSet(input.tokenSet)
   );
   return {
-    user_id: userId,
+    subject,
     regio_id: regio_id ?? null,
     is_admin: isAdminRegioValue(regio_id),
   };
 }
 
-export class Auth2IdentityNotLinkedError extends Error {
+export class Auth2IdentityUnavailableError extends Error {
   constructor() {
-    super("Authenticated account is not linked to a LIS user");
-    this.name = "Auth2IdentityNotLinkedError";
+    super("Authenticated Keycloak response is missing a valid subject");
+    this.name = "Auth2IdentityUnavailableError";
   }
 }
 
-export function requireLinkedIosIdentity(
+export function requireIosSubjectIdentity(
   isIosRequest: boolean,
   identity: Auth2Identity | null
 ): void {
   if (isIosRequest && !identity) {
-    throw new Auth2IdentityNotLinkedError();
+    throw new Auth2IdentityUnavailableError();
   }
 }
 
-export function isAuth2IdentityNotLinkedError(
+export function isAuth2IdentityUnavailableError(
   error: unknown
-): error is Auth2IdentityNotLinkedError {
-  return error instanceof Auth2IdentityNotLinkedError;
+): error is Auth2IdentityUnavailableError {
+  return error instanceof Auth2IdentityUnavailableError;
 }

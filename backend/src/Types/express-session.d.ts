@@ -13,7 +13,7 @@ declare module "express-session" {
       tokenSet: TokenSet;
       userInfo: Record<string, any>;
       identity?: {
-        user_id: number;
+        subject: string;
         regio_id: string | null;
         is_admin: boolean;
       };

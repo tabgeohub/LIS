@@ -105,7 +105,7 @@ async function run() {
   const identity = require("./authIdentity") as {
     resolveAuthenticatedIdentity: (input: any) => Promise<unknown>;
   };
-  const resolveIdentityFromStore = identity.resolveAuthenticatedIdentity;
+  const resolveIdentity = identity.resolveAuthenticatedIdentity;
 
   let refreshCount = 0;
   let revokeCount = 0;
@@ -116,6 +116,7 @@ async function run() {
   const tokenFor = (username: string, roles: string[], expiresAt: number) => {
     const accessToken = jwt(roles, expiresAt, username);
     userInfoForToken.set(accessToken, {
+      ...(username === "missing-subject" ? {} : { sub: `keycloak-${username}` }),
       preferred_username: username,
       name: `Fixture ${username}`,
       email: `${username}@example.invalid`,
@@ -155,6 +156,9 @@ async function run() {
       if (username === "unlinked" && params.password === "correct") {
         return tokenFor(username, ["RWS FIXTURE"], fresh);
       }
+      if (username === "missing-subject" && params.password === "correct") {
+        return tokenFor(username, ["RWS FIXTURE"], fresh);
+      }
       if (username === "expired-session" && params.password === "correct") {
         return tokenFor(username, ["RWS FIXTURE"], expired);
       }
@@ -178,17 +182,10 @@ async function run() {
   oidc.getOidcClientFor = async () => ({ client: mockClient });
   lookup.lookupKeycloakUser = async (_req: unknown, username: string) => {
     if (username === "otp-user") return { ok: true, userId: "keycloak-otp", hasOtp: true };
-    if (["fixture-user", "admin-user", "unlinked", "expired-session", "limited"].includes(username)) {
+    if (["fixture-user", "admin-user", "unlinked", "missing-subject", "expired-session", "limited"].includes(username)) {
       return { ok: true, userId: `keycloak-${username}`, hasOtp: false };
     }
     return { ok: false, reason: "not_found" };
-  };
-  identity.resolveAuthenticatedIdentity = async (input) => {
-    if (input.userInfo.preferred_username === "unlinked") return null;
-    if (input.userInfo.preferred_username === "admin-user") {
-      return { user_id: 77, regio_id: "admin", is_admin: true };
-    }
-    return { user_id: 42, regio_id: "RWS FIXTURE", is_admin: false };
   };
 
   const { createAuth2Router } = require("./index") as {
@@ -237,7 +234,7 @@ async function run() {
     });
     assert.equal(desktopLogin.statusCode, 200);
     assert.deepEqual(desktopLogin.body.identity, {
-      user_id: 42,
+      subject: "keycloak-fixture-user",
       regio_id: "RWS FIXTURE",
       is_admin: false,
     });
@@ -249,7 +246,7 @@ async function run() {
     });
     assert.equal(adminLogin.statusCode, 200);
     assert.deepEqual(adminLogin.body.identity, {
-      user_id: 77,
+      subject: "keycloak-admin-user",
       regio_id: "admin",
       is_admin: true,
     });
@@ -280,7 +277,7 @@ async function run() {
       body: { username: "otp-user", password: "correct", otp: "123456" },
     });
     assert.equal(otpLogin.statusCode, 200);
-    assert.equal(otpLogin.body.identity && (otpLogin.body.identity as { user_id: number }).user_id, 42);
+    assert.equal(otpLogin.body.identity && (otpLogin.body.identity as { subject: string }).subject, "keycloak-otp-user");
 
     const iosLogin = await request(server, {
       path: "/auth2/login",
@@ -289,7 +286,7 @@ async function run() {
     });
     assert.equal(iosLogin.statusCode, 200);
     assert.deepEqual(iosLogin.body.identity, {
-      user_id: 42,
+      subject: "keycloak-fixture-user",
       regio_id: "RWS FIXTURE",
       is_admin: false,
     });
@@ -350,9 +347,35 @@ async function run() {
       client: "ios",
       body: { username: "unlinked", password: "correct" },
     });
-    assert.equal(unlinked.statusCode, 403);
-    assert.equal(unlinked.body.code, "IDENTITY_NOT_LINKED");
-    assert.equal(unlinked.headers["set-cookie"], undefined);
+    assert.equal(unlinked.statusCode, 200, "Keycloak-only account needs no database user");
+    assert.equal((unlinked.body.identity as { subject: string }).subject, "keycloak-unlinked");
+    sessionCookie(unlinked);
+
+    const keycloakOnlyVerify = await request(server, {
+      path: "/auth2/verify-credentials", client: "ios",
+      body: { username: "unlinked", password: "correct", subject: "forged-subject", is_admin: true },
+    });
+    assert.equal(keycloakOnlyVerify.statusCode, 200);
+    assert.deepEqual(keycloakOnlyVerify.body.identity, {
+      subject: "keycloak-unlinked", regio_id: "RWS FIXTURE", is_admin: false,
+    });
+    sessionCookie(keycloakOnlyVerify);
+
+    process.env.AUTH2_REQUIRE_CLIENT_HEADER = "false";
+    const websiteCompatible = await request(server, {
+      path: "/auth2/login", body: { username: "fixture-user", password: "correct" },
+    });
+    process.env.AUTH2_REQUIRE_CLIENT_HEADER = "true";
+    assert.equal(websiteCompatible.statusCode, 200);
+    assert.equal((websiteCompatible.body.identity as { subject: string }).subject, "keycloak-fixture-user");
+
+    const missingSubject = await request(server, {
+      path: "/auth2/login", client: "ios",
+      body: { username: "missing-subject", password: "correct" },
+    });
+    assert.equal(missingSubject.statusCode, 502);
+    assert.equal(missingSubject.body.code, "IDENTITY_UNAVAILABLE");
+    assert.equal(missingSubject.headers["set-cookie"], undefined);
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const limited = await request(server, {
@@ -384,15 +407,15 @@ async function run() {
     });
     assert.equal(afterLogout.statusCode, 401);
 
-    const adminIdentity = await resolveIdentityFromStore({
+    const adminIdentity = await resolveIdentity({
       tokenSet: {
         access_token: jwt(["admin"], fresh),
         claims: () => ({ realm_access: { roles: ["admin"] } }),
       },
-      userInfo: { preferred_username: "admin-user" },
-      db: { query: async () => ({ rows: [{ user_id: "77" }] }) },
+      userInfo: { sub: "keycloak-admin-user", preferred_username: "renamed-admin" },
     });
-    assert.deepEqual(adminIdentity, { user_id: 77, regio_id: "admin", is_admin: true });
+    assert.deepEqual(adminIdentity, { subject: "keycloak-admin-user", regio_id: "admin", is_admin: true });
+    assert.equal(await resolveIdentity({ tokenSet: {}, userInfo: { preferred_username: "admin-user" } }), null);
   } finally {
     await close(server);
   }

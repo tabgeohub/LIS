@@ -4,7 +4,7 @@ import { attemptPasswordGrant, classifyGrantFailure } from "./grantHelpers";
 import type { KeycloakUserLookupResult } from "./keycloakUserLookup";
 import { persistLoginSession } from "./persistLoginSession";
 import {
-  requireLinkedIosIdentity,
+  requireIosSubjectIdentity,
   resolveAuthenticatedIdentity,
 } from "./authIdentity";
 import { isIosClient } from "./authClientHeader";
@@ -70,7 +70,7 @@ export async function authenticatePasswordCredentials(input: {
   });
   const userInfo = await client.userinfo(tokenSet.access_token!);
   const identity = await resolveAuthenticatedIdentity({ tokenSet, userInfo });
-  requireLinkedIosIdentity(isIosClient(input.req), identity);
+  requireIosSubjectIdentity(isIosClient(input.req), identity);
   await persistLoginSession({ req: input.req, tokenSet, userInfo, identity });
   return {
     username: userInfo.preferred_username || userInfo.email,

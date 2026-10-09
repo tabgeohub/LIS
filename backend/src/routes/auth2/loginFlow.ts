@@ -3,7 +3,7 @@ import { getOidcClientFor } from "../auth/oidc";
 import { attemptPasswordGrant } from "./grantHelpers";
 import { persistLoginSession } from "./persistLoginSession";
 import {
-  requireLinkedIosIdentity,
+  requireIosSubjectIdentity,
   resolveAuthenticatedIdentity,
 } from "./authIdentity";
 import { isIosClient } from "./authClientHeader";
@@ -19,7 +19,7 @@ export async function authenticateLogin(req: Request, credentials: LoginCredenti
   const tokenSet = await attemptPasswordGrant({ client, ...credentials });
   const userInfo = await client.userinfo(tokenSet.access_token!);
   const identity = await resolveAuthenticatedIdentity({ tokenSet, userInfo });
-  requireLinkedIosIdentity(isIosClient(req), identity);
+  requireIosSubjectIdentity(isIosClient(req), identity);
   await persistLoginSession({ req, tokenSet, userInfo, identity });
   return {
     username: userInfo.preferred_username || userInfo.email,
