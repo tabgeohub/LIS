@@ -16,9 +16,11 @@ export default async function arcgisPostProxyHandler(
     res.status(result.status);
     if (result.contentType) res.setHeader("content-type", result.contentType);
     res.send(result.body);
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Unknown error";
-    console.error("[arcgis] proxy POST error:", e);
-    res.status(500).json({ error: "Proxy request failed: " + message });
+  } catch (_error: unknown) {
+    console.error("[arcgis] proxy POST request failed");
+    res.status(500).json({
+      code: "ARCGIS_PROXY_UNAVAILABLE",
+      message: "ArcGIS proxy request failed",
+    });
   }
 }

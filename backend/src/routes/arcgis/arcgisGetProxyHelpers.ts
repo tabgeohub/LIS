@@ -43,8 +43,12 @@ export async function fetchArcgisGetProxy(targetUrl: string) {
   };
 }
 
-export function sendArcgisProxyError(res: Response, e: unknown): void {
-  const message = e instanceof Error ? e.message : "Unknown error";
-  console.error("[arcgis] proxy error:", e);
-  res.status(500).json({ error: "Proxy request failed: " + message });
+export function sendArcgisProxyError(res: Response, _error: unknown): void {
+  // A provider error can include request details. Keep server-side logging and
+  // the client response stable and free of provider/token text.
+  console.error("[arcgis] proxy request failed");
+  res.status(500).json({
+    code: "ARCGIS_PROXY_UNAVAILABLE",
+    message: "ArcGIS proxy request failed",
+  });
 }
