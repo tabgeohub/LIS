@@ -8,7 +8,7 @@ import { getSingleFinishedFlightPlan } from "./getSingleFinishedFlightPlan";
 import { updateFinishedPointAttachments } from "./updateFinishedPointAttachments";
 import { createAttachment } from "./createAttachment";
 import { getAttachmentsPlanSinglePoint } from "./getAttachmentsPlanSinglePoint";
-import { getIOSFinishedPlanReceipt, postIOSFinishedPlan } from "./iosFinishedPlanHandlers";
+import { getIOSFinishedPlanReceipt, postIOSFinishedPlan, reconcileIOSFinishedPlan } from "./iosFinishedPlanHandlers";
 
 const router = Router();
 
@@ -16,6 +16,7 @@ const router = Router();
 router.post("/", createFinishedPlan);
 router.post("/attachment", createAttachment);
 router.post("/ios/submit", postIOSFinishedPlan);
+router.post("/ios/reconcile", reconcileIOSFinishedPlan);
 
 // Get
 router.get("/", getFinishedFlightPlans);

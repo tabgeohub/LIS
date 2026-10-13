@@ -15,13 +15,24 @@ export async function postIOSFinishedPlan(req: Request, res: Response): Promise<
   try {
     const result = await submitFinishedPlanIdempotently(input, principal);
     if (result.kind === "confirmed") { res.status(200).json({ planId: result.receipt.planId, receipt: result.receipt }); return; }
-    res.status(status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}`, message: "Finished-plan submission was not accepted" });
+    res.status(result.kind === "pending" ? 202 : status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}`, message: "Finished-plan submission was not accepted" });
   } catch { res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: "Finished-plan submission could not be reconciled" }); }
 }
 export async function getIOSFinishedPlanReceipt(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
   if (!principal) { res.status(403).json({ code: "PLAN_IDENTITY_UNAVAILABLE", message: "A Keycloak plan identity is required" }); return; }
   const receipt = await readFinishedPlanReceipt(req.params.operationKey, principal);
-  if (!receipt) { res.status(404).json({ code: "FINISHED_PLAN_RECEIPT_NOT_FOUND", message: "Finished-plan receipt was not found" }); return; }
+  if (!receipt) { res.status(202).json({ code: "FINISHED_PLAN_PROJECTION_REQUIRED", message: "Reconcile the frozen projection; no persistent operation receipt exists" }); return; }
   res.status(200).json({ planId: receipt.planId, receipt });
+}
+export async function reconcileIOSFinishedPlan(req: Request, res: Response): Promise<void> {
+  const principal = await resolvePlanPrincipal(req);
+  if (!principal) { res.status(403).json({ code: "PLAN_IDENTITY_UNAVAILABLE" }); return; }
+  const input = validateFinishedPlanSubmitInput(req.body);
+  if (!input) { res.status(400).json({ code: "FINISHED_PLAN_OPERATION_INVALID" }); return; }
+  try {
+    const result = await submitFinishedPlanIdempotently(input, principal, undefined, true);
+    if (result.kind === "confirmed") { res.status(200).json({ planId: result.receipt.planId, receipt: result.receipt }); return; }
+    res.status(result.kind === "pending" ? 202 : status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}` });
+  } catch { res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE" }); }
 }

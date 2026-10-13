@@ -11,13 +11,17 @@ export async function postIOSLogOperation(req: Request, res: Response): Promise<
   try {
     const result = await submitIOSLogsIdempotently(input, principal);
     if (result.kind === "confirmed") { res.status(200).json({ operation_key: input.operation_key, receipt: result.receipt }); return; }
-    res.status(status(result.kind)).json({ code: `LOG_OPERATION_${result.kind.toUpperCase()}`, message: "Log operation was not accepted" });
+    if (result.kind === "prepared") { res.status(200).json({ operation_key: input.operation_key, write_permit: result.write_permit }); return; }
+    res.status(result.kind === "uncertain" ? 202 : status(result.kind)).json({ code: `LOG_OPERATION_${result.kind.toUpperCase()}`, message: "Log operation was not accepted" });
   } catch { res.status(503).json({ code: "LOG_OPERATION_UNAVAILABLE", message: "Log operation could not be reconciled" }); }
 }
 export async function getIOSLogOperation(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
   if (!principal) { res.status(403).json({ code: "LOG_IDENTITY_UNAVAILABLE", message: "A Keycloak log identity is required" }); return; }
-  const receipt = await readIOSLogReceipt(req.params.operationKey, principal);
-  if (!receipt) { res.status(404).json({ code: "LOG_OPERATION_RECEIPT_NOT_FOUND", message: "Log receipt was not found" }); return; }
-  res.status(200).json({ operation_key: req.params.operationKey, receipt });
+  try {
+    const context = typeof req.headers["x-lis-recovery-context"] === "string" ? req.headers["x-lis-recovery-context"] : undefined;
+    const receipt = await readIOSLogReceipt(req.params.operationKey, principal, undefined, context);
+    if (!receipt) { res.status(202).json({ code: "LOG_OPERATION_UNCERTAIN", message: "No identifiable log group confirmed" }); return; }
+    res.status(200).json({ operation_key: req.params.operationKey, receipt });
+  } catch { res.status(409).json({ code: "LOG_RECOVERY_CONTEXT_CONFLICT" }); }
 }

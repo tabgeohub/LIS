@@ -29,7 +29,7 @@ export function finishedPlanFail(input: FinishedPlanFailInput) {
 type FinishedPlanAttachment = {
   url: string;
   objectId?: number | string | null;
-  taken_at?: string | Date | null;
+  taken_at?: number | string | Date | null;
   long?: number | null;
   lat?: number | null;
 };

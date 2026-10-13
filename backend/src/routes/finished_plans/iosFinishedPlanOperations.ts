@@ -1,96 +1,103 @@
-import crypto from "node:crypto";
 import type { Pool, PoolClient } from "pg";
-import { pool } from "../../db";
 import { saveFinishedPlanInTransaction } from "../../helpers/finished-plans/createFinishedPlanDb";
 import { type IncomingPlan } from "../../helpers/validators/finishedPlan";
 import type { PlanPrincipal } from "../flightPlans/planAccess";
 import { hasPlanRegionAccess } from "../flightPlans/planAccess";
+import { digest, canonical, RecoverySigner, recoverySigner, validOperationKey } from "../iosRecovery";
+import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 
-export type FinishedPlanSubmitInput = {
-  operation_key: string;
-  package_hash: string;
-  plan: IncomingPlan;
-  /** Full immutable mobile payload retained only by the client/package today. */
-  package_payload: unknown;
-};
-export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; accepted_at?: string };
-type ReceiptRow = FinishedPlanReceipt & { owner_subject: string; plan_id: number };
-
-function isUuid(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-}
-function isHash(value: unknown): value is string { return typeof value === "string" && /^[a-f0-9]{64}$/i.test(value); }
-
-/** Stable key ordering makes conflicting reuse detect the actual submitted shape. */
-function canonical(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
-  if (value && typeof value === "object") return `{${Object.keys(value as Record<string, unknown>).sort().map(k => `${JSON.stringify(k)}:${canonical((value as Record<string, unknown>)[k])}`).join(",")}}`;
-  return JSON.stringify(value);
-}
+export type FinishedPlanSubmitInput = { operation_key: string; package_hash: string; plan: IncomingPlan; package_payload: unknown };
+export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; provenance: "direct_commit" | "state_verified" };
+export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "not_prepared" | "conflict" | "pending" };
 export function finishedPlanPayloadHash(input: Pick<FinishedPlanSubmitInput, "package_hash" | "plan" | "package_payload">): string {
-  return crypto.createHash("sha256").update(canonical({ package_hash: input.package_hash, plan: input.plan, package_payload: input.package_payload })).digest("hex");
+  return digest({ package_hash: input.package_hash.toLowerCase(), plan: input.plan, package_payload: input.package_payload });
 }
 export function validateFinishedPlanSubmitInput(value: unknown): FinishedPlanSubmitInput | null {
-  if (!value || typeof value !== "object") return null;
-  const raw = value as Record<string, unknown>;
-  const plan = raw.plan as IncomingPlan;
-  if (!isUuid(raw.operation_key) || !isHash(raw.package_hash) || !plan || !Number.isSafeInteger(plan.id) || !Array.isArray(plan.points) || !Object.prototype.hasOwnProperty.call(raw, "package_payload")) return null;
-  return { operation_key: raw.operation_key, package_hash: raw.package_hash.toLowerCase(), plan, package_payload: raw.package_payload };
+  const r = value as FinishedPlanSubmitInput;
+  if (!r || !validOperationKey(r.operation_key) || !/^[a-f0-9]{64}$/.test(r.package_hash) ||
+    !r.plan || !Number.isSafeInteger(r.plan.id) || r.plan.id <= 0 || !Array.isArray(r.plan.points) || !Object.prototype.hasOwnProperty.call(r, "package_payload") ||
+    r.plan.points.some(p => !Number.isSafeInteger(p.id) || p.id <= 0 || typeof p.omschrijving !== "string" || !Number.isInteger(p.order) ||
+      (p.attachments || []).some(a => !Number.isSafeInteger(a.taken_at) || typeof a.url !== "string")) || new Set(r.plan.points.map(p => p.id)).size !== r.plan.points.length) return null;
+  return r;
 }
-
-function mapReceipt(row: any): FinishedPlanReceipt { return { operation_key: row.operation_key, planId: Number(row.plan_id), package_hash: row.package_hash, payload_hash: row.payload_hash, accepted_at: row.accepted_at ? new Date(row.accepted_at).toISOString() : undefined }; }
-async function ownedClaim(client: PoolClient, planID: number, subject: string): Promise<boolean> {
-  const row = (await client.query(`SELECT owner_subject, expires_at FROM lis.flightplan_claims WHERE plan_id = $1 FOR UPDATE`, [planID])).rows[0];
-  return !!row && row.owner_subject === subject && new Date(row.expires_at).getTime() > Date.now();
+function confirmation(input: FinishedPlanSubmitInput, provenance: FinishedPlanReceipt["provenance"]): FinishedPlanSubmitResult {
+  return { kind: "confirmed", receipt: { operation_key: input.operation_key, planId: input.plan.id, package_hash: input.package_hash, payload_hash: finishedPlanPayloadHash(input), provenance } };
 }
+function same(a: unknown, b: unknown): boolean { return canonical(a) === canonical(b); }
+function parsed(value: unknown): unknown { if (typeof value !== "string") return value; try { return JSON.parse(value); } catch { return value; } }
+function date(value: unknown): number | null { if (value == null) return null; const ms = new Date(value as any).getTime(); return Number.isNaN(ms) ? null : ms; }
 
-export type FinishedPlanSubmitResult =
-  | { kind: "confirmed"; receipt: FinishedPlanReceipt }
-  | { kind: "not_found" | "forbidden" | "unclaimed" | "not_prepared" | "conflict" | "schema_required" };
-
-/**
- * The receipt row, not merely the transaction, makes a lost HTTP response
- * readable on retry. A plan row lock serializes concurrent submissions for a
- * single plan before legacy writes run.
- */
-export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitInput, principal: PlanPrincipal, db: Pick<Pool, "connect"> = pool): Promise<FinishedPlanSubmitResult> {
-  const client = await db.connect();
-  try {
-    const payloadHash = finishedPlanPayloadHash(input);
-    await client.query("BEGIN");
-    const planRow = (await client.query(`SELECT id, regio_id, status FROM lis.flightPlans WHERE id = $1 FOR UPDATE`, [input.plan.id])).rows[0];
-    if (!planRow) { await client.query("ROLLBACK"); return { kind: "not_found" }; }
-    if (!hasPlanRegionAccess(principal, planRow.regio_id)) { await client.query("ROLLBACK"); return { kind: "forbidden" }; }
-    const existing = (await client.query(`SELECT * FROM lis.ios_finished_plan_receipts WHERE operation_key = $1 FOR UPDATE`, [input.operation_key])).rows[0] as ReceiptRow | undefined;
-    if (existing) {
-      const same = existing.owner_subject === principal.subject && Number(existing.plan_id) === input.plan.id && existing.package_hash === input.package_hash && existing.payload_hash === payloadHash;
-      await client.query("COMMIT");
-      return same ? { kind: "confirmed", receipt: mapReceipt(existing) } : { kind: "conflict" };
+/** Compare every ordinary persisted projection field, without selecting latest rows. */
+export async function projectionMatches(client: Pick<PoolClient, "query">, plan: IncomingPlan): Promise<boolean> {
+  const rows = (await client.query("SELECT f.*, p.omschrijving FROM lis.finished_plans f JOIN lis.points p ON p.id = f.point_id WHERE f.plan_id = $1", [plan.id])).rows;
+  if (rows.length !== plan.points.length || new Set(rows.map(r => Number(r.point_id))).size !== rows.length) return false;
+  const paths = (await client.query("SELECT path, flighttime FROM lis.finished_plans_path WHERE planid = $1", [plan.id])).rows;
+  if (paths.length !== 1 || !same(parsed(paths[0].path), plan.pathData ?? null) || !same(parsed(paths[0].flighttime), plan.flightTime ?? null)) return false;
+  const referenced = rows.flatMap(r => r.attachments_id || []).map(Number);
+  if (new Set(referenced).size !== referenced.length) return false;
+  const attachments = (await client.query("SELECT id, url, point_id, attachmentid, taken_at, location FROM lis.attachments WHERE id = ANY($1::integer[])", [referenced])).rows;
+  if (attachments.length !== referenced.length) return false;
+  for (const point of plan.points) {
+    const row = rows.find(r => Number(r.point_id) === point.id);
+    if (!row || row.omschrijving !== point.omschrijving || row.status !== "bezocht" ||
+      Number(row.point_order) !== point.order || row.pointcomment !== (point.comment ?? "") || (row.spoed ?? null) !== (point.spoed ?? null) ||
+      (row.emailadres ?? null) !== (point.sendToEmail ?? null) || date(row.finished_at) !== date(point.finishedAt)) return false;
+    const actual = (row.attachments_id || []).map((id: number) => attachments.find(a => Number(a.id) === Number(id)));
+    const expected = point.attachments || [];
+    if (actual.length !== expected.length) return false;
+    for (let i = 0; i < expected.length; i++) {
+      const a = actual[i], e = expected[i];
+      const lat = e.lat ?? point.latitude, lon = e.long ?? point.longitude;
+      const location = lat == null || lon == null ? null : String(lat) + "," + String(lon);
+      if (!a || Number(a.point_id) !== point.id || a.url !== e.url || Number(a.attachmentid) !== Number(e.objectId) ||
+        Number(a.taken_at) !== e.taken_at || (a.location ?? null) !== location) return false;
     }
-    if (!(await ownedClaim(client, input.plan.id, principal.subject))) { await client.query("ROLLBACK"); return { kind: "unclaimed" }; }
-    if (planRow.status !== "prepared") { await client.query("ROLLBACK"); return { kind: "not_prepared" }; }
-    // user_id remains intentionally untouched: Keycloak subject v2 is not a
-    // numeric LIS user. New point writes need their own verified server mapping.
-    if (input.plan.points.some(point => point.id < 0)) { await client.query("ROLLBACK"); return { kind: "conflict" }; }
-    await saveFinishedPlanInTransaction(client, input.plan);
-    const inserted = (await client.query(
-      `INSERT INTO lis.ios_finished_plan_receipts (operation_key, owner_subject, plan_id, package_hash, payload_hash, package_payload)
-       VALUES ($1,$2,$3,$4,$5,$6::jsonb) RETURNING *`,
-      [input.operation_key, principal.subject, input.plan.id, input.package_hash, payloadHash, JSON.stringify(input.package_payload)]
-    )).rows[0];
+  }
+  return true;
+}
+function verifiedPhotos(input: FinishedPlanSubmitInput, principal: PlanPrincipal, signer: RecoverySigner): boolean {
+  try {
+    const seen = new Set<string>();
+    for (const point of input.plan.points) for (const a of point.attachments || []) {
+      if (seen.has(a.url)) return false;
+      seen.add(a.url);
+      const context = (a as any).recovery_context;
+      if (typeof context !== "string") return false;
+      const e = signer.verify(context, "photo", principal.subject);
+      if (!validOperationKey(e.operation_key) || !/^[a-f0-9]{64}$/.test(e.attachment_sha256) || !Number.isInteger(e.byte_count) || e.byte_count <= 0 || e.byte_count > 16 * 1024 * 1024 ||
+        !["image/png", "image/jpeg", "image/heic"].includes(e.mime_type) || e.plan_id !== input.plan.id || e.owner_point_id !== point.id || e.package_hash !== input.package_hash ||
+        e.feature_object_id !== a.objectId || e.url !== a.url || !Number.isSafeInteger(e.attachment_id) ||
+        a.url !== ATTACHMENT_LAYER + "/" + e.feature_object_id + "/attachments/" + e.attachment_id) return false;
+    }
+    return true;
+  } catch { return false; }
+}
+export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitInput, principal: PlanPrincipal, db?: Pick<Pool, "connect">, readOnly = false, signer?: RecoverySigner): Promise<FinishedPlanSubmitResult> {
+  db ||= require("../../db").pool;
+  signer ||= recoverySigner();
+  if (!validateFinishedPlanSubmitInput(input) || !verifiedPhotos(input, principal, signer)) return { kind: "conflict" };
+  const client = await db!.connect();
+  try {
+    await client.query(readOnly ? "BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
+    const row = (await client.query("SELECT id, regio_id, status, points FROM lis.flightPlans WHERE id = $1" + (readOnly ? "" : " FOR UPDATE"), [input.plan.id])).rows[0];
+    let result: FinishedPlanSubmitResult;
+    if (!row) result = { kind: "not_found" };
+    else if (!hasPlanRegionAccess(principal, row.regio_id)) result = { kind: "forbidden" };
+    else if (!same((row.points || []).map(Number), input.plan.points.map(p => p.id))) result = { kind: "conflict" };
+    else if (row.status === "finished") result = await projectionMatches(client, input.plan) ? confirmation(input, "state_verified") : { kind: "conflict" };
+    else if (readOnly) result = { kind: "pending" };
+    else if (row.status !== "prepared") result = { kind: "not_prepared" };
+    else {
+      // Existing ambiguous prior rows cannot be overwritten or appended to.
+      const old = await client.query("SELECT point_id FROM lis.finished_plans WHERE plan_id = $1", [input.plan.id]);
+      const oldPaths = await client.query("SELECT planid FROM lis.finished_plans_path WHERE planid = $1", [input.plan.id]);
+      if (old.rows.length || oldPaths.rows.length) result = { kind: "conflict" };
+      else { await saveFinishedPlanInTransaction(client, input.plan); result = confirmation(input, "direct_commit"); }
+    }
     await client.query("COMMIT");
-    return { kind: "confirmed", receipt: mapReceipt(inserted) };
-  } catch (error: any) {
-    try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
-    if (error?.code === "42P01") return { kind: "schema_required" };
-    throw error;
-  } finally { client.release(); }
+    return result;
+  } catch (error) { try { await client.query("ROLLBACK"); } catch {} throw error; }
+  finally { client.release(); }
 }
-
-export async function readFinishedPlanReceipt(operationKey: string, principal: PlanPrincipal, db: Pick<Pool, "query"> = pool): Promise<FinishedPlanReceipt | null> {
-  const result = await db.query(`SELECT r.* FROM lis.ios_finished_plan_receipts r
-    JOIN lis.flightPlans fp ON fp.id = r.plan_id
-    WHERE r.operation_key = $1 AND r.owner_subject = $2 AND (fp.regio_id = $3 OR $4::boolean)`,
-    [operationKey, principal.subject, principal.regio_id, principal.is_admin]);
-  return result.rows[0] ? mapReceipt(result.rows[0]) : null;
-}
+// Operation key alone cannot identify any persistent receipt in this contract.
+export async function readFinishedPlanReceipt(_key: string, _principal: PlanPrincipal): Promise<FinishedPlanReceipt | null> { return null; }

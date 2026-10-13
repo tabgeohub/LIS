@@ -45,9 +45,15 @@ export async function handleArcgisIOSCredentialContract(
     }
 
     res.json({
-      version: 1,
+      version: 2,
       mode: "server_proxy",
       get_proxy_path: "api/arcgis/proxy",
+      upload_contract: "existing_records_v2",
+      max_photo_bytes: 16 * 1024 * 1024,
+      persistent_claims: false,
+      durable_operation_receipts: false,
+      uncertain_writes: "reconcile_or_review",
+      first_write_permits: "process_bound_single_use",
     });
   } catch (_error: unknown) {
     console.error("[arcgis] iOS credential contract failed");

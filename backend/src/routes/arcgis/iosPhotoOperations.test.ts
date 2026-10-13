@@ -1,70 +1,99 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import crypto from "node:crypto";
-import {
-  reconcileOrCreatePhoto,
-  setArcgisPhotoProviderForTests,
-  type ArcgisPhotoProvider,
-  validatePhotoOperationInput,
-} from "./iosPhotoOperations";
-
-const bytes = Buffer.from("mock-photo-bytes");
-const sha = crypto.createHash("sha256").update(bytes).digest("hex");
-const principal = { subject: "keycloak-a", regio_id: "RWS TEST", is_admin: false };
-function input(packageHash = "a".repeat(64)) {
-  return validatePhotoOperationInput({ operation_key: "11111111-1111-4111-8111-111111111111", package_hash: packageHash,
-    local_attachment_id: "photo-a", owner_point_id: 11, plan_id: 7, attachment_sha256: sha, mime_type: "image/jpeg" }, bytes)!;
+import { validatePhotoOperationInput, reconcileOrCreatePhoto, readPhotoOperation, type ArcgisPhotoProvider } from "./iosPhotoOperations";
+import { RecoverySigner } from "../iosRecovery";
+import { WritePermits } from "../iosWritePermit";
+import { makeArcgisPhotoProvider, ATTACHMENT_LAYER } from "./iosArcgisPhotoProvider";
+const principal = { subject: "synthetic", regio_id: "TEST", is_admin: false };
+const signer = new RecoverySigner("synthetic-only-secret");
+const bytes = Buffer.from([137,80,78,71,13,10,26,10,1,2,3]);
+const db: any = { query: async (sql: string) => { assert(!/ios_photo|receipt|claim/.test(sql)); return { rows: [{ id: 7 }], rowCount: 1 }; } };
+const input = () => ({ operation_key: crypto.randomUUID(), package_hash: "a".repeat(64), local_attachment_id: "photo", owner_point_id: 11, plan_id: 7, attachment_sha256: crypto.createHash("sha256").update(bytes).digest("hex"), mime_type: "image/png", byte_count: bytes.length, phase: "prepare" as const });
+function fixture(lost = false) {
+ let features = 0, uploads = 0, saved = false;
+ const provider: ArcgisPhotoProvider = {
+  createFeature: async () => { features++; return 31; },
+  addAttachment: async () => { uploads++; saved = true; if(lost) throw Error("lost"); return 87; },
+  read: async () => saved ? { feature_object_id:31, attachment_id:87, url:"https://synthetic.invalid/31/attachments/87", evidence:{ attachment_sha256:input().attachment_sha256, byte_count:bytes.length } } : null
+ };
+ return { provider, counts: () => [features,uploads] };
 }
-
-/** Deliberately local in-memory SQL fixture: it proves application branching,
- * not PostgreSQL locking or a real ArcGIS provider. */
-function fixturePool() {
-  const rows = new Map<string, any>();
-  const query = async (sql: string, params: any[] = []) => {
-    if (sql.includes("SELECT fp.id FROM lis.flightPlans")) return { rows: [{ id: 7 }], rowCount: 1 };
-    if (sql.includes("SELECT * FROM lis.ios_photo_operations")) return { rows: rows.has(params[0]) ? [rows.get(params[0])] : [], rowCount: rows.has(params[0]) ? 1 : 0 };
-    if (sql.includes("INSERT INTO lis.ios_photo_operations")) {
-      const row = { operation_key: params[0], owner_subject: params[1], plan_id: params[2], owner_point_id: params[3], package_hash: params[4], local_attachment_id: params[5], payload_hash: params[6], outcome: "pending", provider_evidence: {} };
-      rows.set(params[0], row); return { rows: [], rowCount: 1 };
-    }
-    if (sql.includes("UPDATE lis.ios_photo_operations")) {
-      const row = rows.get(params[0]); Object.assign(row, { outcome: params[1], feature_object_id: params[2], provider_attachment_id: params[3], remote_url: params[4], provider_evidence: JSON.parse(params[5]) });
-      return { rows: [row], rowCount: 1 };
-    }
-    return { rows: [], rowCount: 0 };
-  };
-  return { connect: async () => ({ query, release() {} }) } as any;
-}
-
-test("photo confirmation is durable and repeated operation identity reuses the distinct receipt", async () => {
-  let creates = 0;
-  const provider: ArcgisPhotoProvider = {
-    async readback() { return { outcome: "not_created", evidence: { source: "mock readback" } }; },
-    async create() { creates += 1; return { outcome: "confirmed", receipt: { feature_object_id: 81, attachment_id: 91, url: "https://mock/91", evidence: { source: "mock create" } } }; },
-  };
-  setArcgisPhotoProviderForTests(provider);
-  const db = fixturePool();
-  const first = await reconcileOrCreatePhoto(input(), principal, db);
-  const repeated = await reconcileOrCreatePhoto(input(), principal, db);
-  assert.equal(first.outcome, "confirmed"); assert.equal(repeated.outcome, "confirmed");
-  assert.deepEqual(repeated.receipt && [repeated.receipt.feature_object_id, repeated.receipt.attachment_id, repeated.receipt.url], [81, 91, "https://mock/91"]);
-  assert.equal(creates, 1);
-  setArcgisPhotoProviderForTests(null);
+test("phased photo acknowledgments, concurrent suppression, distinct IDs and safe readback", async () => {
+ const i = input(), f = fixture();
+ const permit = await reconcileOrCreatePhoto(i,principal,db,f.provider,signer);
+ const request = {...i,phase:"feature" as const,write_permit:permit.write_permit};
+ const [feature, duplicate] = await Promise.all([reconcileOrCreatePhoto(request,principal,db,f.provider,signer),reconcileOrCreatePhoto(request,principal,db,f.provider,signer)]);
+ assert.deepEqual(feature,duplicate); assert.equal(feature.httpStatus,202); assert.deepEqual(f.counts(),[1,0]);
+ const attach = {...i,phase:"attachment" as const,bytes,write_permit:feature.write_permit,recovery_context:feature.recovery_context};
+ const complete = await reconcileOrCreatePhoto(attach,principal,db,f.provider,signer);
+ assert.equal(complete.httpStatus,200); assert.equal(complete.receipt?.attachment_id,87);
+ assert.equal((await readPhotoOperation(i.operation_key,principal,db,complete.recovery_context,f.provider,signer)).outcome,"confirmed");
+ assert.deepEqual(f.counts(),[1,1]);
+ assert.equal((await reconcileOrCreatePhoto({...attach,owner_point_id:12},principal,db,f.provider,signer)).httpStatus,409);
+ const conflicting=signer.sign("photo",principal.subject,{...i,feature_object_id:32});
+ assert.equal((await reconcileOrCreatePhoto({...attach,recovery_context:conflicting},principal,db,f.provider,signer)).httpStatus,409);
+ assert.equal((await readPhotoOperation(i.operation_key,{...principal,subject:"wrong"},db,complete.recovery_context,f.provider,signer)).httpStatus,409);
 });
-
-test("uncertain provider evidence is retained and never advances to a blind create", async () => {
-  let creates = 0;
-  setArcgisPhotoProviderForTests({ async readback() { return { outcome: "uncertain", evidence: { source: "lost response" } }; }, async create() { creates += 1; return { outcome: "not_created", evidence: {} }; } });
-  const result = await reconcileOrCreatePhoto(input(), principal, fixturePool());
-  assert.equal(result.httpStatus, 202); assert.equal(result.outcome, "uncertain"); assert.equal(creates, 0);
-  setArcgisPhotoProviderForTests(null);
+test("lost attachment response reconciles by content; absent context never confirms or writes", async () => {
+ const i=input(),f=fixture(true);
+ const p=await reconcileOrCreatePhoto(i,principal,db,f.provider,signer);
+ const feature=await reconcileOrCreatePhoto({...i,phase:"feature",write_permit:p.write_permit},principal,db,f.provider,signer);
+ const lost=await reconcileOrCreatePhoto({...i,phase:"attachment",bytes,recovery_context:feature.recovery_context,write_permit:feature.write_permit},principal,db,f.provider,signer);
+ assert.equal(lost.outcome,"uncertain");
+ assert.equal((await readPhotoOperation(i.operation_key,principal,db,feature.recovery_context,f.provider,signer)).outcome,"confirmed");
+ assert.equal((await readPhotoOperation(i.operation_key,principal,db,undefined,f.provider,signer)).httpStatus,202);
+ assert.deepEqual(f.counts(),[1,1]);
 });
-
-test("operation key cannot be rebound to a different photo package", async () => {
-  setArcgisPhotoProviderForTests({ async readback() { return { outcome: "not_created", evidence: {} }; }, async create() { return { outcome: "confirmed", receipt: { feature_object_id: 1, attachment_id: 2, url: "https://mock/2", evidence: {} } }; } });
-  const db = fixturePool();
-  await reconcileOrCreatePhoto(input(), principal, db);
-  const conflict = await reconcileOrCreatePhoto(input("b".repeat(64)), principal, db);
-  assert.equal(conflict.code, "PHOTO_OPERATION_KEY_CONFLICT");
-  setArcgisPhotoProviderForTests(null);
+test("MIME magic, hash, count, maximum and owner checks reject before writes", async () => {
+ const i=input();
+ assert(validatePhotoOperationInput(i));
+ assert.equal(validatePhotoOperationInput({...i,phase:"attachment",recovery_context:"x",mime_type:"image/jpeg"},bytes),null);
+ assert.equal(validatePhotoOperationInput({...i,phase:"attachment",recovery_context:"x",attachment_sha256:"b".repeat(64)},bytes),null);
+ assert.equal(validatePhotoOperationInput({...i,byte_count:16*1024*1024+1}),null);
+ const denied:any={query:async()=>({rows:[],rowCount:0})}, f=fixture();
+ assert.equal((await reconcileOrCreatePhoto(i,principal,denied,f.provider,signer)).httpStatus,403);
+ assert.deepEqual(f.counts(),[0,0]);
+});
+test("single-use write permit is bound to process, owner, operation and payload", async () => {
+ const first = new WritePermits(), next = new WritePermits();
+ const token=first.issue("owner","op","hash",signer);
+ assert.throws(()=>next.consume("owner","op","hash",token,signer));
+ assert.throws(()=>first.consume("other","op","hash",token,signer));
+ first.consume("owner","op","hash",token,signer);
+ assert.throws(()=>first.consume("owner","op","hash",token,signer));
+});
+test("production adapter uses server token in bodies, one feature per image, distinct IDs and content readback",async()=>{
+ const requests: Array<{url:string,init:any}>=[];
+ const fetcher:any=async(url:string,init:any)=>{
+  requests.push({url,init});assert(!url.includes("token="));
+  if(url===ATTACHMENT_LAYER)return Response.json({hasAttachments:true,capabilities:"Query,Create,Uploads"});
+  if(url.endsWith("/addFeatures"))return Response.json({addResults:[{success:true,objectId:31}]});
+  if(url.endsWith("/addAttachment"))return Response.json({addAttachmentResult:{success:true,objectId:87}});
+  if(url.endsWith("/attachments"))return Response.json({attachmentInfos:[{id:87,size:bytes.length,contentType:"image/png"}]});
+  return new Response(new Uint8Array(bytes));
+ };
+ const provider=makeArcgisPhotoProvider(async()=>"synthetic-provider-token",fetcher);
+ assert.equal(await provider.createFeature(),31);
+ assert.equal(await provider.addAttachment(31,{...input(),phase:"attachment",bytes}),87);
+ const receipt=await provider.read(31,87,{...input(),phase:"attachment"});
+ assert.equal(receipt?.url,ATTACHMENT_LAYER+"/31/attachments/87");
+ assert.equal(receipt?.attachment_id,87);
+ assert(requests.every(r=>r.init.body.get("token")==="synthetic-provider-token"));
+ assert(!JSON.stringify(receipt).includes("synthetic-provider-token"));
+});
+test("lost feature acknowledgment never permits another create from absence",async()=>{
+ const i=input(),f=fixture();let creates=0;
+ f.provider.createFeature=async()=>{creates++;throw Error("response lost after provider write");};
+ const p=await reconcileOrCreatePhoto(i,principal,db,f.provider,signer);
+ const feature={...i,phase:"feature" as const,write_permit:p.write_permit};
+ assert.equal((await reconcileOrCreatePhoto(feature,principal,db,f.provider,signer)).outcome,"uncertain");
+ assert.equal((await readPhotoOperation(i.operation_key,principal,db,undefined,f.provider,signer)).httpStatus,202);
+ assert.equal((await reconcileOrCreatePhoto(feature,principal,db,f.provider,signer)).outcome,"uncertain");
+ assert.equal((await reconcileOrCreatePhoto(i,principal,db,f.provider,signer)).outcome,"uncertain");
+ assert.equal(creates,1);
+ const unconfigured=input(),p2=await reconcileOrCreatePhoto(unconfigured,principal,db,f.provider,signer);
+ f.provider.createFeature=async()=>{throw Error("ARCGIS_PROVIDER_UNCONFIGURED");};
+ const unavailable=await reconcileOrCreatePhoto({...unconfigured,phase:"feature",write_permit:p2.write_permit},principal,db,f.provider,signer);
+ assert.equal(unavailable.httpStatus,503);assert.equal(unavailable.code,"PHOTO_PROVIDER_UNCONFIGURED");
 });
