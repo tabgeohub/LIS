@@ -3,12 +3,13 @@ import type { Pool } from "pg";
 import type { PlanPrincipal } from "../flightPlans/planAccess";
 import { digest, RecoverySigner, recoverySigner } from "../iosRecovery";
 import { WritePermits } from "../iosWritePermit";
+import { uploadDiagnostic } from "../iosUploadDiagnostics";
 
 export const MAX_PHOTO_BYTES = 16 * 1024 * 1024;
 export type PhotoOutcome = "pending" | "confirmed" | "not_created" | "uncertain";
 export type PhotoReceipt = { feature_object_id: number; attachment_id: number; url: string; evidence: Record<string, unknown>; recovery_context?: string };
 export type PhotoOperationInput = { operation_key: string; package_hash: string; local_attachment_id: string; owner_point_id: number; plan_id: number; attachment_sha256: string; mime_type: string; byte_count: number; phase: "prepare" | "feature" | "attachment"; recovery_context?: string; write_permit?: string; bytes?: Buffer };
-export type PhotoOperationResult = { httpStatus: number; outcome: PhotoOutcome; receipt?: PhotoReceipt; feature_object_id?: number; recovery_context?: string; write_permit?: string; code?: string };
+export type PhotoOperationResult = { httpStatus: number; outcome: PhotoOutcome; receipt?: PhotoReceipt; feature_object_id?: number; recovery_context?: string; write_permit?: string; code?: string; diagnostic?: ReturnType<typeof uploadDiagnostic> };
 export interface ArcgisPhotoProvider {
   createFeature(): Promise<number>;
   addAttachment(featureID: number, input: PhotoOperationInput): Promise<number>;
@@ -77,8 +78,8 @@ export async function reconcileOrCreatePhoto(input: PhotoOperationInput, princip
         if (!Number.isSafeInteger(id) || id <= 0) throw new Error("invalid feature");
         return { httpStatus: 202, outcome: "pending", feature_object_id: id, recovery_context: signer!.sign("photo", principal.subject, { ...binding, feature_object_id: id }), write_permit: permits.issue(principal.subject, "attachment/" + input.operation_key, hash, signer!) };
       } catch (error) {
-        if (error instanceof Error && ["ARCGIS_PROVIDER_UNCONFIGURED", "ARCGIS_LAYER_UNSUPPORTED"].includes(error.message)) return { httpStatus: 503, outcome: "uncertain", code: "PHOTO_PROVIDER_UNCONFIGURED" };
-        return { httpStatus: 202, outcome: "uncertain", code: "PHOTO_FEATURE_UNCERTAIN" };
+        if (error instanceof Error && ["ARCGIS_PROVIDER_UNCONFIGURED", "ARCGIS_LAYER_UNSUPPORTED"].includes(error.message)) return { httpStatus: 503, outcome: "uncertain", code: "PHOTO_PROVIDER_UNCONFIGURED", diagnostic: uploadDiagnostic("photo", "PHOTO_PROVIDER_UNCONFIGURED", 503, error) };
+        return { httpStatus: 202, outcome: "uncertain", code: "PHOTO_FEATURE_UNCERTAIN", diagnostic: uploadDiagnostic("photo", "PHOTO_FEATURE_UNCERTAIN", 202, error) };
       }
     }
     if (!evidence.feature_object_id) return { httpStatus: 409, outcome: "uncertain", code: "PHOTO_FEATURE_CONTEXT_REQUIRED" };
@@ -92,7 +93,7 @@ export async function reconcileOrCreatePhoto(input: PhotoOperationInput, princip
       const context = signer!.sign("photo", principal.subject, { ...binding, feature_object_id: evidence.feature_object_id, attachment_id: id });
       const read = await adapter!.read(evidence.feature_object_id, id, input);
       return read ? complete(read, binding, principal, signer!) : { httpStatus: 202, outcome: "uncertain", recovery_context: context, feature_object_id: evidence.feature_object_id };
-    } catch { return { httpStatus: 202, outcome: "uncertain", recovery_context: input.recovery_context, code: "PHOTO_ATTACHMENT_UNCERTAIN" }; }
+    } catch (error) { return { httpStatus: 202, outcome: "uncertain", recovery_context: input.recovery_context, code: "PHOTO_ATTACHMENT_UNCERTAIN", diagnostic: uploadDiagnostic("photo", "PHOTO_ATTACHMENT_UNCERTAIN", 202, error) }; }
   };
   const promise = work(); active.set(key, { hash: cacheHash, promise });
   if (active.size > 1000) active.delete(active.keys().next().value!);

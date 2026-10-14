@@ -13,7 +13,7 @@ export async function postIOSLogOperation(req: Request, res: Response): Promise<
     if (result.kind === "confirmed") { res.status(200).json({ operation_key: input.operation_key, receipt: result.receipt }); return; }
     if (result.kind === "prepared") { res.status(200).json({ operation_key: input.operation_key, write_permit: result.write_permit }); return; }
     res.status(result.kind === "uncertain" ? 202 : status(result.kind)).json({ code: `LOG_OPERATION_${result.kind.toUpperCase()}`, message: "Log operation was not accepted" });
-  } catch { res.status(503).json({ code: "LOG_OPERATION_UNAVAILABLE", message: "Log operation could not be reconciled" }); }
+  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "LOG_OPERATION_UNAVAILABLE", message: "Log operation could not be reconciled" }); }
 }
 export async function getIOSLogOperation(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
@@ -23,5 +23,9 @@ export async function getIOSLogOperation(req: Request, res: Response): Promise<v
     const receipt = await readIOSLogReceipt(req.params.operationKey, principal, undefined, context);
     if (!receipt) { res.status(202).json({ code: "LOG_OPERATION_UNCERTAIN", message: "No identifiable log group confirmed" }); return; }
     res.status(200).json({ operation_key: req.params.operationKey, receipt });
-  } catch { res.status(409).json({ code: "LOG_RECOVERY_CONTEXT_CONFLICT" }); }
+  } catch (error) {
+    res.locals.uploadError = error;
+    const contextConflict = error instanceof Error && ["RECOVERY_CONTEXT_CONFLICT", "RECOVERY_CONTEXT_INVALID"].includes(error.message);
+    res.status(contextConflict ? 409 : 503).json({ code: contextConflict ? "LOG_RECOVERY_CONTEXT_CONFLICT" : "LOG_READBACK_UNAVAILABLE" });
+  }
 }

@@ -16,7 +16,7 @@ export async function postIOSFinishedPlan(req: Request, res: Response): Promise<
     const result = await submitFinishedPlanIdempotently(input, principal);
     if (result.kind === "confirmed") { res.status(200).json({ planId: result.receipt.planId, receipt: result.receipt }); return; }
     res.status(result.kind === "pending" ? 202 : status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}`, message: "Finished-plan submission was not accepted" });
-  } catch { res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: "Finished-plan submission could not be reconciled" }); }
+  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: "Finished-plan submission could not be reconciled" }); }
 }
 export async function getIOSFinishedPlanReceipt(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
@@ -34,5 +34,5 @@ export async function reconcileIOSFinishedPlan(req: Request, res: Response): Pro
     const result = await submitFinishedPlanIdempotently(input, principal, undefined, true);
     if (result.kind === "confirmed") { res.status(200).json({ planId: result.receipt.planId, receipt: result.receipt }); return; }
     res.status(result.kind === "pending" ? 202 : status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}` });
-  } catch { res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE" }); }
+  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE" }); }
 }

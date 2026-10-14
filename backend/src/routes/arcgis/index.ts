@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { uploadDiagnostics } from "../iosUploadDiagnostics";
 import {
   handleArcgisGetProxy,
   handleArcgisIOSCredentialContract,
@@ -7,6 +8,8 @@ import {
 import { getPhotoOperation, iosPhotoUploadMiddleware, postPhotoOperation } from "./iosPhotoOperationHandlers";
 
 const router = Router();
+router.use("/ios/photo-operations", uploadDiagnostics("photo"));
+router.use("/ios/credential", uploadDiagnostics("capability"));
 
 router.get("/token", (req, res) => handleArcgisTokenRequest(req, res));
 router.get("/proxy", (req, res) => handleArcgisGetProxy(req, res));

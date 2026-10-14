@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { uploadDiagnostics } from "../iosUploadDiagnostics";
 import { createFinishedPlan } from "./createFinishedPlan";
 import { getFinishedFlightPlans } from "./getFinishedFlightPlans";
 import { deletePoint } from "./deletePoint";
@@ -11,6 +12,7 @@ import { getAttachmentsPlanSinglePoint } from "./getAttachmentsPlanSinglePoint";
 import { getIOSFinishedPlanReceipt, postIOSFinishedPlan, reconcileIOSFinishedPlan } from "./iosFinishedPlanHandlers";
 
 const router = Router();
+router.use("/ios", uploadDiagnostics("plan"));
 
 // Post
 router.post("/", createFinishedPlan);

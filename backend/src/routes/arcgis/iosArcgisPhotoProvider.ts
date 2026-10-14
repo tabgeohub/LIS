@@ -4,12 +4,17 @@ import type { ArcgisPhotoProvider, PhotoOperationInput, PhotoReceipt } from "./i
 // Existing website attachment service. Tokens never leave this adapter.
 export const ATTACHMENT_LAYER = "https://services-eu1.arcgis.com/4D1GBrbE6xp1T4YG/arcgis/rest/services/attachments_layer/FeatureServer/0";
 type Fetcher = typeof fetch;
+function providerRejection(code: unknown, status: number): Error {
+  return Object.assign(new Error("ARCGIS_REQUEST_UNCERTAIN"), {
+    code: [401, 403, 498, 499].includes(Number(code)) || [401, 403].includes(status) ? "ARCGIS_AUTH_REJECTED" : "ARCGIS_REQUEST_REJECTED",
+  });
+}
 export function makeArcgisPhotoProvider(token: () => Promise<string>, request: Fetcher = fetch): ArcgisPhotoProvider {
   async function form(path: string, fields: Record<string, string>): Promise<any> {
     const body = new URLSearchParams({ f: "json", token: await token(), ...fields });
     const response = await request(ATTACHMENT_LAYER + path, { method: "POST", body, signal: AbortSignal.timeout(30000) });
     const result: any = await response.json();
-    if (!response.ok || result.error) throw new Error("ARCGIS_REQUEST_UNCERTAIN");
+    if (!response.ok || result.error) throw providerRejection(result.error?.code, response.status);
     return result;
   }
   return {
@@ -17,7 +22,7 @@ export function makeArcgisPhotoProvider(token: () => Promise<string>, request: F
       const layer = await form("", {});
       if (layer.hasAttachments !== true || typeof layer.capabilities !== "string" || !layer.capabilities.split(",").includes("Create")) throw new Error("ARCGIS_LAYER_UNSUPPORTED");
       const result = await form("/addFeatures", { features: JSON.stringify([{ geometry: null, attributes: {} }]), rollbackOnFailure: "true" });
-      if (result.addResults?.length !== 1 || !result.addResults[0].success) throw new Error("ARCGIS_FEATURE_UNCERTAIN");
+      if (result.addResults?.length !== 1 || !result.addResults[0].success) throw providerRejection(result.addResults?.[0]?.error?.code, 200);
       return result.addResults[0].objectId;
     },
     async addAttachment(featureID, input) {
@@ -27,7 +32,7 @@ export function makeArcgisPhotoProvider(token: () => Promise<string>, request: F
       body.append("attachment", new Blob([new Uint8Array(input.bytes)], { type: input.mime_type }), `${input.local_attachment_id}.${extension}`);
       const response = await request(`${ATTACHMENT_LAYER}/${featureID}/addAttachment`, { method: "POST", body, signal: AbortSignal.timeout(30000) });
       const result: any = await response.json();
-      if (!response.ok || !result.addAttachmentResult?.success || !Number.isSafeInteger(result.addAttachmentResult.objectId) || result.addAttachmentResult.objectId <= 0) throw new Error("ARCGIS_ATTACHMENT_UNCERTAIN");
+      if (!response.ok || !result.addAttachmentResult?.success || !Number.isSafeInteger(result.addAttachmentResult.objectId) || result.addAttachmentResult.objectId <= 0) throw providerRejection(result.error?.code ?? result.addAttachmentResult?.error?.code, response.status);
       return result.addAttachmentResult.objectId;
     },
     async read(featureID: number, attachmentID: number | undefined, input: PhotoOperationInput): Promise<PhotoReceipt | null> {

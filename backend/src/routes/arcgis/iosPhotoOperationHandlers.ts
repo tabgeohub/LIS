@@ -29,7 +29,7 @@ export async function postPhotoOperation(req: Request, res: Response): Promise<v
   try {
     const result = await reconcileOrCreatePhoto(input, principal);
     res.status(result.httpStatus).json({ operation_key: input.operation_key, ...result });
-  } catch { res.status(503).json({ code: "PHOTO_OPERATION_UNAVAILABLE", message: "Photo operation could not be reconciled" }); }
+  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "PHOTO_OPERATION_UNAVAILABLE", message: "Photo operation could not be reconciled" }); }
 }
 export async function getPhotoOperation(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
@@ -39,5 +39,5 @@ export async function getPhotoOperation(req: Request, res: Response): Promise<vo
   const result = await readPhotoOperation(req.params.operationKey, principal, undefined, context);
   if (!result) { res.status(404).json({ code: "PHOTO_OPERATION_NOT_FOUND", message: "Photo operation was not found" }); return; }
   res.status(result.httpStatus).json({ operation_key: req.params.operationKey, ...result });
-  } catch { res.status(503).json({ code: "PHOTO_READBACK_UNAVAILABLE", message: "Photo readback inconclusive" }); }
+  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "PHOTO_READBACK_UNAVAILABLE", message: "Photo readback inconclusive" }); }
 }
