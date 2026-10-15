@@ -49,6 +49,7 @@ export async function handleArcgisIOSCredentialContract(
       mode: "server_proxy",
       get_proxy_path: "api/arcgis/proxy",
       upload_contract: "existing_records_v2",
+      plan_recovery_version: 1,
       max_photo_bytes: 16 * 1024 * 1024,
       persistent_claims: false,
       durable_operation_receipts: false,

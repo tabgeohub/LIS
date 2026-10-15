@@ -13,6 +13,7 @@ import {
 import { insertFinishedPlanPath } from "../repositories/finishedPlansPathRepo";
 import { insertAttachmentReturningId } from "../repositories/attachmentsRepo";
 import {
+  hasFinishedAtColumn,
   insertFinishedPlanRow,
   selectMaxPointOrderForPlan,
 } from "../repositories/finishedPlansRepo";
@@ -105,14 +106,27 @@ class FinishedPlanWriter {
   private readonly plan: IncomingPlan;
   private readonly realIdByPointId: Record<number, number> = {};
   private readonly attachmentIdsByPointId: Record<number, number[]> = {};
+  private readonly allowMissingFinishedAt: boolean;
+  private includeFinishedAt = true;
   private nextOrder = 0;
 
-  constructor(client: PoolClient, plan: IncomingPlan) {
+  constructor(
+    client: PoolClient,
+    plan: IncomingPlan,
+    options: { allowMissingFinishedAt?: boolean } = {}
+  ) {
     this.client = client;
     this.plan = plan;
+    this.allowMissingFinishedAt = options.allowMissingFinishedAt === true;
   }
 
   async save(): Promise<void> {
+    if (
+      this.allowMissingFinishedAt &&
+      this.plan.points.every((point) => point.finishedAt == null)
+    ) {
+      this.includeFinishedAt = await hasFinishedAtColumn(this.client);
+    }
     await this.upsertPoints();
     await this.markFlightPlanFinished();
     await this.insertPath();
@@ -275,7 +289,8 @@ class FinishedPlanWriter {
 
     await insertFinishedPlanRow(
       this.client,
-      this.finishedRowParams(point, realPointId)
+      this.finishedRowParams(point, realPointId),
+      { includeFinishedAt: this.includeFinishedAt }
     );
   }
 
@@ -298,9 +313,10 @@ class FinishedPlanWriter {
 
 export async function saveFinishedPlanInTransaction(
   client: PoolClient,
-  plan: IncomingPlan
+  plan: IncomingPlan,
+  options: { allowMissingFinishedAt?: boolean } = {}
 ): Promise<void> {
-  await new FinishedPlanWriter(client, plan).save();
+  await new FinishedPlanWriter(client, plan, options).save();
 }
 
 export async function rollbackFinishedPlanTransaction(

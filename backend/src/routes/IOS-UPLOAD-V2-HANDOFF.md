@@ -38,3 +38,13 @@ Manual checklist: use generated geometry images; finish and confirm one package;
 Full iOS/shared handoff: `/Users/aboudi17/Github/LIS-iOS/LIS Mobile/ios-documnetation/implementation plan/upload-existing-records-v2-2026-10-13.md`.
 
 Pending: actual layer metadata/content endpoint behavior, deployed existing business schema/routes, authenticated staging/website/Desktop acceptance, real PostgreSQL locking, server-process routing, office geometry-first-member and timer display. No exactly-once guarantee across independent services; evidence retention/cleanup remains owned by later steps.
+
+## Recovery addendum — 2026-10-14
+
+Capability response adds `plan_recovery_version: 1`. Authenticated iOS clients may read `POST api/finished_plans/ios/reconcile` with the existing immutable submission envelope. It returns either the matching `200` receipt, `200 {outcome:"recovery_eligible"}`, a conflict/not-prepared response, or `202` unknown. Eligibility is not a receipt and creates no lease.
+
+`POST api/finished_plans/ios/recover` accepts the same envelope and performs authorization, complete original-member, signed-photo and hash validation, then locks `lis.flightPlans` before inspecting/writing. It returns a verified existing completion only when every ordinary projection matches; otherwise it writes exactly through the existing ordinary finished-plan transaction only for a `prepared` plan with no finished rows, path, or matching expected photo registration. Partial/duplicate matching photo registrations and any incompatible state return conflict. Unrelated historical attachments do not block recovery. The handler has no schema/table/column/marker dependency.
+
+`saveFinishedPlanWithClient` (Website/Desktop path) now obtains the same `FOR UPDATE` plan lock before its first writer mutation and declines an already-finished plan. Normal first-completion request shape, success response and legacy new-point behavior are unchanged. This source-level lock coordination is mock-tested; real PostgreSQL/concurrent client acceptance remains pending.
+
+Recovery verification: `npx tsc --noEmit`, finished-plan operations 7/7, diagnostics 4/4, local capability loopback, photo 6/6 and log 5/5 pass. Tests use injected clients/SQL/provider only. Manual check: retain the package, Retry once, ensure confirmed images do not re-upload, watch reconciliation/recovery, and verify a plan receipt precedes any logs. Do not clear/recreate the package. Deployed routes/capability, actual database/provider behavior, authenticated staging and Website/Desktop acceptance are still pending.

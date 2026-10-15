@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import crypto from "node:crypto";
 import { finishedPlanPayloadHash, submitFinishedPlanIdempotently, validateFinishedPlanSubmitInput } from "./iosFinishedPlanOperations";
+import { saveFinishedPlanInTransaction } from "../../helpers/finished-plans/createFinishedPlanDb";
 import { RecoverySigner } from "../iosRecovery";
 import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 const principal = { subject:"synthetic",regio_id:"TEST",is_admin:false }, signer=new RecoverySigner("synthetic-key");
 function input() { return validateFinishedPlanSubmitInput({operation_key:crypto.randomUUID(),package_hash:"a".repeat(64),package_payload:{duration:13},plan:{id:7,points:[{id:11,omschrijving:"original",comment:"note",order:1,spoed:1,attachments:[]}],pathData:[]}})!; }
-function fixture(fail=false) {
+function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean } = false) {
+ const options=typeof input === "boolean" ? {fail:input} : input;
+ const fail=options.fail === true, hasFinishedAt=options.hasFinishedAt === true;
  let status="prepared", rows:any[]=[],paths:any[]=[],attachments:any[]=[],writes=0;
  const commands:string[]=[];
  const query=async(sql:string,p:any[]=[])=>{
@@ -14,6 +17,7 @@ function fixture(fail=false) {
   if(sql.includes("SELECT id, regio_id"))return{rows:[{id:7,regio_id:"TEST",status,points:[11]}],rowCount:1};
   if(sql.includes("SELECT f.*"))return{rows:rows.map(r=>({...r,omschrijving:"original"})),rowCount:rows.length};
   if(sql.includes("SELECT path, flighttime"))return{rows:paths,rowCount:paths.length};
+  if(sql.includes("information_schema.columns"))return{rows:[{exists:hasFinishedAt}],rowCount:1};
   if(sql.includes("SELECT id, url, point_id"))return{rows:attachments,rowCount:attachments.length};
   if(sql.includes("INSERT INTO lis.attachments")){attachments.push({id:55,url:p[0],point_id:p[1],attachmentid:p[2],taken_at:p[3],location:p[4]});return{rows:[{id:55}],rowCount:1};}
   if(sql.includes("SELECT point_id FROM"))return{rows,rowCount:rows.length};
@@ -39,13 +43,48 @@ test("direct commit then lost-response projection verification without duplicate
  assert.equal((await submitFinishedPlanIdempotently(conflict,principal,f.db,false,signer)).kind,"conflict");assert.equal(f.writes(),1);
  f.rows().push({...f.rows()[0]});assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,true,signer)).kind,"conflict");
 });
+test("iOS omits finished_at only when the existing schema lacks it and no timestamp was supplied",async()=>{
+ const missing=fixture({hasFinishedAt:false});
+ assert.equal((await submitFinishedPlanIdempotently(input(),principal,missing.db,false,signer)).kind,"confirmed");
+ assert(missing.commands.some(command=>command.includes("information_schema.columns")));
+ assert(missing.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&!command.includes("finished_at")));
+
+ const present=fixture({hasFinishedAt:true});
+ assert.equal((await submitFinishedPlanIdempotently(input(),principal,present.db,false,signer)).kind,"confirmed");
+ assert(present.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
+});
+test("a supplied timestamp and the default Desktop writer keep requiring finished_at",async()=>{
+ const ios=fixture({hasFinishedAt:false}), timestamped=input();
+ timestamped.plan.points[0].finishedAt=1791880000000;
+ assert.equal((await submitFinishedPlanIdempotently(timestamped,principal,ios.db,false,signer)).kind,"confirmed");
+ assert(!ios.commands.some(command=>command.includes("information_schema.columns")));
+ assert(ios.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
+
+ const desktop=fixture({hasFinishedAt:false}), client=await desktop.db.connect();
+ await saveFinishedPlanInTransaction(client, {
+   id: 7, user_id: 1, pathData: [], points: [{id:11, omschrijving:"original", comment:"note", order:1, spoed:1, attachments:[]}]
+ });
+ assert(!desktop.commands.some(command=>command.includes("information_schema.columns")));
+ assert(desktop.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
+});
 test("membership, region, invalid IDs and rollback are guarded",async()=>{
  const f=fixture(),i=input();i.plan.points[0].id=12;
  assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,false,signer)).kind,"conflict");
  assert.equal((await submitFinishedPlanIdempotently(input(),{...principal,regio_id:"OTHER"},f.db,false,signer)).kind,"forbidden");
  const broken=fixture(true);await assert.rejects(()=>submitFinishedPlanIdempotently(input(),principal,broken.db,false,signer));assert(broken.commands.includes("ROLLBACK"));
  const bad=input();bad.plan.points[0].id=-1;assert.equal(validateFinishedPlanSubmitInput(bad),null);
- assert.equal((await submitFinishedPlanIdempotently(input(),principal,fixture().db,true,signer)).kind,"pending");
+ assert.equal((await submitFinishedPlanIdempotently(input(),principal,fixture().db,true,signer)).kind,"recovery_eligible");
+});
+test("recovery eligibility is advisory and exact orphan photo registrations require review",async()=>{
+ const f=fixture(),i=input(),url=ATTACHMENT_LAYER+"/31/attachments/87";
+ const context=signer.sign("photo",principal.subject,{operation_key:crypto.randomUUID(),package_hash:i.package_hash,plan_id:7,owner_point_id:11,feature_object_id:31,attachment_id:87,url,attachment_sha256:"c".repeat(64),mime_type:"image/png",byte_count:10});
+ i.plan.points[0].attachments=[{url,objectId:31,taken_at:1791880000000,recovery_context:context} as any];
+ assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,true,signer)).kind,"recovery_eligible");
+ const client=await f.db.connect();
+ const original=client.query;
+ client.query=async(sql:string,p:any[]=[])=>sql.includes("SELECT url, attachmentid FROM lis.attachments")?{rows:[{url,attachmentid:31}],rowCount:1}:original(sql,p);
+ const db={connect:async()=>client} as any;
+ assert.equal((await submitFinishedPlanIdempotently(i,principal,db,true,signer)).kind,"conflict");
 });
 test("full payload hash stable; richer package not persisted",()=>{
  const i=input(),before=finishedPlanPayloadHash(i);i.package_payload={duration:14};assert.notEqual(finishedPlanPayloadHash(i),before);

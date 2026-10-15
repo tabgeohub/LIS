@@ -8,7 +8,7 @@ import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 
 export type FinishedPlanSubmitInput = { operation_key: string; package_hash: string; plan: IncomingPlan; package_payload: unknown };
 export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; provenance: "direct_commit" | "state_verified" };
-export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "not_prepared" | "conflict" | "pending" };
+export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "not_prepared" | "conflict" | "pending" | "recovery_eligible" };
 export function finishedPlanPayloadHash(input: Pick<FinishedPlanSubmitInput, "package_hash" | "plan" | "package_payload">): string {
   return digest({ package_hash: input.package_hash.toLowerCase(), plan: input.plan, package_payload: input.package_payload });
 }
@@ -72,6 +72,22 @@ function verifiedPhotos(input: FinishedPlanSubmitInput, principal: PlanPrincipal
     return true;
   } catch { return false; }
 }
+/**
+ * An attachment can have been registered by a partial older write even when
+ * the plan/path rows are absent.  Do not attach it again: the existing schema
+ * cannot prove that it belongs to this frozen completion without a finished
+ * plan projection.  Only exact remote identities block recovery; unrelated
+ * historical attachments on the same point remain valid.
+ */
+async function hasExpectedAttachmentRegistration(client: Pick<PoolClient, "query">, input: FinishedPlanSubmitInput): Promise<boolean> {
+  const expected = input.plan.points.flatMap(point => (point.attachments || []).map(attachment => ({ url: attachment.url, objectId: Number(attachment.objectId) })));
+  if (!expected.length) return false;
+  const rows = (await client.query(
+    "SELECT url, attachmentid FROM lis.attachments WHERE url = ANY($1::text[]) OR attachmentid = ANY($2::integer[])",
+    [expected.map(value => value.url), expected.map(value => value.objectId)]
+  )).rows;
+  return rows.some(row => expected.some(value => row.url === value.url || Number(row.attachmentid) === value.objectId));
+}
 export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitInput, principal: PlanPrincipal, db?: Pick<Pool, "connect">, readOnly = false, signer?: RecoverySigner): Promise<FinishedPlanSubmitResult> {
   db ||= require("../../db").pool;
   signer ||= recoverySigner();
@@ -85,14 +101,20 @@ export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitIn
     else if (!hasPlanRegionAccess(principal, row.regio_id)) result = { kind: "forbidden" };
     else if (!same((row.points || []).map(Number), input.plan.points.map(p => p.id))) result = { kind: "conflict" };
     else if (row.status === "finished") result = await projectionMatches(client, input.plan) ? confirmation(input, "state_verified") : { kind: "conflict" };
-    else if (readOnly) result = { kind: "pending" };
     else if (row.status !== "prepared") result = { kind: "not_prepared" };
     else {
       // Existing ambiguous prior rows cannot be overwritten or appended to.
       const old = await client.query("SELECT point_id FROM lis.finished_plans WHERE plan_id = $1", [input.plan.id]);
       const oldPaths = await client.query("SELECT planid FROM lis.finished_plans_path WHERE planid = $1", [input.plan.id]);
-      if (old.rows.length || oldPaths.rows.length) result = { kind: "conflict" };
-      else { await saveFinishedPlanInTransaction(client, input.plan); result = confirmation(input, "direct_commit"); }
+      const hasExpectedAttachment = await hasExpectedAttachmentRegistration(client, input);
+      if (old.rows.length || oldPaths.rows.length || hasExpectedAttachment) result = { kind: "conflict" };
+      else if (readOnly) result = { kind: "recovery_eligible" };
+      else {
+        await saveFinishedPlanInTransaction(client, input.plan, {
+          allowMissingFinishedAt: true,
+        });
+        result = confirmation(input, "direct_commit");
+      }
     }
     await client.query("COMMIT");
     return result;

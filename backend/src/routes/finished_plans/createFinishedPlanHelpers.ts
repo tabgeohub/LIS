@@ -46,6 +46,11 @@ export async function saveFinishedPlanWithClient(input: {
   const { client, res, plan } = input;
   try {
     await client.query("BEGIN");
+    // Use the same existing flight-plan row lock as the iOS recovery writer.
+    // It must happen before point/path/attachment writes so a legacy request
+    // cannot append a second completion after recovery has committed.
+    const row = (await client.query("SELECT status FROM lis.flightPlans WHERE id = $1 FOR UPDATE", [plan.id])).rows[0];
+    if (!row || row.status === "finished") throw new Error("Flight plan is already finished");
     await saveFinishedPlanInTransaction(client, plan);
     await client.query("COMMIT");
     finishedPlanOk({

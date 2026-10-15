@@ -103,11 +103,33 @@ export async function selectMaxPointOrderForPlan(
 
 export async function insertFinishedPlanRow(
   db: Queryable,
-  values: unknown[]
+  values: unknown[],
+  options: { includeFinishedAt?: boolean } = {}
 ) {
+  if (options.includeFinishedAt === false) {
+    return db.query(
+      `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      values.slice(0, 8)
+    );
+  }
   return db.query(
     `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres, finished_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
     values
   );
+}
+
+/** Reads catalog metadata only; it does not alter the deployed schema. */
+export async function hasFinishedAtColumn(db: Queryable): Promise<boolean> {
+  const result = await db.query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1
+       FROM information_schema.columns
+       WHERE table_schema = 'lis'
+         AND table_name = 'finished_plans'
+         AND column_name = 'finished_at'
+     ) AS exists`
+  );
+  return result.rows[0]?.exists === true;
 }
