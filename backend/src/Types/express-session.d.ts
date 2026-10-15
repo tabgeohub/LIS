@@ -12,11 +12,6 @@ declare module "express-session" {
     auth?: {
       tokenSet: TokenSet;
       userInfo: Record<string, any>;
-      identity?: {
-        subject: string;
-        regio_id: string | null;
-        is_admin: boolean;
-      };
     };
   }
 }

@@ -23,7 +23,7 @@ export function validatePhotoOperationInput(value: unknown, bytes?: Buffer): Pho
   const r = value as PhotoOperationInput;
   if (!r || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(r.operation_key) || !/^[a-f0-9]{64}$/.test(r.package_hash) || !/^[a-f0-9]{64}$/.test(r.attachment_sha256) ||
     typeof r.local_attachment_id !== "string" || !r.local_attachment_id || r.local_attachment_id.length > 200 ||
-    !Number.isSafeInteger(r.plan_id) || r.plan_id <= 0 || !Number.isSafeInteger(r.owner_point_id) || r.owner_point_id <= 0 ||
+    !Number.isSafeInteger(r.plan_id) || r.plan_id <= 0 || !Number.isSafeInteger(r.owner_point_id) || r.owner_point_id === 0 ||
     !Number.isInteger(r.byte_count) || r.byte_count <= 0 || r.byte_count > MAX_PHOTO_BYTES || !["prepare", "feature", "attachment"].includes(r.phase) ||
     !["image/png", "image/jpeg", "image/heic"].includes(r.mime_type)) return null;
   if (r.phase === "attachment" && (!bytes || bytes.length !== r.byte_count || !matchesImage(bytes, r.mime_type) ||
@@ -40,7 +40,11 @@ export function photoBinding(input: PhotoOperationInput): Record<string, unknown
   return { operation_key, package_hash, local_attachment_id, owner_point_id, plan_id, attachment_sha256, mime_type, byte_count };
 }
 async function authorized(input: PhotoOperationInput, principal: PlanPrincipal, db: Pick<Pool, "query">): Promise<boolean> {
-  return ((await db.query("SELECT id FROM lis.flightPlans WHERE id = $1 AND $2 = ANY(points) AND (regio_id = $3 OR $4::boolean)",
+  // Negative owner IDs are package-local new points. They have no database row
+  // yet, so authorization is bound to the locked plan and signed context; a
+  // positive owner still must be a member of that plan.
+  const memberCheck = input.owner_point_id > 0 ? "AND $2 = ANY(points)" : "";
+  return ((await db.query(`SELECT id FROM lis.flightPlans WHERE id = $1 ${memberCheck} AND (regio_id = $3 OR $4::boolean)`,
     [input.plan_id, input.owner_point_id, principal.regio_id, principal.is_admin])).rowCount || 0) === 1;
 }
 // Bounded process-local suppression only, NOT durable across server restarts.

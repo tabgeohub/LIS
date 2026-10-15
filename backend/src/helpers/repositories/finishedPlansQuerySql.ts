@@ -24,7 +24,14 @@ export function buildSingleFinishedPlanCtes(): string {
           point_id,
           MAX(point_order) AS point_order,
           MAX(pointcomment) AS point_comment,
-          MAX(finished_at) AS finished_at
+          /*
+           * finished_at was added after some deployed LIS databases.  A
+           * direct column reference makes the whole finished-plan screen
+           * fail on those databases.  Converting the row to JSON first keeps
+           * this read compatible while returning null when the column is not
+           * present.
+           */
+          MAX((to_jsonb(ffp_rows) ->> 'finished_at')::timestamptz) AS finished_at
         FROM ffp_rows
         GROUP BY plan_id, point_id
       ),
@@ -66,7 +73,8 @@ export function buildFinishedFlightPlansListPointJson(): string {
     pointOrderExpr: "ffp.point_order",
     pointCommentExpr: "ffp.pointComment",
     attachmentsExpr: "att_list.attachments",
-    finishedAtExpr: "ffp.finished_at",
+    finishedAtExpr: "(to_jsonb(ffp) ->> 'finished_at')::timestamptz",
+    geometryMemberOrderExpr: "NULL::bigint",
   });
 }
 

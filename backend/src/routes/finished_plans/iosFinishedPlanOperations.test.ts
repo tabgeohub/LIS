@@ -14,7 +14,9 @@ function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean } = 
  const commands:string[]=[];
  const query=async(sql:string,p:any[]=[])=>{
   commands.push(sql); assert(!/ios_finished|flightplan_claim/.test(sql));
-  if(sql.includes("SELECT id, regio_id"))return{rows:[{id:7,regio_id:"TEST",status,points:[11]}],rowCount:1};
+  if(sql.includes("SELECT id, regio_id"))return{rows:[{id:7,regio_id:"TEST",user_id:"desktop-owner",status,points:[11]}],rowCount:1};
+  if(sql.includes("INSERT INTO lis.points"))return{rows:[{id:21}],rowCount:1};
+  if(sql.includes("SELECT f.point_id, f.point_order"))return{rows:rows.map(r=>({point_id:r.point_id,point_order:r.point_order,omschrijving:"original"})),rowCount:rows.length};
   if(sql.includes("SELECT f.*"))return{rows:rows.map(r=>({...r,omschrijving:"original"})),rowCount:rows.length};
   if(sql.includes("SELECT path, flighttime"))return{rows:paths,rowCount:paths.length};
   if(sql.includes("information_schema.columns"))return{rows:[{exists:hasFinishedAt}],rowCount:1};
@@ -53,19 +55,19 @@ test("iOS omits finished_at only when the existing schema lacks it and no timest
  assert.equal((await submitFinishedPlanIdempotently(input(),principal,present.db,false,signer)).kind,"confirmed");
  assert(present.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
 });
-test("a supplied timestamp and the default Desktop writer keep requiring finished_at",async()=>{
+test("a supplied timestamp rejects before mutations when finished_at is unavailable",async()=>{
  const ios=fixture({hasFinishedAt:false}), timestamped=input();
  timestamped.plan.points[0].finishedAt=1791880000000;
- assert.equal((await submitFinishedPlanIdempotently(timestamped,principal,ios.db,false,signer)).kind,"confirmed");
- assert(!ios.commands.some(command=>command.includes("information_schema.columns")));
- assert(ios.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
+ await assert.rejects(()=>submitFinishedPlanIdempotently(timestamped,principal,ios.db,false,signer), { code:"FINISHED_AT_STORAGE_UNAVAILABLE" });
+ assert(ios.commands.some(command=>command.includes("information_schema.columns")));
+ assert(!ios.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")));
 
  const desktop=fixture({hasFinishedAt:false}), client=await desktop.db.connect();
  await saveFinishedPlanInTransaction(client, {
    id: 7, user_id: 1, pathData: [], points: [{id:11, omschrijving:"original", comment:"note", order:1, spoed:1, attachments:[]}]
  });
- assert(!desktop.commands.some(command=>command.includes("information_schema.columns")));
- assert(desktop.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&command.includes("finished_at")));
+ assert(desktop.commands.some(command=>command.includes("information_schema.columns")));
+ assert(desktop.commands.some(command=>command.includes("INSERT INTO lis.finished_plans (")&&!command.includes("finished_at")));
 });
 test("membership, region, invalid IDs and rollback are guarded",async()=>{
  const f=fixture(),i=input();i.plan.points[0].id=12;
@@ -74,6 +76,14 @@ test("membership, region, invalid IDs and rollback are guarded",async()=>{
  const broken=fixture(true);await assert.rejects(()=>submitFinishedPlanIdempotently(input(),principal,broken.db,false,signer));assert(broken.commands.includes("ROLLBACK"));
  const bad=input();bad.plan.points[0].id=-1;assert.equal(validateFinishedPlanSubmitInput(bad),null);
  assert.equal((await submitFinishedPlanIdempotently(input(),principal,fixture().db,true,signer)).kind,"recovery_eligible");
+});
+test("a mixed package creates a negative point under the locked Desktop owner and returns its map",async()=>{
+ const f=fixture({hasFinishedAt:false}),i=input();
+ i.plan.points.push({id:-42,omschrijving:"field-created",comment:"new",order:2,spoed:0,attachments:[],latitude:52.1,longitude:4.9} as any);
+ const result=await submitFinishedPlanIdempotently(i,principal,f.db,false,signer);
+ assert.equal(result.kind,"confirmed");
+ if(result.kind==="confirmed") assert.deepEqual(result.receipt.point_id_map,{"-42":21});
+ assert(f.commands.some(command=>command.includes("INSERT INTO lis.points")));
 });
 test("recovery eligibility is advisory and exact orphan photo registrations require review",async()=>{
  const f=fixture(),i=input(),url=ATTACHMENT_LAYER+"/31/attachments/87";

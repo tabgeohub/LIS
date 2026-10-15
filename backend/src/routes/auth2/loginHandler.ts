@@ -2,7 +2,6 @@ import type { RequestHandler } from "express";
 import { logAuthSecurityEvent } from "./authSecurityLog";
 import { authenticateLogin, respondToLoginFailure } from "./loginFlow";
 import { parseLoginInput } from "./validateLoginInput";
-import { isAuth2IdentityUnavailableError } from "./authIdentity";
 
 export const loginHandler: RequestHandler = async (req, res) => {
   const credentials = parseLoginInput(req.body);
@@ -24,16 +23,8 @@ export const loginHandler: RequestHandler = async (req, res) => {
       success: true,
       message: "Login successful",
       user,
-      identity: req.session.auth?.identity ?? null,
     });
   } catch (error: unknown) {
-    if (isAuth2IdentityUnavailableError(error)) {
-      return res.status(502).json({
-        success: false,
-        code: "IDENTITY_UNAVAILABLE",
-        message: "Authenticated Keycloak response is missing a valid subject",
-      });
-    }
     return respondToLoginFailure({ req, res, error, credentials });
   }
 };

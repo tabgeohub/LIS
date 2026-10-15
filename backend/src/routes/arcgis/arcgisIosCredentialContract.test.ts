@@ -35,6 +35,10 @@ function request(server: Server, identity: "none" | "missing" | "regional"): Pro
 }
 
 async function run() {
+  // Capability checks read only schema metadata; keep this contract fixture
+  // isolated from the configured database.
+  const database = require("../../db") as { pool: { query: (sql: string) => Promise<unknown> } };
+  database.pool.query = async () => ({ rows: [{ exists: true }], rowCount: 1 });
   const app = express();
   app.use((req, _res, next) => {
     const identity = req.header("x-fixture-identity");
@@ -42,10 +46,7 @@ async function run() {
       (req as any).session = {
         auth: {
           tokenSet: { access_token: "fixture-access", expires_at: Math.floor(Date.now() / 1000) + 3600 },
-          userInfo: {},
-          ...(identity === "regional"
-            ? { identity: { subject: "fixture-subject", regio_id: "RWS FIXTURE", is_admin: false } }
-            : {}),
+          userInfo: identity === "regional" ? { sub: "fixture-subject" } : {},
         },
       };
     }
@@ -71,6 +72,8 @@ async function run() {
       get_proxy_path: "api/arcgis/proxy",
       upload_contract: "existing_records_v2",
       plan_recovery_version: 1,
+      new_point_upload_version: 1,
+      finished_at_supported: true,
       max_photo_bytes: 16 * 1024 * 1024,
       persistent_claims: false,
       durable_operation_receipts: false,

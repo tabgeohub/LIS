@@ -47,7 +47,8 @@ export type IncomingPoint = IncomingPointCoreFields & {
 
 export type IncomingPlan = {
   id: number;
-  user_id: number;
+  /** Database owner copied from the locked flight plan. It may be a UUID. */
+  user_id: number | string;
   points: IncomingPoint[];
   pathData?: unknown;
   flightTime?: string | number | null;

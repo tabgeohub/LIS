@@ -58,7 +58,7 @@ function normalizeFinishedAt(value: unknown): Date | null {
 
 function buildNewPointOverrides(
   point: FinishedPlanPoint,
-  userId: number
+  userId: number | string
 ): Partial<Record<PointCoreColumn, unknown>> {
   const overrides: Partial<Record<PointCoreColumn, unknown>> = {
     user_id: userId,
@@ -120,18 +120,23 @@ class FinishedPlanWriter {
     this.allowMissingFinishedAt = options.allowMissingFinishedAt === true;
   }
 
-  async save(): Promise<void> {
-    if (
-      this.allowMissingFinishedAt &&
-      this.plan.points.every((point) => point.finishedAt == null)
-    ) {
-      this.includeFinishedAt = await hasFinishedAtColumn(this.client);
+  async save(): Promise<Record<number, number>> {
+    // Read schema metadata before the first mutation. Never discard an
+    // explicitly supplied timestamp merely because an older database lacks it.
+    const hasFinishedAt = await hasFinishedAtColumn(this.client);
+    const requiresFinishedAt = this.plan.points.some(
+      (point) => point.finishedAt != null
+    );
+    if (!hasFinishedAt && requiresFinishedAt) {
+      throw new FinishedAtStorageUnavailableError();
     }
+    this.includeFinishedAt = hasFinishedAt;
     await this.upsertPoints();
     await this.markFlightPlanFinished();
     await this.insertPath();
     await this.insertAttachments();
     await this.insertFinishedRows();
+    return { ...this.realIdByPointId };
   }
 
   private realIdOf(point: FinishedPlanPoint): number {
@@ -315,8 +320,17 @@ export async function saveFinishedPlanInTransaction(
   client: PoolClient,
   plan: IncomingPlan,
   options: { allowMissingFinishedAt?: boolean } = {}
-): Promise<void> {
-  await new FinishedPlanWriter(client, plan, options).save();
+): Promise<Record<number, number>> {
+  return new FinishedPlanWriter(client, plan, options).save();
+}
+
+/** Raised before writes when a requested completion timestamp cannot persist. */
+export class FinishedAtStorageUnavailableError extends Error {
+  readonly code = "FINISHED_AT_STORAGE_UNAVAILABLE";
+  constructor() {
+    super("The database cannot store finished_at timestamps for this completion.");
+    this.name = "FinishedAtStorageUnavailableError";
+  }
 }
 
 export async function rollbackFinishedPlanTransaction(

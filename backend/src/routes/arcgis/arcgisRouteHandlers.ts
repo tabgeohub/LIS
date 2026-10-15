@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { getValidToken } from "../../services/arcgis";
 import { resolvePlanPrincipal } from "../flightPlans/planAccess";
+import { hasFinishedAtColumn } from "../../helpers/repositories/finishedPlansRepo";
+import { pool } from "../../db";
 import {
   fetchArcgisGetProxy,
   resolveArcgisGetProxyTarget,
@@ -44,12 +46,15 @@ export async function handleArcgisIOSCredentialContract(
       return;
     }
 
+    const finished_at_supported = await hasFinishedAtColumn(pool);
     res.json({
       version: 2,
       mode: "server_proxy",
       get_proxy_path: "api/arcgis/proxy",
       upload_contract: "existing_records_v2",
       plan_recovery_version: 1,
+      new_point_upload_version: 1,
+      finished_at_supported,
       max_photo_bytes: 16 * 1024 * 1024,
       persistent_claims: false,
       durable_operation_receipts: false,

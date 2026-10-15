@@ -16,6 +16,7 @@ type AuthSession = {
     preferred_username?: string;
     email?: string;
     name?: string;
+    sub?: string;
   };
 };
 
@@ -66,7 +67,8 @@ class MeResponseBuilder {
       username: this.username(),
       name: firstNonEmpty([this.auth.userInfo?.name, this.idClaims.name]) || null,
       email: firstNonEmpty([this.auth.userInfo?.email, this.idClaims.email]) || null,
-      sub: firstNonEmpty([this.idClaims.sub, this.accessClaims?.sub]) || null,
+      // Userinfo is the verified account identity used by plan authorization.
+      sub: firstNonEmpty([this.auth.userInfo?.sub, this.idClaims.sub, this.accessClaims?.sub]) || null,
     };
   }
 

@@ -175,6 +175,8 @@ export type FinishedPlanDetailsPointJsonOptions = {
   attachmentsExpr: string;
   finishedAtExpr?: string;
   includeGeometry?: boolean;
+  /** The query-local ordering expression for a geometry member. */
+  geometryMemberOrderExpr?: string;
 };
 
 export function buildFinishedPlanDetailsPointJsonbObject(
@@ -192,7 +194,12 @@ export function buildFinishedPlanDetailsPointJsonbObject(
   }
 
   if (options.includeGeometry) {
-    fields.push(...pointJsonPairs(POINT_GEOMETRY_FIELDS));
+    fields.push(...pointJsonPairs(POINT_GEOMETRY_FIELDS.filter(
+      (field) => field !== "geometry_member_order"
+    )));
+    fields.push(
+      `'geometry_member_order', ${options.geometryMemberOrderExpr ?? "NULL::bigint"}`
+    );
   }
 
   return `jsonb_build_object(

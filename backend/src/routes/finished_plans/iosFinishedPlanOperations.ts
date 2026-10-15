@@ -7,7 +7,7 @@ import { digest, canonical, RecoverySigner, recoverySigner, validOperationKey } 
 import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 
 export type FinishedPlanSubmitInput = { operation_key: string; package_hash: string; plan: IncomingPlan; package_payload: unknown };
-export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; provenance: "direct_commit" | "state_verified" };
+export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; provenance: "direct_commit" | "state_verified"; point_id_map?: Record<string, number> };
 export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "not_prepared" | "conflict" | "pending" | "recovery_eligible" };
 export function finishedPlanPayloadHash(input: Pick<FinishedPlanSubmitInput, "package_hash" | "plan" | "package_payload">): string {
   return digest({ package_hash: input.package_hash.toLowerCase(), plan: input.plan, package_payload: input.package_payload });
@@ -16,12 +16,17 @@ export function validateFinishedPlanSubmitInput(value: unknown): FinishedPlanSub
   const r = value as FinishedPlanSubmitInput;
   if (!r || !validOperationKey(r.operation_key) || !/^[a-f0-9]{64}$/.test(r.package_hash) ||
     !r.plan || !Number.isSafeInteger(r.plan.id) || r.plan.id <= 0 || !Array.isArray(r.plan.points) || !Object.prototype.hasOwnProperty.call(r, "package_payload") ||
-    r.plan.points.some(p => !Number.isSafeInteger(p.id) || p.id <= 0 || typeof p.omschrijving !== "string" || !Number.isInteger(p.order) ||
+    r.plan.points.some(p => !Number.isSafeInteger(p.id) || p.id === 0 || typeof p.omschrijving !== "string" || !Number.isInteger(p.order) ||
       (p.attachments || []).some(a => !Number.isSafeInteger(a.taken_at) || typeof a.url !== "string")) || new Set(r.plan.points.map(p => p.id)).size !== r.plan.points.length) return null;
+  for (const point of r.plan.points.filter(point => point.id < 0)) {
+    if (!Number.isFinite(point.latitude) || !Number.isFinite(point.longitude) ||
+      point.latitude! < -90 || point.latitude! > 90 || point.longitude! < -180 || point.longitude! > 180) return null;
+  }
   return r;
 }
-function confirmation(input: FinishedPlanSubmitInput, provenance: FinishedPlanReceipt["provenance"]): FinishedPlanSubmitResult {
-  return { kind: "confirmed", receipt: { operation_key: input.operation_key, planId: input.plan.id, package_hash: input.package_hash, payload_hash: finishedPlanPayloadHash(input), provenance } };
+function confirmation(input: FinishedPlanSubmitInput, provenance: FinishedPlanReceipt["provenance"], pointIDMap: Record<number, number> = {}): FinishedPlanSubmitResult {
+  const point_id_map = Object.fromEntries(Object.entries(pointIDMap).map(([key, value]) => [key, value]));
+  return { kind: "confirmed", receipt: { operation_key: input.operation_key, planId: input.plan.id, package_hash: input.package_hash, payload_hash: finishedPlanPayloadHash(input), provenance, ...(Object.keys(point_id_map).length ? { point_id_map } : {}) } };
 }
 function same(a: unknown, b: unknown): boolean { return canonical(a) === canonical(b); }
 function parsed(value: unknown): unknown { if (typeof value !== "string") return value; try { return JSON.parse(value); } catch { return value; } }
@@ -54,6 +59,24 @@ export async function projectionMatches(client: Pick<PoolClient, "query">, plan:
     }
   }
   return true;
+}
+/** Resolve package-local negative IDs only from the committed ordered projection.
+ * This is deliberately conservative: any mismatch leaves recovery pending. */
+async function persistedPointMap(client: Pick<PoolClient, "query">, plan: IncomingPlan): Promise<Record<number, number> | null> {
+  const rows = (await client.query("SELECT f.point_id, f.point_order, p.omschrijving FROM lis.finished_plans f JOIN lis.points p ON p.id = f.point_id WHERE f.plan_id = $1 ORDER BY f.point_order, f.point_id", [plan.id])).rows;
+  if (rows.length !== plan.points.length) return null;
+  const map: Record<number, number> = {};
+  for (let i = 0; i < plan.points.length; i++) {
+    const expected = plan.points[i], actual = rows[i];
+    if (!actual || Number(actual.point_order) !== expected.order || actual.omschrijving !== expected.omschrijving) return null;
+    const id = Number(actual.point_id);
+    if (expected.id > 0 && id !== expected.id) return null;
+    if (expected.id < 0) map[expected.id] = id;
+  }
+  return map;
+}
+function withMappedPointIDs(plan: IncomingPlan, pointIDMap: Record<number, number>): IncomingPlan {
+  return { ...plan, points: plan.points.map(point => point.id < 0 ? { ...point, id: pointIDMap[point.id] } : point) };
 }
 function verifiedPhotos(input: FinishedPlanSubmitInput, principal: PlanPrincipal, signer: RecoverySigner): boolean {
   try {
@@ -95,13 +118,17 @@ export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitIn
   const client = await db!.connect();
   try {
     await client.query(readOnly ? "BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
-    const row = (await client.query("SELECT id, regio_id, status, points FROM lis.flightPlans WHERE id = $1" + (readOnly ? "" : " FOR UPDATE"), [input.plan.id])).rows[0];
+    const row = (await client.query("SELECT id, regio_id, user_id, status, points FROM lis.flightPlans WHERE id = $1" + (readOnly ? "" : " FOR UPDATE"), [input.plan.id])).rows[0];
     let result: FinishedPlanSubmitResult;
     if (!row) result = { kind: "not_found" };
     else if (!hasPlanRegionAccess(principal, row.regio_id)) result = { kind: "forbidden" };
-    else if (!same((row.points || []).map(Number), input.plan.points.map(p => p.id))) result = { kind: "conflict" };
-    else if (row.status === "finished") result = await projectionMatches(client, input.plan) ? confirmation(input, "state_verified") : { kind: "conflict" };
-    else if (row.status !== "prepared") result = { kind: "not_prepared" };
+    else if (!same((row.points || []).map(Number), input.plan.points.filter(p => p.id > 0).map(p => p.id))) result = { kind: "conflict" };
+    else if (row.status === "finished") {
+      const pointIDMap = await persistedPointMap(client, input.plan);
+      const persisted = pointIDMap ? withMappedPointIDs(input.plan, pointIDMap) : input.plan;
+      result = pointIDMap !== null && await projectionMatches(client, persisted) ? confirmation(input, "state_verified", pointIDMap) : { kind: "conflict" };
+    }
+    else if (row.status !== "prepared" && row.status !== "in-progress") result = { kind: "not_prepared" };
     else {
       // Existing ambiguous prior rows cannot be overwritten or appended to.
       const old = await client.query("SELECT point_id FROM lis.finished_plans WHERE plan_id = $1", [input.plan.id]);
@@ -110,10 +137,10 @@ export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitIn
       if (old.rows.length || oldPaths.rows.length || hasExpectedAttachment) result = { kind: "conflict" };
       else if (readOnly) result = { kind: "recovery_eligible" };
       else {
-        await saveFinishedPlanInTransaction(client, input.plan, {
+        const pointIDMap = await saveFinishedPlanInTransaction(client, { ...input.plan, user_id: row.user_id }, {
           allowMissingFinishedAt: true,
         });
-        result = confirmation(input, "direct_commit");
+        result = confirmation(input, "direct_commit", pointIDMap);
       }
     }
     await client.query("COMMIT");

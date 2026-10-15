@@ -23,7 +23,6 @@ function stringRoles(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((role): role is string => typeof role === "string");
 }
-
 export function realmRolesFromTokenSet(tokenSet: AuthIdentityTokenSet): string[] {
   const accessClaims = decodeJwtPayload<TokenClaims>(tokenSet.access_token || "");
   const accessRoles = stringRoles(accessClaims?.realm_access?.roles);
@@ -60,26 +59,4 @@ export async function resolveAuthenticatedIdentity(input: {
     regio_id: regio_id ?? null,
     is_admin: isAdminRegioValue(regio_id),
   };
-}
-
-export class Auth2IdentityUnavailableError extends Error {
-  constructor() {
-    super("Authenticated Keycloak response is missing a valid subject");
-    this.name = "Auth2IdentityUnavailableError";
-  }
-}
-
-export function requireIosSubjectIdentity(
-  isIosRequest: boolean,
-  identity: Auth2Identity | null
-): void {
-  if (isIosRequest && !identity) {
-    throw new Auth2IdentityUnavailableError();
-  }
-}
-
-export function isAuth2IdentityUnavailableError(
-  error: unknown
-): error is Auth2IdentityUnavailableError {
-  return error instanceof Auth2IdentityUnavailableError;
 }

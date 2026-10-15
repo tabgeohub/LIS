@@ -2,6 +2,7 @@ import type { Response } from "express";
 import type { PoolClient } from "pg";
 import { pool } from "../../db";
 import {
+  FinishedAtStorageUnavailableError,
   rollbackFinishedPlanTransaction,
   saveFinishedPlanInTransaction,
 } from "../../helpers/finished-plans/createFinishedPlanDb";
@@ -29,6 +30,15 @@ export async function connectFinishedPlanClient(
 }
 
 function failFinishedPlanSave(res: Response, e: unknown): void {
+  if (e instanceof FinishedAtStorageUnavailableError) {
+    finishedPlanFail({
+      res,
+      status: 409,
+      code: e.code,
+      message: e.message,
+    });
+    return;
+  }
   finishedPlanFail({
     res,
     status: 500,

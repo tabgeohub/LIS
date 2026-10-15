@@ -10,8 +10,6 @@ export type PlanPrincipal = Auth2Identity;
 export async function resolvePlanPrincipal(req: Request): Promise<PlanPrincipal | null> {
   const auth = req.session?.auth;
   if (!auth) return null;
-  const identity = auth.identity;
-  if (identity?.subject && typeof identity.regio_id !== "undefined") return identity;
   if (!auth.tokenSet || !auth.userInfo) return null;
   return resolveAuthenticatedIdentity({ tokenSet: auth.tokenSet, userInfo: auth.userInfo });
 }

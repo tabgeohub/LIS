@@ -8,7 +8,6 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "verify:regio-apis": "npx ts-node --transpile-only scripts/verify-regio-apis.ts",
-    "test:bootstrap-probe": "npx ts-node --transpile-only src/routes/bootstrapProbe.test.ts",
     "test:server-lifecycle": "npx ts-node --transpile-only src/serverLifecycle.test.ts",
     "test:auth2-ios-contract": "npx ts-node --transpile-only src/routes/auth2/auth2IosContract.test.ts",
     "test:arcgis-ios-contract": "npx ts-node --transpile-only src/routes/arcgis/arcgisIosCredentialContract.test.ts",
@@ -16,7 +15,6 @@
     "test:ios-finished-plan-operations": "npx ts-node --transpile-only src/routes/finished_plans/iosFinishedPlanOperations.test.ts",
     "test:finished-plan-query": "npx ts-node --transpile-only src/helpers/queries/finished-plans/buildFinishedPlanQuery.test.ts",
     "test:ios-log-operations": "npx ts-node --transpile-only src/routes/logs/iosLogOperations.test.ts",
-    "test:flight-plan-claims": "npx ts-node --transpile-only src/routes/flightPlans/planClaims.test.ts",
     "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts",
     "test:post-login-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/resolvePostLoginRedirect.test.ts",
     "test:safe-server-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeServerRedirect.test.ts"

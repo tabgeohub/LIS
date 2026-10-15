@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { validateFinishedPlan } from "../../helpers/validators/finishedPlan";
+import { FinishedAtStorageUnavailableError } from "../../helpers/finished-plans/createFinishedPlanDb";
 import { resolvePlanPrincipal } from "../flightPlans/planAccess";
 import { readFinishedPlanReceipt, submitFinishedPlanIdempotently, validateFinishedPlanSubmitInput } from "./iosFinishedPlanOperations";
 
@@ -13,6 +14,14 @@ function sendIOSFinishedPlanResult(res: Response, result: Awaited<ReturnType<typ
   if (result.kind === "recovery_eligible") { res.status(200).json({ outcome: "recovery_eligible" }); return; }
   res.status(result.kind === "pending" ? 202 : status(result.kind)).json({ code: `FINISHED_PLAN_${result.kind.toUpperCase()}`, message: "Finished-plan submission was not accepted" });
 }
+function sendFinishedPlanError(res: Response, error: unknown, fallback: string): void {
+  if (error instanceof FinishedAtStorageUnavailableError) {
+    res.status(409).json({ code: error.code, message: error.message });
+    return;
+  }
+  res.locals.uploadError = error;
+  res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: fallback });
+}
 export async function postIOSFinishedPlan(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
   if (!principal) { res.status(403).json({ code: "PLAN_IDENTITY_UNAVAILABLE", message: "A Keycloak plan identity is required" }); return; }
@@ -22,7 +31,7 @@ export async function postIOSFinishedPlan(req: Request, res: Response): Promise<
   try {
     const result = await submitFinishedPlanIdempotently(input, principal);
     sendIOSFinishedPlanResult(res, result);
-  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: "Finished-plan submission could not be reconciled" }); }
+  } catch (error) { sendFinishedPlanError(res, error, "Finished-plan submission could not be reconciled"); }
 }
 export async function getIOSFinishedPlanReceipt(req: Request, res: Response): Promise<void> {
   const principal = await resolvePlanPrincipal(req);
@@ -39,7 +48,7 @@ export async function reconcileIOSFinishedPlan(req: Request, res: Response): Pro
   try {
     const result = await submitFinishedPlanIdempotently(input, principal, undefined, true);
     sendIOSFinishedPlanResult(res, result);
-  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE" }); }
+  } catch (error) { sendFinishedPlanError(res, error, "Finished-plan reconciliation could not be completed"); }
 }
 /**
  * Explicit user-authorised recovery for an already frozen iOS request. This
@@ -54,5 +63,5 @@ export async function recoverIOSFinishedPlan(req: Request, res: Response): Promi
   if (!input || !legacy?.ok) { res.status(400).json({ code: "FINISHED_PLAN_OPERATION_INVALID" }); return; }
   try {
     sendIOSFinishedPlanResult(res, await submitFinishedPlanIdempotently(input, principal));
-  } catch (error) { res.locals.uploadError = error; res.status(503).json({ code: "FINISHED_PLAN_UNAVAILABLE", message: "Finished-plan recovery could not be completed" }); }
+  } catch (error) { sendFinishedPlanError(res, error, "Finished-plan recovery could not be completed"); }
 }

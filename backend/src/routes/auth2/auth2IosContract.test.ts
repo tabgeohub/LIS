@@ -233,11 +233,7 @@ async function run() {
       body: { username: "fixture-user", password: "correct" },
     });
     assert.equal(desktopLogin.statusCode, 200);
-    assert.deepEqual(desktopLogin.body.identity, {
-      subject: "keycloak-fixture-user",
-      regio_id: "RWS FIXTURE",
-      is_admin: false,
-    });
+    assert.equal(desktopLogin.body.identity, undefined);
 
     const adminLogin = await request(server, {
       path: "/auth2/login",
@@ -245,11 +241,7 @@ async function run() {
       body: { username: "admin-user", password: "correct" },
     });
     assert.equal(adminLogin.statusCode, 200);
-    assert.deepEqual(adminLogin.body.identity, {
-      subject: "keycloak-admin-user",
-      regio_id: "admin",
-      is_admin: true,
-    });
+    assert.equal(adminLogin.body.identity, undefined);
 
     const otpChallenge = await request(server, {
       path: "/auth2/verify-credentials",
@@ -277,7 +269,7 @@ async function run() {
       body: { username: "otp-user", password: "correct", otp: "123456" },
     });
     assert.equal(otpLogin.statusCode, 200);
-    assert.equal(otpLogin.body.identity && (otpLogin.body.identity as { subject: string }).subject, "keycloak-otp-user");
+    assert.equal(otpLogin.body.identity, undefined);
 
     const iosLogin = await request(server, {
       path: "/auth2/login",
@@ -285,11 +277,7 @@ async function run() {
       body: { username: "fixture-user", password: "correct" },
     });
     assert.equal(iosLogin.statusCode, 200);
-    assert.deepEqual(iosLogin.body.identity, {
-      subject: "keycloak-fixture-user",
-      regio_id: "RWS FIXTURE",
-      is_admin: false,
-    });
+    assert.equal(iosLogin.body.identity, undefined);
     const cookie = sessionCookie(iosLogin);
 
     const me = await request(server, {
@@ -299,7 +287,9 @@ async function run() {
       cookie,
     });
     assert.equal(me.statusCode, 200);
-    assert.deepEqual(me.body.identity, iosLogin.body.identity);
+    assert.equal(me.body.identity, undefined);
+    assert.equal((me.body.user as { sub?: string }).sub, "keycloak-fixture-user");
+    assert.deepEqual((me.body.roles as { realm?: string[] }).realm, ["RWS FIXTURE"]);
     assert.equal(refreshCount, 1, "expired access token must refresh before /me");
 
     const protectedRequest = await request(server, {
@@ -348,7 +338,7 @@ async function run() {
       body: { username: "unlinked", password: "correct" },
     });
     assert.equal(unlinked.statusCode, 200, "Keycloak-only account needs no database user");
-    assert.equal((unlinked.body.identity as { subject: string }).subject, "keycloak-unlinked");
+    assert.equal(unlinked.body.identity, undefined);
     sessionCookie(unlinked);
 
     const keycloakOnlyVerify = await request(server, {
@@ -356,9 +346,7 @@ async function run() {
       body: { username: "unlinked", password: "correct", subject: "forged-subject", is_admin: true },
     });
     assert.equal(keycloakOnlyVerify.statusCode, 200);
-    assert.deepEqual(keycloakOnlyVerify.body.identity, {
-      subject: "keycloak-unlinked", regio_id: "RWS FIXTURE", is_admin: false,
-    });
+    assert.equal(keycloakOnlyVerify.body.identity, undefined);
     sessionCookie(keycloakOnlyVerify);
 
     process.env.AUTH2_REQUIRE_CLIENT_HEADER = "false";
@@ -367,15 +355,14 @@ async function run() {
     });
     process.env.AUTH2_REQUIRE_CLIENT_HEADER = "true";
     assert.equal(websiteCompatible.statusCode, 200);
-    assert.equal((websiteCompatible.body.identity as { subject: string }).subject, "keycloak-fixture-user");
+    assert.equal(websiteCompatible.body.identity, undefined);
 
     const missingSubject = await request(server, {
       path: "/auth2/login", client: "ios",
       body: { username: "missing-subject", password: "correct" },
     });
-    assert.equal(missingSubject.statusCode, 502);
-    assert.equal(missingSubject.body.code, "IDENTITY_UNAVAILABLE");
-    assert.equal(missingSubject.headers["set-cookie"], undefined);
+    assert.equal(missingSubject.statusCode, 200);
+    assert.equal(missingSubject.body.identity, undefined);
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const limited = await request(server, {
