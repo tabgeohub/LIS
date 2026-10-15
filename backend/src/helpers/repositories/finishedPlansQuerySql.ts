@@ -84,8 +84,12 @@ export function buildFinishedPlansSelectBody(
           ORDER BY pt.created_at, pt.id
         ) AS points_data
       FROM lis.flightplans fp
-      JOIN points_per_plan ppp ON ppp.plan_id = fp.id
-      JOIN lis.points pt ON pt.id = ppp.point_id
+      JOIN LATERAL UNNEST(fp.points) WITH ORDINALITY
+        AS plan_member(point_id, member_order) ON TRUE
+      JOIN points_per_plan ppp
+        ON ppp.plan_id = fp.id
+        AND ppp.point_id = plan_member.point_id
+      JOIN lis.points pt ON pt.id = plan_member.point_id
       LEFT JOIN lis.geometries g ON g.id = pt.geometry_id
       ${whereClause}`;
 }
