@@ -8,7 +8,7 @@ import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 
 export type FinishedPlanSubmitInput = { operation_key: string; package_hash: string; plan: IncomingPlan; package_payload: unknown };
 export type FinishedPlanReceipt = { operation_key: string; planId: number; package_hash: string; payload_hash: string; provenance: "direct_commit" | "state_verified"; point_id_map?: Record<string, number> };
-export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "not_prepared" | "conflict" | "pending" | "recovery_eligible" };
+export type FinishedPlanSubmitResult = { kind: "confirmed"; receipt: FinishedPlanReceipt } | { kind: "not_found" | "forbidden" | "conflict" | "pending" | "recovery_eligible" };
 export function finishedPlanPayloadHash(input: Pick<FinishedPlanSubmitInput, "package_hash" | "plan" | "package_payload">): string {
   return digest({ package_hash: input.package_hash.toLowerCase(), plan: input.plan, package_payload: input.package_payload });
 }
@@ -128,7 +128,6 @@ export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitIn
       const persisted = pointIDMap ? withMappedPointIDs(input.plan, pointIDMap) : input.plan;
       result = pointIDMap !== null && await projectionMatches(client, persisted) ? confirmation(input, "state_verified", pointIDMap) : { kind: "conflict" };
     }
-    else if (row.status !== "prepared" && row.status !== "in-progress") result = { kind: "not_prepared" };
     else {
       // Existing ambiguous prior rows cannot be overwritten or appended to.
       const old = await client.query("SELECT point_id FROM lis.finished_plans WHERE plan_id = $1", [input.plan.id]);

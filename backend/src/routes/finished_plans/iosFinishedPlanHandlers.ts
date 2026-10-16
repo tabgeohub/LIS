@@ -5,7 +5,7 @@ import { resolvePlanPrincipal } from "../flightPlans/planAccess";
 import { readFinishedPlanReceipt, submitFinishedPlanIdempotently, validateFinishedPlanSubmitInput } from "./iosFinishedPlanOperations";
 
 function status(result: string): number {
-  return ({ not_found: 404, forbidden: 403, unclaimed: 409, not_prepared: 409, conflict: 409, schema_required: 503 } as Record<string, number>)[result] || 503;
+  return ({ not_found: 404, forbidden: 403, unclaimed: 409, conflict: 409, schema_required: 503 } as Record<string, number>)[result] || 503;
 }
 function sendIOSFinishedPlanResult(res: Response, result: Awaited<ReturnType<typeof submitFinishedPlanIdempotently>>): void {
   if (result.kind === "confirmed") { res.status(200).json({ planId: result.receipt.planId, receipt: result.receipt }); return; }

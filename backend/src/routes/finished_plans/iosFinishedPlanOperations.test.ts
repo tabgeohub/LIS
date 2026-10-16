@@ -7,10 +7,11 @@ import { RecoverySigner } from "../iosRecovery";
 import { ATTACHMENT_LAYER } from "../arcgis/iosArcgisPhotoProvider";
 const principal = { subject:"synthetic",regio_id:"TEST",is_admin:false }, signer=new RecoverySigner("synthetic-key");
 function input() { return validateFinishedPlanSubmitInput({operation_key:crypto.randomUUID(),package_hash:"a".repeat(64),package_payload:{duration:13},plan:{id:7,points:[{id:11,omschrijving:"original",comment:"note",order:1,spoed:1,attachments:[]}],pathData:[]}})!; }
-function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean } = false) {
+function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean; status?: string } = false) {
  const options=typeof input === "boolean" ? {fail:input} : input;
  const fail=options.fail === true, hasFinishedAt=options.hasFinishedAt === true;
- let status="prepared", rows:any[]=[],paths:any[]=[],attachments:any[]=[],writes=0;
+ const initialStatus=options.status ?? "prepared";
+ let status=initialStatus, rows:any[]=[],paths:any[]=[],attachments:any[]=[],writes=0;
  const commands:string[]=[];
  const query=async(sql:string,p:any[]=[])=>{
   commands.push(sql); assert(!/ios_finished|flightplan_claim/.test(sql));
@@ -29,7 +30,7 @@ function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean } = 
   if(sql.includes("UPDATE lis.flightplans SET status"))status="finished";
   if(sql.includes("INSERT INTO lis.finished_plans_path"))paths.push({path:p[0],flighttime:p[2]});
   if(sql.includes("INSERT INTO lis.finished_plans (")) { if(fail)throw Error("synthetic"); writes++; rows.push({point_id:p[0],point_order:p[2],attachments_id:p[3],pointcomment:p[4],status:p[5],spoed:p[6],emailadres:p[7],finished_at:p[8]}); }
-  if(sql==="ROLLBACK"){status="prepared";rows=[];paths=[];}
+  if(sql==="ROLLBACK"){status=initialStatus;rows=[];paths=[];}
   return{rows:[],rowCount:1};
  };
  return{db:{connect:async()=>({query,release(){}})} as any,commands,writes:()=>writes,rows:()=>rows};
@@ -45,6 +46,22 @@ test("direct commit then lost-response projection verification without duplicate
  assert.equal((await submitFinishedPlanIdempotently(conflict,principal,f.db,false,signer)).kind,"conflict");assert.equal(f.writes(),1);
  f.rows().push({...f.rows()[0]});assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,true,signer)).kind,"conflict");
 });
+for (const status of ["prepared", "in-progress", "pre-prepared", "cancelled", "unknown"]) {
+ test(`completion and recovery accept a non-finished ${status} plan`,async()=>{
+  const direct=fixture({status}),i=input();
+  assert.equal((await submitFinishedPlanIdempotently(i,principal,direct.db,false,signer)).kind,"confirmed");
+  assert.equal(direct.writes(),1);
+  assert(direct.commands.some(sql=>sql.includes("FOR UPDATE")));
+  assert.equal((await submitFinishedPlanIdempotently(i,principal,direct.db,true,signer)).kind,"confirmed");
+  assert.equal(direct.writes(),1);
+
+  const recovery=fixture({status});
+  assert.equal((await submitFinishedPlanIdempotently(i,principal,recovery.db,true,signer)).kind,"recovery_eligible");
+  assert.equal(recovery.writes(),0);
+  assert.equal((await submitFinishedPlanIdempotently(i,principal,recovery.db,false,signer)).kind,"confirmed");
+  assert.equal(recovery.writes(),1);
+ });
+}
 test("iOS omits finished_at only when the existing schema lacks it and no timestamp was supplied",async()=>{
  const missing=fixture({hasFinishedAt:false});
  assert.equal((await submitFinishedPlanIdempotently(input(),principal,missing.db,false,signer)).kind,"confirmed");
