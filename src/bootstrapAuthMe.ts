@@ -1,6 +1,5 @@
 import type { UserType } from "Types";
-
-const ROLE_MARKERS = ["RWS ", "EXT ", "admin"] as const;
+import { resolveAuthUserFromRealmRoles } from "helpers/auth/resolveAuthUserFromRealmRoles";
 
 type AuthMePayload = {
   pendingClientPath?: string;
@@ -8,21 +7,17 @@ type AuthMePayload = {
   user: { sub: string; username: string; email?: string };
 };
 
-function roleMatchesMarker(item: string): boolean {
-  return ROLE_MARKERS.some((marker) => item.includes(marker));
-}
-
-export function pickRealmRole(realmRoles: string[]): string | undefined {
-  return realmRoles.find(roleMatchesMarker);
-}
-
-function hasAuthMeUser(data: AuthMePayload | null | undefined): data is AuthMePayload {
+function hasAuthMeUser(
+  data: AuthMePayload | null | undefined
+): data is AuthMePayload {
   return Boolean(data && data.user && data.user.sub);
 }
 
 export function buildAuthUserFromMe(data: AuthMePayload): UserType {
+  const { role, affiliation } = resolveAuthUserFromRealmRoles(data.roles.realm);
   return {
-    role: pickRealmRole(data.roles.realm) as string,
+    role: role as string,
+    affiliation,
     user_id: data.user.sub as unknown as number,
     user_name: data.user.username,
     email: data.user.email,
@@ -41,4 +36,9 @@ export function applyAuthMeBootstrap(
   }
   if (!hasAuthMeUser(data)) return;
   handlers.setUser(buildAuthUserFromMe(data));
+}
+
+/** @deprecated Prefer resolveAuthUserFromRealmRoles — kept for call-site compatibility. */
+export function pickRealmRole(realmRoles: string[]): string | undefined {
+  return resolveAuthUserFromRealmRoles(realmRoles).role;
 }

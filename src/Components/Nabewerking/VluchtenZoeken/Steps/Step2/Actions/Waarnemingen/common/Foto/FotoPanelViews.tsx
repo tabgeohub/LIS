@@ -3,6 +3,7 @@ import {
   FinishedFlightPlanType,
   FinishedPointType,
 } from "Types/finished_plans";
+import { useCanEdit } from "hooks/useCanEdit";
 import FotoEmptyState from "./FotoEmptyState";
 import FotoAttachmentGrid from "./FotoAttachmentGrid";
 import {
@@ -48,6 +49,7 @@ export function FotoPanelFilledView(input: {
   onAttachmentsUpdated: (newAttachments: AttachmentType[]) => void;
 }) {
   const { model } = input;
+  const userCanEdit = useCanEdit();
   return (
     <div className="h-full">
       <div className="overflow-y-scroll pb-20 thin-scrollbar flex-grow">
@@ -57,7 +59,7 @@ export function FotoPanelFilledView(input: {
           setIsOpen={model.setIsOpen}
           activeIndex={model.activeIndex}
           setActiveIndex={model.setActiveIndex}
-          onDelete={model.deleteImage}
+          onDelete={userCanEdit ? model.deleteImage : undefined}
           onShowLocation={model.handleNavigateToLocation}
         />
       </div>

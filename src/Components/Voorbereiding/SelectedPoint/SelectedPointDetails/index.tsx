@@ -5,12 +5,14 @@ import { useTabState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
 import { buildSelectedPointDetails } from "./selectedPointDetailsData";
 import { SelectedPointActions } from "./SelectedPointActions";
 import { SelectedPointDetailsList } from "./SelectedPointDetailsList";
 
 export default function SelectedPointDetails() {
   const logAction = useLogAction();
+  const userCanEdit = useCanEdit();
   const organizations = useConstSelectOptions("organisaties");
   const activities = useConstSelectOptions("activiteiten");
   const { setClickedPointId, clickedPoint, setClickedPoint } = usePopUpState();
@@ -25,12 +27,15 @@ export default function SelectedPointDetails() {
     setSelectedBottomTab(options.tab);
     logAction({ message: options.message, step: "Selected point details" });
   };
-  const actions = [
+  const viewActions = [
+    { label: labels.viewObservations, onClick: selectAction({ tab: "viewPlans", message: "User clicked 'View plans' button" }) },
+  ];
+  const editActions = [
     { label: labels.editPoint, onClick: selectAction({ tab: "editSelectedPoint", message: "User clicked 'Aandachtspunt wijzigen' button" }) },
     { label: labels.deletePoint, onClick: selectAction({ tab: "deletePoint", message: "User clicked 'Delete point' button" }) },
-    { label: labels.viewObservations, onClick: selectAction({ tab: "viewPlans", message: "User clicked 'View plans' button" }) },
     { label: labels.addToPlan, onClick: selectAction({ tab: "addToPlan", message: "User clicked 'Add to plan' button" }) },
   ];
+  const actions = userCanEdit ? [...editActions, ...viewActions] : viewActions;
   const handleClose = () => {
     setSelectedBottomTab("Kaartlagenlijst");
     setSelectedTab("none");

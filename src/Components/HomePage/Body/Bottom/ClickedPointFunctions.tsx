@@ -8,6 +8,7 @@ import { usePointsStore } from "hooks/features";
 import { MdDelete, MdOutlineZoomIn, MdOutlineZoomInMap } from "react-icons/md";
 import { EnrichedPointType } from "Types";
 import { useDeleteData } from "api-hooks/mutations";
+import { useCanEdit } from "hooks/useCanEdit";
 import MenuItem from "./common/MenuItem";
 
 function ClickedPointFunctions({
@@ -25,6 +26,7 @@ function ClickedPointFunctions({
 
   const logAction = useLogAction();
   const content = useContent();
+  const userCanEdit = useCanEdit();
 
   const zoomToPoint = useCallback(() => {
     if (mapView && clickedPoint) {
@@ -100,18 +102,20 @@ function ClickedPointFunctions({
         onClick={goToPoint}
       />
 
-      <MenuItem
-        icon={<MdDelete className="text-2xl text-primary mt-1" />}
-        title={
-          content.bottomSection.clickedPointFunctions.menu.removeFromResults
-            .title
-        }
-        description={
-          content.bottomSection.clickedPointFunctions.menu.removeFromResults
-            .description
-        }
-        onClick={removePoint}
-      />
+      {userCanEdit && (
+        <MenuItem
+          icon={<MdDelete className="text-2xl text-primary mt-1" />}
+          title={
+            content.bottomSection.clickedPointFunctions.menu.removeFromResults
+              .title
+          }
+          description={
+            content.bottomSection.clickedPointFunctions.menu.removeFromResults
+              .description
+          }
+          onClick={removePoint}
+        />
+      )}
     </div>
   );
 }

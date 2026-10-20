@@ -18,6 +18,7 @@ import { TbBorderOuter, TbLayersLinked } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
 import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import {
   downloadCsvFromRows,
@@ -49,6 +50,7 @@ export default function ListPointFunctions({
   const { setSelectedTab } = useTabState();
 
   const { graphicsLayer } = useMapViewState();
+  const userCanEdit = useCanEdit();
 
   const tableView = () => {
     setOpenResultTab(false);
@@ -133,20 +135,22 @@ export default function ListPointFunctions({
 
   return (
     <div className="bg-white max-w-[250px] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] z-50">
-      <div
-        className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
-        onClick={addPoint}
-      >
-        <IoMdAdd className="text-2xl text-primary mt-1" />
-        <div className="">
-          <p className="text-[14px] font-semibold text-gray-800">
-            {content.layout.searchResult.listPointFunctions.addPoints.title}
-          </p>
-          <p className="text-[12px] text-gray-500">
-            {content.layout.searchResult.listPointFunctions.addPoints.subtitle}{" "}
-          </p>
+      {userCanEdit && (
+        <div
+          className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"
+          onClick={addPoint}
+        >
+          <IoMdAdd className="text-2xl text-primary mt-1" />
+          <div className="">
+            <p className="text-[14px] font-semibold text-gray-800">
+              {content.layout.searchResult.listPointFunctions.addPoints.title}
+            </p>
+            <p className="text-[12px] text-gray-500">
+              {content.layout.searchResult.listPointFunctions.addPoints.subtitle}{" "}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         className="flex gap-x-4 px-2 border-[1px] py-2 hover:bg-blue-100"

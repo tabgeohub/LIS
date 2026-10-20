@@ -59,8 +59,18 @@ export interface FlightPlanType extends FlightPlanPersistenceFields {
   is_finished?: boolean;
 }
 
+/** Companion Keycloak marker paired with an RWS region role. */
+export type UserAffiliation = "intern" | "extern" | null;
+
 export interface UserType {
+  /**
+   * Effective regio / access role used across the app:
+   * `admin` or the RWS region role (e.g. `RWS NN`).
+   * Never the companion `extern` / `intern` marker alone.
+   */
   role: string;
+  /** Set when the user also has an `extern` or `intern` realm role. */
+  affiliation: UserAffiliation;
   user_id: number;
   user_name: string;
   email?: string;

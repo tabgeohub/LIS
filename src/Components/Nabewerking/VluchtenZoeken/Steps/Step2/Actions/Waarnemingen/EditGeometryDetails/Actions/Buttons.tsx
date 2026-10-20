@@ -2,6 +2,7 @@ import { useContent } from "hooks/useContent";
 import { FinishedGeometryType } from "Types/finished_plans";
 import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useCanEdit } from "hooks/useCanEdit";
 import type { EditObservationButtonsProps } from "../../common/editObservationFormProps";
 
 export default function Buttons({
@@ -12,9 +13,11 @@ export default function Buttons({
   selectedGeometry?: FinishedGeometryType;
 }) {
   const { withLog, labels } = useWizardButtons("Second step - Edit geometry");
+  const userCanEdit = useCanEdit();
   const content = useContent();
   const fotoLabel =
-    content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails.fotoBtn;
+    content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails
+      .fotoBtn;
 
   return (
     <WizardButtonBar
@@ -22,14 +25,19 @@ export default function Buttons({
       buttons={[
         {
           label: labels.vorige,
-          onClick: withLog("User clicked 'Cancel' button", () => setOpenEdit(false)),
+          onClick: withLog("User clicked 'Cancel' button", () =>
+            setOpenEdit(false)
+          ),
         },
         {
           label: fotoLabel,
-          onClick: withLog("User clicked 'Foto's' button", () => setAction("foto")),
+          onClick: withLog("User clicked 'Foto's' button", () =>
+            setAction("foto")
+          ),
         },
         {
           label: labels.opslaan,
+          hidden: !userCanEdit,
           onClick: handleUpdate,
         },
       ]}

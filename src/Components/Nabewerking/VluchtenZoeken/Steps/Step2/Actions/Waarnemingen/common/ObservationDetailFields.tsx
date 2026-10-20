@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import InputComp from "Components/Common/FormComponents/InputComp";
 import TextAreaComp from "Components/Common/FormComponents/TextAreaComp";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
 
 type ObservationDetailFieldsProps = {
   vluchtnummer: string;
@@ -20,6 +21,7 @@ type ObservationDetailFieldsProps = {
 /** Shared read-only / editable observation fields for point + geometry edit forms. */
 export function ObservationDetailFields(props: ObservationDetailFieldsProps) {
   const content = useContent();
+  const userCanEdit = useCanEdit();
   const labels =
     content.nabewerking.vluchtenZoeken.step2.waarnemingen.editPointDetails
       .labels;
@@ -62,11 +64,13 @@ export function ObservationDetailFields(props: ObservationDetailFieldsProps) {
         value={props.email}
         label={labels.emailadres}
         setValue={props.setEmail}
+        disabled={!userCanEdit}
       />
       <TextAreaComp
         value={props.comment}
         label={labels.aanvullendeInfo}
         setValue={props.setComment}
+        disabled={!userCanEdit}
       />
 
       <InputComp

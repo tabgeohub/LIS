@@ -10,7 +10,7 @@ export default function FotoAttachmentGrid(input: {
   setIsOpen: (value: boolean) => void;
   activeIndex: number;
   setActiveIndex: (value: number) => void;
-  onDelete: (attachmentId: number) => void;
+  onDelete?: (attachmentId: number) => void;
   onShowLocation: (location: string | null | undefined) => void;
 }) {
   if (input.validAttachments.length === 0) {

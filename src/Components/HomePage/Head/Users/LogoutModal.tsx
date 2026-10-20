@@ -22,7 +22,7 @@ export default function LogoutModal({
   const content = useContent();
 
   async function logout() {
-    setUser({ user_id: 0, user_name: "", role: "" });
+    setUser({ user_id: 0, user_name: "", role: "", affiliation: null });
     setPoints([]);
     setIsOpen(false);
     setOpenList(false);

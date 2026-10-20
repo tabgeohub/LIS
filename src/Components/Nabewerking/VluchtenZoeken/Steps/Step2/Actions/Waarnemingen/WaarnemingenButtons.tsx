@@ -9,17 +9,18 @@ export function WaarnemingenButtons(props: WaarnemingenButtonsProps) {
   const handlers = useWaarnemingenButtonHandlers(props);
   return (
     <>
-      <button onClick={handlers.onPrev} className="gray-button">
+      <button type="button" onClick={handlers.onPrev} className="gray-button">
         {content.common.vorige}
       </button>
       <button
+        type="button"
         onClick={handlers.onNext}
         disabled={!props.canNext}
         className="gray-button"
       >
         {content.common.volgende}
       </button>
-      <button onClick={handlers.onCancel} className="gray-button">
+      <button type="button" onClick={handlers.onCancel} className="gray-button">
         {content.common.annuleren}
       </button>
     </>

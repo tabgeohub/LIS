@@ -13,6 +13,9 @@ import InstallationsPage from "Components/InstallationsPage";
 import DevicesUpdatesPage from "Components/DevicesUpdatesPage";
 import PostLoginRedirect from "Components/Common/PostLoginRedirect";
 import { applyAuthMeBootstrap } from "./bootstrapAuthMe";
+import { installViewerMutationGuard } from "helpers/http/installViewerMutationGuard";
+
+installViewerMutationGuard();
 
 export default function App() {
   const { setUser } = useAuth();

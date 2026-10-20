@@ -13,6 +13,7 @@ import {
   MdTableChart,
 } from "react-icons/md";
 import { FlightPlanType } from "Types";
+import { useCanEdit } from "hooks/useCanEdit";
 import {
   exportSearchedFlightPlansCsv,
   exportSearchedFlightPlansShp,
@@ -35,6 +36,7 @@ export default function DropDown({
   const { redGraphicsLayer } = useMapViewState();
   const { table, labels, noop, closeSearchedAndOpenTable } =
     useSearchedResultsDropdownChrome();
+  const userCanEdit = useCanEdit();
 
   const tableView = () => {
     table.setOpenTable(true);
@@ -56,7 +58,19 @@ export default function DropDown({
   return (
     <SearchedResultsActionsMenu
       actions={[
-        { key: "add", icon: <MdAddCircleOutline className="text-2xl text-primary mt-1" />, title: labels.addPoints.title, description: labels.addPoints.subtitle, onClick: noop },
+        ...(userCanEdit
+          ? [
+              {
+                key: "add",
+                icon: (
+                  <MdAddCircleOutline className="text-2xl text-primary mt-1" />
+                ),
+                title: labels.addPoints.title,
+                description: labels.addPoints.subtitle,
+                onClick: noop,
+              },
+            ]
+          : []),
         { key: "table", icon: <MdTableChart className="text-2xl text-primary mt-1" />, title: labels.tableView.title, description: labels.tableView.subtitle, onClick: tableView },
         { key: "zoom", icon: <MdOutlineZoomOutMap className="text-2xl text-primary mt-1" />, title: labels.zoomAll.title, description: labels.zoomAll.subtitle, onClick: noop },
         { key: "select", icon: <MdOutlineSelectAll className="text-2xl text-primary mt-1" />, title: labels.selectAll.title, description: labels.selectAll.subtitle, onClick: selectAll },

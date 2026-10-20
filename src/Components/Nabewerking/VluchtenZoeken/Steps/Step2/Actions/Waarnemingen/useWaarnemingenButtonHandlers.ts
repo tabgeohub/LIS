@@ -22,6 +22,7 @@ export function useWaarnemingenButtonHandlers(props: ButtonsProps) {
       log("User clicked 'Previous' button");
     },
     onNext: () => {
+      // Intern (viewer) users may open details to view photos; form stays read-only.
       props.setOpenEdit(true);
       log("User clicked 'Next' button");
     },

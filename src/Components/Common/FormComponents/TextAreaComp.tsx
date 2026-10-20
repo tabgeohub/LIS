@@ -2,10 +2,12 @@ export default function TextAreaComp({
   value,
   setValue,
   label,
+  disabled = false,
 }: {
   value: string;
   setValue: (value: string) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <>
@@ -15,6 +17,8 @@ export default function TextAreaComp({
         onChange={(e) => setValue(e.target.value)}
         className="col-span-4 inputClass !w-[80%] pl-2"
         rows={4}
+        disabled={disabled}
+        readOnly={disabled}
       />
     </>
   );

@@ -14,7 +14,7 @@ export default function Navbar() {
     setIsLoggingOut(true);
 
     // Clear user state
-    setUser({ user_id: 0, user_name: "", role: "" });
+    setUser({ user_id: 0, user_name: "", role: "", affiliation: null });
 
     try {
       const res = await fetch(`${getBackEndUrl()}/auth/logout`, {

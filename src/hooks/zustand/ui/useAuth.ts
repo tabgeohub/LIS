@@ -5,6 +5,6 @@ export const useAuth = create<{
   user: UserType;
   setUser: (user: UserType) => void;
 }>((set) => ({
-  user: { user_id: 0, user_name: "", role: "" },
+  user: { user_id: 0, user_name: "", role: "", affiliation: null },
   setUser: (tab: UserType) => set({ user: tab }),
 }));

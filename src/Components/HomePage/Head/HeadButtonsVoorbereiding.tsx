@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useTabState } from "hooks/zustand/ui";
 import { useOpeSideBarState } from "hooks/zustand/ui";
 import { voorbereidingTabs } from "./constants";
@@ -9,11 +10,14 @@ import useHandleClosePopUp from "Components/HomePage/hooks/popUpModal/useHandleC
 import useResetTabs from "Components/HomePage/hooks/tabs/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
+import { applyViewerTabLocks } from "helpers/auth/viewerAccess";
 
 export default function HeadButtonsVoorbereiding() {
   const { setSelectedTab } = useTabState();
   const { setOpenSideBar } = useOpeSideBarState();
   const { user } = useAuth();
+  const userCanEdit = useCanEdit();
   const { resetFeatures } = useResetFeatures();
   const { graphicsLayer, graphicsLayerHover, redGraphicsLayer } =
     useMapViewState();
@@ -23,10 +27,14 @@ export default function HeadButtonsVoorbereiding() {
 
   const content = useContent();
 
-  const primaryPairTabs = voorbereidingTabs.slice(0, 2);
-  const restVoorbereidingTabs = voorbereidingTabs.slice(2);
+  const tabs = useMemo(
+    () => applyViewerTabLocks(voorbereidingTabs, userCanEdit),
+    [userCanEdit]
+  );
+  const primaryPairTabs = tabs.slice(0, 2);
+  const restVoorbereidingTabs = tabs.slice(2);
 
-  const handleVoorbereidingTabClick = (item: (typeof voorbereidingTabs)[0]) => {
+  const handleVoorbereidingTabClick = (item: (typeof tabs)[0]) => {
     if (!item.disabled && user.user_id !== 0) {
       reset();
       handleClose();

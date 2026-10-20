@@ -16,9 +16,14 @@ export function loginRedirect() {
 }
 
 export async function logoutRequest(
-  setUser: (user: { user_id: number; user_name: string; role: string }) => void
+  setUser: (user: {
+    user_id: number;
+    user_name: string;
+    role: string;
+    affiliation: null;
+  }) => void
 ) {
-  setUser({ user_id: 0, user_name: "", role: "" });
+  setUser({ user_id: 0, user_name: "", role: "", affiliation: null });
   const res = await fetch(`${getBackEndUrl()}/auth/logout`, {
     method: "POST",
     credentials: "include",

@@ -4,6 +4,7 @@ import {
   FinishedFlightPlanType,
   FinishedPointType,
 } from "Types/finished_plans";
+import { useCanEdit } from "hooks/useCanEdit";
 import CreateImageBtn from "./CreateImageBtn";
 
 export function FotoPanelBackFooter(input: {
@@ -12,7 +13,7 @@ export function FotoPanelBackFooter(input: {
 }) {
   return (
     <div className="flex bg-white absolute left-0 bottom-0 items-center border-t border-gray-300 justify-end w-full gap-x-2 py-1 pr-3">
-      <button onClick={input.onBack} className="gray-button">
+      <button type="button" onClick={input.onBack} className="gray-button">
         {input.vorigeLabel}
       </button>
     </div>
@@ -28,16 +29,20 @@ export function FotoPanelActionsFooter(input: {
   fileInputId: string;
   onAttachmentsUpdated: (newAttachments: AttachmentType[]) => void;
 }) {
+  const userCanEdit = useCanEdit();
+
   return (
     <div className="flex bg-white absolute left-0 bottom-0 items-center border-t border-gray-300 justify-end w-full gap-x-2 py-1 pr-3">
-      <CreateImageBtn
-        setLoading={input.setLoading}
-        attachmentPoint={input.attachmentPoint}
-        selectedPlan={input.selectedPlan}
-        fileInputId={input.fileInputId}
-        onAttachmentsUpdated={input.onAttachmentsUpdated}
-      />
-      <button onClick={input.onBack} className="gray-button">
+      {userCanEdit && (
+        <CreateImageBtn
+          setLoading={input.setLoading}
+          attachmentPoint={input.attachmentPoint}
+          selectedPlan={input.selectedPlan}
+          fileInputId={input.fileInputId}
+          onAttachmentsUpdated={input.onAttachmentsUpdated}
+        />
+      )}
+      <button type="button" onClick={input.onBack} className="gray-button">
         {input.vorigeLabel}
       </button>
     </div>

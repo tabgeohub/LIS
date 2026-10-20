@@ -1,9 +1,9 @@
+import { useMemo, useState } from "react";
 import { useTabState } from "hooks/zustand/ui";
 import { useOpeSideBarState } from "hooks/zustand/ui";
 import { toolsTabs } from "./constants";
 import FilterTabs from "./Common/FilterTabs";
 import { useMapViewState } from "hooks/zustand/ui";
-import { useState } from "react";
 import Exporter from "Components/HomePageTools/Exporter";
 import Uploaden from "Components/HomePageTools/Uploaden";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
@@ -12,6 +12,8 @@ import useResetTabs from "Components/HomePage/hooks/tabs/useResetTabs";
 import CommonTabBtn from "./Common/CommonTabBtn";
 import { useContent } from "hooks/useContent";
 import { handleToolsTabClick } from "./handleToolsTabClick";
+import { useCanEdit } from "hooks/useCanEdit";
+import { applyViewerTabLocks } from "helpers/auth/viewerAccess";
 
 export default function HeadButtonsTools() {
   const { setSelectedTab, setOpenBevragen } = useTabState();
@@ -24,14 +26,22 @@ export default function HeadButtonsTools() {
   const handleClose = useHandleClosePopUp();
   const reset = useResetTabs();
   const content = useContent();
+  const userCanEdit = useCanEdit();
+
+  const tabs = useMemo(
+    () => applyViewerTabLocks(toolsTabs, userCanEdit),
+    [userCanEdit]
+  );
 
   return (
     <div className="flex gap-x-1">
       <div className="border-gray-200 border-[1px] px-4 py-[1px] bg-white rounded-sm flex flex-col justify-between">
         <div className="flex gap-[10px] pt-2">
-          {toolsTabs.map((item) => (
+          {tabs.map((item) => (
             <CommonTabBtn
+              key={item.id}
               onClick={() => {
+                if (item.disabled) return;
                 handleClose();
                 reset();
                 handleToolsTabClick({

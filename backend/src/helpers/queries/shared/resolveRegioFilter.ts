@@ -67,21 +67,28 @@ export function getSessionRealmRoles(req: Request): string[] {
   return resolveRealmRolesFromAuth(auth);
 }
 
-function isRwsOrExtRole(role: string): boolean {
-  return role.includes("RWS ") || role.includes("EXT ");
-}
-
 function isAdminRoleName(role: string): boolean {
   return role.toLowerCase() === "admin";
 }
 
-/** Matches frontend App.tsx role selection. */
+/** Region roles only (`RWS …` / `RWS_…`) — never companion extern/intern/EXT markers. */
+function isRwsRegionRole(role: string): boolean {
+  const trimmed = role.trim();
+  return (
+    /^RWS([\s_].*)?$/i.test(trimmed) ||
+    trimmed.toUpperCase().startsWith("RWS ")
+  );
+}
+
+/**
+ * Matches frontend resolveAuthUserFromRealmRoles:
+ * admin if present, otherwise the RWS region role (ignore extern/intern).
+ */
 export function pickRegioRoleFromRealmRoles(
   roles: string[]
 ): string | undefined {
-  return roles.find(
-    (item) => isRwsOrExtRole(item) || isAdminRoleName(item)
-  );
+  if (roles.some(isAdminRoleName)) return "admin";
+  return roles.find(isRwsRegionRole);
 }
 
 export function isAdminRegioValue(regio: unknown): boolean {

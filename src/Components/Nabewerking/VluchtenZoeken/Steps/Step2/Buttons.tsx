@@ -5,6 +5,7 @@ import { useHandleClearFinishedPlan } from "hooks/handleCancel/useHandleClearFin
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useCanEdit } from "hooks/useCanEdit";
 import { clearFinishedPlanStep2Layers } from "./clearFinishedPlanStep2Layers";
 import { runFinishedPlanStep2ExitCleanup } from "./runFinishedPlanStep2ExitCleanup";
 
@@ -14,6 +15,7 @@ export default function Buttons({
   setAction: (value: ActionType) => void;
 }) {
   const { withLog, labels, content } = useWizardButtons("Second step");
+  const userCanEdit = useCanEdit();
   const { setStep } = useFinishedPlansState();
   const { resetFeatures } = useResetFeatures();
   const {
@@ -75,6 +77,7 @@ export default function Buttons({
         },
         {
           label: step2.vluchtBewerken,
+          hidden: !userCanEdit,
           onClick: withLog("User clicked 'Vlucht bewerken' button", () =>
             setAction("vluchtBewerken")
           ),

@@ -11,6 +11,7 @@ import {
   mergeFlightPlanPersistenceFields,
   pickFlightPlanPersistenceFields,
 } from "helpers/plans/pickFlightPlanPersistenceFields";
+import { useCanEdit } from "hooks/useCanEdit";
 
 export default function Buttons({
   setAction,
@@ -20,11 +21,12 @@ export default function Buttons({
   const store = useFinishedPlansState();
   const { selectedPlan, setSelectedPlan } = store;
   const { user } = useAuth();
+  const userCanEdit = useCanEdit();
   const { update, loading } = useUpdateData(`/flightPlans/vluchtplans`);
   const { logStep, withLog, labels } = useWizardButtons("Second step - Edit flight");
 
   function handleSubmit() {
-    if (!selectedPlan) return;
+    if (!userCanEdit || !selectedPlan) return;
 
     const attributes = {
       vluchtnummer: selectedPlan.vluchtnummer,
@@ -59,6 +61,7 @@ export default function Buttons({
           },
           {
             label: labels.opslaan,
+            hidden: !userCanEdit,
             onClick: handleSubmit,
           },
           {

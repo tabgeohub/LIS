@@ -3,6 +3,7 @@ import { usePopUpState } from "hooks/zustand/ui";
 import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { EnrichedPointType } from "Types";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
 import ResultTabPointsListFrame from "./ResultTabPointsListFrame";
 
 export default function PointsListEdit({
@@ -18,6 +19,7 @@ export default function PointsListEdit({
   const { setOpenSideBar } = useOpeSideBarState();
   const { setClickedPoint } = usePopUpState();
   const content = useContent();
+  const userCanEdit = useCanEdit();
   const editTabs = content.bottomSection.editPointTabs;
 
   const openBottomTab = (tab: string, point: EnrichedPointType) => {
@@ -26,26 +28,32 @@ export default function PointsListEdit({
     setClickedPoint(point);
   };
 
-  const renderRowFooter = (point: EnrichedPointType) => (
-    <div className="text-blue-500 text-sm font-medium mt-4">
-      {[
-        ["editSelectedPoint", editTabs.editPoint],
-        ["deletePoint", editTabs.deletePoint],
-        ["viewPlans", editTabs.viewObservations],
-        ["addToPlan", editTabs.addToPlan],
-      ].map(([tab, label], index) => (
-        <span key={tab}>
-          {index > 0 && <span className="mx-2">-</span>}
-          <span
-            onClick={() => openBottomTab(tab, point)}
-            className="cursor-pointer hover:text-blue-600 hover:underline hover:font-semibold transition-all"
-          >
-            {label}
+  const renderRowFooter = (point: EnrichedPointType) => {
+    const actions: [string, string][] = userCanEdit
+      ? [
+          ["editSelectedPoint", editTabs.editPoint],
+          ["deletePoint", editTabs.deletePoint],
+          ["viewPlans", editTabs.viewObservations],
+          ["addToPlan", editTabs.addToPlan],
+        ]
+      : [["viewPlans", editTabs.viewObservations]];
+
+    return (
+      <div className="text-blue-500 text-sm font-medium mt-4">
+        {actions.map(([tab, label], index) => (
+          <span key={tab}>
+            {index > 0 && <span className="mx-2">-</span>}
+            <span
+              onClick={() => openBottomTab(tab, point)}
+              className="cursor-pointer hover:text-blue-600 hover:underline hover:font-semibold transition-all"
+            >
+              {label}
+            </span>
           </span>
-        </span>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
+  };
 
   return (
     <ResultTabPointsListFrame

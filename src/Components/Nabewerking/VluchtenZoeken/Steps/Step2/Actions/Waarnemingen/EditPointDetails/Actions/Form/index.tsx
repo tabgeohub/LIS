@@ -7,6 +7,7 @@ import { useUpdateData } from "api-hooks/mutations";
 import LoadingBars from "Components/Common/LoadingBars";
 import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
+import { useCanEdit } from "hooks/useCanEdit";
 import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { submitEditPointDetails } from "./submitEditPointDetails";
 import type { EditObservationFormProps } from "../../../common/editObservationFormProps";
@@ -18,6 +19,7 @@ export default function Form({
   setOpenEdit,
 }: EditObservationFormProps) {
   const logAction = useLogAction();
+  const userCanEdit = useCanEdit();
 
   const { selectedPoint, selectedPlan, setSelectedPlan, setSelectedPoint } =
     useFinishedPlansState();
@@ -134,8 +136,9 @@ export default function Form({
         }
       />
 
-      {isAdHoc && (
+      {isAdHoc && userCanEdit && (
         <button
+          type="button"
           onClick={() => {
             setAction("editPointCoordinates");
 

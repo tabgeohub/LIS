@@ -24,7 +24,10 @@ export default function CommonTabBtn({
   return (
     <div
       key={item.id}
+      aria-disabled={item.disabled}
       onClick={() => {
+        if (item.disabled) return;
+
         onClick();
 
         resetFeatures();
@@ -32,7 +35,10 @@ export default function CommonTabBtn({
         logAction({ message: `User clicked ${item.label} tab` });
       }}
       className={classNames(
-        "hover:bg-blue-50 hover:border-blue-200 relative cursor-pointer text-center grid grid-rows-2 justify-center text-gray-400 group border-2 transition-all duration-300 rounded-xl",
+        "relative text-center grid grid-rows-2 justify-center text-gray-400 group border-2 transition-all duration-300 rounded-xl",
+        item.disabled
+          ? "cursor-not-allowed opacity-40"
+          : "hover:bg-blue-50 hover:border-blue-200 cursor-pointer",
         selectedTab === item.id
           ? "border-blue-200 bg-blue-50"
           : "border-transparent"
