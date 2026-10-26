@@ -1,14 +1,6 @@
 # .dockerignore
 node_modules
-# The frontend aliases shared/* to this source file during its Vite build.
 backend
-!backend/
-backend/*
-!backend/src/
-backend/src/*
-!backend/src/shared/
-backend/src/shared/*
-!backend/src/shared/geometryFormFields.ts
 .git
 .vscode
 npm-debug.log
