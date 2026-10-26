@@ -6,6 +6,7 @@ import useLogAction from "hooks/useLogAction";
 import { useContent } from "hooks/useContent";
 import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
+import { useCanEdit } from "hooks/useCanEdit";
 
 export default function Buttons({
   handleCancel,
@@ -15,6 +16,7 @@ export default function Buttons({
   setVluchtnummer: (vluchtnummer: string) => void;
 }) {
   const { logStep, withLog, labels } = useWizardButtons("View plan");
+  const userCanEdit = useCanEdit();
   const {
     setOpenFilter,
     selectedPlan,
@@ -77,6 +79,7 @@ export default function Buttons({
       buttons={[
         {
           label: "Duplicate",
+          hidden: !userCanEdit,
           onClick: duplicateFlightPlan,
           disabled: selectedPlan?.status !== "pre-prepared",
         },

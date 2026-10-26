@@ -12,6 +12,8 @@ import { useMapViewState } from "hooks/zustand/ui";
 
 import { useWizardButtons } from "hooks/wizard/useWizardButtons";
 
+import { useCanEdit } from "hooks/useCanEdit";
+
 import { runWizardCleanup } from "hooks/wizard/useWizardCleanup";
 
 import WizardButtonBar from "Components/Common/Wizard/WizardButtonBar";
@@ -47,6 +49,8 @@ export default function Buttons({
 }) {
 
   const { logStep, withLog } = useWizardButtons("View plan - Step 2");
+
+  const userCanEdit = useCanEdit();
 
   const { user } = useAuth();
 
@@ -190,6 +194,8 @@ export default function Buttons({
 
           label: "Aandachtspunt bewerken",
 
+          hidden: !userCanEdit,
+
           onClick: withLog("User clicked 'Edit point' button", () => setStep(3)),
 
         },
@@ -197,6 +203,8 @@ export default function Buttons({
         {
 
           label: "Opslaan",
+
+          hidden: !userCanEdit,
 
           onClick: submitStep2,
 

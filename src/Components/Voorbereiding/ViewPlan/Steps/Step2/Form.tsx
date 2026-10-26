@@ -1,5 +1,6 @@
 import InputComp from "Components/Common/FormComponents/InputComp";
 import { useAuth } from "hooks/zustand/ui";
+import { useCanEdit } from "hooks/useCanEdit";
 import { useViewPlanState } from "Components/Voorbereiding/ViewPlan/useViewPlanState";
 import FlightPlanStandardFields, {
   pickFlightPlanFormFields,
@@ -20,11 +21,13 @@ export default function Form({
   const fields = pickFlightPlanFormFields(viewPlanState);
   const { user } = useAuth();
   const { datum } = viewPlanState;
+  const userCanEdit = useCanEdit();
 
   return (
     <FlightPlanStandardFields
       fields={fields}
       {...selectProps}
+      disabled={!userCanEdit}
       geplandeVliegduurDisabled
       typeLuchtvaartuigDisabled
       header={

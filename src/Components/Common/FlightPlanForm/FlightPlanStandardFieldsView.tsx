@@ -22,6 +22,7 @@ export type FlightPlanStandardFieldsProps = {
   geplandeVliegduurDisabled?: boolean;
   typeLuchtvaartuigDisabled?: boolean;
   omschrijvingAsTextArea?: boolean;
+  disabled?: boolean;
   header?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -38,10 +39,12 @@ export default function FlightPlanStandardFieldsView({
   geplandeVliegduurDisabled = false,
   typeLuchtvaartuigDisabled = false,
   omschrijvingAsTextArea = false,
+  disabled = false,
   header,
   footer,
   className = "space-y-3",
 }: FlightPlanStandardFieldsProps) {
+  const fieldsDisabled = disabled;
   const waarnemerField =
     waarnemerOptions != null ? (
       <SelectComp
@@ -50,7 +53,7 @@ export default function FlightPlanStandardFieldsView({
         setValue={fields.setWaarnemer}
         required
         options={waarnemerOptions}
-        disabled={waarnemerDisabled}
+        disabled={waarnemerDisabled || fieldsDisabled}
       />
     ) : (
       <InputComp
@@ -58,7 +61,7 @@ export default function FlightPlanStandardFieldsView({
         value={fields.waarnemer}
         setValue={fields.setWaarnemer}
         required
-        disabled={waarnemerDisabled}
+        disabled={waarnemerDisabled || fieldsDisabled}
       />
     );
 
@@ -72,6 +75,7 @@ export default function FlightPlanStandardFieldsView({
             value={fields.omschrijving}
             setValue={fields.setOmschrijving}
             label={labels.omschrijving}
+            disabled={fieldsDisabled}
           />
         </div>
       ) : (
@@ -79,6 +83,7 @@ export default function FlightPlanStandardFieldsView({
           label={labels.omschrijving}
           value={fields.omschrijving}
           setValue={fields.setOmschrijving}
+          disabled={fieldsDisabled}
         />
       )}
 
@@ -87,6 +92,7 @@ export default function FlightPlanStandardFieldsView({
         value={fields.piloot}
         setValue={fields.setPiloot}
         options={pilootOptions}
+        disabled={fieldsDisabled}
       />
 
       {waarnemerField}
@@ -97,10 +103,10 @@ export default function FlightPlanStandardFieldsView({
         setValue={fields.setDatum}
         required
         type="date"
-        disabled={datumDisabled}
+        disabled={datumDisabled || fieldsDisabled}
       />
 
-      {typeLuchtvaartuigDisabled ? (
+      {typeLuchtvaartuigDisabled || fieldsDisabled ? (
         <InputComp
           label={labels.typeLuchtvaartuig}
           value={fields.typeLuchtvaartuig}
@@ -121,25 +127,28 @@ export default function FlightPlanStandardFieldsView({
         value={Number(fields.aantalPassagiers ?? 0)}
         setValue={fields.setAantalPassagiers}
         type="number"
+        disabled={fieldsDisabled}
       />
 
       <InputComp
         label={labels.doelEnHoofdthema}
         value={fields.doelEnHoofdthema}
         setValue={fields.setDoelEnHoofdthema}
+        disabled={fieldsDisabled}
       />
 
       <InputComp
         label={labels.aanvullendeInfo}
         value={fields.aanvullendeInfo}
         setValue={fields.setAanvullendeInfo}
+        disabled={fieldsDisabled}
       />
 
       <InputComp
         label={labels.geplandeVliegduur}
         value={fields.geplandeVliegduur}
         setValue={fields.setGeplandeVliegduur}
-        disabled={geplandeVliegduurDisabled}
+        disabled={geplandeVliegduurDisabled || fieldsDisabled}
       />
 
       {footer}

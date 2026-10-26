@@ -5,6 +5,7 @@ import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import Buttons from "./Buttons";
 import PointsAdding from "./PointsAdding";
 import { useViewPlanStepMap } from "./useViewPlanStepMap";
+import { useCanEdit } from "hooks/useCanEdit";
 
 export default function Step2({
   vluchtnummer,
@@ -19,6 +20,7 @@ export default function Step2({
 }) {
   const { clickedPoint, setClickedPoint, clickedGeometry, setClickedGeometry, setStep, selectedPlan } =
     useViewPlanState();
+  const userCanEdit = useCanEdit();
   const { selectTargetPoint, selectTargetGeometry } = useViewPlanStepMap({
     selectedPlan,
     clickedPoint,
@@ -48,9 +50,12 @@ export default function Step2({
         />
       </div>
 
-      <div className="h-[2px] bg-gray-200 my-4" />
-
-      <PointsAdding setStep={setStep} />
+      {userCanEdit && (
+        <>
+          <div className="h-[2px] bg-gray-200 my-4" />
+          <PointsAdding setStep={setStep} />
+        </>
+      )}
     </ScrollButtonsLayout>
   );
 }

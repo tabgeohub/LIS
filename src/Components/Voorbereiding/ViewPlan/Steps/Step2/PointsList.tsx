@@ -1,6 +1,7 @@
 import { useOpenTable } from "hooks/zustand/ui";
 import useLogAction from "hooks/useLogAction";
 import { TbPolygon, TbLine } from "react-icons/tb";
+import { useCanEdit } from "hooks/useCanEdit";
 
 export default function PointsList({
   clickedPoint,
@@ -14,13 +15,16 @@ export default function PointsList({
   selectTargetGeometry: (geometryId: number) => void;
 }) {
   const logAction = useLogAction();
+  const userCanEdit = useCanEdit();
 
   const { pointsTable, geometriesTable } = useOpenTable();
 
   return (
     <>
       <h4 className="text-sm font-bold text-black">
-        Selecteer een aandachtspunt voor details en eventuele bewerkingen
+        {userCanEdit
+          ? "Selecteer een aandachtspunt voor details en eventuele bewerkingen"
+          : "Selecteer een aandachtspunt voor details"}
       </h4>
 
       <div className="flex justify-between">
