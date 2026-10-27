@@ -1,6 +1,5 @@
 import type { RequestHandler } from "express";
 import path from "path";
-import fs from "fs";
 import { hasPassword, verifyPassword } from "./passwordStore";
 import {
   renderDownloadPage,
@@ -12,6 +11,7 @@ import {
   buildDownloadActionPath,
   resolveDownloadFilename,
 } from "../helpers/downloads/fileDownloadHelpers";
+import { resolveSafeUploadFile } from "../helpers/downloads/safeUploadFile";
 
 const uploadDir = path.join(__dirname, "..", "uploads");
 
@@ -60,8 +60,8 @@ export function sendVerifiedDownload(input: {
   filename: string;
 }): void {
   const { res, filename } = input;
-  const filePath = path.join(uploadDir, filename);
-  if (!fs.existsSync(filePath)) {
+  const filePath = resolveSafeUploadFile(uploadDir, filename);
+  if (!filePath) {
     res.status(404).send("❌ Bestand niet gevonden");
     return;
   }

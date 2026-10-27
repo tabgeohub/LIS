@@ -17,7 +17,8 @@
     "test:ios-log-operations": "npx ts-node --transpile-only src/routes/logs/iosLogOperations.test.ts",
     "test:safe-return-path": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeReturnPath.test.ts",
     "test:post-login-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/resolvePostLoginRedirect.test.ts",
-    "test:safe-server-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeServerRedirect.test.ts"
+    "test:safe-server-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeServerRedirect.test.ts",
+    "test:safe-upload-file": "npx ts-node --transpile-only src/helpers/downloads/safeUploadFile.test.ts"
   },
   "keywords": [],
   "author": "",

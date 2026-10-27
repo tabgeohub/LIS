@@ -1,6 +1,4 @@
 import express, { RequestHandler } from "express";
-import path from "path";
-import fs from "fs";
 import dotenv from "dotenv";
 import { setPassword, hasPassword } from "./passwordStore";
 import { requireSessionAuth } from "../helpers/auth/requireSessionAuth";
@@ -19,6 +17,7 @@ import {
   sendVerifiedDownload,
   uploadDir,
 } from "./fileDownloadHelpers";
+import { resolveSafeUploadFile } from "../helpers/downloads/safeUploadFile";
 
 dotenv.config();
 
@@ -47,8 +46,8 @@ const setPasswordHandler: RequestHandler<
     return;
   }
 
-  const filePath = path.join(uploadDir, filename);
-  if (!fs.existsSync(filePath)) {
+  const filePath = resolveSafeUploadFile(uploadDir, filename);
+  if (!filePath) {
     res.status(404).send("❌ Bestand niet gevonden");
     return;
   }

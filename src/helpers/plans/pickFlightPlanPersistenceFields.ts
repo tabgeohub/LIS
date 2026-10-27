@@ -1,9 +1,20 @@
 import type { FlightPlanPersistenceFields } from "Types";
-import { FLIGHT_PLAN_PERSISTENCE_FIELD_NAMES } from "shared/flightPlanFields";
+
+const flightPlanPersistenceFieldNames = [
+  "omschrijving",
+  "waarnemer",
+  "piloot",
+  "datum",
+  "vliegduur",
+  "luchtvaartuig",
+  "passagiers",
+  "hoofdthema",
+  "aanvullende",
+] as const satisfies readonly (keyof FlightPlanPersistenceFields)[];
 
 /** Keys of the 9 DB persistence fields shared by pick/merge/log helpers. */
 export const FLIGHT_PLAN_PERSISTENCE_KEYS =
-  FLIGHT_PLAN_PERSISTENCE_FIELD_NAMES satisfies ReadonlyArray<
+  flightPlanPersistenceFieldNames satisfies ReadonlyArray<
     keyof FlightPlanPersistenceFields
   >;
 
