@@ -6,6 +6,7 @@ import { useContent } from "hooks/useContent";
 type ObservationDetailFieldsProps = {
   vluchtnummer: string;
   datumDisplay: string;
+  finishedAtDisplay?: string;
   waarnemer: string;
   email: string;
   setEmail: (value: string) => void;
@@ -40,6 +41,15 @@ export function ObservationDetailFields(props: ObservationDetailFieldsProps) {
         setValue={() => {}}
         disabled
       />
+
+      {props.finishedAtDisplay ? (
+        <InputComp
+          value={props.finishedAtDisplay}
+          label={labels.afgerondOp}
+          setValue={() => {}}
+          disabled
+        />
+      ) : null}
 
       <InputComp
         value={props.waarnemer}

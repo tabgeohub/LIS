@@ -7,6 +7,7 @@ export function buildSingleFinishedFlightPlanQuery(): string {
     pointOrderExpr: "ppp.point_order",
     pointCommentExpr: "ppp.point_comment",
     attachmentsExpr: "ap.attachments",
+    finishedAtExpr: "ppp.finished_at",
     includeGeometry: true,
   });
   return `${buildSingleFinishedPlanCtes()}

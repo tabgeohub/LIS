@@ -11,6 +11,7 @@ import ScrollButtonsLayout from "Components/Common/ScrollButtonsLayout";
 import { submitEditPointDetails } from "./submitEditPointDetails";
 import type { EditObservationFormProps } from "../../../common/editObservationFormProps";
 import { ObservationDetailFields } from "../../../common/ObservationDetailFields";
+import { formatFinishedAtDisplay } from "../../../common/formatFinishedAtDisplay";
 
 export default function Form({
   setAction,
@@ -113,6 +114,7 @@ export default function Form({
         datumDisplay={`${selectedPoint.datum.split("T")[0]} - ${
           selectedPoint.datum.split("T")[1]
         }`}
+        finishedAtDisplay={formatFinishedAtDisplay(selectedPoint.finished_at)}
         waarnemer={selectedPlan?.waarnemer || ""}
         email={email}
         setEmail={setEmail}

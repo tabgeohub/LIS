@@ -171,6 +171,7 @@ export type FinishedPlanDetailsPointJsonOptions = {
   pointOrderExpr: string;
   pointCommentExpr: string;
   attachmentsExpr: string;
+  finishedAtExpr?: string;
   includeGeometry?: boolean;
 };
 
@@ -183,6 +184,10 @@ export function buildFinishedPlanDetailsPointJsonbObject(
     `'point_comment', ${options.pointCommentExpr}`,
     `'attachments', ${options.attachmentsExpr}`,
   ];
+
+  if (options.finishedAtExpr) {
+    fields.push(`'finished_at', ${options.finishedAtExpr}`);
+  }
 
   if (options.includeGeometry) {
     fields.push(...pointJsonPairs(POINT_GEOMETRY_FIELDS));

@@ -23,7 +23,8 @@ export function buildSingleFinishedPlanCtes(): string {
           plan_id,
           point_id,
           MAX(point_order) AS point_order,
-          MAX(pointcomment) AS point_comment
+          MAX(pointcomment) AS point_comment,
+          MAX(finished_at) AS finished_at
         FROM ffp_rows
         GROUP BY plan_id, point_id
       ),
@@ -65,6 +66,7 @@ export function buildFinishedFlightPlansListPointJson(): string {
     pointOrderExpr: "ffp.point_order",
     pointCommentExpr: "ffp.pointComment",
     attachmentsExpr: "att_list.attachments",
+    finishedAtExpr: "ffp.finished_at",
   });
 }
 

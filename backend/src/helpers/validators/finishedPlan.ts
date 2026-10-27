@@ -41,6 +41,8 @@ export type IncomingPoint = IncomingPointCoreFields & {
   comment: string | null;
   spoed?: number | null;
   sendToEmail?: string | null;
+  /** Epoch ms or ISO string from Desktop Opslaan. */
+  finishedAt?: number | string | null;
 };
 
 export type IncomingPlan = {

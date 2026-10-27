@@ -42,6 +42,19 @@ function coalesceFalse(value: unknown): boolean {
   return (value as boolean | null | undefined) ?? false;
 }
 
+/** Normalize Desktop Opslaan timestamp (epoch ms or ISO) for Postgres. */
+function normalizeFinishedAt(value: unknown): Date | null {
+  if (value == null) return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return new Date(value);
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+}
+
 function buildNewPointOverrides(
   point: FinishedPlanPoint,
   userId: number
@@ -252,6 +265,7 @@ class FinishedPlanWriter {
       "bezocht",
       coalesceNull(point.spoed),
       coalesceNull(point.sendToEmail),
+      normalizeFinishedAt(point.finishedAt),
     ];
   }
 

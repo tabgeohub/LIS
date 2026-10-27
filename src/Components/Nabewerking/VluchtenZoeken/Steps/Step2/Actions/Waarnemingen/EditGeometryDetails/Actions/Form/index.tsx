@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { applyGeometryCommentUpdate } from "./applyGeometryCommentUpdate";
 import type { EditObservationFormProps } from "../../../common/editObservationFormProps";
 import { ObservationDetailFields } from "../../../common/ObservationDetailFields";
+import { formatFinishedAtDisplay } from "../../../common/formatFinishedAtDisplay";
 
 export default function Form({
   setAction,
@@ -102,6 +103,7 @@ export default function Form({
         datumDisplay={`${firstPoint.datum.split("T")[0]} - ${
           firstPoint.datum.split("T")[1]
         }`}
+        finishedAtDisplay={formatFinishedAtDisplay(firstPoint.finished_at)}
         waarnemer={selectedPlan?.waarnemer || ""}
         email={email}
         setEmail={setEmail}

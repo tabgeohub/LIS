@@ -1,16 +1,19 @@
 import express from "express";
 import path from "path";
-import fs from "fs";
+import { parseValidFilename } from "../helpers/downloads/fileDownloadHelpers";
+import { resolveSafeUploadFile } from "../helpers/downloads/safeUploadFile";
 
 const router = express.Router();
 const uploadDir = path.join(__dirname, "..", "uploads");
 
-// @ts-ignore
 router.get("/:filename", (req, res) => {
-  const { filename } = req.params;
-  const filePath = path.join(uploadDir, filename);
+  const filename = parseValidFilename(req.params.filename || "");
+  if (!filename) {
+    return res.status(400).send("Invalid filename");
+  }
 
-  if (!fs.existsSync(filePath)) {
+  const filePath = resolveSafeUploadFile(uploadDir, filename);
+  if (!filePath) {
     return res.status(404).send("File not found");
   }
 

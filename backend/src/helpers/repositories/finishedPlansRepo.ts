@@ -106,8 +106,8 @@ export async function insertFinishedPlanRow(
   values: unknown[]
 ) {
   return db.query(
-    `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    `INSERT INTO lis.finished_plans (point_id, plan_id, point_order, attachments_id, pointComment, status, spoed, emailadres, finished_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
     values
   );
 }
