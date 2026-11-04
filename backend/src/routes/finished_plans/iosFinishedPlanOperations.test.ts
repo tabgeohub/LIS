@@ -13,12 +13,24 @@ function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean; sta
  const initialStatus=options.status ?? "prepared";
  let status=initialStatus, rows:any[]=[],paths:any[]=[],attachments:any[]=[],writes=0;
  const commands:string[]=[];
+ const pointInserts:Record<string,unknown>[]=[];
+ const points=new Map<number,Record<string,unknown>>([[11,{omschrijving:"original"}]]);
+ let planPointIDs=[11],nextPointID=21;
+ const description=(id:number)=>points.get(id)?.omschrijving;
  const query=async(sql:string,p:any[]=[])=>{
   commands.push(sql); assert(!/ios_finished|flightplan_claim/.test(sql));
-  if(sql.includes("SELECT id, regio_id"))return{rows:[{id:7,regio_id:"TEST",user_id:"desktop-owner",status,points:[11]}],rowCount:1};
-  if(sql.includes("INSERT INTO lis.points"))return{rows:[{id:21}],rowCount:1};
-  if(sql.includes("SELECT f.point_id, f.point_order"))return{rows:rows.map(r=>({point_id:r.point_id,point_order:r.point_order,omschrijving:"original"})),rowCount:rows.length};
-  if(sql.includes("SELECT f.*"))return{rows:rows.map(r=>({...r,omschrijving:"original"})),rowCount:rows.length};
+  if(sql.includes("SELECT id, regio_id"))return{rows:[{id:7,regio_id:"TEST",user_id:"desktop-owner",status,points:[...planPointIDs]}],rowCount:1};
+  if(sql.includes("INSERT INTO lis.points")){
+   const columns=sql.match(/\(([^)]+)\)/)![1].split(",").map(column=>column.trim());
+   const values=Object.fromEntries(columns.map((column,index)=>[column,p[index]]));
+   pointInserts.push(values);
+   const id=nextPointID++;points.set(id,values);
+   return{rows:[{id}],rowCount:1};
+  }
+  if(sql.includes("UPDATE lis.points SET omschrijving"))points.set(p[2],{...points.get(p[2]),omschrijving:p[0]});
+  if(sql.includes("UPDATE lis.flightplans SET points"))planPointIDs=[...p[0]];
+  if(sql.includes("SELECT f.point_id, f.point_order"))return{rows:rows.map(r=>({point_id:r.point_id,point_order:r.point_order,omschrijving:description(r.point_id)})),rowCount:rows.length};
+  if(sql.includes("SELECT f.*"))return{rows:rows.map(r=>({...r,omschrijving:description(r.point_id)})),rowCount:rows.length};
   if(sql.includes("SELECT path, flighttime"))return{rows:paths,rowCount:paths.length};
   if(sql.includes("information_schema.columns"))return{rows:[{exists:hasFinishedAt}],rowCount:1};
   if(sql.includes("SELECT id, url, point_id"))return{rows:attachments,rowCount:attachments.length};
@@ -30,10 +42,10 @@ function fixture(input: boolean | { fail?: boolean; hasFinishedAt?: boolean; sta
   if(sql.includes("UPDATE lis.flightplans SET status"))status="finished";
   if(sql.includes("INSERT INTO lis.finished_plans_path"))paths.push({path:p[0],flighttime:p[2]});
   if(sql.includes("INSERT INTO lis.finished_plans (")) { if(fail)throw Error("synthetic"); writes++; rows.push({point_id:p[0],point_order:p[2],attachments_id:p[3],pointcomment:p[4],status:p[5],spoed:p[6],emailadres:p[7],finished_at:p[8]}); }
-  if(sql==="ROLLBACK"){status=initialStatus;rows=[];paths=[];}
+  if(sql==="ROLLBACK"){status=initialStatus;rows=[];paths=[];attachments=[];planPointIDs=[11];points.clear();points.set(11,{omschrijving:"original"});}
   return{rows:[],rowCount:1};
  };
- return{db:{connect:async()=>({query,release(){}})} as any,commands,writes:()=>writes,rows:()=>rows};
+ return{db:{connect:async()=>({query,release(){}})} as any,commands,pointInserts,writes:()=>writes,rows:()=>rows,pointCount:()=>points.size,planPointIDs:()=>planPointIDs,status:()=>status};
 }
 test("direct commit then lost-response projection verification without duplicate rows",async()=>{
  const f=fixture(),i=input();
@@ -94,13 +106,80 @@ test("membership, region, invalid IDs and rollback are guarded",async()=>{
  const bad=input();bad.plan.points[0].id=-1;assert.equal(validateFinishedPlanSubmitInput(bad),null);
  assert.equal((await submitFinishedPlanIdempotently(input(),principal,fixture().db,true,signer)).kind,"recovery_eligible");
 });
-test("a mixed package creates a negative point under the locked Desktop owner and returns its map",async()=>{
- const f=fixture({hasFinishedAt:false}),i=input();
- i.plan.points.push({id:-42,omschrijving:"field-created",comment:"new",order:2,spoed:0,attachments:[],latitude:52.1,longitude:4.9} as any);
+function mixedInput() {
+ const i=input();
+ i.plan.points.push(
+  {id:-42,omschrijving:"field-created first",comment:"new",order:2,spoed:0,attachments:[],latitude:52.1,longitude:4.9},
+  {id:-43,omschrijving:"field-created second",comment:"new",order:3,spoed:0,attachments:[],latitude:52.2,longitude:4.8}
+ );
+ return i;
+}
+for (const [label,flags,expected] of [
+ ["omitted",{},[0,0]],
+ ["null",{vertrouwelijk:null,herhalen:null},[0,0]],
+ ["zero",{vertrouwelijk:0,herhalen:0},[0,0]],
+ ["one",{vertrouwelijk:1,herhalen:1},[1,1]],
+ ["mixed zero/one",{vertrouwelijk:0,herhalen:1},[0,1]],
+ ["mixed one/zero",{vertrouwelijk:1,herhalen:0},[1,0]],
+] as const) {
+ test(`new-point INSERT uses numeric flags for ${label} values`,async()=>{
+  const f=fixture(),i=mixedInput();
+  Object.assign(i.plan.points[1],flags);
+  const frozen=JSON.stringify(i);
+  assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,false,signer)).kind,"confirmed");
+  assert.equal(f.pointInserts.length,2);
+  assert.deepEqual([f.pointInserts[0].vertrouwelijk,f.pointInserts[0].herhalen],expected);
+  assert.deepEqual([f.pointInserts[1].vertrouwelijk,f.pointInserts[1].herhalen],[0,0]);
+  assert.equal(JSON.stringify(i),frozen,"database defaults must not mutate the frozen request");
+ });
+}
+test("shared Desktop writer preserves explicit numeric new-point flags",async()=>{
+ const f=fixture(),client=await f.db.connect(),i=mixedInput();
+ Object.assign(i.plan.points[1],{vertrouwelijk:1,herhalen:0});
+ Object.assign(i.plan.points[2],{vertrouwelijk:0,herhalen:1});
+ await saveFinishedPlanInTransaction(client,{...i.plan,user_id:"desktop-owner"});
+ assert.deepEqual(f.pointInserts.map(p=>[p.vertrouwelijk,p.herhalen]),[[1,0],[0,1]]);
+});
+test("a mixed package maps two new points and reconciles a lost response without duplicate inserts",async()=>{
+ const f=fixture({hasFinishedAt:false}),i=mixedInput();
  const result=await submitFinishedPlanIdempotently(i,principal,f.db,false,signer);
  assert.equal(result.kind,"confirmed");
- if(result.kind==="confirmed") assert.deepEqual(result.receipt.point_id_map,{"-42":21});
- assert(f.commands.some(command=>command.includes("INSERT INTO lis.points")));
+ if(result.kind==="confirmed"){
+  assert.equal(result.receipt.provenance,"direct_commit");
+  assert.deepEqual(result.receipt.point_id_map,{"-42":21,"-43":22});
+ }
+ assert.deepEqual(f.planPointIDs(),[11,21,22]);
+ assert(f.pointInserts.every(point=>point.user_id==="desktop-owner"));
+ const read=await submitFinishedPlanIdempotently(i,principal,f.db,true,signer);
+ assert.equal(read.kind,"confirmed");
+ if(read.kind==="confirmed"){
+  assert.equal(read.receipt.provenance,"state_verified");
+  assert.deepEqual(read.receipt.point_id_map,{"-42":21,"-43":22});
+ }
+ assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,false,signer)).kind,"confirmed");
+ assert.equal(f.pointInserts.length,2);
+ assert.equal(f.writes(),3);
+ const mismatch=mixedInput();mismatch.plan.points[1].omschrijving="different point";
+ assert.equal((await submitFinishedPlanIdempotently(mismatch,principal,f.db,true,signer)).kind,"conflict");
+ // Even a matching finished projection cannot confirm different plan members.
+ f.planPointIDs()[1]=99;
+ assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,true,signer)).kind,"conflict");
+ assert.equal(f.pointInserts.length,2);
+ assert.equal(f.writes(),3);
+});
+test("new-point submissions still require the original positive plan members before writing",async()=>{
+ const f=fixture(),i=mixedInput();i.plan.points[0].id=12;
+ assert.equal((await submitFinishedPlanIdempotently(i,principal,f.db,false,signer)).kind,"conflict");
+ assert.equal(f.pointInserts.length,0);assert.equal(f.writes(),0);
+ assert.deepEqual(f.planPointIDs(),[11]);
+});
+test("a failure after new-point inserts rolls back the complete plan transaction",async()=>{
+ const f=fixture(true);
+ await assert.rejects(()=>submitFinishedPlanIdempotently(mixedInput(),principal,f.db,false,signer),/synthetic/);
+ assert.equal(f.pointInserts.length,2,"failure must occur after both new-point inserts");
+ assert(f.commands.includes("ROLLBACK"));assert(!f.commands.includes("COMMIT"));
+ assert.equal(f.pointCount(),1);assert.deepEqual(f.planPointIDs(),[11]);
+ assert.equal(f.status(),"prepared");assert.deepEqual(f.rows(),[]);
 });
 test("recovery eligibility is advisory and exact orphan photo registrations require review",async()=>{
  const f=fixture(),i=input(),url=ATTACHMENT_LAYER+"/31/attachments/87";

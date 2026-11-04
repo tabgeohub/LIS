@@ -122,12 +122,16 @@ export async function submitFinishedPlanIdempotently(input: FinishedPlanSubmitIn
     let result: FinishedPlanSubmitResult;
     if (!row) result = { kind: "not_found" };
     else if (!hasPlanRegionAccess(principal, row.regio_id)) result = { kind: "forbidden" };
-    else if (!same((row.points || []).map(Number), input.plan.points.filter(p => p.id > 0).map(p => p.id))) result = { kind: "conflict" };
     else if (row.status === "finished") {
       const pointIDMap = await persistedPointMap(client, input.plan);
       const persisted = pointIDMap ? withMappedPointIDs(input.plan, pointIDMap) : input.plan;
-      result = pointIDMap !== null && await projectionMatches(client, persisted) ? confirmation(input, "state_verified", pointIDMap) : { kind: "conflict" };
+      // Completion replaces package-local negative IDs in the plan's member
+      // list. Reconcile against those verified persisted IDs, not the original
+      // positive-only list that is required before the first write.
+      result = pointIDMap !== null && same((row.points || []).map(Number), persisted.points.map(p => p.id)) &&
+        await projectionMatches(client, persisted) ? confirmation(input, "state_verified", pointIDMap) : { kind: "conflict" };
     }
+    else if (!same((row.points || []).map(Number), input.plan.points.filter(p => p.id > 0).map(p => p.id))) result = { kind: "conflict" };
     else {
       // Existing ambiguous prior rows cannot be overwritten or appended to.
       const old = await client.query("SELECT point_id FROM lis.finished_plans WHERE plan_id = $1", [input.plan.id]);

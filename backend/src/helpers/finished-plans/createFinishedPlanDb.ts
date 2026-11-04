@@ -39,8 +39,8 @@ function coalesceNull<T>(value: T | null | undefined): T | null {
   return value ?? null;
 }
 
-function coalesceFalse(value: unknown): boolean {
-  return (value as boolean | null | undefined) ?? false;
+function coalesceZero(value: number | null | undefined): number {
+  return value ?? 0;
 }
 
 /** Normalize Desktop Opslaan timestamp (epoch ms or ISO) for Postgres. */
@@ -62,8 +62,8 @@ function buildNewPointOverrides(
 ): Partial<Record<PointCoreColumn, unknown>> {
   const overrides: Partial<Record<PointCoreColumn, unknown>> = {
     user_id: userId,
-    vertrouwelijk: coalesceFalse(point.vertrouwelijk),
-    herhalen: coalesceFalse(point.herhalen),
+    vertrouwelijk: coalesceZero(point.vertrouwelijk),
+    herhalen: coalesceZero(point.herhalen),
   };
   for (const field of NEW_POINT_NULLABLE_FIELDS) {
     overrides[field] = coalesceNull(
