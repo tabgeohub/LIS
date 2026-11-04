@@ -19,6 +19,37 @@ function fixture(lost = false) {
  };
  return { provider, counts: () => [features,uploads] };
 }
+test("ad hoc photo authorization binds every parameter through prepare, upload and readback", async () => {
+ const i = { ...input(), owner_point_id: -1 }, f = fixture();
+ let authorizationChecks = 0;
+ const strictDB: any = { query: async (sql: string, values: unknown[]) => {
+  const placeholders = [...new Set([...sql.matchAll(/\$(\d+)/g)].map(match => Number(match[1])))].sort((a,b) => a-b);
+  assert.deepEqual(placeholders, values.map((_, index) => index + 1), "unused untyped parameters cause PostgreSQL 42P18");
+  assert.deepEqual(values, [i.plan_id, principal.regio_id, principal.is_admin]);
+  assert(!sql.includes("ANY(points)"), "a new point has no positive database member ID yet");
+  authorizationChecks++;
+  return { rows: [{ id: i.plan_id }], rowCount: 1 };
+ } };
+ const permit = await reconcileOrCreatePhoto(i, principal, strictDB, f.provider, signer);
+ assert.equal(permit.httpStatus, 200);
+ assert.deepEqual(f.counts(), [0,0]);
+ const feature = await reconcileOrCreatePhoto({ ...i, phase:"feature", write_permit:permit.write_permit }, principal, strictDB, f.provider, signer);
+ const complete = await reconcileOrCreatePhoto({ ...i, phase:"attachment", bytes, recovery_context:feature.recovery_context, write_permit:feature.write_permit }, principal, strictDB, f.provider, signer);
+ assert.equal(complete.outcome, "confirmed");
+ assert.equal((await readPhotoOperation(i.operation_key, principal, strictDB, complete.recovery_context, f.provider, signer)).outcome, "confirmed");
+ assert.equal(authorizationChecks, 4);
+ assert.deepEqual(f.counts(), [1,1]);
+});
+test("positive photo owners retain plan membership and region authorization bindings", async () => {
+ const i = input(), f = fixture();
+ const strictDB: any = { query: async (sql: string, values: unknown[]) => {
+  assert(sql.includes("$2 = ANY(points)"));
+  assert.deepEqual(values, [i.plan_id, i.owner_point_id, principal.regio_id, principal.is_admin]);
+  return { rows: [], rowCount: 0 };
+ } };
+ assert.equal((await reconcileOrCreatePhoto(i, principal, strictDB, f.provider, signer)).httpStatus, 403);
+ assert.deepEqual(f.counts(), [0,0]);
+});
 test("phased photo acknowledgments, concurrent suppression, distinct IDs and safe readback", async () => {
  const i = input(), f = fixture();
  const permit = await reconcileOrCreatePhoto(i,principal,db,f.provider,signer);

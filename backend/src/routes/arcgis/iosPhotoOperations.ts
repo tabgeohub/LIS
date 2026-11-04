@@ -43,9 +43,16 @@ async function authorized(input: PhotoOperationInput, principal: PlanPrincipal, 
   // Negative owner IDs are package-local new points. They have no database row
   // yet, so authorization is bound to the locked plan and signed context; a
   // positive owner still must be a member of that plan.
-  const memberCheck = input.owner_point_id > 0 ? "AND $2 = ANY(points)" : "";
-  return ((await db.query(`SELECT id FROM lis.flightPlans WHERE id = $1 ${memberCheck} AND (regio_id = $3 OR $4::boolean)`,
-    [input.plan_id, input.owner_point_id, principal.regio_id, principal.is_admin])).rowCount || 0) === 1;
+  const positiveOwner = input.owner_point_id > 0;
+  // Keep placeholders contiguous: PostgreSQL cannot infer the type of an
+  // unused $2 when a package-local point has no membership predicate.
+  const query = positiveOwner
+    ? "SELECT id FROM lis.flightPlans WHERE id = $1 AND $2 = ANY(points) AND (regio_id = $3 OR $4::boolean)"
+    : "SELECT id FROM lis.flightPlans WHERE id = $1 AND (regio_id = $2 OR $3::boolean)";
+  const values = positiveOwner
+    ? [input.plan_id, input.owner_point_id, principal.regio_id, principal.is_admin]
+    : [input.plan_id, principal.regio_id, principal.is_admin];
+  return ((await db.query(query, values)).rowCount || 0) === 1;
 }
 // Bounded process-local suppression only, NOT durable across server restarts.
 const active = new Map<string, { hash: string; promise: Promise<PhotoOperationResult> }>();
