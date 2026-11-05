@@ -2,6 +2,7 @@ import express, { Express, Router, type RequestHandler } from "express";
 import { legacyAuthUsageMonitor } from "../helpers/auth/legacyAuthUsageMonitor";
 import { requirePassword, uploadsDir } from "../helpers/auth/requirePassword";
 import { rejectViewerMutations } from "../helpers/auth/rejectViewerMutations";
+import { requireSessionAuth } from "../helpers/auth/requireSessionAuth";
 import { requireSessionAuthWritable } from "../helpers/auth/requireSessionAuthWritable";
 import arcgisRouter from "../routes/arcgis";
 import authRouter from "../routes/auth";
@@ -57,7 +58,8 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/api/timeslider", ...writable, timesliderRouter);
   app.use("/api/arcgis", ...writable, arcgisRouter);
   app.use("/uploads", requirePassword, express.static(uploadsDir));
-  app.use("/api/upload-report", ...writable, reportUploadRouter);
+  // Intern users may generate observation reports, so no viewer write-block here.
+  app.use("/api/upload-report", requireSessionAuth, reportUploadRouter);
   app.use("/api/file-download", fileDownloadRouter);
   app.use("/api/direct-download", directDownloadRouter);
   app.use("/api/installers", ...writable, installersRouter);

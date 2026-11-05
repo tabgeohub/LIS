@@ -28,6 +28,7 @@ export function assertCanEdit(
 export const VIEWER_ALLOWED_TAB_IDS = new Set<string>([
   "viewPlan",
   "vluchtZoeken",
+  "waarnemings",
   "timeslider",
   "aandachtspuntenFilteren",
   "bevragen",

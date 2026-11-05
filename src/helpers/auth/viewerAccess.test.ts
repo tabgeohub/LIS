@@ -27,5 +27,6 @@ describe("viewerAccess", () => {
     expect(locked.find((t) => t.id === "flightPlan")?.disabled).toBe(true);
     expect(locked.find((t) => t.id === "viewPlan")?.disabled).toBe(false);
     expect(VIEWER_ALLOWED_TAB_IDS.has("vluchtZoeken")).toBe(true);
+    expect(VIEWER_ALLOWED_TAB_IDS.has("waarnemings")).toBe(true);
   });
 });
