@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { pool } from "../../db";
 import { updatePointByIdReturning } from "../../helpers/repositories/pointsRepo";
 import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function editPoint(req: Request, res: Response): Promise<void> {
   const { id } = req.body;
+  if (!(await authorizeEntityRegion(req, res, "points", id))) return;
 
   await runReturningUpdateById({
     res,

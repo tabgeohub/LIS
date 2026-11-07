@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
 import { buildPointSearchQuery } from "../../helpers/queries/points/buildPointSearchQuery";
+import { authorizeFinishedPlan } from "../finished_plans/authorizeFinishedPlan";
 
 export async function getPrepreparedFlightPlanPoints(
   req: Request,
@@ -8,6 +9,7 @@ export async function getPrepreparedFlightPlanPoints(
 ): Promise<void> {
   try {
     const { id } = req.params;
+    if (!(await authorizeFinishedPlan(req, res, id))) return;
 
     const result = await pool.query(buildPointSearchQuery("planId"), [id]);
 

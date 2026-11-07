@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
+import { authorizeFinishedPlan } from "./authorizeFinishedPlan";
 import {
   commitAttachmentUpdate,
   parseAttachmentUpdateBody,
@@ -17,6 +18,7 @@ export async function updateFinishedPointAttachments(
     return;
   }
 
+  if (!(await authorizeFinishedPlan(req, res, parsed.planId))) return;
   const client = await pool.connect();
   try {
     await commitAttachmentUpdate({

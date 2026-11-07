@@ -5,11 +5,13 @@ import {
   isValidCreateFlightPlanBody,
   respondCreateFlightPlanError,
 } from "./createFlightPlanHelpers";
+import { authorizeCreateRegion } from "./planAccess";
 
 export async function createFlightPlan(
   req: Request,
   res: Response
 ): Promise<void> {
+  if (!(await authorizeCreateRegion(req, res, req.body?.regio_id))) return;
   if (!isValidCreateFlightPlanBody(req.body)) {
     missingFields(res);
     return;

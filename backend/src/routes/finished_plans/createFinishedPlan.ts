@@ -7,6 +7,7 @@ import {
   connectFinishedPlanClient,
   saveFinishedPlanWithClient,
 } from "./createFinishedPlanHelpers";
+import { authorizeFinishedPlan } from "./authorizeFinishedPlan";
 
 export async function createFinishedPlan(
   req: Request,
@@ -23,6 +24,7 @@ export async function createFinishedPlan(
     return;
   }
 
+  if (!(await authorizeFinishedPlan(req, res, validated.plan.id))) return;
   const client = await connectFinishedPlanClient(res);
   if (!client) {
     return;

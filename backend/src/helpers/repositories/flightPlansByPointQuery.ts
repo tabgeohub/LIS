@@ -19,13 +19,14 @@ const FLIGHT_PLANS_BY_POINT_SQL = `
       JOIN LATERAL unnest(f.points) AS point_id ON TRUE
       JOIN lis.points p ON p.id = point_id
       LEFT JOIN lis.finished_plans fp ON fp.point_id = p.id AND fp.plan_id = f.id
-      WHERE $1 = ANY(f.points)
+      WHERE $1 = ANY(f.points) AND ($2::boolean OR f.regio_id = $3)
       GROUP BY f.id;
       `;
 
 export async function selectFlightPlansByPointId(
   db: Queryable,
-  pointId: number
+  pointId: number,
+  principal: { is_admin: boolean; regio_id: string | null }
 ) {
-  return db.query(FLIGHT_PLANS_BY_POINT_SQL, [pointId]);
+  return db.query(FLIGHT_PLANS_BY_POINT_SQL, [pointId, principal.is_admin, principal.regio_id]);
 }

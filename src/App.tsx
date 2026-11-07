@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 import "@arcgis/core/assets/esri/themes/light/main.css";
 import Dashboard from "Components/DashboardPage";
+import MigratedFlightDetail from "Components/DashboardPage/MigratedFlightDetail";
 import { useAuth } from "hooks/zustand/ui";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 import TimesliderItemDetailPage from "Components/TimesliderItemDetailPage";
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/flight/:id" element={<MigratedFlightDetail />} />
 
           <Route path="/images" element={<TimesliderItemDetailPage />} />
           <Route path="/installations" element={<InstallationsPage />} />

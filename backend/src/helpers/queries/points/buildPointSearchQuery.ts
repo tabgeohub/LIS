@@ -10,7 +10,7 @@ export function buildPointSearchQuery(filter: PointSearchFilter): string {
 
   const whereClause =
     filter === "omschrijving"
-      ? "LOWER(pt.omschrijving) LIKE LOWER($1)"
+      ? "LOWER(pt.omschrijving) LIKE LOWER($1) AND ($2::boolean OR (fp.regio_id = $3 AND pt.regio_id = $3))"
       : "fp.id = $1";
 
   return buildPointSearchQuerySql({ pointJson, joins, whereClause });

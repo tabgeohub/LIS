@@ -3,9 +3,10 @@ import { pool } from "../../db";
 import { selectFlightPlansByPointId } from "../../helpers/queries/flight-plans/flightPlansByPointQuery";
 
 export async function queryFlightPlansByPoint(
-  pointId: string
+  pointId: string,
+  principal: { is_admin: boolean; regio_id: string | null }
 ): Promise<unknown[]> {
-  const result = await selectFlightPlansByPointId(pool, parseInt(pointId, 10));
+  const result = await selectFlightPlansByPointId(pool, parseInt(pointId, 10), principal);
   return result.rows;
 }
 

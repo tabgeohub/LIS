@@ -7,6 +7,7 @@ import {
   rollbackImportPointsTransaction,
   runImportPointsTransaction,
 } from "./createPointFromImportHelpers";
+import { authorizeCreateRegion } from "../flightPlans/planAccess";
 
 export async function createPointFromImport(
   req: Request,
@@ -20,6 +21,10 @@ export async function createPointFromImport(
       message: "Body must contain a non-empty 'rows' array.",
     });
     return;
+  }
+  for (const row of rows) {
+    const region = row && typeof row === "object" ? (row as Record<string, unknown>).regio_id : undefined;
+    if (!(await authorizeCreateRegion(req, res, region))) return;
   }
 
   const client = await pool.connect();

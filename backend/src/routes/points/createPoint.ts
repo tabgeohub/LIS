@@ -7,8 +7,10 @@ import {
   serverError,
 } from "../../helpers/http/routeResponses";
 import { getMissingFields } from "../../helpers/http/validateBody";
+import { authorizeCreateRegion } from "../flightPlans/planAccess";
 
 export async function createPoint(req: Request, res: Response): Promise<void> {
+  if (!(await authorizeCreateRegion(req, res, req.body?.regio_id))) return;
   if (getMissingFields(req.body, ["omschrijving", "user_id"]).length > 0) {
     missingFields(res, MISSING_FIELDS_MESSAGE_WITH_PERIOD);
     return;

@@ -3,6 +3,7 @@ import {
   fetchGeometryWithPoints,
   sendGetGeometryError,
 } from "./getSingleGeometryHelpers";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function getSingleGeometry(
   req: Request,
@@ -19,6 +20,7 @@ export async function getSingleGeometry(
   }
 
   try {
+    if (!(await authorizeEntityRegion(req, res, "geometries", geometry_id))) return;
     const result = await fetchGeometryWithPoints(geometry_id);
     if (!result) {
       res.status(404).json({

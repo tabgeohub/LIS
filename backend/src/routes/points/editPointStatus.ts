@@ -1,8 +1,10 @@
 import { pool } from "../../db";
 import { createStatusUpdateHandler } from "../../helpers/http/createStatusUpdateHandler";
 import { updatePointStatus } from "../../helpers/repositories/pointsRepo";
+import type { Request, Response } from "express";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
-export const editPointStatus = createStatusUpdateHandler({
+const updateStatus = createStatusUpdateHandler({
   runQuery: (id, status) =>
     updatePointStatus(pool, {
       id: id as string | number,
@@ -15,3 +17,7 @@ export const editPointStatus = createStatusUpdateHandler({
     errorMessage: "Failed to update point status:",
   },
 });
+export async function editPointStatus(req: Request, res: Response): Promise<void> {
+  if (!(await authorizeEntityRegion(req, res, "points", req.body?.id))) return;
+  await updateStatus(req, res);
+}

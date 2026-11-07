@@ -4,6 +4,7 @@ import {
   commitGeometryUpdate,
   rollbackGeometryUpdateError,
 } from "./updateGeometryHelpers";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function updateGeometry(req: Request, res: Response): Promise<void> {
   const { id } = req.params;
@@ -14,6 +15,7 @@ export async function updateGeometry(req: Request, res: Response): Promise<void>
     return;
   }
 
+  if (!(await authorizeEntityRegion(req, res, "geometries", geometryId))) return;
   const { points, ...metadata } = req.body;
   const client = await pool.connect();
 

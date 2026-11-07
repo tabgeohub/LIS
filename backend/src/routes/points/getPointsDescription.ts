@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../../db";
-import { selectPointsByOmschrijving } from "../../helpers/repositories/pointsRepo";
+import { denyMissingPlanIdentity, resolvePlanPrincipal } from "../flightPlans/planAccess";
 
 export async function getPointsDescription(req: Request, res: Response) {
   const { omschrijving } = req.params;
@@ -11,9 +11,11 @@ export async function getPointsDescription(req: Request, res: Response) {
   }
 
   try {
-    const result = await selectPointsByOmschrijving(pool, omschrijving);
+    const principal = await resolvePlanPrincipal(req);
+    if (!principal) { denyMissingPlanIdentity(res); return; }
+    const result = await pool.query("SELECT count(*)::int AS count FROM lis.points WHERE omschrijving=$1 AND ($2::boolean OR regio_id=$3)", [omschrijving, principal.is_admin, principal.regio_id]);
 
-    res.json(result.rows.length);
+    res.json(result.rows[0]?.count ?? 0);
   } catch (err) {
     console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
 

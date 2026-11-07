@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { runInTransaction } from "../../helpers/entities/entityDeleteHelpers";
-import { deleteAttachmentsByIds } from "../../helpers/repositories/attachmentsRepo";
-import { deleteFinishedPlanByPlanAndPoint } from "../../helpers/repositories/finishedPlansRepo";
+import { deleteOrphanedAttachments } from "../../helpers/repositories/attachmentsRepo";
+import { deleteFinishedPlanByPlanAndPoint, lockAttachmentsIdForPlanPoint } from "../../helpers/repositories/finishedPlansRepo";
 import { arrayRemovePointFromFlightPlan } from "../../helpers/repositories/flightPlansRepo";
+import { authorizeFinishedPlan } from "./authorizeFinishedPlan";
 
 export async function deletePoint(req: Request, res: Response): Promise<void> {
   const { data } = req.params;
@@ -13,17 +14,17 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
   }
 
   try {
-    const { point_id, plan_id, attachments } = JSON.parse(data);
+    const { point_id, plan_id } = JSON.parse(data);
+    if (!(await authorizeFinishedPlan(req, res, plan_id))) return;
 
     await runInTransaction(async (client) => {
-      if (attachments && attachments.length > 0) {
-        await deleteAttachmentsByIds(client, attachments);
-      }
+      const existing = await lockAttachmentsIdForPlanPoint(client, { planId: plan_id, pointId: point_id });
 
       await deleteFinishedPlanByPlanAndPoint(client, {
         planId: plan_id,
         pointId: point_id,
       });
+      await deleteOrphanedAttachments(client, existing.rows.flatMap(row => row.attachments_id || []));
 
       await arrayRemovePointFromFlightPlan(client, {
         pointId: point_id,

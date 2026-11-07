@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { pool } from "../../db";
 import { runReturningUpdateById } from "../../helpers/http/runReturningUpdate";
 import { updateFlightPlanPointsReturning } from "../../helpers/repositories/flightPlansRepo";
+import { authorizeFlightPlan } from "./planAccess";
 
 export async function updateVluchtPlanPoints(
   req: Request,
   res: Response
 ): Promise<void> {
   const { points, id } = req.body;
+  if (!(await authorizeFlightPlan(req, res, id))) return;
 
   await runReturningUpdateById({
     res,

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { denyMissingPlanIdentity, resolvePlanPrincipal } from "../flightPlans/planAccess";
 import {
   queryFlightPlansByPoint,
   sendFlightPlansByPointError,
@@ -16,7 +17,9 @@ export async function getFlightPlansByPoint(
   }
 
   try {
-    const rows = await queryFlightPlansByPoint(pointId);
+    const principal = await resolvePlanPrincipal(req);
+    if (!principal) { denyMissingPlanIdentity(res); return; }
+    const rows = await queryFlightPlansByPoint(pointId, principal);
     res.status(200).json(rows);
   } catch (err) {
     sendFlightPlansByPointError(res, err);

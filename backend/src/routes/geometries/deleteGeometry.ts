@@ -7,6 +7,7 @@ import {
   sendDeleteError,
 } from "../../helpers/entities/entityDeleteHelpers";
 import { deleteGeometryCascade } from "./deleteGeometryCascade";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function deleteGeometry(req: Request, res: Response): Promise<void> {
   const geometryId = parseRouteEntityId(req.params.id, "geometry");
@@ -17,6 +18,7 @@ export async function deleteGeometry(req: Request, res: Response): Promise<void>
   }
 
   try {
+    if (!(await authorizeEntityRegion(req, res, "geometries", geometryId))) return;
     if (!(await entityExists("geometries", geometryId))) {
       res.status(404).json({ message: "Geometry not found" });
       return;

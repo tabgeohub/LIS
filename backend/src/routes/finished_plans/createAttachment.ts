@@ -4,6 +4,7 @@ import {
   buildAttachmentLocation,
   insertAttachmentRow,
 } from "./createAttachmentHelpers";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function createAttachment(
   req: Request,
@@ -20,6 +21,7 @@ export async function createAttachment(
   ) {
     return;
   }
+  if (!(await authorizeEntityRegion(req, res, "points", pointId))) return;
 
   await insertAttachmentRow({
     res,

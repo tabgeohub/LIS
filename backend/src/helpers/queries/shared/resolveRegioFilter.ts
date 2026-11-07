@@ -62,23 +62,24 @@ function resolveRealmRolesFromAuth(auth: {
 }
 
 export function getSessionRealmRoles(req: Request): string[] {
-  const auth = req.session?.auth;
+  const auth = (req.session as unknown as { auth?: { tokenSet?: { access_token?: string; claims?: () => unknown } } })?.auth;
   if (!auth?.tokenSet?.access_token) return [];
-  return resolveRealmRolesFromAuth(auth);
+  return rolesFromTokenSet(auth.tokenSet);
 }
 
 function isRwsOrExtRole(role: string): boolean {
-  return role.includes("RWS ") || role.includes("EXT ");
+  return role.startsWith("RWS ") || role.startsWith("EXT ");
 }
 
 function isAdminRoleName(role: string): boolean {
-  return role.toLowerCase() === "admin";
+  return role === "admin";
 }
 
 /** Matches frontend App.tsx role selection. */
 export function pickRegioRoleFromRealmRoles(
   roles: string[]
 ): string | undefined {
+  if (roles.includes("admin")) return "admin";
   return roles.find(
     (item) => isRwsOrExtRole(item) || isAdminRoleName(item)
   );
@@ -108,9 +109,11 @@ function resolveNonAdminOrQueryRegio(input: {
  * - Admin: optional regio_id/regio query param to filter; omit for all regios.
  */
 export function resolveRegioFilter(req: Request): string | undefined {
-  const sessionRegio = pickRegioRoleFromRealmRoles(getSessionRealmRoles(req));
+  const roles = getSessionRealmRoles(req);
+  const sessionRegio = pickRegioRoleFromRealmRoles(roles);
   const queryRegio =
     firstQueryValue(req.query.regio_id) ?? firstQueryValue(req.query.regio);
 
+  if (!sessionRegio) return "__LIS_UNRECOGNIZED_REGION__";
   return resolveNonAdminOrQueryRegio({ sessionRegio, queryRegio });
 }

@@ -1,0 +1,23 @@
+# TST to PROD flight migration: implementation status
+
+Migration is implemented locally but deliberately disabled by default. The dashboard and HTTP routes return `MIGRATION_DISABLED` unless `MIGRATION_ENABLED=true` and the relevant source or destination configuration is complete. The storage SQL has not been applied. Do not deploy this work or transfer real data.
+
+## Local assumptions and limitations
+
+The business schema is inferred from application queries. No deployed database, Keycloak realm, ArcGIS service or credentials were inspected. The storage DDL assumes PostgreSQL, a `lis` schema, UUID identifiers for new migration records and text representations of business IDs. It intentionally avoids foreign keys into unverified business tables. The importer checks columns, generated owner IDs, a text-compatible flight owner, and actor foreign keys before writing; this still does not validate every type, constraint, trigger, row-security policy, privilege, or production screen. The export fixture is synthetic and does not establish that deployed schemas permit retaining historical actor IDs, timestamps or empty optional fields. Do not activate on the basis of this preflight alone.
+
+Source snapshots use a repeatable-read, read-only transaction over raw persistence rows; they are canonicalized, size-bounded, signed with Ed25519 and stored immutably. The destination retrieves them only from its configured source URL through a narrow credentialed endpoint, verifies signatures, compares exact names/coordinates/vertex order, checks allowlisted photo URLs, writes an expiring preview, and imports under fixed-order table/advisory locks in one transaction. The same log-group advisory lock used by the legacy writer is used during import. Browser writes require a session-bound CSRF token and a first-party Origin. The dashboard includes source handoff and destination confirmation flows. The DDL must be reviewed and tested against disposable PostgreSQL before any deployment; its immutability trigger also prevents deletion, so retention requires an explicit operational procedure.
+
+The existing finished-flight read authorization changes were present before this work. This work adds a parent-flight check to attachment updates, finished-point deletion, prepared-plan point reads, and flight-plan mutations; checks persisted regions for direct point and geometry reads, edits, deletions, and creation; filters point flight history; and denies regionless or unrecognized-role sessions. It also avoids trusting caller-supplied attachment IDs on deletion. The audit is based on repository routes and fixture identities; deployed role mappings and desktop compatibility still require release validation.
+
+## Release gates
+
+Before activation, inspect both deployed schemas and realm role mappings; validate all constraints, generated values, timestamps and owner/actor references. Run isolated real PostgreSQL rollback/concurrency and desktop 1.1.1 acceptance tests, plus public/intranet handoff and provider checks. Provision the explicit source instance UUID, fixed URLs, separate service credentials, signing key and trusted public key, destination region allowlist, and ArcGIS URL allowlist. Live validation remains pending. Never apply the provided SQL to live databases as part of local development.
+
+## Local checks
+
+Backend TypeScript compilation passed. Migration fixtures cover signed-export tampering and expiry, source changes, secret and lookup stripping, structural capture, name normalization and ambiguity, coordinate/region/geometry-order conflicts, unavailable photos, and unsupported schema conditions. The frontend production build passed. The architecture check now passes after moving the shared click guard out of the HomePage path.
+
+PostgreSQL 16 was installed locally and isolated source/destination fixture databases verified the storage SQL, complete geometry vertices and their ID order, completion order, historical timestamps, reused ArcGIS attachment identity, GPS/time, source log actors and multiple log groups, rollback after a post-write mapping failure, and the duplicate-transfer uniqueness constraint. Existing iOS completion, logging, photo, authentication, and query fixtures also passed against local mocks. The PostgreSQL fixture is guarded by `LIS_MIGRATION_ACCEPTANCE_DB=lis_source_fixture:lis_destination_fixture`; it does not accept arbitrary database names.
+
+`npx tsc --noEmit` for the frontend still fails on the established non-migration type baseline in `api-hooks/mutations`, existing HomePage map hooks, report/photo components, preparation flows, and ArcGIS helpers. No migration dashboard file is reported. No live-service tests were run.

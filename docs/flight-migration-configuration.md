@@ -1,0 +1,11 @@
+# Flight migration configuration
+
+`MIGRATION_ENABLED` is false unless it is explicitly set to `true`. Leave it unset during development and while deploying the additive database storage. The API and dashboard then return `MIGRATION_DISABLED` and no source snapshots or transfers are created.
+
+Configure the TST source with `MIGRATION_ROLE=source`, a stable RFC 4122 `MIGRATION_SOURCE_INSTANCE_UUID`, `MIGRATION_SOURCE_ENVIRONMENT=TST`, `MIGRATION_SOURCE_ISSUER`, `MIGRATION_DESTINATION_FRONTEND_URL`, `MIGRATION_EXPORT_SIGNING_KEY_ID`, `MIGRATION_EXPORT_SIGNING_PRIVATE_KEY`, and `MIGRATION_EXPORT_READ_CREDENTIAL`. The signing key is an Ed25519 PKCS#8 PEM; encode newlines as `\n` when supplied through an environment variable. Do not reuse a session secret, OIDC client secret, recovery context, or upload permit.
+
+Configure PROD with `MIGRATION_ROLE=destination`, the same `MIGRATION_SOURCE_INSTANCE_UUID`, `MIGRATION_SOURCE_BACKEND_URL`, `MIGRATION_DESTINATION_ISSUER`, `MIGRATION_DESTINATION_REGION_ROLES` as a JSON array of exact application realm-role names, `MIGRATION_TRUSTED_EXPORT_PUBLIC_KEYS_JSON` as a JSON object keyed by signing-key ID, `MIGRATION_EXPORT_READ_CREDENTIAL`, `MIGRATION_STATUS_READ_CREDENTIAL`, and `MIGRATION_ARCGIS_ALLOWED_ORIGINS_JSON` as a JSON array of exact ArcGIS URL origins. `MIGRATION_STATUS_BACKEND_URL` and `MIGRATION_STATUS_READ_CREDENTIAL` on TST enable status display; without them the source dashboard deliberately shows **Status unavailable**.
+
+Use separate random values for export retrieval and status retrieval. The export credential is accepted only by TST’s read-only export endpoints. The status credential is accepted only by PROD’s read-only transfer-status endpoint. Neither bypasses a browser admin session, creates a preview, or commits a transfer.
+
+Before setting `MIGRATION_ENABLED=true`, apply and verify the additive SQL in a disposable database, then run schema and role validation against the candidate environments. Confirm each configured destination-region role exists as an actual production region, that source and destination public/intranet URLs resolve, that the ArcGIS allowlist covers all attachment URL origins, and that the signing public key matches the TST private key. This configuration is a release gate; it is not a license to transfer production data during local development.

@@ -6,6 +6,7 @@ import {
   sendDeleteError,
 } from "../../helpers/entities/entityDeleteHelpers";
 import { deletePointInTransaction } from "./deletePointHelpers";
+import { authorizeEntityRegion } from "../flightPlans/entityRegionAccess";
 
 export async function deletePoint(req: Request, res: Response): Promise<void> {
   const pointId = parseRouteEntityId(req.params.id, "point");
@@ -16,6 +17,7 @@ export async function deletePoint(req: Request, res: Response): Promise<void> {
   }
 
   try {
+    if (!(await authorizeEntityRegion(req, res, "points", pointId))) return;
     if (!(await entityExists("points", pointId))) {
       res.status(404).json({ message: "Point not found" });
       return;

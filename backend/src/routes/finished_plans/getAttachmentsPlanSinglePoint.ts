@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { fetchAttachmentsForPlanPoint } from "../../helpers/queries/finished-plans/fetchAttachmentsForPlanPoint";
+import { authorizeFinishedPlan } from "./authorizeFinishedPlan";
 
 export async function getAttachmentsPlanSinglePoint(
   req: Request,
@@ -13,6 +14,7 @@ export async function getAttachmentsPlanSinglePoint(
   }
 
   try {
+    if (!(await authorizeFinishedPlan(req, res, planId))) return;
     const rows = await fetchAttachmentsForPlanPoint({
       planId: parseInt(planId as string, 10),
       pointId: parseInt(pointId as string, 10),

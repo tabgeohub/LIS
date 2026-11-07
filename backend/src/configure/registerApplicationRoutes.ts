@@ -22,6 +22,7 @@ import reportUploadRouter from "../routes/reportUpload";
 import templateFlightsRouter from "../routes/template_plans";
 import timesliderRouter from "../routes/timeslider";
 import usersRouter from "../routes/users";
+import migrationsRouter, { migrationInternalRouter } from "../routes/migrations";
 
 /** Mount HTTP routes. OpenAPI coverage lives in `backend/src/docs/*.docs.ts`. */
 export function registerApplicationRoutes(app: Express, auth2Router: Router) {
@@ -51,4 +52,8 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/api/direct-download", directDownloadRouter);
   app.use("/api/installers", requireSessionAuth, installersRouter);
   app.use("/api/devices-updates", devicesUpdatesRouter);
+  // The handler is always mounted, but all migration operations are disabled
+  // until explicit source/destination configuration is present.
+  app.use("/api/migrations", requireSessionAuth, migrationsRouter);
+  app.use("/internal/migrations", migrationInternalRouter);
 }
