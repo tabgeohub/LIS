@@ -9,7 +9,6 @@ import Navbar from "./Navbar";
 import FlightMigration from "./FlightMigration";
 import { useUsersManagementState } from "hooks/zustand/ui";
 import { useAuth } from "hooks/zustand/ui";
-import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 export default function Dashboard() {
   const activeTab = useUsersManagementState((state) => state.activeTab);
@@ -22,12 +21,9 @@ export default function Dashboard() {
   }, [localFlightListDemo, setActiveTab]);
 
   if (user.role !== "admin" && !localFlightListDemo) {
-    const returnTo = `${window.location.pathname}${window.location.search}`;
-    const isMigrationHandoff = new URLSearchParams(window.location.search).has("migrationExport");
     return (
       <div className="px-10 py-6">
         <p>U bent niet geautoriseerd om deze pagina te bekijken.</p>
-        {isMigrationHandoff && <a className="mt-4 inline-block rounded bg-blue-700 px-4 py-2 text-white" href={`${getBackEndUrl()}/auth/login?return_to=${encodeURIComponent(returnTo)}`}>Sign in to continue migration</a>}
       </div>
     );
   }
