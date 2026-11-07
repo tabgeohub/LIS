@@ -20,7 +20,7 @@
     "test:safe-server-redirect": "npx ts-node --transpile-only src/routes/auth/authKeycloak/safeServerRedirect.test.ts",
     "test:safe-upload-file": "npx ts-node --transpile-only src/helpers/downloads/safeUploadFile.test.ts",
     "test:migrations": "npx ts-node src/migrations/migrationPrimitives.test.ts && npx ts-node src/migrations/commitCoordinator.test.ts && npx ts-node src/migrations/regionHistory.test.ts && npx ts-node src/routes/migrations/migrationConfig.test.ts && npx ts-node src/routes/migrations/sourceSnapshot.test.ts && npx ts-node src/routes/migrations/destination.test.ts",
-    "test:migrations:postgres": "npx ts-node src/routes/migrations/postgresAcceptance.test.ts"
+    "test:finished-flight-list": "npx ts-node src/routes/migrations/migrationConfig.test.ts"
   },
   "keywords": [],
   "author": "",
