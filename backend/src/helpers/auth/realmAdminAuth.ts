@@ -14,7 +14,7 @@ export function getRealmRoles(req: Request): string[] {
 }
 
 export function isAdmin(req: Request): boolean {
-  return getRealmRoles(req).some((role) => role.toLowerCase().includes("admin"));
+  return getRealmRoles(req).includes("admin");
 }
 
 export const requireAdmin: RequestHandler = (req, res, next) => {

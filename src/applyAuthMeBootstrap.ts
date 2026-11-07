@@ -24,6 +24,7 @@ function matchesAppRole(item: string): boolean {
 }
 
 function pickAppRole(realmRoles: string[] | undefined): string | undefined {
+  if (realmRoles?.includes("admin")) return "admin";
   return realmRoles?.find(matchesAppRole);
 }
 

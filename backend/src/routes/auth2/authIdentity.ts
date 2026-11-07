@@ -1,6 +1,5 @@
 import type { TokenSet, UserinfoResponse } from "openid-client";
 import {
-  isAdminRegioValue,
   pickRegioRoleFromRealmRoles,
 } from "../../helpers/queries/shared/resolveRegioFilter";
 import { decodeJwtPayload } from "../auth/jwt";
@@ -51,12 +50,11 @@ export async function resolveAuthenticatedIdentity(input: {
   const subject = input.userInfo.sub;
   if (typeof subject !== "string" || !subject.trim() || subject !== subject.trim()) return null;
 
-  const regio_id = pickRegioRoleFromRealmRoles(
-    realmRolesFromTokenSet(input.tokenSet)
-  );
+  const roles = realmRolesFromTokenSet(input.tokenSet);
+  const regio_id = pickRegioRoleFromRealmRoles(roles);
   return {
     subject,
     regio_id: regio_id ?? null,
-    is_admin: isAdminRegioValue(regio_id),
+    is_admin: roles.includes("admin"),
   };
 }
