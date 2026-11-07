@@ -1,6 +1,6 @@
 # TST to PROD flight migration: implementation status
 
-Migration is implemented locally but deliberately disabled by default. The dashboard and HTTP routes return `MIGRATION_DISABLED` unless `MIGRATION_ENABLED=true` and the relevant source or destination configuration is complete. The storage SQL has not been applied. Do not deploy this work or transfer real data.
+Migration is implemented locally with code-owned configuration and enabled for the configured TST and PROD hostnames only. `localhost` and `127.0.0.1` additionally provide a read-only finished-flight list; export, preview, and commit routes reject requests in that mode. A frontend-only localhost run shows visibly labelled synthetic fixtures when no backend is running. Unknown hosts return `MIGRATION_DISABLED`. The storage SQL has not been applied. Do not deploy this work or transfer real data.
 
 ## Local assumptions and limitations
 
@@ -18,6 +18,6 @@ Before activation, inspect both deployed schemas and realm role mappings; valida
 
 Backend TypeScript compilation passed. Migration fixtures cover signed-export tampering and expiry, source changes, secret and lookup stripping, structural capture, name normalization and ambiguity, coordinate/region/geometry-order conflicts, unavailable photos, and unsupported schema conditions. The frontend production build passed. The architecture check now passes after moving the shared click guard out of the HomePage path.
 
-PostgreSQL 16 was installed locally and isolated source/destination fixture databases verified the storage SQL, complete geometry vertices and their ID order, completion order, historical timestamps, reused ArcGIS attachment identity, GPS/time, source log actors and multiple log groups, rollback after a post-write mapping failure, and the duplicate-transfer uniqueness constraint. Existing iOS completion, logging, photo, authentication, and query fixtures also passed against local mocks. The PostgreSQL fixture is guarded by `LIS_MIGRATION_ACCEPTANCE_DB=lis_source_fixture:lis_destination_fixture`; it does not accept arbitrary database names.
+PostgreSQL 16 was installed locally and isolated source/destination fixture databases verified the storage SQL, complete geometry vertices and their ID order, completion order, historical timestamps, reused ArcGIS attachment identity, GPS/time, source log actors and multiple log groups, rollback after a post-write mapping failure, and the duplicate-transfer uniqueness constraint. Existing iOS completion, logging, photo, authentication, and query fixtures also passed against local mocks. The PostgreSQL fixture has fixed disposable database names and cannot target configured LIS databases.
 
 `npx tsc --noEmit` for the frontend still fails on the established non-migration type baseline in `api-hooks/mutations`, existing HomePage map hooks, report/photo components, preparation flows, and ArcGIS helpers. No migration dashboard file is reported. No live-service tests were run.

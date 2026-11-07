@@ -26,7 +26,7 @@ function exportRowValue(value: Json, preserveActor: boolean): Json {
 }
 
 /** Captures raw persistence rows in one read-only repeatable-read snapshot. */
-export async function captureFlightSnapshot(db: Pick<Pool, "connect">, flightId: string, actor: { subject: string }, config: MigrationConfig, now = Date.now()): Promise<SignedExport> {
+export async function captureFlightSnapshot(db: Pick<Pool, "connect">, flightId: string, actor: { subject: string; issuer: string }, config: MigrationConfig, now = Date.now()): Promise<SignedExport> {
   const client = await db.connect();
   try {
     await client.query("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY");
@@ -63,8 +63,8 @@ export async function captureFlightSnapshot(db: Pick<Pool, "connect">, flightId:
     const attachmentIds = new Set(records.attachments.map(row => String(asObject(row).id)));
     if (records.completions.some(row => { const ids = asObject(row).attachments_id; return ids != null && (!Array.isArray(ids) || ids.some(value => !attachmentIds.has(String(value)))); })) throw new Error("INVALID_EXPORT_STRUCTURE");
     const payload: FlightMigrationExportV1 = {
-      version: 1, source: { instance: config.sourceInstance, environment: config.sourceEnvironment, issuer: config.sourceIssuer, flightId }, exportId: randomUUID(),
-      createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(), exportedBy: { subject: actor.subject, issuer: config.sourceIssuer },
+      version: 1, source: { instance: config.sourceInstance, environment: config.sourceEnvironment, issuer: actor.issuer, flightId }, exportId: randomUUID(),
+      createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(), exportedBy: { subject: actor.subject, issuer: actor.issuer },
       records, counts: { points: records.points.length, geometries: records.geometries.length, completions: records.completions.length, attachments: records.attachments.length, logs: records.logs.length },
     };
     // Canonicalize before signing so accidental non-JSON database values fail here.
@@ -77,7 +77,7 @@ export async function captureFlightSnapshot(db: Pick<Pool, "connect">, flightId:
 
 /** Stable digest of saved business records, excluding export ID, actor and expiry. */
 export async function currentFlightDigest(db: Pick<Pool, "connect">, flightId: string, config: MigrationConfig): Promise<string> {
-  const snapshot = await captureFlightSnapshot(db, flightId, { subject: "digest-check" }, config);
+  const snapshot = await captureFlightSnapshot(db, flightId, { subject: "digest-check", issuer: "digest-check" }, config);
   return createHash("sha256").update(canonicalJson(snapshot.payload.records as unknown as Json)).digest("hex");
 }
 
@@ -86,7 +86,7 @@ export async function storeSourceExport(client: PoolClient, signed: SignedExport
   await client.query(`INSERT INTO lis.migration_exports (export_id, source_instance, source_flight_id, actor_subject, actor_issuer, payload_canonical, digest, key_id, signature, created_at, expires_at)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, [p.exportId, p.source.instance, p.source.flightId, p.exportedBy.subject, p.exportedBy.issuer, Buffer.from(canonicalJson(p as unknown as Json)), signed.digest, signed.keyId, signed.signature, p.createdAt, p.expiresAt]);
 }
-export async function createAndStoreSourceExport(db: Pick<Pool, "connect">, flightId: string, actor: { subject: string }, config: MigrationConfig): Promise<SignedExport> {
+export async function createAndStoreSourceExport(db: Pick<Pool, "connect">, flightId: string, actor: { subject: string; issuer: string }, config: MigrationConfig): Promise<SignedExport> {
   const signed = await captureFlightSnapshot(db, flightId, actor, config);
   const client = await db.connect();
   try { await client.query("BEGIN"); await storeSourceExport(client, signed); await client.query("COMMIT"); return signed; }

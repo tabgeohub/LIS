@@ -1,14 +1,15 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
+import { userInfo } from "node:os";
 import { Pool } from "pg";
 import { migrationConfig } from "./config";
 import { captureFlightSnapshot } from "./sourceSnapshot";
 import { buildProposal, importPayload } from "./destination";
 
 async function main() {
-  if (process.env.LIS_MIGRATION_ACCEPTANCE_DB !== "lis_source_fixture:lis_destination_fixture") throw new Error("Disposable fixture database names must be explicitly acknowledged");
-  const source = new Pool({ host: "localhost", port: 55477, database: "lis_source_fixture", user: process.env.USER });
-  const destination = new Pool({ host: "localhost", port: 55477, database: "lis_destination_fixture", user: process.env.USER });
+  // Fixed disposable names prevent this fixture from targeting a configured LIS database.
+  const source = new Pool({ host: "localhost", port: 55477, database: "lis_source_fixture", user: userInfo().username });
+  const destination = new Pool({ host: "localhost", port: 55477, database: "lis_destination_fixture", user: userInfo().username });
   try {
     await source.query("TRUNCATE lis.migration_entity_mappings, lis.migration_transfers, lis.migration_previews, lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
     await destination.query("TRUNCATE lis.migration_entity_mappings, lis.migration_transfers, lis.migration_previews, lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
@@ -21,8 +22,8 @@ async function main() {
     await source.query("INSERT INTO lis.finished_plans_path (planid,path,flighttime) VALUES ($1,'[]','01:00:00')", [flight.id]);
     await source.query("INSERT INTO lis.logging (flight_id,planid,pointid,userid,message,date) VALUES (8,$1,$2,'source-user','event','2025-01-03 10:01+00'),(9,$1,$3,'source-user','second event','2025-01-03 10:03+00')", [flight.id, point.id, secondPoint.id]);
     const privateKey = generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" }).toString();
-    const config = migrationConfig({ MIGRATION_SOURCE_INSTANCE_UUID: "11111111-1111-4111-8111-111111111111", MIGRATION_SOURCE_ISSUER: "tst", MIGRATION_EXPORT_SIGNING_KEY_ID: "fixture", MIGRATION_EXPORT_SIGNING_PRIVATE_KEY: privateKey });
-    const signed = await captureFlightSnapshot(source, String(flight.id), { subject: "source-admin" }, config);
+    const config = migrationConfig({ sourceInstance: "11111111-1111-4111-8111-111111111111", exportKeyId: "fixture", exportPrivateKey: privateKey });
+    const signed = await captureFlightSnapshot(source, String(flight.id), { subject: "source-admin", issuer: "https://keycloak.example/realms/tst" }, config);
     assert.equal(signed.payload.records.completions.length, 2);
     assert.equal(signed.payload.records.attachments.length, 1);
     assert.equal(signed.payload.records.logs.length, 2);

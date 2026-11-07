@@ -1,5 +1,6 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { Request, RequestHandler, Response } from "express";
+import { migrationConfig } from "./config";
 
 type MigrationSession = { migrationCsrf?: string };
 function session(req: Request): MigrationSession { return req.session as unknown as MigrationSession; }
@@ -13,7 +14,7 @@ function acceptedOrigin(req: Request): boolean {
   const origin = req.get("origin");
   if (!origin) return false;
   const own = `${req.protocol}://${req.get("host")}`;
-  return origin === own || [process.env.PUBLIC_FRONTEND_URL, process.env.INTRANET_FRONTEND_URL].includes(origin);
+  return origin === own || migrationConfig(req.hostname).browserOrigins.includes(origin);
 }
 /** Browser state changes require a session-bound token and a known first-party origin. */
 export const requireMigrationCsrf: RequestHandler = (req, res, next) => {

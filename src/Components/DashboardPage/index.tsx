@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import AllUsersTable from "./AllUsersTable";
 import AddUser from "./AddUser/index";
 import EditUser from "./EditUser/index";
@@ -12,9 +13,15 @@ import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
 
 export default function Dashboard() {
   const activeTab = useUsersManagementState((state) => state.activeTab);
+  const setActiveTab = useUsersManagementState((state) => state.setActiveTab);
   const { user } = useAuth();
+  const localFlightListDemo = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
-  if (user.role !== "admin") {
+  useEffect(() => {
+    if (localFlightListDemo) setActiveTab("migrations");
+  }, [localFlightListDemo, setActiveTab]);
+
+  if (user.role !== "admin" && !localFlightListDemo) {
     const returnTo = `${window.location.pathname}${window.location.search}`;
     const isMigrationHandoff = new URLSearchParams(window.location.search).has("migrationExport");
     return (

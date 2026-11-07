@@ -4,7 +4,7 @@ import { captureFlightSnapshot, currentFlightDigest } from "./sourceSnapshot";
 import { migrationConfig } from "./config";
 
 const privateKey = generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString();
-const config = migrationConfig({ MIGRATION_SOURCE_INSTANCE_UUID: "11111111-1111-4111-8111-111111111111", MIGRATION_SOURCE_ISSUER: "tst", MIGRATION_EXPORT_SIGNING_KEY_ID: "fixture", MIGRATION_EXPORT_SIGNING_PRIVATE_KEY: privateKey });
+const config = migrationConfig({ sourceInstance: "11111111-1111-4111-8111-111111111111", exportKeyId: "fixture", exportPrivateKey: privateKey });
 let comment = "original";
 const statements: string[] = [];
 const client = {
@@ -24,7 +24,7 @@ const client = {
 };
 const db = { async connect() { return client; } };
 async function main() {
-  const signed = await captureFlightSnapshot(db as any, "7", { subject: "source-admin" }, config);
+  const signed = await captureFlightSnapshot(db as any, "7", { subject: "source-admin", issuer: "https://keycloak.example/realms/tst" }, config);
   assert.equal(signed.payload.records.completions.length, 1);
   assert.ok(statements[0].includes("REPEATABLE READ READ ONLY"));
   assert.ok(statements.every(sql => !sql.includes("FOR SHARE")));
