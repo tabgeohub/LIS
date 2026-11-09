@@ -4,7 +4,7 @@ import { pool } from "../../db";
 import { createRequireAdmin, getRealmRoles } from "../../helpers/auth/realmAdminAuth";
 import { decodeJwtPayload } from "../auth/jwt";
 import { resolveAuthenticatedIdentity } from "../auth2/authIdentity";
-import { migrationConfig, configuredForDestination, configuredForSource } from "./config";
+import { migrationConfig, configuredForDestination, configuredForSource, deploymentRoleForHost } from "./config";
 import { buildProposal, importPayload, selectableRegions, verifyExport, verifyPhotoReferences } from "./destination";
 import { captureFlightSnapshot } from "./sourceSnapshot";
 import { migrationApiError, migrationCsrf, requireMigrationCsrf } from "./security";
@@ -14,7 +14,20 @@ const router = Router();
 export const migrationInternalRouter = Router();
 type Actor = { subject: string; issuer: string };
 
-function config(req: Request) { return migrationConfig(req.hostname); }
+function browserHostname(req: Request): string | undefined {
+  for (const header of [req.get("origin"), req.get("referer")]) {
+    if (!header) continue;
+    try { return new URL(header).hostname; } catch {}
+  }
+  return undefined;
+}
+function config(req: Request) {
+  // Some reverse proxies forward an internal Host value. Only use an Origin or
+  // Referer hostname when it is one of the two explicitly configured LIS sites.
+  if (deploymentRoleForHost(req.hostname)) return migrationConfig(req.hostname);
+  const browserHost = browserHostname(req);
+  return browserHost && deploymentRoleForHost(browserHost) ? migrationConfig(browserHost) : migrationConfig(req.hostname);
+}
 function disabled(res: Response) { res.status(404).json({ code: "MIGRATION_DISABLED", message: "Flight transfer is disabled" }); }
 function sourceReady(configured: ReturnType<typeof config>) { return configuredForSource(configured); }
 function destinationReady(configured: ReturnType<typeof config>) { return configuredForDestination(configured); }

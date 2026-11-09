@@ -35,6 +35,9 @@ export const MIGRATION_DEPLOYMENT_ROLES: Record<string, MigrationConfig["role"]>
   "tst-lis.rws.nl": "source",
   "lis.rws.nl": "destination",
 };
+export function deploymentRoleForHost(hostname: string): MigrationConfig["role"] | undefined {
+  return MIGRATION_DEPLOYMENT_ROLES[hostname.toLowerCase()];
+}
 /** Localhost may list finished flights from the configured local database only. */
 export const MIGRATION_LOCALHOST_CONFIG: Partial<MigrationConfig> = {
   enabled: true,
@@ -51,7 +54,7 @@ function normalized(config: MigrationConfig): MigrationConfig {
 /** Runtime reads only code-owned values. Overrides are for local fixtures. */
 export function migrationConfig(input: string | Partial<MigrationConfig> = {}): MigrationConfig {
   const hostname = typeof input === "string" ? input.toLowerCase() : "";
-  const deploymentRole = hostname ? MIGRATION_DEPLOYMENT_ROLES[hostname] : undefined;
+  const deploymentRole = hostname ? deploymentRoleForHost(hostname) : undefined;
   const overrides = typeof input === "string"
     ? (["localhost", "127.0.0.1"].includes(hostname) ? MIGRATION_LOCALHOST_CONFIG : deploymentRole ? { enabled: true, role: deploymentRole } : { enabled: false })
     : input;

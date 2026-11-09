@@ -47,12 +47,13 @@ export default function FlightMigration() {
           setRegions(data.regions || []);
           setCsrf(data.csrfToken || configured.csrfToken || "");
         }
-      } catch {
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : "MIGRATION_REQUEST_FAILED";
         if (localBrowser()) {
           setMode("fixture");
           setFlights(localDemoFlights);
           setNotice("Synthetic local preview data is shown because no local backend is running. It is not TST or PROD data.");
-        } else setNotice("Flight transfer is unavailable in this environment.");
+        } else setNotice(`Flight transfer is unavailable in this environment (${reason}).`);
       }
     };
     void load();
