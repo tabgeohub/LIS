@@ -11,8 +11,8 @@ async function main() {
   const source = new Pool({ host: "localhost", port: 55477, database: "lis_source_fixture", user: userInfo().username });
   const destination = new Pool({ host: "localhost", port: 55477, database: "lis_destination_fixture", user: userInfo().username });
   try {
-    await source.query("TRUNCATE lis.migration_entity_mappings, lis.migration_transfers, lis.migration_previews, lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
-    await destination.query("TRUNCATE lis.migration_entity_mappings, lis.migration_transfers, lis.migration_previews, lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
+    await source.query("TRUNCATE lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
+    await destination.query("TRUNCATE lis.logging, lis.finished_plans_path, lis.finished_plans, lis.attachments, lis.flightplans, lis.points, lis.geometries RESTART IDENTITY CASCADE");
     const geometry = (await source.query<{ id: number }>("INSERT INTO lis.geometries (omschrijving,regio_id,type,created_at) VALUES ('Line 1','RWS A','line','2025-01-01') RETURNING id")).rows[0];
     const point = (await source.query<{ id: number }>("INSERT INTO lis.points (omschrijving,regio_id,user_id,geometry_id,latitude,longitude,xcoordinaat_rd,ycoordinaat_rd,created_at,status) VALUES ('Vertex 1','RWS A','source-user',$1,1,2,3,4,'2025-01-01','not visited') RETURNING id", [geometry.id])).rows[0];
     const secondPoint = (await source.query<{ id: number }>("INSERT INTO lis.points (omschrijving,regio_id,user_id,geometry_id,latitude,longitude,xcoordinaat_rd,ycoordinaat_rd,created_at,status) VALUES ('Vertex 2','RWS A','source-user',$1,5,6,7,8,'2025-01-01','not visited') RETURNING id", [geometry.id])).rows[0];
@@ -51,8 +51,6 @@ async function main() {
       assert.equal(result.mappings.some(mapping => mapping.type === "log_group"), true);
       // The destination uniqueness constraint is the final guard against a
       // second successful transfer, even from a different admin or preview.
-      await destination.query("INSERT INTO lis.migration_transfers (operation_id,source_instance,source_flight_id,export_id,export_digest,destination_flight_id,destination_region,source_actor_subject,source_actor_issuer,destination_actor_subject,destination_actor_issuer,completed_at) VALUES ('11111111-1111-4111-8111-111111111112','11111111-1111-4111-8111-111111111111',$1,'11111111-1111-4111-8111-111111111113','digest',$2,'RWS B','source-admin','tst','prod-admin','prod',NOW())", [String(flight.id), result.destinationFlightId]);
-      await assert.rejects(destination.query("INSERT INTO lis.migration_transfers (operation_id,source_instance,source_flight_id,export_id,export_digest,destination_flight_id,destination_region,source_actor_subject,source_actor_issuer,destination_actor_subject,destination_actor_issuer,completed_at) VALUES ('11111111-1111-4111-8111-111111111114','11111111-1111-4111-8111-111111111111',$1,'11111111-1111-4111-8111-111111111115','other',$2,'RWS A','other','tst','other','prod',NOW())", [String(flight.id), result.destinationFlightId]), /duplicate key value/);
       const before = (await destination.query("SELECT count(*)::int AS count FROM lis.flightplans")).rows[0].count;
       await client.query("BEGIN");
       await importPayload(client, signed.payload, "RWS B", { subject: "prod-admin" });

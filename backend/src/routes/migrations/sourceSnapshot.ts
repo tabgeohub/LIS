@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { Pool, PoolClient } from "pg";
+import type { Pool } from "pg";
 import { canonicalJson, type FlightMigrationExportV1, type Json, signExport, type SignedExport } from "../../migrations/exportContract";
 import type { MigrationConfig } from "./config";
 
@@ -79,16 +79,4 @@ export async function captureFlightSnapshot(db: Pick<Pool, "connect">, flightId:
 export async function currentFlightDigest(db: Pick<Pool, "connect">, flightId: string, config: MigrationConfig): Promise<string> {
   const snapshot = await captureFlightSnapshot(db, flightId, { subject: "digest-check", issuer: "digest-check" }, config);
   return createHash("sha256").update(canonicalJson(snapshot.payload.records as unknown as Json)).digest("hex");
-}
-
-export async function storeSourceExport(client: PoolClient, signed: SignedExport): Promise<void> {
-  const p = signed.payload;
-  await client.query(`INSERT INTO lis.migration_exports (export_id, source_instance, source_flight_id, actor_subject, actor_issuer, payload_canonical, digest, key_id, signature, created_at, expires_at)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, [p.exportId, p.source.instance, p.source.flightId, p.exportedBy.subject, p.exportedBy.issuer, Buffer.from(canonicalJson(p as unknown as Json)), signed.digest, signed.keyId, signed.signature, p.createdAt, p.expiresAt]);
-}
-export async function createAndStoreSourceExport(db: Pick<Pool, "connect">, flightId: string, actor: { subject: string; issuer: string }, config: MigrationConfig): Promise<SignedExport> {
-  const signed = await captureFlightSnapshot(db, flightId, actor, config);
-  const client = await db.connect();
-  try { await client.query("BEGIN"); await storeSourceExport(client, signed); await client.query("COMMIT"); return signed; }
-  catch (error) { try { await client.query("ROLLBACK"); } catch {} throw error; } finally { client.release(); }
 }

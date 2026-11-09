@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
 import { MAX_EXPORT_BYTES, verifyExport, type FlightMigrationExportV1, type Json, type SignedExport } from "../../migrations/exportContract";
@@ -7,7 +6,6 @@ import { missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportC
 import type { MigrationConfig } from "./config";
 
 type Row = Record<string, unknown>;
-type Preview = { preview_id: string; source_instance: string; source_flight_id: string; export_id: string; export_digest: string; verified_export: FlightMigrationExportV1; destination_region: string; actor_subject: string; actor_issuer: string; proposal: Json; expires_at: Date };
 const q = (name: string) => `"${name.split('"').join('""')}"`;
 const obj = (value: Json): Row => value && typeof value === "object" && !Array.isArray(value) ? value as Row : (() => { throw new Error("INVALID_EXPORT"); })();
 const id = (row: Row) => String(row.id ?? "");
@@ -183,10 +181,4 @@ export async function importPayload(client: PoolClient, payload: FlightMigration
   }
   return { destinationFlightId, mappings };
 }
-export async function storePreview(client: Pick<PoolClient, "query">, input: { payload: FlightMigrationExportV1; digest: string; region: string; actor: { subject: string; issuer: string }; proposal: Json }): Promise<{ id: string; expiresAt: string }> {
-  const id = randomUUID(), created = new Date(), expires = new Date(created.getTime() + 15 * 60 * 1000);
-  await client.query(`INSERT INTO lis.migration_previews (preview_id,source_instance,source_flight_id,export_id,export_digest,verified_export,destination_region,actor_subject,actor_issuer,proposal,created_at,expires_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`, [id, input.payload.source.instance, input.payload.source.flightId, input.payload.exportId, input.digest, JSON.stringify(input.payload), input.region, input.actor.subject, input.actor.issuer, JSON.stringify(input.proposal), created, expires]);
-  return { id, expiresAt: expires.toISOString() };
-}
-export async function loadPreview(client: Pick<PoolClient, "query">, id: string, lock = false): Promise<Preview | null> { return (await client.query<Preview>(`SELECT * FROM lis.migration_previews WHERE preview_id=$1${lock ? " FOR UPDATE" : ""}`, [id])).rows[0] ?? null; }
 export { verifyExport };

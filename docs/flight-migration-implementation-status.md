@@ -1,7 +1,7 @@
-# Finished flight-plan local view: implementation status
+# One-shot finished-flight transfer: implementation status
 
-The former TST-to-PROD transfer workflow is disabled. No migration SQL exists in this repository, and the application does not create or alter database tables.
+The implementation uses no migration SQL, tables, or additional business fields. It exports a signed, expiry-bound package from TST without persisting it. PROD verifies the package, validates the selected region and photo references, recomputes a preview, and imports the business records in one transaction.
 
-On `localhost` and `127.0.0.1`, the dashboard's **Finished flight plans** section is a read-only list backed by existing `lis.flightplans` and `lis.finished_plans` records when a local backend is configured. The standalone frontend falls back to synthetic, clearly labelled preview rows so the screen can be reviewed without Keycloak or a database.
+The deliberate trade-off is that there is no durable transfer record, source-to-PROD mapping, duplicate prevention, or recovery after a lost response. The admin must inspect PROD before retrying an uncertain import. `localhost` remains read-only and uses fixtures when no local backend is configured.
 
-There is no deployment, source export, status call, preview, import, attachment transfer, or data mutation. Live TST/PROD validation is intentionally out of scope.
+No deployment, live schema inspection, Keycloak role validation, ArcGIS/provider validation, or real data transfer has been performed. Those remain release gates.
