@@ -70,7 +70,7 @@ function optionalReferences(value: Json, key: string): Json[] {
 }
 /** Verify every foreign record link before an importer reaches a database. */
 function validateStructure(payload: FlightMigrationExportV1): void {
-  const flight = row(payload.records.flight);
+  row(payload.records.flight);
   const members = references(payload.records.flight, "points").map(String);
   if (!members.length || new Set(members).size !== members.length) throw new Error("INVALID_EXPORT_STRUCTURE");
   const pointIds = new Set(payload.records.points.map(rowId));
@@ -91,11 +91,9 @@ function validateStructure(payload: FlightMigrationExportV1): void {
   if (attachmentIds.size !== payload.records.attachments.length || payload.records.attachments.some(attachment => !pointIds.has(String(row(attachment).point_id)))) throw new Error("INVALID_EXPORT_STRUCTURE");
   for (const completion of payload.records.completions) if (optionalReferences(completion, "attachments_id").some(attachment => !attachmentIds.has(String(attachment)))) throw new Error("INVALID_EXPORT_STRUCTURE");
   if (payload.records.path !== null) row(payload.records.path);
-  const flightId = String(flight.id ?? payload.source.flightId);
-  for (const log of payload.records.logs) {
-    const current = row(log); const logFlight = current.planid ?? current.planId; const logPoint = current.pointid ?? current.pointId;
-    if (logFlight !== undefined && String(logFlight) !== flightId || logPoint !== undefined && !pointIds.has(String(logPoint))) throw new Error("INVALID_EXPORT_STRUCTURE");
-  }
+  // Legacy logs are deliberately not imported. They remain covered by the
+  // package signature and count check, but their point-id conventions (such
+  // as pointid: 0 for a flight-level event) cannot block a flight transfer.
 }
 
 export function verifyExport(envelope: SignedExport, trustedKeys: Record<string, string>, now = Date.now()): FlightMigrationExportV1 {

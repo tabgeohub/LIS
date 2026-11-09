@@ -11,7 +11,7 @@ type Proposal = {
   ready: boolean;
   conflicts: string[];
   mappings: { points: Array<{ action: string }>; geometries: Array<{ action: string }> };
-  counts: { points: number; geometries: number; completions: number; attachments: number; logs: number; hasPath: boolean };
+  counts: { points: number; geometries: number; completions: number; attachments: number; sourceLogsSkipped: number; hasPath: boolean };
 };
 type Preview = { source: { flightId: string; flightNumber?: string; flightDate?: string | null }; region: string; proposal: Proposal };
 
@@ -96,7 +96,7 @@ export default function ImportFinishedFlightPlan() {
       {!preview && <button type="button" className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50" disabled={!envelope || !region || busy} onClick={previewImport}>Preview import</button>}
       {preview && <div className="space-y-3 rounded border bg-white p-4">
         <p>Flight: {preview.source.flightNumber || preview.source.flightId}; date: {date(preview.source.flightDate)}; selected PROD region: {preview.region}.</p>
-        <p>Points: {preview.proposal.counts.points}; geometries: {preview.proposal.counts.geometries}; completions: {preview.proposal.counts.completions}; attachments: {preview.proposal.counts.attachments}; logs: {preview.proposal.counts.logs}; path: {preview.proposal.counts.hasPath ? "yes" : "no"}.</p>
+        <p>Points: {preview.proposal.counts.points}; geometries: {preview.proposal.counts.geometries}; completions: {preview.proposal.counts.completions}; attachments: {preview.proposal.counts.attachments}; path: {preview.proposal.counts.hasPath ? "yes" : "no"}. Source logs skipped: {preview.proposal.counts.sourceLogsSkipped}.</p>
         <p>Points reused/new: {count(preview.proposal.mappings.points, "reuse")}/{count(preview.proposal.mappings.points, "create")}; geometries reused/new: {count(preview.proposal.mappings.geometries, "reuse")}/{count(preview.proposal.mappings.geometries, "create")}.</p>
         {preview.proposal.conflicts.length > 0 && <ul className="list-disc pl-5 text-red-700">{preview.proposal.conflicts.map(conflict => <li key={conflict}>{conflict}</li>)}</ul>}
         <button type="button" className="rounded bg-red-700 px-4 py-2 text-white disabled:opacity-50" disabled={!preview.proposal.ready || busy} onClick={importFlight}>Import to PROD</button>

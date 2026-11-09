@@ -23,6 +23,7 @@ const now = Date.parse("2026-11-09T10:30:00.000Z");
 const keys = { "fixture-key": publicPem };
 
 assert.equal(verifyExport(envelope(), keys, now).source.flightId, "44");
+assert.equal(verifyExport(envelope(payload({ records: { ...payload().records, logs: [{ id: 7, flight_id: 2, planid: 44, pointid: 0 }] }, counts: { points: 1, geometries: 0, completions: 1, attachments: 0, logs: 1 } })), keys, now).records.logs.length, 1);
 assert.throws(() => verifyExport({ ...envelope(), digest: "0".repeat(64) }, keys, now), /INVALID_EXPORT_SIGNATURE/);
 assert.throws(() => verifyExport({ ...envelope(), keyId: "unknown" }, keys, now), /UNKNOWN_SIGNING_KEY/);
 assert.throws(() => verifyExport(envelope(payload({ expiresAt: "2026-11-09T10:20:00.000Z" })), keys, now), /EXPORT_EXPIRED/);
