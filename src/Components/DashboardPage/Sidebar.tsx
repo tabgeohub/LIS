@@ -4,6 +4,7 @@ const SIDEBAR_TABS = [
   { key: "all" as const, label: "All Users" },
   { key: "create" as const, label: "Add User" },
   { key: "roles" as const, label: "All Roles" },
+  { key: "migrations" as const, label: "Import finished flight plan" },
 ];
 
 export default function Sidebar() {

@@ -3,6 +3,7 @@ import AddUser from "./AddUser/index";
 import EditUser from "./EditUser/index";
 import ResetPassword from "./ResetPassword/index";
 import AllRoles from "./AllRoles/index";
+import ImportFinishedFlightPlan from "./ImportFinishedFlightPlan";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { useUsersManagementState } from "hooks/zustand/ui";
@@ -32,6 +33,7 @@ export default function Dashboard() {
             {activeTab === "edit" && <EditUser />}
             {activeTab === "reset" && <ResetPassword />}
             {activeTab === "roles" && <AllRoles />}
+            {activeTab === "migrations" && <ImportFinishedFlightPlan />}
           </div>
         </div>
       </div>

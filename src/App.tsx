@@ -13,6 +13,7 @@ import InstallationsPage from "Components/InstallationsPage";
 import DevicesUpdatesPage from "Components/DevicesUpdatesPage";
 import PostLoginRedirect from "Components/Common/PostLoginRedirect";
 import { applyAuthMeBootstrap } from "./bootstrapAuthMe";
+import MigratedFlightDetail from "Components/DashboardPage/MigratedFlightDetail";
 
 export default function App() {
   const { setUser } = useAuth();
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/flight/:id" element={<MigratedFlightDetail />} />
 
           <Route path="/images" element={<TimesliderItemDetailPage />} />
           <Route path="/installations" element={<InstallationsPage />} />

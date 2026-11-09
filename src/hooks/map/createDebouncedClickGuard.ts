@@ -1,3 +1,4 @@
+/** Shared map-click guard, kept outside HomePage so generic hooks stay independent. */
 export function createDebouncedClickGuard(debounceMs = 150) {
   let isProcessing = false;
   let lastClickTime = 0;
