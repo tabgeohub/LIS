@@ -45,7 +45,7 @@ function validate(payload: FlightMigrationExportV1, now: number): void {
     }
   };
   check(payload.records as unknown as Json);
-  validateStructure(payload);
+  validateRecordLinks(payload);
 }
 
 function row(value: Json, error = "INVALID_EXPORT_STRUCTURE"): { [key: string]: Json } {
@@ -69,28 +69,43 @@ function optionalReferences(value: Json, key: string): Json[] {
   return result;
 }
 /** Verify every foreign record link before an importer reaches a database. */
-function validateStructure(payload: FlightMigrationExportV1): void {
-  row(payload.records.flight);
+export function validateRecordLinks(payload: FlightMigrationExportV1): void {
+  const flight = row(payload.records.flight);
+  if (String(flight.id) !== payload.source.flightId) throw new Error("INVALID_EXPORT_STRUCTURE");
   const members = references(payload.records.flight, "points").map(String);
   if (!members.length || new Set(members).size !== members.length) throw new Error("INVALID_EXPORT_STRUCTURE");
   const pointIds = new Set(payload.records.points.map(rowId));
+  if (pointIds.size !== payload.records.points.length) throw new Error("INVALID_EXPORT_STRUCTURE");
   if (members.some(member => !pointIds.has(member))) throw new Error("INVALID_EXPORT_STRUCTURE");
   const geometryIds = new Set(payload.records.geometries.map(rowId));
+  if (geometryIds.size !== payload.records.geometries.length) throw new Error("INVALID_EXPORT_STRUCTURE");
   const vertices = new Set<string>();
   for (const geometry of payload.records.geometries) {
-    for (const vertex of references(geometry, "vertices")) vertices.add(rowId(vertex));
+    const geometryVertices = references(geometry, "vertices");
+    if (new Set(geometryVertices.map(rowId)).size !== geometryVertices.length) throw new Error("INVALID_EXPORT_STRUCTURE");
+    for (const vertex of geometryVertices) {
+      const point = payload.records.points.find(point => rowId(point) === rowId(vertex));
+      if (!point || String(row(vertex).geometry_id) !== rowId(geometry) || canonicalJson(point) !== canonicalJson(vertex)) throw new Error("INVALID_EXPORT_STRUCTURE");
+      vertices.add(rowId(vertex));
+    }
   }
   for (const point of payload.records.points) {
     const geometry = row(point).geometry_id;
-    if (geometry !== undefined && geometry !== null && !geometryIds.has(String(geometry))) throw new Error("INVALID_EXPORT_STRUCTURE");
+    if (geometry !== undefined && geometry !== null && (!geometryIds.has(String(geometry)) || !vertices.has(rowId(point)))) throw new Error("INVALID_EXPORT_STRUCTURE");
   }
   if ([...vertices].some(vertex => !pointIds.has(vertex))) throw new Error("INVALID_EXPORT_STRUCTURE");
   const completionPoints = payload.records.completions.map(completion => String(row(completion).point_id));
   if (completionPoints.length !== members.length || new Set(completionPoints).size !== completionPoints.length || members.some(member => !completionPoints.includes(member))) throw new Error("INVALID_EXPORT_STRUCTURE");
   const attachmentIds = new Set(payload.records.attachments.map(rowId));
   if (attachmentIds.size !== payload.records.attachments.length || payload.records.attachments.some(attachment => !pointIds.has(String(row(attachment).point_id)))) throw new Error("INVALID_EXPORT_STRUCTURE");
-  for (const completion of payload.records.completions) if (optionalReferences(completion, "attachments_id").some(attachment => !attachmentIds.has(String(attachment)))) throw new Error("INVALID_EXPORT_STRUCTURE");
-  if (payload.records.path !== null) row(payload.records.path);
+  for (const completion of payload.records.completions) {
+    if (String(row(completion).plan_id) !== payload.source.flightId) throw new Error("INVALID_EXPORT_STRUCTURE");
+    if (optionalReferences(completion, "attachments_id").some(attachmentId => {
+      const attachment = payload.records.attachments.find(attachment => rowId(attachment) === String(attachmentId));
+      return !attachment || String(row(attachment).point_id) !== String(row(completion).point_id);
+    })) throw new Error("INVALID_EXPORT_STRUCTURE");
+  }
+  if (payload.records.path !== null && String(row(payload.records.path).planid) !== payload.source.flightId) throw new Error("INVALID_EXPORT_STRUCTURE");
   // Legacy logs are deliberately not imported. They remain covered by the
   // package signature and count check, but their point-id conventions (such
   // as pointid: 0 for a flight-level event) cannot block a flight transfer.

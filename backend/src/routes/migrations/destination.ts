@@ -1,6 +1,6 @@
 import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
-import { type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
+import { validateRecordLinks, type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
 import { matchGeometry, matchPoint, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
 import { FINISHED_AT_TYPES, FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
 import { validateCompletionTimes } from "../../migrations/completionTimes";
@@ -19,14 +19,15 @@ export async function selectableRegions(db: Pick<Pool, "query">, roles: string[]
   return roles.filter(role => role !== "admin" && actual.has(role));
 }
 function sourcePoints(payload: FlightMigrationExportV1): Row[] {
-  const rows = [...payload.records.points, ...payload.records.geometries.flatMap(geometry => { const record = obj(geometry); return Array.isArray(record.vertices) ? record.vertices as Json[] : []; })].map(value => obj(value));
+  // Geometry persistence order is point-ID order. Allocate new vertex IDs in
+  // the exported vertex order, independently of the flight visit order.
+  const rows = [...payload.records.points.filter(point => obj(point).geometry_id == null), ...payload.records.geometries.flatMap(geometry => { const record = obj(geometry); return Array.isArray(record.vertices) ? record.vertices as Json[] : []; })].map(value => obj(value));
   return [...new Map(rows.map(row => [id(row), row])).values()];
 }
 async function schemaColumns(client: Pick<PoolClient, "query">): Promise<ImportColumn[]> {
   return (await client.query<any>("SELECT table_name,column_name,is_nullable,column_default,is_generated,identity_generation,data_type,udt_name FROM information_schema.columns WHERE table_schema='lis' AND table_name = ANY($1::text[])", [Object.keys(REQUIRED_COLUMNS)])).rows;
 }
 function compatible(column: ImportColumn | undefined, ...types: string[]): boolean { return Boolean(column && types.includes(column.data_type)); }
-const REQUIRED_FOREIGN_KEYS = new Set(["points.geometry_id", "attachments.point_id", "finished_plans.plan_id", "finished_plans.point_id", "finished_plans_path.planid"]);
 export async function ensureImportSchema(client: Pick<PoolClient, "query">): Promise<ImportSchema> {
   const columns = await schemaColumns(client);
   const finishedAt = columns.find(column => column.table_name === "finished_plans" && column.column_name === "finished_at");
@@ -51,8 +52,9 @@ export async function ensureImportSchema(client: Pick<PoolClient, "query">): Pro
     client.query<{ table_name: string }>("SELECT c.relname AS table_name FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='lis' AND c.relname=ANY($1::text[]) AND c.relrowsecurity", [tables]),
   ]);
   if (foreignKeys.rows.some(row => row.column_name === "user_id" || row.column_name === "userid")) throw new Error("UNSUPPORTED_SCHEMA_HISTORICAL_ACTOR_FK");
-  const presentForeignKeys = new Set(foreignKeys.rows.map(row => `${row.table_name}.${row.column_name}`));
-  for (const foreignKey of REQUIRED_FOREIGN_KEYS) if (!presentForeignKeys.has(foreignKey)) throw new Error(`UNSUPPORTED_SCHEMA_MISSING_FOREIGN_KEY_${foreignKey}`);
+  // Legacy PROD schemas may store these relationships without declared FKs.
+  // Package links are validated in buildProposal and remapped before writes;
+  // any constraints that do exist remain active during the transaction.
   if (constraints.rows.some(row => row.constraint_type === "c" || row.constraint_type === "x" || row.constraint_type === "u" && !(row.columns.length === 1 && row.columns[0] === "id"))) throw new Error("UNSUPPORTED_SCHEMA_CONSTRAINT");
   if (triggers.rows.length) throw new Error("UNSUPPORTED_SCHEMA_TRIGGER_" + triggers.rows.map(row => row.table_name).join(","));
   if (rls.rows.length) throw new Error("UNSUPPORTED_SCHEMA_ROW_SECURITY_" + rls.rows.map(row => row.table_name).join(","));
@@ -87,6 +89,7 @@ async function loadDestinations(client: Pick<PoolClient, "query">, payload: Flig
   return { destinationPoints, destinationGeometries };
 }
 export async function buildProposal(client: Pick<PoolClient, "query">, payload: FlightMigrationExportV1, region: string): Promise<Json> {
+  validateRecordLinks(payload);
   const schema = await ensureImportSchema(client);
   validateCompletionTimes(payload, schema.finishedAtColumn);
   const { destinationPoints, destinationGeometries } = await loadDestinations(client, payload), points = sourcePoints(payload), geometries = payload.records.geometries.map(value => obj(value));

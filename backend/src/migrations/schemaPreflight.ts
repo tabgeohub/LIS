@@ -1,5 +1,7 @@
 export const REQUIRED_COLUMNS: Record<string, string[]> = {
-  flightplans: ["id", "regio_id", "status", "points"], points: ["id"], geometries: ["id"],
+  flightplans: ["id", "regio_id", "user_id", "status", "points"],
+  points: ["id", "geometry_id", "regio_id", "user_id", "omschrijving", "latitude", "longitude", "xcoordinaat_rd", "ycoordinaat_rd"],
+  geometries: ["id", "regio_id", "omschrijving", "type"],
   finished_plans: ["plan_id", "point_id", "point_order", "attachments_id", "finished_at"],
   attachments: ["id", "point_id", "attachmentid", "url", "taken_at", "location"],
   finished_plans_path: ["planid", "path", "flighttime"],
