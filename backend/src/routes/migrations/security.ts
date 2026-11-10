@@ -1,6 +1,7 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { Request, RequestHandler, Response } from "express";
 import { migrationConfig } from "./config";
+import { FinishedAtSchemaError } from "../../migrations/schemaPreflight";
 
 type MigrationSession = { migrationCsrf?: string };
 const session = (req: Request): MigrationSession => req.session as unknown as MigrationSession;
@@ -13,6 +14,10 @@ export const requireMigrationCsrf: RequestHandler = (req, res, next) => {
   next();
 };
 export function migrationApiError(res: Response, error: unknown): void {
+  if (error instanceof FinishedAtSchemaError) {
+    res.status(422).json({ code: error.code, message: error.message, details: error.details });
+    return;
+  }
   const code = error instanceof Error ? error.message : "MIGRATION_FAILED";
   const status = /NOT_FOUND/.test(code) ? 404 : /FORBIDDEN|CSRF|ADMIN/.test(code) ? 403 : /EXPIRED/.test(code) ? 410 : /CONFLICT|CHANGED|UNAVAILABLE/.test(code) ? 409 : /INVALID|TOO_LARGE|SCHEMA|PHOTO/.test(code) ? 422 : 500;
   res.status(status).json({ code, message: code.split("_").join(" ") });

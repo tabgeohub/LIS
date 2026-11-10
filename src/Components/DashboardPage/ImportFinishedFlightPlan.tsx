@@ -22,7 +22,7 @@ async function api(path: string, options: RequestInit = {}) {
     headers: { accept: "application/json", ...(options.headers || {}) },
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.code || "MIGRATION_REQUEST_FAILED");
+  if (!response.ok) throw new Error(data.message || data.code || "MIGRATION_REQUEST_FAILED");
   return data;
 }
 

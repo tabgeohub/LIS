@@ -2,7 +2,7 @@ import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
 import { type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
 import { matchGeometry, matchPoint, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
-import { missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
+import { FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
 
 type Row = Record<string, unknown>;
 const q = (name: string) => `"${name.split('"').join('""')}"`;
@@ -28,6 +28,8 @@ function compatible(column: ImportColumn | undefined, ...types: string[]): boole
 const REQUIRED_FOREIGN_KEYS = new Set(["points.geometry_id", "attachments.point_id", "finished_plans.plan_id", "finished_plans.point_id", "finished_plans_path.planid"]);
 export async function ensureImportSchema(client: Pick<PoolClient, "query">): Promise<ImportSchema> {
   const columns = await schemaColumns(client);
+  const finishedAt = columns.find(column => column.table_name === "finished_plans" && column.column_name === "finished_at");
+  if (!compatible(finishedAt, "timestamp with time zone", "timestamp without time zone")) throw new FinishedAtSchemaError(finishedAt);
   const missing = missingRequiredColumns(columns); if (missing.length) throw new Error("UNSUPPORTED_SCHEMA_" + missing.join(","));
   const owner = columns.find(column => column.table_name === "flightplans" && column.column_name === "user_id");
   const pointOwner = columns.find(column => column.table_name === "points" && column.column_name === "user_id");
@@ -37,7 +39,6 @@ export async function ensureImportSchema(client: Pick<PoolClient, "query">): Pro
     const key = columns.find(column => column.table_name === table && column.column_name === "id");
     if (!compatible(key, "integer", "bigint", "smallint")) throw new Error(`UNSUPPORTED_SCHEMA_${table}_ID_TYPE`);
   }
-  if (!compatible(columns.find(column => column.table_name === "finished_plans" && column.column_name === "finished_at"), "timestamp with time zone", "timestamp without time zone")) throw new Error("UNSUPPORTED_SCHEMA_FINISHED_AT");
   if (!columns.some(column => column.table_name === "finished_plans_path" && column.column_name === "planid")) throw new Error("UNSUPPORTED_SCHEMA_PATH_PLANID");
   if (!compatible(columns.find(column => column.table_name === "flightplans" && column.column_name === "points"), "ARRAY") || !compatible(columns.find(column => column.table_name === "finished_plans" && column.column_name === "attachments_id"), "ARRAY") || !compatible(columns.find(column => column.table_name === "finished_plans_path" && column.column_name === "path"), "jsonb", "json") || !compatible(columns.find(column => column.table_name === "attachments" && column.column_name === "url"), "text", "character varying", "character")) throw new Error("UNSUPPORTED_SCHEMA_REQUIRED_TYPES");
   if (columns.some(column => SKIPPED_COLUMNS.has(column.column_name) && column.is_nullable === "NO" && !column.column_default)) throw new Error("UNSUPPORTED_SCHEMA_SKIPPED_FIELD");
