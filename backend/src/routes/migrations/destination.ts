@@ -2,7 +2,8 @@ import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
 import { type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
 import { matchGeometry, matchPoint, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
-import { FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
+import { FINISHED_AT_TYPES, FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
+import { validateCompletionTimes } from "../../migrations/completionTimes";
 
 type Row = Record<string, unknown>;
 const q = (name: string) => `"${name.split('"').join('""')}"`;
@@ -29,7 +30,7 @@ const REQUIRED_FOREIGN_KEYS = new Set(["points.geometry_id", "attachments.point_
 export async function ensureImportSchema(client: Pick<PoolClient, "query">): Promise<ImportSchema> {
   const columns = await schemaColumns(client);
   const finishedAt = columns.find(column => column.table_name === "finished_plans" && column.column_name === "finished_at");
-  if (!compatible(finishedAt, "timestamp with time zone", "timestamp without time zone")) throw new FinishedAtSchemaError(finishedAt);
+  if (!finishedAt || !FINISHED_AT_TYPES.includes(finishedAt.data_type)) throw new FinishedAtSchemaError(finishedAt);
   const missing = missingRequiredColumns(columns); if (missing.length) throw new Error("UNSUPPORTED_SCHEMA_" + missing.join(","));
   const owner = columns.find(column => column.table_name === "flightplans" && column.column_name === "user_id");
   const pointOwner = columns.find(column => column.table_name === "points" && column.column_name === "user_id");
@@ -62,7 +63,7 @@ export async function ensureImportSchema(client: Pick<PoolClient, "query">): Pro
     writable.set(table, fields.map(column => column.column_name));
     required.set(table, fields.filter(column => column.is_nullable === "NO" && !column.column_default).map(column => column.column_name));
   }
-  return { writable, required };
+  return { writable, required, finishedAtColumn: finishedAt };
 }
 function projection(table: string, source: Row, columns: string[], remove: string[], additions: Row): Row {
   const dropped = new Set(["id", ...remove]), result: Row = {};
@@ -86,7 +87,8 @@ async function loadDestinations(client: Pick<PoolClient, "query">, payload: Flig
   return { destinationPoints, destinationGeometries };
 }
 export async function buildProposal(client: Pick<PoolClient, "query">, payload: FlightMigrationExportV1, region: string): Promise<Json> {
-  await ensureImportSchema(client);
+  const schema = await ensureImportSchema(client);
+  validateCompletionTimes(payload, schema.finishedAtColumn);
   const { destinationPoints, destinationGeometries } = await loadDestinations(client, payload), points = sourcePoints(payload), geometries = payload.records.geometries.map(value => obj(value));
   const conflicts: string[] = [];
   const pointMappings = points.map(source => { const match = matchPoint(shapePoint(source), destinationPoints.map(shapePoint), region); if (match.kind === "conflict") conflicts.push(`${name(source)}: ${match.reason}`); return { sourceId: id(source), action: match.kind, destinationId: match.kind === "reuse" ? match.value.id : null }; });

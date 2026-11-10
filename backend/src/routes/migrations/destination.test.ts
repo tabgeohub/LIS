@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { ensureImportSchema, verifyPhotoReferences } from "./destination";
 import { FinishedAtSchemaError } from "../../migrations/schemaPreflight";
+import { validateCompletionTimes } from "../../migrations/completionTimes";
+import type { ImportColumn } from "../../migrations/schemaPreflight";
 import { migrationApiError } from "./security";
 import type { PoolClient } from "pg";
 import type { Response } from "express";
@@ -12,6 +14,24 @@ const base = (): FlightMigrationExportV1 => ({
 });
 const allowed = ["https://services-eu1.arcgis.com"];
 async function run() {
+  const timeColumn: ImportColumn = { table_name: "finished_plans", column_name: "finished_at", data_type: "time without time zone", udt_name: "time", is_nullable: "YES", column_default: null, is_generated: "NEVER", identity_generation: null };
+  for (const value of [null, "00:00:00", "14:32:10", "23:59:59.123456", "24:00:00"]) {
+    const payload = base();
+    payload.records.completions = [{ point_id: 1, finished_at: value }];
+    const original = JSON.stringify(payload);
+    validateCompletionTimes(payload, timeColumn);
+    assert.equal(JSON.stringify(payload), original, "completion times are preserved verbatim");
+  }
+  for (const value of ["2026-11-10T14:32:10Z", "14:32:10+01:00", "25:00:00", "12:60:00", "12:00:00.1234567", 1234]) {
+    const payload = base(); payload.records.completions = [{ point_id: 1, finished_at: value }];
+    assert.throws(() => validateCompletionTimes(payload, timeColumn), /INVALID_COMPLETION_TIME/);
+  }
+  const nullCompletion = base(); nullCompletion.records.completions = [{ point_id: 1, finished_at: null }];
+  assert.throws(() => validateCompletionTimes(nullCompletion, { ...timeColumn, is_nullable: "NO", column_default: "now()" }), /NULL_NOT_ALLOWED/);
+  // A TIME column now passes type preflight. Other missing columns must still
+  // be rejected; this is not a schema-validation bypass.
+  const timeDb = { query: async () => ({ rows: [timeColumn] }) } as unknown as PoolClient;
+  await assert.rejects(ensureImportSchema(timeDb), (error: unknown) => error instanceof Error && !(error instanceof FinishedAtSchemaError) && error.message.startsWith("UNSUPPORTED_SCHEMA_"));
   // These fixture databases have no business data. Preflight must expose the
   // detected type and stop after its read-only metadata query.
   for (const detected of [{ data_type: "text", udt_name: "text" }, { data_type: "date", udt_name: "date" }, { data_type: "bigint", udt_name: "int8" }, null]) {
