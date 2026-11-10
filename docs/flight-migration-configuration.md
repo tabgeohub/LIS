@@ -1,7 +1,9 @@
-# Finished flight-plan local view
+# One-shot finished-flight transfer
 
-This repository does not contain a database migration for flight transfer and does not create any tables.
+This feature creates no tables and adds no fields. `tst-lis.rws.nl` can download a signed package for one finished flight. `lis.rws.nl` can upload that package, validate it, preview matching against existing production records, and import it in one transaction into the existing LIS business tables.
 
-`backend/src/routes/migrations/config.ts` enables exactly one API on `localhost` and `127.0.0.1`: `GET /api/migrations/flights`. It reads the existing `lis.flightplans` and `lis.finished_plans` tables and returns finished flights only. Every deployed hostname is disabled. There are no export, preview, transfer, status, or mutation endpoints.
+The package is never saved by either server. There is no transfer history, source-to-PROD mapping, durable duplicate protection, or lost-response recovery. Do not retry an uncertain import without first inspecting PROD manually.
 
-Running the frontend by itself (`npm run dev`) requires no environment variables and shows clearly labelled synthetic rows. When the normal backend is configured with a local LIS database and an authenticated admin session, the same page displays that database's finished flights read-only.
+`localhost` and `127.0.0.1` remain read-only: they list existing local finished plans when the normal backend is configured, or use clearly labelled synthetic rows when the frontend is run alone with `npm run dev`.
+
+The host roles, source instance UUID, signing key pair, and ArcGIS attachment origin are code-owned in `backend/src/routes/migrations/config.ts`, as requested. The private signing key must be rotated and moved to appropriate deployment secrets before a real release.

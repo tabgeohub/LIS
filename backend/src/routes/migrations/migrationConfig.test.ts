@@ -13,8 +13,10 @@ const destination = migrationConfig({ enabled: true, role: "destination", source
 assert.equal(configuredForDestination(destination), true);
 assert.deepEqual(regionNames([{ id: "RWS A" }, { id: "admin" }, { id: "Other" }], destination.destinationRegions), ["RWS A"]);
 assert.equal(migrationConfig("unknown.example").role, "source");
-assert.equal(migrationConfig("tst-lis.rws.nl").enabled, false);
-assert.equal(migrationConfig("lis.rws.nl").enabled, false);
+assert.equal(migrationConfig("tst-lis.rws.nl").enabled, true);
+assert.equal(migrationConfig("tst-lis.rws.nl").role, "source");
+assert.equal(migrationConfig("lis.rws.nl").enabled, true);
+assert.equal(migrationConfig("lis.rws.nl").role, "destination");
 assert.equal(migrationConfig("unknown.example").enabled, false);
 assert.equal(migrationConfig("localhost").enabled, true);
 assert.equal(migrationConfig("localhost").readOnly, true);
