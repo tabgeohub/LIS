@@ -1,10 +1,6 @@
 import axios from "axios";
-import toast from "react-hot-toast";
 import { useAuth } from "hooks/zustand/ui";
-import {
-  assertCanEdit,
-  VIEWER_ONLY_MESSAGE,
-} from "helpers/auth/viewerAccess";
+import { assertCanEdit } from "helpers/auth/viewerAccess";
 
 const WRITE_METHODS = new Set(["post", "put", "patch", "delete"]);
 
@@ -31,9 +27,8 @@ export function installViewerMutationGuard() {
     const user = useAuth.getState().user;
     try {
       assertCanEdit(user);
-    } catch {
-      toast.error(VIEWER_ONLY_MESSAGE);
-      return Promise.reject(new Error(VIEWER_ONLY_MESSAGE));
+    } catch (error) {
+      return Promise.reject(error);
     }
     return config;
   });

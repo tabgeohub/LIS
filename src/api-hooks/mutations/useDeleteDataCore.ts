@@ -1,4 +1,5 @@
 import { toast } from "react-hot-toast";
+import { isViewerBlockedError } from "helpers/auth/viewerAccess";
 import { apiDelete, apiUrl, useApiMutation } from "./useApiMutation";
 
 type DeleteVariables<T> = {
@@ -38,7 +39,9 @@ export function useDeleteData<T = undefined>(
     try {
       await mutation.mutateAsync(input);
     } catch (error) {
-      toast.error(mutation.getMutationErrorMessage(error));
+      if (!isViewerBlockedError(error)) {
+        toast.error(mutation.getMutationErrorMessage(error));
+      }
     }
   }
 

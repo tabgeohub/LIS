@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   applyViewerTabLocks,
+  assertCanEdit,
   canEdit,
+  isViewerBlockedError,
   isViewerOnly,
   VIEWER_ALLOWED_TAB_IDS,
 } from "./viewerAccess";
@@ -15,6 +17,17 @@ describe("viewerAccess", () => {
   it("allows edits for extern / null affiliation", () => {
     expect(canEdit({ affiliation: "extern" })).toBe(true);
     expect(canEdit({ affiliation: null })).toBe(true);
+  });
+
+  it("throws a recognisable (silent) error for blocked viewer writes", () => {
+    let caught: unknown;
+    try {
+      assertCanEdit({ affiliation: "intern" });
+    } catch (error) {
+      caught = error;
+    }
+    expect(isViewerBlockedError(caught)).toBe(true);
+    expect(isViewerBlockedError(new Error("other"))).toBe(false);
   });
 
   it("locks write tabs for viewers", () => {

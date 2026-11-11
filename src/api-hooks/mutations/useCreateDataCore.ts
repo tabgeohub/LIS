@@ -1,4 +1,5 @@
 import { toast } from "react-hot-toast";
+import { isViewerBlockedError } from "helpers/auth/viewerAccess";
 import { apiPost, apiUrl, useApiMutation } from "./useApiMutation";
 
 type CreateVariables<T> = {
@@ -45,7 +46,7 @@ export function useCreateData<T, R extends { message?: string; id?: number }>(
       input.onSuccess?.(responseData);
       return responseData.id ?? null;
     } catch (error) {
-      if (!input.disableErrorMessage) {
+      if (!input.disableErrorMessage && !isViewerBlockedError(error)) {
         toast.error(mutation.getMutationErrorMessage(error));
       }
       return null;

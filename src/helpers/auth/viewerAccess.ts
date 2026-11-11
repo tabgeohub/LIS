@@ -3,6 +3,18 @@ import type { UserType } from "Types";
 export const VIEWER_ONLY_MESSAGE =
   "U heeft alleen leesrechten (intern). Wijzigingen zijn niet toegestaan.";
 
+/** Thrown when a viewer-only user triggers a write; callers stay silent on it. */
+export class ViewerBlockedError extends Error {
+  constructor() {
+    super(VIEWER_ONLY_MESSAGE);
+    this.name = "ViewerBlockedError";
+  }
+}
+
+export function isViewerBlockedError(error: unknown): boolean {
+  return error instanceof ViewerBlockedError;
+}
+
 /** Intern affiliation = view-only across the app. */
 export function isViewerOnly(
   user: Pick<UserType, "affiliation"> | null | undefined
@@ -20,7 +32,7 @@ export function assertCanEdit(
   user: Pick<UserType, "affiliation"> | null | undefined
 ): void {
   if (isViewerOnly(user)) {
-    throw new Error(VIEWER_ONLY_MESSAGE);
+    throw new ViewerBlockedError();
   }
 }
 

@@ -2,10 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { getBackEndUrl } from "@helpers/http/getBackEndUrl";
-import {
-  assertCanEdit,
-  VIEWER_ONLY_MESSAGE,
-} from "helpers/auth/viewerAccess";
+import { assertCanEdit } from "helpers/auth/viewerAccess";
 import { useAuth } from "hooks/zustand/ui";
 import { invalidateAfterMutation } from "lib/invalidateAfterMutation";
 import {
@@ -52,12 +49,7 @@ export function useApiMutation<TVariables, TResult>(
   const { user } = useAuth();
   const mutation = useMutation({
     mutationFn: async (variables: TVariables) => {
-      try {
-        assertCanEdit(user);
-      } catch {
-        toast.error(VIEWER_ONLY_MESSAGE);
-        throw new Error(VIEWER_ONLY_MESSAGE);
-      }
+      assertCanEdit(user);
       const url = config.buildUrl(config.path, variables);
       return config.request(url, variables);
     },
