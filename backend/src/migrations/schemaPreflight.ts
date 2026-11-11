@@ -7,8 +7,8 @@ export const REQUIRED_COLUMNS: Record<string, string[]> = {
   finished_plans_path: ["planid", "path", "flighttime"],
 };
 export interface SchemaColumn { table_name: string; column_name: string }
-export type ImportColumn = SchemaColumn & { is_nullable: string; column_default: string | null; is_generated: string; identity_generation: string | null; data_type: string; udt_name?: string };
-export type ImportSchema = { writable: Map<string, string[]>; required: Map<string, string[]>; finishedAtColumn: ImportColumn };
+export type ImportColumn = SchemaColumn & { is_nullable: string; column_default: string | null; is_generated: string; identity_generation: string | null; data_type: string; udt_name?: string; character_maximum_length?: number | null };
+export type ImportSchema = { writable: Map<string, string[]>; required: Map<string, string[]>; finishedAtColumn: ImportColumn; pointNameMaxLength: number | null };
 export const FINISHED_AT_TYPES = ["timestamp with time zone", "timestamp without time zone", "time without time zone"];
 /** Only schema metadata is exposed; no completion records or credentials. */
 export class FinishedAtSchemaError extends Error {

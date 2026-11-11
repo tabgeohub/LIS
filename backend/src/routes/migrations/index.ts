@@ -109,7 +109,7 @@ router.post("/imports", requireExactAdmin, requireMigrationCsrf, async (req, res
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
-      const imported = await importPayload(client, payload, region, actor(req));
+      const imported = await importPayload(client, payload, region, actor(req), req.body?.confirmedRenames);
       await client.query("COMMIT");
       res.status(201).json({ destinationFlightId: imported.destinationFlightId, region, mappings: imported.mappings });
     } catch (error) {

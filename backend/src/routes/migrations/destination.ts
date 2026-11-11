@@ -1,7 +1,8 @@
 import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
 import { validateRecordLinks, type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
-import { matchGeometry, matchPoint, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
+import { matchGeometry, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
+import { proposePoints, requireConfirmedRenames, type PointMapping } from "../../migrations/pointProposal";
 import { FINISHED_AT_TYPES, FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
 import { validateCompletionTimes } from "../../migrations/completionTimes";
 
@@ -25,7 +26,7 @@ function sourcePoints(payload: FlightMigrationExportV1): Row[] {
   return [...new Map(rows.map(row => [id(row), row])).values()];
 }
 async function schemaColumns(client: Pick<PoolClient, "query">): Promise<ImportColumn[]> {
-  return (await client.query<any>("SELECT table_name,column_name,is_nullable,column_default,is_generated,identity_generation,data_type,udt_name FROM information_schema.columns WHERE table_schema='lis' AND table_name = ANY($1::text[])", [Object.keys(REQUIRED_COLUMNS)])).rows;
+  return (await client.query<ImportColumn>("SELECT table_name,column_name,is_nullable,column_default,is_generated,identity_generation,data_type,udt_name,character_maximum_length FROM information_schema.columns WHERE table_schema='lis' AND table_name = ANY($1::text[])", [Object.keys(REQUIRED_COLUMNS)])).rows;
 }
 function compatible(column: ImportColumn | undefined, ...types: string[]): boolean { return Boolean(column && types.includes(column.data_type)); }
 export async function ensureImportSchema(client: Pick<PoolClient, "query">): Promise<ImportSchema> {
@@ -33,6 +34,9 @@ export async function ensureImportSchema(client: Pick<PoolClient, "query">): Pro
   const finishedAt = columns.find(column => column.table_name === "finished_plans" && column.column_name === "finished_at");
   if (!finishedAt || !FINISHED_AT_TYPES.includes(finishedAt.data_type)) throw new FinishedAtSchemaError(finishedAt);
   const missing = missingRequiredColumns(columns); if (missing.length) throw new Error("UNSUPPORTED_SCHEMA_" + missing.join(","));
+  const pointName = columns.find(column => column.table_name === "points" && column.column_name === "omschrijving");
+  if (!compatible(pointName, "text", "character varying", "character")) throw new Error("UNSUPPORTED_SCHEMA_POINT_NAME");
+  if (pointName?.is_generated === "ALWAYS" || pointName?.identity_generation) throw new Error("UNSUPPORTED_SCHEMA_POINT_NAME_NOT_WRITABLE");
   const owner = columns.find(column => column.table_name === "flightplans" && column.column_name === "user_id");
   const pointOwner = columns.find(column => column.table_name === "points" && column.column_name === "user_id");
   if (!owner || !["text", "character varying", "character"].includes(owner.data_type)) throw new Error("UNSUPPORTED_SCHEMA_FLIGHT_OWNER");
@@ -65,7 +69,7 @@ export async function ensureImportSchema(client: Pick<PoolClient, "query">): Pro
     writable.set(table, fields.map(column => column.column_name));
     required.set(table, fields.filter(column => column.is_nullable === "NO" && !column.column_default).map(column => column.column_name));
   }
-  return { writable, required, finishedAtColumn: finishedAt };
+  return { writable, required, finishedAtColumn: finishedAt, pointNameMaxLength: pointName?.character_maximum_length ?? null };
 }
 function projection(table: string, source: Row, columns: string[], remove: string[], additions: Row): Row {
   const dropped = new Set(["id", ...remove]), result: Row = {};
@@ -88,16 +92,24 @@ async function loadDestinations(client: Pick<PoolClient, "query">, payload: Flig
   const destinationGeometries = geometryNames.length ? (await client.query<Row>("SELECT to_jsonb(g) || jsonb_build_object('vertices', COALESCE(v.rows, '[]'::jsonb)) AS row FROM lis.geometries g LEFT JOIN LATERAL (SELECT jsonb_agg(to_jsonb(p) ORDER BY p.id) AS rows FROM lis.points p WHERE p.geometry_id=g.id) v ON true")).rows.map(row => obj(row.row as Json)) : [];
   return { destinationPoints, destinationGeometries };
 }
-export async function buildProposal(client: Pick<PoolClient, "query">, payload: FlightMigrationExportV1, region: string): Promise<Json> {
+export type MigrationProposal = {
+  ready: boolean;
+  conflicts: string[];
+  mappings: { points: PointMapping[]; geometries: Array<{ sourceId: string; action: string; destinationId: string | null }> };
+  counts: { points: number; geometries: number; completions: number; attachments: number; sourceLogsSkipped: number; hasPath: boolean };
+};
+
+export async function buildProposal(client: Pick<PoolClient, "query">, payload: FlightMigrationExportV1, region: string): Promise<MigrationProposal> {
   validateRecordLinks(payload);
   const schema = await ensureImportSchema(client);
   validateCompletionTimes(payload, schema.finishedAtColumn);
   const { destinationPoints, destinationGeometries } = await loadDestinations(client, payload), points = sourcePoints(payload), geometries = payload.records.geometries.map(value => obj(value));
   const conflicts: string[] = [];
-  const pointMappings = points.map(source => { const match = matchPoint(shapePoint(source), destinationPoints.map(shapePoint), region); if (match.kind === "conflict") conflicts.push(`${name(source)}: ${match.reason}`); return { sourceId: id(source), action: match.kind, destinationId: match.kind === "reuse" ? match.value.id : null }; });
+  const pointMappings = proposePoints(points.map(shapePoint), destinationPoints.map(shapePoint), region, payload.exportId, schema.pointNameMaxLength);
+  for (const mapping of pointMappings) if (mapping.action === "conflict") conflicts.push(`${mapping.sourceName}: ${mapping.reason}`);
   const geometryMappings = geometries.map(source => { const match = matchGeometry(shapeGeometry(source), destinationGeometries.map(shapeGeometry), region); if (match.kind === "conflict") conflicts.push(`${name(source)}: ${match.reason}`); return { sourceId: id(source), action: match.kind, destinationId: match.kind === "reuse" ? match.value.id : null }; });
   for (const source of points) { if (source.geometry_id == null) continue; const point = pointMappings.find(mapping => mapping.sourceId === id(source)); const geometry = geometryMappings.find(mapping => mapping.sourceId === String(source.geometry_id)); if (!geometry) { conflicts.push(`${name(source)}: missing geometry definition`); continue; } if (point?.action === "reuse" && (geometry.action !== "reuse" || !destinationPoints.some(candidate => id(candidate) === point.destinationId && String(candidate.geometry_id) === geometry.destinationId))) conflicts.push(`${name(source)}: point belongs to a different geometry`); }
-  return { ready: conflicts.length === 0, conflicts, mappings: { points: pointMappings, geometries: geometryMappings }, counts: { points: points.length, geometries: geometries.length, completions: payload.records.completions.length, attachments: payload.records.attachments.length, sourceLogsSkipped: payload.records.logs.length, hasPath: payload.records.path !== null } } as unknown as Json;
+  return { ready: conflicts.length === 0, conflicts, mappings: { points: pointMappings, geometries: geometryMappings }, counts: { points: points.length, geometries: geometries.length, completions: payload.records.completions.length, attachments: payload.records.attachments.length, sourceLogsSkipped: payload.records.logs.length, hasPath: payload.records.path !== null } };
 }
 export type PhotoHead = (url: URL) => Promise<number>;
 async function defaultPhotoHead(url: URL): Promise<number> {
@@ -111,15 +123,16 @@ export async function verifyPhotoReferences(payload: FlightMigrationExportV1, al
 }
 const field = (row: Row, ...keys: string[]): unknown => keys.map(key => row[key]).find(value => value !== undefined);
 const mappedId = (map: Map<string, string>, value: unknown, what: string): string => { const destination = map.get(String(value)); if (!destination) throw new Error(`MISSING_${what}_MAPPING`); return destination; };
-export async function importPayload(client: PoolClient, payload: FlightMigrationExportV1, region: string, actor: { subject: string }): Promise<{ destinationFlightId: string; mappings: Array<{ type: string; source: string; destination: string; created: boolean }> }> {
+export async function importPayload(client: PoolClient, payload: FlightMigrationExportV1, region: string, actor: { subject: string }, confirmedRenames: unknown): Promise<{ destinationFlightId: string; mappings: Array<{ type: string; source: string; destination: string; created: boolean }> }> {
   const schema = await ensureImportSchema(client); await client.query("SELECT pg_advisory_xact_lock(hashtext('lis.migration.import'))"); await client.query("LOCK TABLE lis.geometries, lis.points, lis.flightplans, lis.finished_plans, lis.attachments, lis.finished_plans_path IN SHARE ROW EXCLUSIVE MODE");
-  const proposal = await buildProposal(client, payload, region); if (obj(proposal).ready !== true) throw new Error("MATCHING_CONFLICT");
+  const proposal = await buildProposal(client, payload, region);
+  requireConfirmedRenames(proposal.mappings.points, confirmedRenames);
+  if (!proposal.ready) throw new Error("MATCHING_CONFLICT");
   const mappings: Array<{ type: string; source: string; destination: string; created: boolean }> = [];
-  const { destinationPoints, destinationGeometries } = await loadDestinations(client, payload);
   const geometryMap = new Map<string, string>();
-  for (const source of payload.records.geometries.map(value => obj(value))) { const match = matchGeometry(shapeGeometry(source), destinationGeometries.map(shapeGeometry), region); if (match.kind === "reuse") { geometryMap.set(id(source), match.value.id); mappings.push({ type: "geometry", source: id(source), destination: match.value.id, created: false }); } else { const created = await insertJson(client, schema, "geometries", projection("geometries", source, schema.writable.get("geometries")!, ["vertices", "regio_id", ...SKIPPED_COLUMNS], { regio_id: region })); geometryMap.set(id(source), id(created)); mappings.push({ type: "geometry", source: id(source), destination: id(created), created: true }); } }
+  for (const source of payload.records.geometries.map(value => obj(value))) { const match = proposal.mappings.geometries.find(mapping => mapping.sourceId === id(source))!; if (match.action === "reuse") { geometryMap.set(id(source), match.destinationId!); mappings.push({ type: "geometry", source: id(source), destination: match.destinationId!, created: false }); } else { const created = await insertJson(client, schema, "geometries", projection("geometries", source, schema.writable.get("geometries")!, ["vertices", "regio_id", ...SKIPPED_COLUMNS], { regio_id: region })); geometryMap.set(id(source), id(created)); mappings.push({ type: "geometry", source: id(source), destination: id(created), created: true }); } }
   const pointMap = new Map<string, string>();
-  for (const source of sourcePoints(payload)) { const match = matchPoint(shapePoint(source), destinationPoints.map(shapePoint), region); if (match.kind === "reuse") { pointMap.set(id(source), match.value.id); mappings.push({ type: "point", source: id(source), destination: match.value.id, created: false }); } else { const geometry = field(source, "geometry_id"); const created = await insertJson(client, schema, "points", projection("points", source, schema.writable.get("points")!, ["regio_id", "user_id", ...SKIPPED_COLUMNS], { regio_id: region, user_id: actor.subject, ...(geometry == null ? {} : { geometry_id: mappedId(geometryMap, geometry, "GEOMETRY") }) })); pointMap.set(id(source), id(created)); mappings.push({ type: "point", source: id(source), destination: id(created), created: true }); } }
+  for (const source of sourcePoints(payload)) { const match = proposal.mappings.points.find(mapping => mapping.sourceId === id(source))!; if (match.action === "reuse") { pointMap.set(id(source), match.destinationId!); mappings.push({ type: "point", source: id(source), destination: match.destinationId!, created: false }); } else { const geometry = field(source, "geometry_id"); const created = await insertJson(client, schema, "points", projection("points", source, schema.writable.get("points")!, ["regio_id", "user_id", ...SKIPPED_COLUMNS], { omschrijving: match.destinationName, regio_id: region, user_id: actor.subject, ...(geometry == null ? {} : { geometry_id: mappedId(geometryMap, geometry, "GEOMETRY") }) })); pointMap.set(id(source), id(created)); mappings.push({ type: "point", source: id(source), destination: id(created), created: true }); } }
   const sourceFlight = obj(payload.records.flight), sourceMembers = Array.isArray(sourceFlight.points) ? sourceFlight.points : [];
   const flight = await insertJson(client, schema, "flightplans", projection("flightplans", sourceFlight, schema.writable.get("flightplans")!, ["regio_id", "user_id", "points", "status", ...SKIPPED_COLUMNS], { regio_id: region, user_id: actor.subject, status: "finished", points: sourceMembers.map(sourceId => Number(mappedId(pointMap, sourceId, "POINT"))) }));
   const destinationFlightId = id(flight); mappings.push({ type: "flight", source: id(sourceFlight), destination: destinationFlightId, created: true });

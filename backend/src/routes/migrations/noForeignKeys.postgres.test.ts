@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { buildProposal, ensureImportSchema, importPayload } from "./destination";
 import { validateRecordLinks, type FlightMigrationExportV1 } from "../../migrations/exportContract";
+import { renamedPoints } from "../../migrations/pointProposal";
 
 // Explicit private socket only: never read database settings from .env.
 const socket = process.argv[2];
@@ -50,7 +51,7 @@ async function run() {
       assert.equal((await buildProposal(client, payload, "RWS NN") as any).ready, true);
       assert.equal((await client.query("SELECT count(*) FROM lis.flightplans")).rows[0].count, "0", "preview is read-only");
       await client.query("BEGIN");
-      const result = await importPayload(client, payload, "RWS NN", { subject: "prod-admin" });
+      const result = await importPayload(client, payload, "RWS NN", { subject: "prod-admin" }, []);
       await client.query("COMMIT");
       assert.equal(JSON.stringify(payload), before);
       const mapping = (type: string, source: string) => Number(result.mappings.find(row => row.type === type && row.source === source)!.destination);
@@ -77,7 +78,7 @@ async function run() {
       assert(reuse.mappings.points.every((row: any) => row.action === "reuse"));
       assert(reuse.mappings.geometries.every((row: any) => row.action === "reuse"));
       await client.query("BEGIN");
-      const reused = await importPayload(client, payload, "RWS NN", { subject: "second-admin" });
+      const reused = await importPayload(client, payload, "RWS NN", { subject: "second-admin" }, []);
       assert(reused.mappings.filter(row => row.type === "point" || row.type === "geometry").every(row => !row.created));
       assert.deepEqual((await client.query("SELECT * FROM lis.points ORDER BY id")).rows, pointsBefore);
       await client.query("ROLLBACK");
@@ -96,7 +97,7 @@ async function run() {
           return client.query(sql, values);
         } } as unknown as PoolClient;
         await client.query("BEGIN");
-        await assert.rejects(importPayload(failing, fresh, "RWS NN", { subject: "prod-admin" }), /synthetic write failure/);
+        await assert.rejects(importPayload(failing, fresh, "RWS NN", { subject: "prod-admin" }, []), /synthetic write failure/);
         await client.query("ROLLBACK");
         assert.equal((await client.query("SELECT count(*) FROM lis.flightplans")).rows[0].count, "1");
         assert.equal((await client.query("SELECT count(*) FROM lis.geometries")).rows[0].count, "1");
@@ -119,6 +120,94 @@ async function run() {
       const tables = (await client.query("SELECT table_name FROM information_schema.tables WHERE table_schema='lis' ORDER BY table_name")).rows.map(row => row.table_name);
       assert.deepEqual(tables, ["attachments", "finished_plans", "finished_plans_path", "flightplans", "geometries", "points"]);
       console.log("Disposable PostgreSQL: no-FK preview/import, vertex/visit order, time precision/nulls, relationships, reuse, rollback at all ten write stages passed");
+
+      const adHoc = fixture();
+      (adHoc.records.points.find((point: any) => point.id === 1) as any).omschrijving = "Ad hoc waarneming 1";
+      for (const geometry of adHoc.records.geometries as any[]) {
+        geometry.omschrijving += "-ad-hoc-fixture";
+        for (const vertex of geometry.vertices) vertex.omschrijving += "-ad-hoc-fixture";
+      }
+      const originalAdHoc = JSON.stringify(adHoc);
+      const snapshot = async () => {
+        const rows: unknown[] = [];
+        for (const table of tables) rows.push((await client.query(`SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text), '[]'::jsonb) AS rows FROM lis.${table} t`)).rows[0].rows);
+        return rows;
+      };
+      await client.query("BEGIN");
+      await client.query("INSERT INTO lis.points (omschrijving,regio_id,user_id,latitude,longitude,xcoordinaat_rd,ycoordinaat_rd) VALUES ('Ad hoc waarneming 1','RWS NN','original-owner',1,2,3,4), ('Ad hoc waarneming 1','other region','other-owner',1,2,3,4)");
+      const baseline = await snapshot();
+      const adHocPreview = await buildProposal(client, adHoc, "RWS NN");
+      assert.equal(adHocPreview.ready, true);
+      const confirmation = renamedPoints(adHocPreview.mappings.points);
+      assert.equal(confirmation.length, 1);
+      assert.match(confirmation[0].destinationName, /^Ad hoc waarneming 1-\d{6}$/);
+      assert.deepEqual(await buildProposal(client, adHoc, "RWS NN"), adHocPreview);
+      assert.deepEqual(await snapshot(), baseline, "preview makes no writes");
+
+      // Every stage of a renamed-point import rolls back without touching the
+      // old points or any unrelated business rows.
+      for (let failure = 1; failure <= 10; failure++) {
+        await client.query("SAVEPOINT renamed_attempt");
+        let writes = 0;
+        const failing = { query: async (sql: string, values?: any[]) => {
+          if (sql.startsWith("INSERT INTO") && ++writes === failure) throw new Error("synthetic renamed write failure");
+          return client.query(sql, values);
+        } } as unknown as PoolClient;
+        await assert.rejects(importPayload(failing, adHoc, "RWS NN", { subject: "prod-admin" }, confirmation), /synthetic renamed write failure/);
+        await client.query("ROLLBACK TO SAVEPOINT renamed_attempt");
+        assert.deepEqual(await snapshot(), baseline);
+      }
+      for (const tampered of [undefined, [], [{ ...confirmation[0], destinationName: "choose-any-name" }]]) {
+        let writes = 0;
+        const monitor = { query: async (sql: string, values?: any[]) => { if (sql.startsWith("INSERT INTO")) writes++; return client.query(sql, values); } } as unknown as PoolClient;
+        await assert.rejects(importPayload(monitor, adHoc, "RWS NN", { subject: "prod-admin" }, tampered), /PREVIEW_CHANGED/);
+        assert.equal(writes, 0);
+        assert.deepEqual(await snapshot(), baseline);
+      }
+      await client.query("SAVEPOINT name_limit");
+      await client.query(`ALTER TABLE lis.points ALTER COLUMN omschrijving TYPE varchar(${confirmation[0].destinationName.length - 1})`);
+      const tooLong = await buildProposal(client, adHoc, "RWS NN");
+      assert.equal(tooLong.ready, false);
+      assert(tooLong.conflicts.some(conflict => conflict.includes("name length")));
+      await client.query("ROLLBACK TO SAVEPOINT name_limit");
+
+      const renamedResult = await importPayload(client, adHoc, "RWS NN", { subject: "prod-admin" }, confirmation);
+      const renamedPoint = (await client.query("SELECT * FROM lis.points WHERE omschrijving=$1", [confirmation[0].destinationName])).rows[0];
+      assert.equal(renamedPoint.user_id, "prod-admin");
+      assert.equal(renamedPoint.regio_id, "RWS NN");
+      assert.deepEqual([renamedPoint.latitude, renamedPoint.longitude, renamedPoint.xcoordinaat_rd, renamedPoint.ycoordinaat_rd], [1, 2, 3, 4]);
+      const newFlight = (await client.query("SELECT * FROM lis.flightplans WHERE id=$1", [renamedResult.destinationFlightId])).rows[0];
+      assert.equal(newFlight.points[1], renamedPoint.id);
+      const newCompletion = (await client.query("SELECT * FROM lis.finished_plans WHERE plan_id=$1 AND point_order=2", [renamedResult.destinationFlightId])).rows[0];
+      assert.equal(newCompletion.point_id, renamedPoint.id);
+      const newPhoto = (await client.query("SELECT * FROM lis.attachments WHERE id=$1", [newCompletion.attachments_id[0]])).rows[0];
+      assert.equal(newPhoto.point_id, renamedPoint.id);
+      assert.equal(newPhoto.attachmentid, 5511);
+      assert.equal(newPhoto.url, (adHoc.records.attachments[0] as any).url);
+      assert.equal(JSON.stringify(adHoc), originalAdHoc, "signed package remains immutable");
+      assert.deepEqual((await client.query("SELECT user_id FROM lis.points WHERE omschrijving='Ad hoc waarneming 1' ORDER BY id")).rows.map(row => row.user_id), ["original-owner", "other-owner"]);
+      await client.query("ROLLBACK");
+
+      // Two admins preview the same suffix. The second import must wait for
+      // the first transaction and then reject the stale name before writes.
+      await client.query("INSERT INTO lis.points (omschrijving) VALUES ('Ad hoc waarneming 1')");
+      const sharedPreview = await buildProposal(client, adHoc, "RWS NN");
+      const sharedConfirmation = renamedPoints(sharedPreview.mappings.points);
+      const second = await db.connect();
+      try {
+        await client.query("BEGIN");
+        await second.query("BEGIN");
+        await importPayload(client, adHoc, "RWS NN", { subject: "first-admin" }, sharedConfirmation);
+        const waiting = assert.rejects(importPayload(second, adHoc, "RWS NN", { subject: "second-admin" }, sharedConfirmation), /PREVIEW_CHANGED/);
+        await client.query("COMMIT");
+        await waiting;
+        await second.query("ROLLBACK");
+        assert.equal((await client.query("SELECT count(*) FROM lis.flightplans")).rows[0].count, "2");
+        const refreshed = await buildProposal(client, adHoc, "RWS NN");
+        assert.equal(refreshed.ready, true);
+        assert.notEqual(renamedPoints(refreshed.mappings.points)[0].destinationName, sharedConfirmation[0].destinationName);
+      } finally { second.release(); }
+      console.log("Disposable PostgreSQL: Ad hoc rename, confirmed names, VARCHAR limits, completion/photo mapping, ten-stage rollback, and simultaneous admins passed");
     } finally { client.release(); }
   } finally {
     await db?.end();
