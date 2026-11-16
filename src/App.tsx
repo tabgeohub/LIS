@@ -16,13 +16,10 @@ import { applyAuthMeBootstrap } from "./bootstrapAuthMe";
 import { installViewerMutationGuard } from "helpers/http/installViewerMutationGuard";
 
 installViewerMutationGuard();
-import MigratedFlightDetail from "Components/DashboardPage/MigratedFlightDetail";
 
 export default function App() {
   const { setUser } = useAuth();
-  const [pendingClientPath, setPendingClientPath] = useState<string | null>(
-    null
-  );
+  const [pendingClientPath, setPendingClientPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${getBackEndUrl()}/auth/me`, {
@@ -43,10 +40,6 @@ export default function App() {
           <Route path="/" element={<Home />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route
-            path="/dashboard/flight/:id"
-            element={<MigratedFlightDetail />}
-          />
 
           <Route path="/images" element={<TimesliderItemDetailPage />} />
           <Route path="/installations" element={<InstallationsPage />} />
