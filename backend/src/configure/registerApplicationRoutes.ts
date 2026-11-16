@@ -19,6 +19,7 @@ import installersRouter from "../routes/installers";
 import keycloakRouter from "../routes/keycloak";
 import logsRouter from "../routes/logs";
 import main from "../routes/main";
+import migrationsRouter from "../routes/migrations";
 import pointsRouter from "../routes/points";
 import reportUploadRouter from "../routes/reportUpload";
 import templateFlightsRouter from "../routes/template_plans";
@@ -43,20 +44,21 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/", main);
   app.use("/auth", authKeycloak);
   app.use("/auth2", auth2Router);
-  // Session-protected APIs (writes blocked for intern / viewer-only)
-  app.use("/api/keycloak", ...writable, keycloakRouter);
-  app.use("/api/auth", ...writable, authRouter);
-  app.use("/api/users", ...writable, usersRouter);
-  app.use("/api/flightPlans", ...writable, flightPlansRouter);
-  app.use("/api/points", ...writable, pointsRouter);
-  app.use("/api/emails", ...writable, emailsRouter);
-  app.use("/api/finished_plans", ...writable, finishedPlansRouter);
-  app.use("/api/templateFlight", ...writable, templateFlightsRouter);
-  app.use("/api/logs", ...writable, logsRouter);
-  app.use("/api/consts", ...writable, constsRouter);
-  app.use("/api/geometries", ...writable, geometriesRouter);
-  app.use("/api/timeslider", ...writable, timesliderRouter);
-  app.use("/api/arcgis", ...writable, arcgisRouter);
+  // Session-protected APIs
+  app.use("/api/keycloak", requireSessionAuth, keycloakRouter);
+  app.use("/api/auth", requireSessionAuth, authRouter);
+  app.use("/api/users", requireSessionAuth, usersRouter);
+  app.use("/api/flightPlans", requireSessionAuth, flightPlansRouter);
+  app.use("/api/points", requireSessionAuth, pointsRouter);
+  app.use("/api/emails", requireSessionAuth, emailsRouter);
+  app.use("/api/finished_plans", requireSessionAuth, finishedPlansRouter);
+  app.use("/api/templateFlight", requireSessionAuth, templateFlightsRouter);
+  app.use("/api/logs", requireSessionAuth, logsRouter);
+  app.use("/api/consts", requireSessionAuth, constsRouter);
+  app.use("/api/geometries", requireSessionAuth, geometriesRouter);
+  app.use("/api/migrations", requireSessionAuth, migrationsRouter);
+  app.use("/api/timeslider", requireSessionAuth, timesliderRouter);
+  app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
   app.use("/uploads", requirePassword, express.static(uploadsDir));
   // Intern users may generate observation reports, so no viewer write-block here.
   app.use("/api/upload-report", requireSessionAuth, reportUploadRouter);

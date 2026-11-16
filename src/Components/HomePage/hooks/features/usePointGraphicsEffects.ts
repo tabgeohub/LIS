@@ -4,7 +4,7 @@ import { FinishedFlightPlanType } from "Types/finished_plans";
 import { getPointAndGeometryIdsFromPlans } from "@helpers/timeslider";
 import { validateMapView } from "@helpers/ArcGISHelpers/validateMapView";
 import { replaceGraphics } from "@helpers/ArcGISHelpers/replaceGraphics";
-import { createDebouncedClickGuard } from "Components/HomePage/hooks/map/mapClickGuard";
+import { createDebouncedClickGuard } from "hooks/map/createDebouncedClickGuard";
 import { buildPointMapGraphics } from "./pointMapGraphics";
 
 function clearLayer(layer: __esri.GraphicsLayer | null | undefined): void {
