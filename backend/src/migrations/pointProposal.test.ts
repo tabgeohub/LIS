@@ -47,4 +47,64 @@ const geometry = { id: "11", name: "G", region: "RWS NN", type: "line", vertices
 assert.equal(matchGeometry(geometry, [geometry, { ...geometry, id: "12" }], "RWS NN").kind, "conflict");
 const changed = propose([existing, point({ id: "102", name: expectedName })]);
 assert.throws(() => requireConfirmedRenames(changed, renamedPoints(propose([existing]))), /PREVIEW_CHANGED/);
+
+const incompatible = point({ name: "RWSNN_Ameland KNRM station", latitude: 10, longitude: 20, rdX: 30, rdY: 40 });
+const prodTwin = point({
+  id: "900",
+  name: "RWSNN_Ameland KNRM station",
+  region: "RWS NN",
+  latitude: 11,
+  longitude: 20,
+  rdX: 30,
+  rdY: 40,
+});
+assert.equal(propose([prodTwin], [incompatible])[0].action, "conflict");
+assert.equal(propose([prodTwin], [incompatible])[0].reason, "Incompatible point");
+const manualName = "RWSNN_Ameland KNRM station TST";
+const manual = proposePoints(
+  [incompatible],
+  [prodTwin],
+  "RWS NN",
+  "export-123",
+  null,
+  [{ sourceId: "1", destinationName: `  ${manualName}  ` }],
+);
+assert.equal(manual[0].action, "create");
+assert.equal(manual[0].renamed, true);
+assert.equal(manual[0].destinationName, manualName);
+requireConfirmedRenames(manual, renamedPoints(manual));
+assert.equal(
+  proposePoints(
+    [incompatible],
+    [prodTwin],
+    "RWS NN",
+    "export-123",
+    null,
+    [{ sourceId: "1", destinationName: "RWSNN_Ameland KNRM station" }],
+  )[0].reason,
+  "Renamed point name already exists",
+);
+assert.equal(
+  proposePoints(
+    [incompatible],
+    [prodTwin],
+    "RWS NN",
+    "export-123",
+    null,
+    [{ sourceId: "1", destinationName: "ok" }],
+  )[0].renamed,
+  true,
+);
+assert.equal(
+  proposePoints(
+    [{ ...incompatible, geometryId: "11" }],
+    [prodTwin],
+    "RWS NN",
+    "export-123",
+    null,
+    [{ sourceId: "1", destinationName: "vertex rename" }],
+  )[0].action,
+  "conflict",
+  "geometry vertices stay blocked",
+);
 console.log("Ad hoc point proposal fixtures passed");

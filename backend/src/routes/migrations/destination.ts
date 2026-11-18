@@ -2,7 +2,13 @@ import { request } from "undici";
 import type { Pool, PoolClient } from "pg";
 import { validateRecordLinks, type FlightMigrationExportV1, type Json } from "../../migrations/exportContract";
 import { matchGeometry, type MatchGeometry, type MatchPoint } from "../../migrations/matching";
-import { proposePoints, requireConfirmedRenames, type PointMapping } from "../../migrations/pointProposal";
+import {
+  parseRequestedRenames,
+  proposePoints,
+  requireConfirmedRenames,
+  type PointMapping,
+  type RenameConfirmation,
+} from "../../migrations/pointProposal";
 import { FINISHED_AT_TYPES, FinishedAtSchemaError, missingRequiredColumns, REQUIRED_COLUMNS, SKIPPED_COLUMNS, type ImportColumn, type ImportSchema } from "../../migrations/schemaPreflight";
 import { validateCompletionTimes } from "../../migrations/completionTimes";
 
@@ -99,13 +105,25 @@ export type MigrationProposal = {
   counts: { points: number; geometries: number; completions: number; attachments: number; sourceLogsSkipped: number; hasPath: boolean };
 };
 
-export async function buildProposal(client: Pick<PoolClient, "query">, payload: FlightMigrationExportV1, region: string): Promise<MigrationProposal> {
+export async function buildProposal(
+  client: Pick<PoolClient, "query">,
+  payload: FlightMigrationExportV1,
+  region: string,
+  requestedRenames: RenameConfirmation[] = [],
+): Promise<MigrationProposal> {
   validateRecordLinks(payload);
   const schema = await ensureImportSchema(client);
   validateCompletionTimes(payload, schema.finishedAtColumn);
   const { destinationPoints, destinationGeometries } = await loadDestinations(client, payload), points = sourcePoints(payload), geometries = payload.records.geometries.map(value => obj(value));
   const conflicts: string[] = [];
-  const pointMappings = proposePoints(points.map(shapePoint), destinationPoints.map(shapePoint), region, payload.exportId, schema.pointNameMaxLength);
+  const pointMappings = proposePoints(
+    points.map(shapePoint),
+    destinationPoints.map(shapePoint),
+    region,
+    payload.exportId,
+    schema.pointNameMaxLength,
+    requestedRenames,
+  );
   for (const mapping of pointMappings) if (mapping.action === "conflict") conflicts.push(`${mapping.sourceName}: ${mapping.reason}`);
   const geometryMappings = geometries.map(source => { const match = matchGeometry(shapeGeometry(source), destinationGeometries.map(shapeGeometry), region); if (match.kind === "conflict") conflicts.push(`${name(source)}: ${match.reason}`); return { sourceId: id(source), action: match.kind, destinationId: match.kind === "reuse" ? match.value.id : null }; });
   for (const source of points) { if (source.geometry_id == null) continue; const point = pointMappings.find(mapping => mapping.sourceId === id(source)); const geometry = geometryMappings.find(mapping => mapping.sourceId === String(source.geometry_id)); if (!geometry) { conflicts.push(`${name(source)}: missing geometry definition`); continue; } if (point?.action === "reuse" && (geometry.action !== "reuse" || !destinationPoints.some(candidate => id(candidate) === point.destinationId && String(candidate.geometry_id) === geometry.destinationId))) conflicts.push(`${name(source)}: point belongs to a different geometry`); }
@@ -125,7 +143,8 @@ const field = (row: Row, ...keys: string[]): unknown => keys.map(key => row[key]
 const mappedId = (map: Map<string, string>, value: unknown, what: string): string => { const destination = map.get(String(value)); if (!destination) throw new Error(`MISSING_${what}_MAPPING`); return destination; };
 export async function importPayload(client: PoolClient, payload: FlightMigrationExportV1, region: string, actor: { subject: string }, confirmedRenames: unknown): Promise<{ destinationFlightId: string; mappings: Array<{ type: string; source: string; destination: string; created: boolean }> }> {
   const schema = await ensureImportSchema(client); await client.query("SELECT pg_advisory_xact_lock(hashtext('lis.migration.import'))"); await client.query("LOCK TABLE lis.geometries, lis.points, lis.flightplans, lis.finished_plans, lis.attachments, lis.finished_plans_path IN SHARE ROW EXCLUSIVE MODE");
-  const proposal = await buildProposal(client, payload, region);
+  const requestedRenames = parseRequestedRenames(confirmedRenames);
+  const proposal = await buildProposal(client, payload, region, requestedRenames);
   requireConfirmedRenames(proposal.mappings.points, confirmedRenames);
   if (!proposal.ready) throw new Error("MATCHING_CONFLICT");
   const mappings: Array<{ type: string; source: string; destination: string; created: boolean }> = [];

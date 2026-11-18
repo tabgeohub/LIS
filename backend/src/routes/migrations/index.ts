@@ -6,6 +6,7 @@ import { decodeJwtPayload } from "../auth/jwt";
 import { migrationConfig, isProdHostname, isTrustedTstSource } from "./config";
 import { buildProposal, importPayload, selectableRegions, verifyPhotoReferences } from "./destination";
 import { verifyExport } from "../../migrations/exportContract";
+import { parseRequestedRenames } from "../../migrations/pointProposal";
 import { migrationApiError, migrationCsrf, requireMigrationCsrf } from "./security";
 
 const router = Router();
@@ -96,7 +97,18 @@ router.post("/imports/preview", requireExactAdmin, requireMigrationCsrf, async (
   try {
     const { payload, region } = await validatedPayload(req);
     const client = await pool.connect();
-    try { res.json({ source: sourceSummary(payload), region, proposal: await buildProposal(client, payload, region) }); }
+    try {
+      res.json({
+        source: sourceSummary(payload),
+        region,
+        proposal: await buildProposal(
+          client,
+          payload,
+          region,
+          parseRequestedRenames(req.body?.pointRenames),
+        ),
+      });
+    }
     finally { client.release(); }
   } catch (error) { migrationApiError(res, error); }
 });

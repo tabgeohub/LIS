@@ -18,12 +18,37 @@ export function adHocCandidateName(exportId: string, sourceId: string, baseName:
   return `${normalizedName(baseName)}-${suffix}`;
 }
 
+/** Optional admin-chosen names for incompatible standalone points. Invalid entries are ignored. */
+export function parseRequestedRenames(value: unknown): RenameConfirmation[] {
+  if (value == null) return [];
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const result: RenameConfirmation[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") continue;
+    const sourceId = (entry as { sourceId?: unknown }).sourceId;
+    const destinationName = (entry as { destinationName?: unknown }).destinationName;
+    if (typeof sourceId !== "string" || typeof destinationName !== "string" || seen.has(sourceId)) continue;
+    seen.add(sourceId);
+    result.push({ sourceId, destinationName });
+  }
+  return result;
+}
+
 /** One pure decision path for both read-only preview and locked import. */
-export function proposePoints(source: MatchPoint[], destination: MatchPoint[], region: string, exportId: string, maxNameLength: number | null): PointMapping[] {
+export function proposePoints(
+  source: MatchPoint[],
+  destination: MatchPoint[],
+  region: string,
+  exportId: string,
+  maxNameLength: number | null,
+  requestedRenames: RenameConfirmation[] = [],
+): PointMapping[] {
   const productionNames = new Set(destination.map(point => normalizedName(point.name)));
   // Reserve even not-yet-processed regular names, so a suffix cannot shadow one.
   const reserved = new Set([...productionNames, ...source.map(point => normalizedName(point.name))]);
   const createdNames = new Set<string>();
+  const renameBySource = new Map(requestedRenames.map(entry => [entry.sourceId, entry.destinationName]));
   return source.map(point => {
     const mapping: PointMapping = { sourceId: point.id, action: "create", destinationId: null, sourceName: point.name, destinationName: point.name, renamed: false };
     const invalid = matchPoint(point, [], region);
@@ -43,7 +68,27 @@ export function proposePoints(source: MatchPoint[], destination: MatchPoint[], r
       return conflict("No unused Ad hoc name after 100 attempts");
     }
     const match = matchPoint(point, destination, region);
-    if (match.kind === "conflict") return conflict(match.reason);
+    if (match.kind === "conflict") {
+      const requested = renameBySource.get(point.id);
+      if (
+        requested !== undefined &&
+        match.reason === "Incompatible point" &&
+        point.geometryId === null
+      ) {
+        const candidate = normalizedName(requested);
+        if (!candidate) return conflict(match.reason);
+        if (maxNameLength !== null && [...candidate].length > maxNameLength) {
+          return conflict("Renamed point exceeds production name length");
+        }
+        if (reserved.has(candidate) || createdNames.has(candidate)) {
+          return conflict("Renamed point name already exists");
+        }
+        reserved.add(candidate);
+        createdNames.add(candidate);
+        return { ...mapping, destinationName: candidate, renamed: true };
+      }
+      return conflict(match.reason);
+    }
     if (match.kind === "reuse") return { ...mapping, action: "reuse", destinationId: match.value.id, destinationName: match.value.name };
     if (maxNameLength !== null && [...point.name].length > maxNameLength) return conflict("Point exceeds production name length");
     createdNames.add(base);
