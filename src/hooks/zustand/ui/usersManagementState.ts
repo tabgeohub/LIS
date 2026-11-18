@@ -3,7 +3,7 @@ import type { KeycloakUser } from "Types/keycloakUser";
 
 export type { KeycloakUser };
 
-type UsersTabType = "all" | "create" | "edit" | "reset" | "roles";
+type UsersTabType = "all" | "create" | "edit" | "reset" | "roles" | "migrations";
 
 export const useUsersManagementState = create<{
   activeTab: UsersTabType;

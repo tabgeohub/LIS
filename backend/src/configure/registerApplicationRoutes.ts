@@ -19,6 +19,7 @@ import installersRouter from "../routes/installers";
 import keycloakRouter from "../routes/keycloak";
 import logsRouter from "../routes/logs";
 import main from "../routes/main";
+import migrationsRouter from "../routes/migrations";
 import pointsRouter from "../routes/points";
 import reportUploadRouter from "../routes/reportUpload";
 import templateFlightsRouter from "../routes/template_plans";
@@ -55,6 +56,7 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/api/logs", ...writable, logsRouter);
   app.use("/api/consts", ...writable, constsRouter);
   app.use("/api/geometries", ...writable, geometriesRouter);
+  app.use("/api/migrations", ...writable, migrationsRouter);
   app.use("/api/timeslider", ...writable, timesliderRouter);
   app.use("/api/arcgis", ...writable, arcgisRouter);
   app.use("/uploads", requirePassword, express.static(uploadsDir));
