@@ -8,6 +8,8 @@ export const swaggerTags = [
   { name: "Consts", description: "Lookup tables (regios, piloten, …)" },
   { name: "Users", description: "User management" },
   { name: "Emails", description: "Email templates & sending" },
+  { name: "Piloten", description: "Piloten management CRUD" },
+  { name: "Waarnemers", description: "Waarnemers management CRUD (regio-scoped)" },
   { name: "Auth", description: "Legacy login (Keycloak used in production)" },
   { name: "Auth2", description: "Keycloak-backed session auth (verify / login / me / logout)" },
   { name: "DevicesUpdates", description: "Getac device update agent & admin APIs" },

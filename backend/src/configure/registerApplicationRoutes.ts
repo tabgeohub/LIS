@@ -20,11 +20,13 @@ import keycloakRouter from "../routes/keycloak";
 import logsRouter from "../routes/logs";
 import main from "../routes/main";
 import migrationsRouter from "../routes/migrations";
+import pilotenRouter from "../routes/piloten";
 import pointsRouter from "../routes/points";
 import reportUploadRouter from "../routes/reportUpload";
 import templateFlightsRouter from "../routes/template_plans";
 import timesliderRouter from "../routes/timeslider";
 import usersRouter from "../routes/users";
+import waarnemersRouter from "../routes/waarnemers";
 
 const writable = requireSessionAuthWritable;
 
@@ -51,6 +53,8 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/api/flightPlans", requireSessionAuth, flightPlansRouter);
   app.use("/api/points", requireSessionAuth, pointsRouter);
   app.use("/api/emails", requireSessionAuth, emailsRouter);
+  app.use("/api/piloten", requireSessionAuth, pilotenRouter);
+  app.use("/api/waarnemers", requireSessionAuth, waarnemersRouter);
   app.use("/api/finished_plans", requireSessionAuth, finishedPlansRouter);
   app.use("/api/templateFlight", requireSessionAuth, templateFlightsRouter);
   app.use("/api/logs", requireSessionAuth, logsRouter);
