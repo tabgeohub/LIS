@@ -59,6 +59,7 @@
       "vluchtplanStatus": "Vluchtplan status aanpassen",
       "verwijderen": "Aandachtspunten verwijderen",
       "emailijst": "E-maillijst bijwerken",
+      "pilotenWaarnemers": "Piloten & waarnemers bewerken",
       "tekengereedschap": "Tekengereedschap",
       "editGeometry": "Geometrie bewerken"
     },
@@ -544,6 +545,7 @@
     "label": "Tools",
     "tabs": {
       "emailijst": "E-maillijst bewerken",
+      "pilotenWaarnemers": "Piloten & waarnemers bewerken",
       "verwijderen": "Aandachtspunten verwijderen",
       "startgebied": "Startgebied",
       "exporteer": "Exporteer kaart",
@@ -560,6 +562,31 @@
         "emailadres": "E-mailadres",
         "failToast": "Ongeldig e-mailadres",
         "successToast": "E-mail succesvol bijgewerkt"
+      }
+    },
+    "pilotenWaarnemers": {
+      "chooser": {
+        "text": "Kies wat u wilt bewerken.",
+        "editPiloten": "Piloten bewerken",
+        "editWaarnemers": "Waarnemers bewerken"
+      },
+      "piloten": {
+        "listText": "Selecteer een piloot om te wijzigen of te verwijderen, of voeg een nieuwe piloot toe.",
+        "deleteModal": "Weet u zeker dat u deze piloot wilt verwijderen?",
+        "naam": "Naam",
+        "status": "Status",
+        "successToast": "Piloot succesvol bijgewerkt",
+        "createSuccessToast": "Piloot succesvol aangemaakt",
+        "failToast": "Vul alle verplichte velden in"
+      },
+      "waarnemers": {
+        "listText": "Selecteer een waarnemer om te wijzigen of te verwijderen, of voeg een nieuwe waarnemer toe.",
+        "deleteModal": "Weet u zeker dat u deze waarnemer wilt verwijderen?",
+        "naam": "Naam",
+        "regio": "Regio",
+        "successToast": "Waarnemer succesvol bijgewerkt",
+        "createSuccessToast": "Waarnemer succesvol aangemaakt",
+        "failToast": "Vul alle verplichte velden in"
       }
     },
     "exporteer": {

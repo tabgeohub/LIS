@@ -19,6 +19,7 @@ import CreateReport from "Components/Nabewerking/CreateReport";
 import ChangeFlightPlanStatus from "Components/Nabewerking/ChangeFlightPlanStatus";
 import AandachtspuntenVerwijderen from "Components/HomePageTools/AandachtspuntenVerwijderen";
 import Emailijst from "Components/HomePageTools/Emailijst";
+import PilotenWaarnemers from "Components/HomePageTools/PilotenWaarnemers";
 import ToevoegenKaartlagen from "Components/HomePageTools/ToevoegenKaartlagen";
 import Uploaden from "Components/HomePageTools/Uploaden";
 import EditGeometry from "Components/HomePageTools/EditGeometry";
@@ -63,6 +64,7 @@ export default function Left({
     // Tools
     verwijderen: AandachtspuntenVerwijderen,
     emailijst: Emailijst,
+    pilotenWaarnemers: PilotenWaarnemers,
     kaartlagen: ToevoegenKaartlagen,
     uploaden: Uploaden,
     tekengereedschap: DrawingTool,

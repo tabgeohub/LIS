@@ -5,6 +5,7 @@ import { useSelectedBottomTabState } from "hooks/zustand/ui";
 import { useContent } from "hooks/useContent";
 import { useResetFeatures } from "hooks/features/useResetFeatures";
 import { useResetPointFilters } from "hooks/features/useResetPointFilters";
+import { usePilotenWaarnemersStep } from "Components/HomePageTools/PilotenWaarnemers/usePilotenWaarnemersStep";
 import { handleTabHeaderClose } from "./handleTabHeaderClose";
 import { resolveTabHeaderText } from "./resolveTabHeaderText";
 
@@ -17,13 +18,18 @@ export function useTabHeaderModel() {
   const { resetPointFilters } = useResetPointFilters();
   const content = useContent();
   const { selectedBottomTab } = useSelectedBottomTabState();
+  const { step: pilotenWaarnemersStep } = usePilotenWaarnemersStep();
 
   return {
     visible:
       selectedTab !== "none" &&
       selectedBottomTab !== "result" &&
       selectedBottomTab !== "searched",
-    title: resolveTabHeaderText(selectedTab, content),
+    title: resolveTabHeaderText(
+      selectedTab,
+      content,
+      pilotenWaarnemersStep
+    ),
     onClose: () =>
       handleTabHeaderClose({
         selectedTab,

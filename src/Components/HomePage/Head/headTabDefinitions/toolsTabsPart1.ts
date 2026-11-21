@@ -1,6 +1,6 @@
 import { IconType } from "react-icons";
 import { IoNewspaperOutline } from "react-icons/io5";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdPeopleOutline } from "react-icons/md";
 import { RiRestartFill } from "react-icons/ri";
 import { ToolsTabsType } from "Types";
 import content from "../../../../constants/content.json";
@@ -16,6 +16,12 @@ export const toolsTabsPart1: {
     id: "emailijst",
     label: content.tools.tabs.emailijst,
     icon: IoNewspaperOutline,
+    disabled: false,
+  },
+  {
+    id: "pilotenWaarnemers",
+    label: content.tools.tabs.pilotenWaarnemers,
+    icon: MdPeopleOutline,
     disabled: false,
   },
   {

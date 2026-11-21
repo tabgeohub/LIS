@@ -4,8 +4,10 @@ import {
   emailKeys,
   finishedPlanKeys,
   geometryKeys,
+  pilootKeys,
   pointKeys,
   templateFlightKeys,
+  waarnemerKeys,
 } from "./queryKeys";
 import { invalidateFlightPlanQueries } from "./invalidateFlightPlanQueries";
 
@@ -45,6 +47,20 @@ const PATH_INVALIDATIONS: PathInvalidation[] = [
     matches: (path) => path.includes("/emails"),
     invalidate: (queryClient) =>
       queryClient.invalidateQueries({ queryKey: emailKeys.all }),
+  },
+  {
+    matches: (path) => path.includes("/piloten"),
+    invalidate: (queryClient) => {
+      queryClient.invalidateQueries({ queryKey: pilootKeys.all });
+      queryClient.invalidateQueries({ queryKey: constKeys.piloten() });
+    },
+  },
+  {
+    matches: (path) => path.includes("/waarnemers"),
+    invalidate: (queryClient) => {
+      queryClient.invalidateQueries({ queryKey: waarnemerKeys.all });
+      queryClient.invalidateQueries({ queryKey: constKeys.waarnemers() });
+    },
   },
   {
     matches: (path) => path.includes("/consts"),

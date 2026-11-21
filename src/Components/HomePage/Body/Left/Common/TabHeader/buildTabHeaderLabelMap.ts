@@ -28,6 +28,7 @@ export function buildTabHeaderLabelMap(
     vluchtplanStatus: h.vluchtplanStatus,
     verwijderen: h.verwijderen,
     emailijst: h.emailijst,
+    pilotenWaarnemers: h.pilotenWaarnemers,
     tekengereedschap: h.tekengereedschap,
     editGeometry: h.editGeometry,
   };

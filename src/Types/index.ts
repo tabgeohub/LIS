@@ -122,6 +122,18 @@ export interface EmailType {
   email: string;
 }
 
+export interface PilootType {
+  id: string;
+  naam: string;
+  status: string;
+}
+
+export interface WaarnemerType {
+  id: string;
+  naam: string;
+  regio_id: string;
+}
+
 export type VoorbereidingTabsType =
   | "none"
   | "enrichedAddPoint"
@@ -137,6 +149,7 @@ export type VoorbereidingTabsType =
 export type ToolsTabsType =
   | "none"
   | "emailijst"
+  | "pilotenWaarnemers"
   | "verwijderen"
   | "startgebied"
   | "bevragen"
