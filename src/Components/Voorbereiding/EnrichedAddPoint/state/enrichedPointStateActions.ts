@@ -3,6 +3,7 @@ import { initialEnrichedPointValues } from "./enrichedPointStateDefaults";
 import { EnrichedPointState } from "./enrichedPointStateTypes";
 
 type SetState = StoreApi<EnrichedPointState>["setState"];
+type CoordinateKey = "xCoord" | "yCoord" | "longitude" | "latitude";
 
 export function createEnrichedPointActions(set: SetState) {
   const update = <Key extends keyof typeof initialEnrichedPointValues>(
@@ -10,12 +11,15 @@ export function createEnrichedPointActions(set: SetState) {
     value: (typeof initialEnrichedPointValues)[Key]
   ) => set({ [key]: value } as Pick<EnrichedPointState, Key>);
 
+  const updateCoordinate = (key: CoordinateKey, value: number) =>
+    set((state) => (Object.is(state[key], value) ? state : { [key]: value }));
+
   return {
     setStep: (value: number) => update("step", value),
-    setXCoord: (value: number) => update("xCoord", value),
-    setYCoord: (value: number) => update("yCoord", value),
-    setLongitude: (value: number) => update("longitude", value),
-    setLatitude: (value: number) => update("latitude", value),
+    setXCoord: (value: number) => updateCoordinate("xCoord", value),
+    setYCoord: (value: number) => updateCoordinate("yCoord", value),
+    setLongitude: (value: number) => updateCoordinate("longitude", value),
+    setLatitude: (value: number) => updateCoordinate("latitude", value),
     setCoordinateSystem: (value: EnrichedPointState["coordinateSystem"]) =>
       update("coordinateSystem", value),
     setVertrouwelijk: (value: boolean) => update("vertrouwelijk", value),

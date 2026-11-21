@@ -1,6 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from "react";
-import type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
+import { useEffect, useRef } from "react";
 import {
   applyCoordinateSystemSync,
   type CoordinateSystemSyncInput,
@@ -9,9 +7,16 @@ import {
 export type { CoordinateSyncPatch } from "@helpers/geo/buildCoordinateSyncPatch";
 
 export function useCoordinateSystemSync(input: CoordinateSystemSyncInput) {
-  const { coordinateSystem, rdX, rdY, latitude, longitude, patchCoords } = input;
+  const { coordinateSystem, rdX, rdY, latitude, longitude } = input;
+  const sourceX = coordinateSystem === "RD" ? rdX : longitude;
+  const sourceY = coordinateSystem === "RD" ? rdY : latitude;
+  const latestInput = useRef(input);
 
   useEffect(() => {
-    applyCoordinateSystemSync(input);
-  }, [coordinateSystem, rdX, rdY, latitude, longitude, patchCoords]);
+    latestInput.current = input;
+  }, [input]);
+
+  useEffect(() => {
+    applyCoordinateSystemSync(latestInput.current);
+  }, [coordinateSystem, sourceX, sourceY]);
 }
