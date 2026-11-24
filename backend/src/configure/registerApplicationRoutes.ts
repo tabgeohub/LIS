@@ -15,6 +15,7 @@ import flightPlansRouter from "../routes/flightPlans";
 import geometriesRouter from "../routes/geometries";
 import installersRouter from "../routes/installers";
 import keycloakRouter from "../routes/keycloak";
+import layersRouter from "../routes/layers";
 import logsRouter from "../routes/logs";
 import main from "../routes/main";
 import picturesRouter from "../routes/pictures";
@@ -48,6 +49,7 @@ export function registerApplicationRoutes(app: Express, auth2Router: Router) {
   app.use("/api/timeslider", requireSessionAuth, timesliderRouter);
   app.use("/api/arcgis", requireSessionAuth, arcgisRouter);
   app.use("/api/pictures", picturesRouter);
+  app.use("/api/layers", layersRouter);
   app.use("/uploads", requirePassword, express.static(uploadsDir));
   app.use("/api/upload-report", requireSessionAuth, reportUploadRouter);
   app.use("/api/file-download", fileDownloadRouter);
