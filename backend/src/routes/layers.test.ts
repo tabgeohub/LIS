@@ -23,7 +23,25 @@ const nn = fixture("Artikel20_2017.tpkx", "NN", "NN package");
 const mn = fixture("Natura2000_MN.tpkx", "MN", "MN package");
 const catalog = JSON.stringify({ layers: [nn.entry, mn.entry] });
 
+async function assertLayerError(response: Response, status: number, code: string, message: string) {
+  assert.equal(response.status, status);
+  const requestId = response.headers.get("x-lis-request-id");
+  assert(requestId);
+  assert.match(requestId, /^[0-9a-f-]{36}$/);
+  assert.deepEqual(await response.json(), { message, code, request_id: requestId });
+  return requestId;
+}
+
 test("layers catalog API", async (t) => {
+  const logger = t.mock.method(console, "error", () => {});
+  function assertLogged(requestId: string, operation: string, code: string, cause?: string) {
+    const log = logger.mock.calls.find(({ arguments: [prefix, fields] }) =>
+      prefix === "[layers]" && fields?.request_id === requestId
+    );
+    assert(log);
+    assert.deepEqual(log.arguments[1], { request_id: requestId, operation, code, cause_code: cause });
+  }
+
   const originalSharePath = process.env.LIS_SHARE_PATH;
   const sharePath = await mkdtemp(path.join(os.tmpdir(), "lis-layers-"));
   t.after(async () => {
@@ -82,12 +100,11 @@ test("layers catalog API", async (t) => {
     fetch(`${baseUrl}/api/layers/${url}`, { headers: as ? { cookie: as } : {} });
 
   await t.test("requires a LIS session", async () => {
-    const response = await fetch(catalogUrl);
-    assert.equal(response.status, 401);
-    assert.deepEqual(await response.json(), { message: "Authentication required" });
+    const response = await fetch(catalogUrl, { headers: { "x-lis-request-id": "caller-supplied" } });
+    const catalogRequestId = await assertLayerError(response, 401, "LAYER_AUTH_REQUIRED", "Authentication required");
     const download = await getPackage(nn.entry.url);
-    assert.equal(download.status, 401);
-    await download.json();
+    const downloadRequestId = await assertLayerError(download, 401, "LAYER_AUTH_REQUIRED", "Authentication required");
+    assert.notEqual(catalogRequestId, downloadRequestId);
   });
 
   await t.test("filters the catalog by the session region and gives admins every region", async () => {
@@ -96,12 +113,12 @@ test("layers catalog API", async (t) => {
     assert.match(response.headers.get("content-type") ?? "", /^application\/json(?:;|$)/);
     assert.equal(response.headers.get("cache-control"), "private, no-store");
     assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.match(response.headers.get("x-lis-request-id") ?? "", /^[0-9a-f-]{36}$/);
     assert.deepEqual(await response.json(), { layers: [nn.entry] });
     assert.deepEqual(await (await getCatalog(mnCookie)).json(), { layers: [mn.entry] });
     assert.deepEqual(await (await getCatalog(adminCookie)).json(), { layers: [nn.entry, mn.entry] });
     const denied = await getCatalog(otherCookie);
-    assert.equal(denied.status, 403);
-    await denied.json();
+    await assertLayerError(denied, 403, "LAYER_ACCESS_DENIED", "A LIS region or admin role is required.");
   });
 
   await t.test("streams the authorized package version and denies out-of-region direct requests", async () => {
@@ -113,11 +130,9 @@ test("layers catalog API", async (t) => {
       assert.deepEqual(Buffer.from(await response.arrayBuffer()), pkg.bytes);
     }
     const denied = await getPackage(mn.entry.url, cookie);
-    assert.equal(denied.status, 404);
-    await denied.json();
+    await assertLayerError(denied, 404, "LAYER_PACKAGE_NOT_FOUND", "Layer package not found.");
     const noRole = await getPackage(nn.entry.url, otherCookie);
-    assert.equal(noRole.status, 403);
-    await noRole.json();
+    await assertLayerError(noRole, 403, "LAYER_ACCESS_DENIED", "A LIS region or admin role is required.");
   });
 
   await t.test("rejects unlisted versions, symlinked package paths, and an incompatible catalog", async () => {
@@ -126,24 +141,22 @@ test("layers catalog API", async (t) => {
     await mkdir(retainedPath);
     await writeFile(path.join(retainedPath, retained.entry.name), retained.bytes);
     const old = await getPackage(retained.entry.url, adminCookie);
-    assert.equal(old.status, 404);
-    await old.json();
+    await assertLayerError(old, 404, "LAYER_PACKAGE_NOT_FOUND", "Layer package not found.");
 
     const versionPath = path.join(layersPath, "layers_tpkx", nn.entry.sha256);
     const movedPath = `${versionPath}-moved`;
     await rename(versionPath, movedPath);
     await symlink(movedPath, versionPath, process.platform === "win32" ? "junction" : "dir");
     const linked = await getPackage(nn.entry.url, cookie);
-    assert.equal(linked.status, 404);
-    await linked.json();
+    const missingId = await assertLayerError(linked, 404, "LAYER_PACKAGE_MISSING", "A published layer package is missing.");
+    assertLogged(missingId, "open_package", "LAYER_PACKAGE_MISSING");
 
     await writeFile(catalogPath, JSON.stringify([nn.entry]));
     const invalid = await getCatalog(adminCookie);
-    assert.equal(invalid.status, 503);
-    await invalid.json();
+    const invalidId = await assertLayerError(invalid, 503, "LAYER_CATALOG_INVALID", "Layer catalog is invalid.");
+    assertLogged(invalidId, "validate_catalog", "LAYER_CATALOG_INVALID");
     const invalidPackage = await getPackage(mn.entry.url, adminCookie);
-    assert.equal(invalidPackage.status, 503);
-    await invalidPackage.json();
+    await assertLayerError(invalidPackage, 503, "LAYER_CATALOG_INVALID", "Layer catalog is invalid.");
     await writeFile(catalogPath, catalog);
   });
 
@@ -156,13 +169,12 @@ test("layers catalog API", async (t) => {
   await t.test("returns 404 for a missing catalog or symbolic link", async () => {
     await rm(catalogPath);
     const missing = await getCatalog();
-    assert.equal(missing.status, 404);
-    assert.deepEqual(await missing.json(), { message: "Layer catalog not found." });
+    const missingId = await assertLayerError(missing, 404, "LAYER_CATALOG_NOT_FOUND", "Layer catalog not found.");
+    assertLogged(missingId, "read_catalog", "LAYER_CATALOG_NOT_FOUND");
 
     await symlink(sharePath, catalogPath, process.platform === "win32" ? "junction" : "dir");
     const linked = await getCatalog();
-    assert.equal(linked.status, 404);
-    assert.deepEqual(await linked.json(), { message: "Layer catalog not found." });
+    await assertLayerError(linked, 404, "LAYER_CATALOG_NOT_FOUND", "Layer catalog not found.");
     await rm(catalogPath, { recursive: true });
   });
 
@@ -171,12 +183,11 @@ test("layers catalog API", async (t) => {
     await writeFile(catalogPath, catalog);
     await rename(layersPath, movedLayersPath);
     const missing = await getCatalog();
-    assert.equal(missing.status, 503);
-    assert.deepEqual(await missing.json(), { message: "Layer storage is unavailable." });
+    const unavailableId = await assertLayerError(missing, 503, "LAYER_STORAGE_UNAVAILABLE", "Layer storage is unavailable.");
+    assertLogged(unavailableId, "check_directory", "LAYER_STORAGE_UNAVAILABLE", "ENOENT");
 
     await symlink(movedLayersPath, layersPath, process.platform === "win32" ? "junction" : "dir");
     const linked = await getCatalog();
-    assert.equal(linked.status, 503);
-    assert.deepEqual(await linked.json(), { message: "Layer storage is unavailable." });
+    await assertLayerError(linked, 503, "LAYER_STORAGE_UNAVAILABLE", "Layer storage is unavailable.");
   });
 });
